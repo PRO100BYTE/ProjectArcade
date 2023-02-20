@@ -20,4 +20,4 @@ Dependencies
 - Visual C++ 2015, 2017 and 2019 redistributable packages (32-bit versions)
 - Visual C++ 2015, 2017 and 2019 redistributable packages (64-bit versions)
 - DirectX
-- Platform .NET Framework
+- .NET Framework
