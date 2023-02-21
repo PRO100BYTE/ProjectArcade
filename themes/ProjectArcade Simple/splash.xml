@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+<formatVersion>7</formatVersion>
+<include subset="colorset" name="Blue" displayName="${blue}">./_inc/colors/blue.xml</include>
+<view name="splash">
+<splash name="splash">
+<backgroundColor>161616</backgroundColor>
+</splash>
+
+<image name="background">
+<path>./_inc/images/splash.jpg</path>
+</image>
+
+<image name="progressbar">
+<origin>0 0</origin>
+<pos>0.2005208333333333 0.9</pos>
+<size>0.5989583333333333 0.0092592592592593</size>
+<path>./_inc/images/progressbar.png</path>
+<color>FFFFFF</color>
+<roundCorners>0</roundCorners>
+<zIndex>6</zIndex>
+</image>
+
+<image name="progressbar:active">
+<tile>true</tile>
+<path>./_inc/images/progressbar.png</path>
+<color>${baseColor}</color>
+<colorEnd>${gradientEndColor}</colorEnd>
+<gradientType>horizontal</gradientType>
+<zIndex>7</zIndex>
+</image>
+
+<text name="label">
+<color>FFFFFFFF</color>
+<fontPath>./_inc/fonts/montserrat.ttf</fontPath>
+<color>d9d9d9</color>
+<fontSize>0.028</fontSize>
+<glowColor>000000</glowColor>
+<glowSize>0</glowSize>
+</text>
+</view>
+</theme>

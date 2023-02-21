@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+Theme: No Flash
+Author: Mr. Overlay
+-->
+<theme>
+<formatVersion>7</formatVersion>
+<view name="screen">
+
+<!-- Hidden Elements -->
+<text name="clock">
+<pos>1.0 1.0</pos>
+</text>
+
+<controllerActivity name="controllerActivity">
+<pos>1.0 1.0</pos>
+</controllerActivity>
+</view>
+
+
+
+<!-- Pop Up Menu -->
+
+<view name="menu">
+<menuText name="menutitle">
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+<fontSize>0.044</fontSize>
+<color>ffffff</color>
+</menuText>
+
+<menuText name="menufooter">
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+<fontSize>0.02</fontSize>
+</menuText>
+<menuText name="menutext">
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+<fontSize>0.025</fontSize>
+<color>A6C6D1</color>
+<selectorColor>0F85A5</selectorColor>
+<selectorColorEnd>0F6585</selectorColorEnd>
+<selectedColor>ffffff</selectedColor>
+<separatorColor>0C3F53</separatorColor>
+</menuText>
+
+<menuTextSmall name="menutextsmall">
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+<fontSize>0.02</fontSize>
+</menuTextSmall>
+<menuBackground name="menubg">
+<color>333333</color>
+<cornerSize>52 52</cornerSize>
+<path>./assets/frame.png</path>
+</menuBackground>
+</view>
+
+<view name="system">
+<image name="staticBackground">
+<size>1 1</size>
+<pos>0 0</pos>
+<origin>0 0</origin>
+<tile>false</tile>
+<linearSmooth>true</linearSmooth>
+<path>./assets/projectarcade-bg.jpg</path>
+<zIndex>0</zIndex>
+</image>
+
+
+
+
+<!-- Hidden Help Menu -->
+<helpsystem name="help">
+<pos>1.0 1.0</pos>
+</helpsystem>
+
+
+<!-- Logos -->
+<image name="logo">
+<path>./art/${system.theme}.svg</path>
+<path>./art/${system.theme}.png</path>
+</image>
+
+<text name="logoText">
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+<fontSize>0.092</fontSize>
+<color>FFFFFFFF</color>
+</text>
+</view>
+
+<view name="detailed">
+
+<!-- Help in Game Menu -->
+<helpsystem name="help">
+<size>1.0 0.1</size>
+<pos>0.02 0.93</pos>
+</helpsystem>
+
+
+
+<image name="background" extra="true">
+<size>1 1</size>
+<pos>0 0</pos>
+<origin>0 0</origin>
+<path>./assets/projectarcade.jpg</path>
+<zIndex>0</zIndex>
+<color>CCCCCC</color>
+</image>
+
+<image name="backgroundx" extra="true">
+<size>1 1</size>
+<pos>0 0</pos>
+<origin>0 0</origin>
+<path>./assets/gamelist.png</path>
+</image>
+
+<image name="console" extra="true">
+<pos>0.5 0.04</pos>
+<origin>0.5 0.0</origin>
+<maxSize>0.34 0.08</maxSize>
+<path>./art/${system.theme}.svg</path>
+<path>./art/${system.theme}.png</path>
+<zIndex>150</zIndex>
+</image>
+
+<image name="md_thumbnail">
+<visible>false</visible>
+<origin>0.5 0.5</origin>
+<pos>0.5 0.5</pos>
+<minSize>1.25 1.25</minSize>
+<color>FFFFFF0A</color>
+</image>
+<video name="md_video">
+<origin>0.5 0.5</origin>
+<pos>0.776 0.388</pos>
+<maxSize>0.347 0.46</maxSize>
+<delay>0.7</delay>
+<showSnapshotNoVideo>true</showSnapshotNoVideo>
+<showSnapshotDelay>true</showSnapshotDelay>
+<snapshotSource>image</snapshotSource>
+</video>
+
+<text name="md_description">
+<pos>0.605 0.685</pos>
+<size>0.347 0.183</size>
+<color>ffffff</color>
+<fontSize>0.021</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+<image name="logo">
+<pos>1 1</pos>
+<color>00000000</color>
+<path>./assets/box.png</path>
+</image>
+</view>
+
+  <view name="detailed">
+  <textlist name="gamelist">
+  <selectorColor>0f85a5</selectorColor>
+  <selectorColorEnd>0F6585</selectorColorEnd>
+  <selectedColor>ffffff</selectedColor>
+  <primaryColor>ffffff</primaryColor>
+  <secondaryColor>ffffff</secondaryColor>
+  <fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+  <fontSize>0.022</fontSize>
+  <pos>0.051 0.170</pos>
+  <size>0.21 0.70</size>
+  <alignment>left</alignment>
+  <horizontalMargin>0.01</horizontalMargin>
+  <origin>0 0</origin>
+  <lineSpacing>2.1</lineSpacing>
+  <selectorImagePath>./assets/box.png</selectorImagePath>
+  <selectorOffsetY>-0.01</selectorOffsetY>
+  <selectorHeight>0.052</selectorHeight>
+  </textlist>
+
+<!--Info Card-->
+<image name="md_marquee">
+<pos>0.43 0.225</pos>
+<maxSize>0.26 0.1</maxSize>
+<origin>0.5 0.5</origin>
+</image>
+
+<text name="md_lbl_releasedate">
+<pos>0.3 0.28</pos>
+<size>0.125 0.10</size>
+<alignment>right</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+
+<datetime name="md_releasedate">
+<pos>0.425 0.28</pos>
+<size>0.125 0.10</size>
+<alignment>left</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</datetime>
+
+<text name="md_lbl_developer">
+<pos>0.3 0.34</pos>
+<size>0.125 0.10</size>
+<alignment>right</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+
+<text name="md_developer">
+<pos>0.425 0.34</pos>
+<size>0.125 0.10</size>
+<alignment>left</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+
+<text name="md_lbl_publisher">
+<pos>0.3 0.40</pos>
+<size>0.125 0.10</size>
+<alignment>right</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+
+<text name="md_publisher">
+<pos>0.425 0.40</pos>
+<size>0.125 0.10</size>
+<alignment>left</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+
+<text name="md_lbl_genre">
+<pos>0.3 0.46</pos>
+<size>0.125 0.10</size>
+<alignment>right</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+
+<text name="md_genre">
+<pos>0.425 0.46</pos>
+<size>0.125 0.10</size>
+<alignment>left</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+
+<text name="md_lbl_players">
+<pos>0.3 0.52</pos>
+<size>0.125 0.10</size>
+<alignment>right</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+
+<text name="md_players">
+<pos>0.425 0.52</pos>
+<size>0.125 0.10</size>
+<alignment>left</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+
+<text name="md_lbl_lastplayed">
+<pos>0.3 0.58</pos>
+<size>0.125 0.10</size>
+<alignment>right</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+
+<datetime name="md_lastplayed">
+<pos>0.425 0.58</pos>
+<size>0.125 0.10</size>
+<alignment>left</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</datetime>
+
+<text name="md_lbl_playcount">
+<pos>0.3 0.64</pos>
+<size>0.125 0.10</size>
+<alignment>right</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+
+<text name="md_playcount">
+<pos>0.425 0.64</pos>
+<size>0.125 0.10</size>
+<alignment>left</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+
+<text name="md_lbl_gametime">
+<pos>0.3 0.70</pos>
+<size>0.125 0.10</size>
+<alignment>right</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+
+<text name="md_gametime">
+<pos>0.425 0.70</pos>
+<size>0.125 0.10</size>
+<alignment>left</alignment>
+<color>ffffff</color>
+<fontSize>0.022</fontSize>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+</text>
+
+<text name="md_lbl_rating">
+<visible>false</visible>
+</text>
+
+<rating name="md_rating">
+<pos>0.36 0.79</pos>
+<alignment>center</alignment>
+<color>ffffff</color>
+<maxsize>0.15 0.10</maxsize>
+<filledPath>./art/rating_filled.svg</filledPath>
+<unfilledPath>./art/rating_unfilled.svg</unfilledPath>
+</rating>	
+</view>
+
+
+<!-- System -->
+<view name="system">
+<carousel name="systemcarousel">
+<type>horizontal</type>
+<pos>0 0.2</pos>
+<size>1 0.3925</size>
+<origin>0 0</origin>
+<color>00000000</color>
+<logoScale>1</logoScale>
+<logoSize>0.25 0.155</logoSize>
+<logoPos>-1 0</logoPos>
+</carousel>
+
+<text name="systemInfo">
+<pos>0 0.83</pos>
+<size>1 0.25</size>
+<backgroundColor>00000000</backgroundColor>
+<color>ffffff</color>
+<fontPath>./assets/fonts/Montserrat-SemiBold.ttf</fontPath>
+<fontSize>0.03</fontSize>
+</text>
+</view>
+</theme>
