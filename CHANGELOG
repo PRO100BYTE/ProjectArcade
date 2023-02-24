@@ -21,7 +21,7 @@ ProjectArcade 1.4
 - Adding a built-in Kodi media player
 
 ProjectArcade 1.5.1
-- Redesigned configs for PS1 and PS2 emulators
+- Modified configs for PS1 and PS2 emulators
 - Minor bug fixes
 
 ProjectArcade 1.5.2
@@ -29,9 +29,14 @@ ProjectArcade 1.5.2
 
 ProjectArcade 1.5.3
 - Minor bug fixes
-- Modified the standard ProjectArcade theme
+- Redesigned the standard ProjectArcade theme
 - Added a new theme: ProjectArcade Simple
 - Added new platforms and emulators
+
+ProjectArcade 1.5.4
+- Minor bug fixes
+- Built-in Ludo - libretro frontend
+- New boot animations
 
 ---- RU ----
 
@@ -56,7 +61,7 @@ ProjectArcade 1.4
 - Добавление встроенного медиаплеера Kodi
 
 ProjectArcade 1.5.1
-- Переработаны конфиги для эмуляторов PS1 и PS2
+- Доработаны конфиги для эмуляторов PS1 и PS2
 - Небольшие исправления багов
 
 ProjectArcade 1.5.2
@@ -64,7 +69,11 @@ ProjectArcade 1.5.2
 
 ProjectArcade 1.5.3
 - Небольшие исправления багов
-- Доработана стандартная тема ProjectArcade
+- Переработана стандартная тема ProjectArcade
 - Добавлена новая тема: ProjectArcade Simple
 - Добавлены новые платформы и эмуляторы
 
+ProjectArcade 1.5.4
+- Небольшие исправления багов
+- Встроенный Ludo - libretro фронтенд
+- Новые загрузочные анимации
