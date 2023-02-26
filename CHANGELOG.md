@@ -1,4 +1,12 @@
-﻿**ProjectArcade 1.0**
+﻿<h1 align="left">
+  <br>
+  <a href="https://projects.thedayg0ne.ru/"><img src="https://raw.githubusercontent.com/TheDayG0ne/ProjectArcade/master/resources/images/projectarcade-github.png" alt="ProjectArcade" width="500"></a>
+</h1>
+
+
+## ProjectArcade Changelog
+
+**ProjectArcade 1.0**
 - The first version of the shell
 
 **ProjectArcade 1.1**
