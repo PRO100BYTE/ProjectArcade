@@ -13,6 +13,7 @@ You can get detailed information here: https://www.gnu.org/licenses.
 With it you will be able to quickly run games from many compatible ROM collections. This saves hours of configuration and installation time, leaving you free to play your favourite retro games.
 
 ProjectArcade thanks to RetroBat developments automatically downloads and installs all the relevant software needed to have the best retro gaming experience on your Windows PC.
+
 ProjectArcade can also run in Portable Mode. This means you can play games from an external hard drive or from any removable storage device, as long as the computer meets the minimum requirements.
 
 ## 💻 System Requirements
@@ -21,7 +22,7 @@ ProjectArcade can also run in Portable Mode. This means you can play games from 
 |---|---|
 |**Processor:**|CPU with SSE2 support. Two or more cores, 3GHz or faster, 2008 or later. Intel Core i3 / Core i5 / Core i7 / Core i9 recommended, AMD Ryzen also recommended|
 |**Graphics:**|Modern, with Direct3D 11.1 / OpenGL 4.4 / Vulkan support|
-|**Dependencies:**|[Visual C++ 2005-2022 Redistributable Packages (32 and 64 bit)](https://dl.thedayg0ne.ru/VCRHyb_x86-x64)|
+|**Dependencies:**|[Visual C++ 2005-2022 Redistributable Packages (32 and 64 bit)](https://dl.thedayg0ne.ru/VCRHyb_x86-x64.exe)|
 |   |[DirectX](https://www.microsoft.com/download/details.aspx?id=35)|
 |   |[.NET Framework 6.0 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.14-windows-x64-installer)|
 |   |[.NET Framework 7.0 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-7.0.3-windows-x64-installer)|
