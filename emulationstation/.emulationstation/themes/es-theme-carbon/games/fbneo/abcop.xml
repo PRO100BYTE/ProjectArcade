@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <!-- Sample per-game customisation
+  <view name="detailed">
+    <image name="pergame1" extra="true">
+      <tile>false</tile>
+      <minSize>0.55 0.85</minSize>
+      <pos>0.5 0.5</pos>
+      <origin>0.5 0.5</origin>
+      <path>./abcop-thumb.png</path>
+      <color>FFFFFF92</color>
+      <zIndex>25</zIndex>
+    </image>
+  </view>
+  -->
+</theme>

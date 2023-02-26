@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Theme: es-theme-carbon
+author: Fabrice CARUSO
+license: creative commons CC-BY-NC-SA
+originally based on: "Carbon" by Eric Hettervik (Rookervik)
+originally based on: "simple" by nils bonenberger
+-->
+<theme defaultView="Icons">
+  <formatVersion>7</formatVersion>
+  <view name="system">
+    <image name="background" extra="static">
+      <tile>false</tile>
+      <size>1 1</size>
+      <pos>0 0</pos>
+      <origin>0 0</origin>
+      <path>./../art/bg.png</path>
+      <color>${backgroundColor}</color>
+      <zIndex>10</zIndex>
+      <scale>1.10</scale>
+    </image>
+
+    <text name="logoText">
+      <fontPath>./../art/fonts/Cabin-Bold.ttf</fontPath>
+      <fontSize>0.06</fontSize>
+      <color>FFFFFFFF</color>
+      <glowColor>00000010</glowColor>
+      <glowSize>3</glowSize>
+      <forceUppercase>false</forceUppercase>    
+    </text>
+    
+    <image name="logo">
+      <!-- try png -->
+      <path>./../art/logos/${system.theme}.png</path>
+      <!-- try svg -->
+      <path>./../art/logos/${system.theme}.svg</path>
+      <!-- check if lang resources exist -->
+      <path>./../art/logos/${system.theme}-${lang}.png</path>
+      <path>./../art/logos/${system.theme}-${lang}.svg</path>
+      <linearSmooth>true</linearSmooth>
+    </image>
+    
+    <image name="logo" region="eu"></image>
+		<image name="logo" region="us">
+		  <path>./../art/logos/us/${system.theme}.png</path>
+			<path>./../art/logos/us/${system.theme}.svg</path>
+		</image>
+		
+		<image name="logo" region="jp">
+		  <path>./../art/logos/jp/${system.theme}.png</path>
+			<path>./../art/logos/jp/${system.theme}.svg</path>
+		</image>
+		    
+    <image name="BottomBar" extra="static">
+      <tile>false</tile>
+      <size>1 0.065</size>
+      <pos>0 1</pos>
+      <origin>0 1</origin>
+      <path>./../art/bottom.png</path>
+      <color>${bottomBarColor}</color>
+      <zIndex>50</zIndex>
+    </image>
+    <image name="ControllerOverlay" extra="true">
+      <tile>false</tile>
+      <pos>0.5 0.19</pos>
+      <origin>0.5 0.5</origin>
+      <maxSize>0.3 0.3</maxSize>
+      <path>./../art/controllers/default.svg</path>
+      <path>./../art/controllers/${system.theme}.svg</path>
+      <color>${baseColor}</color>
+      <zIndex>19</zIndex>
+      <linearSmooth>true</linearSmooth>
+    </image>
+  </view>
+    
+  <feature supported="manufacturer">
+    <view name="system">
+      <text name="manufacturerName" extra="static">
+        <text>${system.sortedBy}</text>
+        <alignment>left</alignment>
+        <verticalAlignment>top</verticalAlignment>
+        <fontPath>./../art/fonts/Cabin-Regular.ttf</fontPath>
+        <fontSize>0.060</fontSize>
+        <pos>0.029 0.037</pos>
+        <size>0.942 0.28</size>
+        <color>C0C0C0</color>      
+        <zIndex>100</zIndex>
+        <color>D0D0D0FF</color>
+        <glowColor>00000080</glowColor>
+        <glowSize>1</glowSize>
+
+        <fontSize tinyScreen="true">0.065</fontSize>
+        <glowSize tinyScreen="true">1</glowSize>
+      </text>
+      <text name="fullName" extra="true">
+        <text>${system.fullName}</text>
+        <alignment>left</alignment>
+        <verticalAlignment>top</verticalAlignment>
+        <fontPath>./../art/fonts/Cabin-Regular.ttf</fontPath>
+        <fontSize>0.024</fontSize>
+        <pos>0.03 0.12</pos>
+        <pos verticalScreen="true">0.03 0.10</pos>         
+        <size>0.94 0.28</size>
+        <zIndex>100</zIndex>
+        <color>D0D0D0FF</color>
+        <glowColor>000000A0</glowColor>
+        <glowSize>1</glowSize>
+        
+        <pos tinyScreen="true">0.03 0.13</pos>
+        <glowColor tinyScreen="true">00000040</glowColor>
+        <fontSize tinyScreen="true">0.035</fontSize>
+      </text>
+      <text name="releaseYyear" extra="true">
+        <text>${system.releaseYearOrNull}</text>
+        <alignment>left</alignment>
+        <verticalAlignment>top</verticalAlignment>
+        <fontPath>./../art/fonts/Cabin-Regular.ttf</fontPath>
+        <fontSize>0.024</fontSize>
+        <pos>0.03 0.157</pos>
+        <pos verticalScreen="true">0.03 0.127</pos>         
+        <size>0.94 0.28</size>        
+        <zIndex>100</zIndex>
+        <color>D0D0D0FF</color>
+        <glowColor>000000A0</glowColor>
+        <glowSize>1</glowSize>
+                
+        <pos tinyScreen="true">0.03 0.19</pos>
+        <glowColor tinyScreen="true">00000040</glowColor>
+        <fontSize tinyScreen="true">0.035</fontSize>
+      </text> 
+    </view>
+  </feature>
+  
+</theme>

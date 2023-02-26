@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+
+	<view name="grid,detailed,gamecarousel">
+
+		<image name="iconsBk" extra="true" ifHelpPrompts="true" onclick="gameoptions">
+			<path>./../art/filter.png</path>
+			<color>00000080</color>
+			<colorEnd>000000ff</colorEnd>
+			<gradientType>horizontal</gradientType>
+			<origin>0 0</origin>
+			<pos>0.953 0.16</pos>
+			<size>0.047 0.774</size>
+			<zIndex>12</zIndex>
+		</image>
+
+		<image name="iconsLine" extra="true" ifHelpPrompts="true">
+			<path>./../art/white.png</path>
+			<color>${glowColor}</color>
+			<origin>0 0</origin>
+			<pos>0.95 0.16</pos>
+			<size>0.003 0.775</size>
+			<zIndex>14</zIndex>
+		</image>  
+			    
+		<rating name="md_rating">
+			<origin>0.5 0</origin>
+			<pos>0.976 0.21</pos>
+			<size>0.05 0.03</size>
+			<rotation>-90</rotation> 
+			<color>FFFF00</color>
+			<unfilledColor>808080</unfilledColor>
+			<unfilledPath>:/star_filled.svg</unfilledPath>
+			<horizontalAlignment>right</horizontalAlignment>  
+			<zIndex>15</zIndex>
+		</rating>
+
+		<text name="md_players">
+			<origin>0.5 0.5</origin>
+			<fontPath>./../art/fonts/players.ttf</fontPath>
+			<text>1</text>
+			<size>0.03 0.03</size>
+			<pos>0.976 0.37</pos>
+			<alignment>center</alignment>
+			<fontSize>0.034</fontSize>
+			<color>dddddd</color>
+		</text>
+
+		<image name="md_manual,md_nomanual">
+			<origin>0.5 0.5</origin>
+			<pos>0.976 0.42</pos>
+			<path>./../art/book.png</path>
+			<maxSize>0.02 0.03</maxSize>
+			<color>dddddd</color>
+		</image>
+	
+		<image name="md_nomanual">
+			<color>80808040</color>
+		</image>
+		
+		<image name="md_cheevos,md_notcheevos">
+			<origin>0.5 0.5</origin>
+			<path>./../art/icons/Contest.png</path>
+			<pos>0.976 0.47</pos>
+			<maxSize>0.02 0.03</maxSize>     
+			<color>dddddd</color>
+			<zIndex>100</zIndex>
+		</image>
+    
+		<image name="md_notcheevos">
+			<color>80808040</color>
+		</image> 
+
+    <image name="md_savestate,md_nosavestate">
+      <origin>0.5 0.5</origin>
+      <path>./../art/icons/SaveState.png</path>
+      <pos>0.976 0.52</pos>
+      <y ifCheevos="false">0.47</y>
+      <maxSize>0.02 0.03</maxSize>
+      <color>dddddd</color>
+      <zIndex>150</zIndex>
+    </image>
+    
+    <image name="md_nosavestate">
+      <color>80808030</color>
+    </image>
+
+		<image name="md_kidgame, md_notkidgame"> 
+			<origin>0.5 0.5</origin>
+			<pos>0.976 0.57</pos>
+			<path>./../art/kid.svg</path>
+			<maxSize>0.02 0.03</maxSize>
+			<color>dddddd</color>
+			<zIndex>100</zIndex>
+			<linearSmooth>true</linearSmooth>
+		</image>
+		
+		<image name="md_notkidgame"> 
+			<color>80808000</color>
+		</image>
+
+		<image name="md_hidden">
+			<origin>0.5 0.5</origin>
+			<pos>0.976 0.92</pos>
+			<path>./../art/hidden.svg</path>
+			<maxSize>0.02 0.03</maxSize>
+			<color>ff0000</color>
+			<zIndex>100</zIndex>
+		</image>
+		
+		<datetime name="md_releasedate">
+			<origin>0.5 1</origin>
+			<pos>0.976 0.78</pos>
+			<size>0.1 0.035</size>
+			<format>%Y</format>
+			<color>dddddd</color>
+			<forceUppercase>0</forceUppercase>
+			<fontPath>./../art/fonts/Cabin-Bold.ttf</fontPath>
+			<rotation>-90</rotation>
+			<alignment>left</alignment>
+			<fontSize>0.025</fontSize>
+		</datetime>
+
+		<image name="md_flag">
+			<origin>0.5 0</origin>
+			<pos>0.976 0.88</pos>
+			<maxSize>0.022 0.05</maxSize>
+			<linearSmooth>true</linearSmooth>
+		</image>
+
+	</view>	
+
+<!-- DETAILED -->  	
+	<view name="detailed,gamecarousel"> 
+	
+    <video name="md_video">
+			<pos>0.74 0.39</pos>
+			<maxSize>0.39 0.4</maxSize>
+		</video>
+ 
+		<text name="md_description">
+			<pos>0.55 0.615</pos>
+			<size>0.38 0.25</size>
+		</text> 
+	<!--
+		<image name="developerImage" extra="true">
+			<origin>1 0.5</origin>
+			<pos>0.56 0.64</pos>
+			<path>./../art/icons/copyright.svg</path>
+			<maxSize>0.022 0.022</maxSize>
+			<linearSmooth>true</linearSmooth>
+			<zIndex>100</zIndex>
+		</image>
+	-->
+		<text name="md_developer">
+			<pos>0.55 0.88</pos>
+      <size>0.34 0.035</size>
+		</text> 
+<!--
+		<image name="genreImage" extra="true">
+			<origin>1 0.5</origin>
+			<pos>0.57 0.91</pos>
+			<path>./../art/icons/Games.png</path>
+			<maxSize>0.025 0.04</maxSize>
+			<linearSmooth>true</linearSmooth>
+			<zIndex>100</zIndex>
+		</image>
+	-->
+		<text name="md_genre">
+				<pos>0.55 0.88</pos>
+      <size>0.38 0.035</size>
+			<alignment>right</alignment>
+		</text>
+	<!--
+		<image name="releaseDateImage" extra="true">
+			<visible>false</visible>
+		</image>
+-->
+    <text name="md_lbl_releasedate">
+      <visible>false</visible>
+    </text>
+
+		<text name="md_lbl_players">
+			<visible>false</visible>
+		</text>	
+	
+	</view>
+
+<!--   GRID  -->
+	<view name="grid"> 
+		<imagegrid name="gamegrid">
+			<pos>0.01 0.16</pos>
+			<size>0.935 0.84</size>
+		</imagegrid>
+	</view>
+<!--   CAROUSEL  -->
+	<customView name="Carousel">
+		<imagegrid name="gamegrid">
+			<pos>0 0.16</pos>
+			<size>0.95 0.84</size>
+		</imagegrid>
+	</customView>
+	
+</theme>

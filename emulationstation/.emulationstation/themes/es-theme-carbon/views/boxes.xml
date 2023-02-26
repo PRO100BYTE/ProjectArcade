@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Theme: es-theme-carbon
+author: Fabrice CARUSO
+license: creative commons CC-BY-NC-SA
+originally based on: "Carbon" by Eric Hettervik (Rookervik)
+originally based on: "simple" by nils bonenberger
+-->
+<theme defaultView="Icons">
+  <formatVersion>7</formatVersion>
+  <customView name="Boxes" inherits="grid" displayName="${basicGridName}">
+    <imagegrid name="gamegrid">
+      <autoLayout>6 2</autoLayout>
+      <autoLayout verticalScreen="true">2 2</autoLayout>
+      <autoLayoutSelectedZoom>1.08</autoLayoutSelectedZoom>
+    </imagegrid>
+    <text name="gridtile">
+      <visible>false</visible>
+    </text>
+    <text name="gridtile:selected">
+      <visible>false</visible>
+    </text>
+    <image name="gridtile.favorite">
+      <path>./art/favorite.png</path>
+      <pos>0.91 0.09</pos>
+      <maxSize>0.14 0.14</maxSize>
+      <origin>0.5 0.5</origin>
+      <horizontalAlignment>right</horizontalAlignment>
+      <color>FFFF00B0</color>
+    </image>
+  </customView>
+</theme>

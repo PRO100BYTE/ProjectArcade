@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <!-- Spanish -->
+  <variables lang="es">
+    <tilesViewName>Viñetas</tilesViewName>
+    <iconsViewName>Iconos</iconsViewName>
+    <basicGridName>Cuadrícula</basicGridName>
+    <carouselViewName>Carrusel de cuadrículas</carouselViewName>
+    <gameCarouselViewName>Carrusel de juegos</gameCarouselViewName>
+    <blue>Azul</blue>
+    <red>Rojo</red>
+    <green>Verde</green>
+    <cyan>cian</cyan>
+    <yellow>Amarillo</yellow>
+    <violet>Violeta</violet>
+    <orange>Naranja</orange>
+    <gray>Gris</gray>
+    <none>Ninguno</none>
+    <roundBorderSubsetName>Bordes redondeados</roundBorderSubsetName>
+    <blinkBorderSubsetName>Bordes parpadeantes</blinkBorderSubsetName>
+    <yes>Si</yes>
+    <no>No</no>
+    <marquee>marquesina</marquee>
+    <image>imagen</image>
+    <text>texto</text>
+    <thumbnail>miniatura</thumbnail>
+    <systemBackgroundName>Fondo</systemBackgroundName>
+    <systemViewName>Visualización de sistema</systemViewName>
+    <systemview.darkened>oscurecido</systemview.darkened>
+    <systemview.horizontal>horizontal</systemview.horizontal>
+    <systemview.legacy>antiguo</systemview.legacy>
+    <systemview.transparent>transparente</systemview.transparent>
+    <systemview.simple>simple</systemview.simple>
+    <systemview.vertical>vertical</systemview.vertical>
+    <systemview.wheel>rueda</systemview.wheel>
+    <previewBarSubsetName>Panel de visualización</previewBarSubsetName>
+    <videoboxesSubsetName>Mostrar vídeo en modo caja</videoboxesSubsetName>
+    <zoomboxesSubsetName>Ampliar cajas</zoomboxesSubsetName>
+    <orientationSubsetName>Orientación</orientationSubsetName>
+    <videosSubsetName>Vídeos</videosSubsetName>
+    <logosSubsetName>Logotipos</logosSubsetName>
+    <hideselectionSubsetName>Ocultar la selección</hideselectionSubsetName>
+    <optimizesmallscreensSubsetName>Optimizar para pantallas pequeñas</optimizesmallscreensSubsetName>
+    <animationsSubsetName>Animaciones de transición</animationsSubsetName>
+    <helpSubsetName>Iconos de ayuda</helpSubsetName>
+    <colored>Coloreados</colored>
+    <subset.colorset>Esquema de colores</subset.colorset>
+    <subset.shader>Efectos TV</subset.shader>
+    <glowSubsetName>Selección con halo</glowSubsetName>
+    <systemViewExInfos>Información de sistemas detallada</systemViewExInfos>
+    <dateFormat>%d/%m/%Y</dateFormat>
+    <helpbuttons>Posición de los botones</helpbuttons>
+    <xboxbuttons>Botones Xbox</xboxbuttons>
+    <psxbuttons>Botones Playstation</psxbuttons>
+    <gamecarouseltype>Tipo imagen para el carrusel</gamecarouseltype>
+    <gameBar>Barra de información de los juegos</gameBar>
+    <scanlines>Líneas de escaneo</scanlines>
+    <crt>Tubo rayos catódicos</crt>
+    <systembackground.miniconsole>Mini consolas</systembackground.miniconsole>
+    <systembackground.consoles>Consolas</systembackground.consoles>
+    <systembackground.carboncontrollers>Controles carbon</systembackground.carboncontrollers>
+    <systembackground.carbonlegacy>Controles antiguos</systembackground.carbonlegacy>
+    <systembackground.simple>Simple</systembackground.simple>
+    <systembackground.randomvideo>Vídeo aleatorio</systembackground.randomvideo>
+    <systembackground.randomfanart>Ilustración aleatoria</systembackground.randomfanart>
+    <systembackground.randomimage>Imagen aleatoria</systembackground.randomimage>
+    <systembackground.randombox>Caja aleatoria</systembackground.randombox>
+    <systembackground.minirandomimage>Imagen pequeña aleatoria</systembackground.minirandomimage>
+    <systembackground.minirandombox>Caja pequeña aleatoria</systembackground.minirandombox>
+    <systembackground.minirandomvideo>Vídeo pequeño aleatorio</systembackground.minirandomvideo>
+  </variables>
+</theme>

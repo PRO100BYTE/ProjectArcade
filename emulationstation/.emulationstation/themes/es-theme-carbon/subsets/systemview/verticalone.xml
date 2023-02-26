@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <include>./vertical.xml</include>
+  <feature supported="manufacturer">
+    <view name="system">
+      <text name="manufacturerName" extra="static">
+        <pos>0.029 0.067</pos>
+        <alignment>right</alignment>
+      </text>
+      <text name="fullName" extra="true">
+        <pos>0.03 0.15</pos>
+        <alignment>right</alignment>
+      </text>
+      <text name="releaseYyear" extra="true">
+       <pos>0.03 0.187</pos>
+        <alignment>right</alignment>
+      </text>
+    </view>
+  </feature>
+  <view name="system">
+    <carousel name="systemcarousel"><maxLogoCount>1</maxLogoCount><type>horizontal</type><defaultTransition>slide</defaultTransition><pos>0.04 -0.5</pos><size>0.34 1.435</size><color>00000000</color><colorEnd>00000000</colorEnd>--&gt;
+    </carousel>
+    <text name="systemInfo">
+      <pos>0.04 0.67</pos>
+      <size>0.92 0.25</size>
+    </text>
+    <image name="CenterFade" extra="true">
+      <tile>false</tile>
+      <pos>0.5 0</pos>
+      <size>1 0.2</size>
+      <origin>0.5 0.5</origin>
+      <path>./../../art/centerfade.png</path>
+      <color>${centerFadeColor}</color>
+      <visible>true</visible>
+    </image>
+    <image name="CenterFade2" extra="true">
+      <tile>false</tile>
+      <pos>0.5 1</pos>
+      <size>1 0.25</size>
+      <origin>0.5 0.5</origin>
+      <path>./../../art/centerfade.png</path>
+      <color>${centerFadeColor}</color>
+      <visible>true</visible>
+    </image>
+  </view>
+</theme>

@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Theme: es-theme-carbon
+author: Fabrice CARUSO
+license: creative commons CC-BY-NC-SA
+originally based on: "Carbon" by Eric Hettervik (Rookervik)
+originally based on: "simple" by nils bonenberger
+-->
+<theme>
+  <formatVersion>7</formatVersion>
+  <view name="menu">
+    <menuText name="menutitle">
+      <fontPath>./../art/fonts/Cabin-Bold.ttf</fontPath>
+      <fontSize>0.038</fontSize>
+      <color>FAFAFA</color>
+    </menuText>
+    <menuText name="menufooter">
+      <fontPath>./../art/fonts/Cabin-Regular.ttf</fontPath>
+      <fontSize>0.02</fontSize>
+      <color>777777FF</color>
+    </menuText>
+    <menuText name="menutext">
+      <fontPath>./../art/fonts/Cabin-Regular.ttf</fontPath>
+      <fontSize>0.028</fontSize>
+      <fontSize tinyScreen="true">0.034</fontSize>
+      <color>969696</color>
+      <separatorColor>202020</separatorColor>
+      <selectorColor>${baseColor}</selectorColor>
+      <selectorColorEnd>${gradientEndColor}</selectorColorEnd>
+      <selectedColor>FFFFFF</selectedColor>
+      <selectorGradientType>horizontal</selectorGradientType>
+    </menuText>
+    <menuTextSmall name="menutextsmall">
+      <fontPath>./../art/fonts/Cabin-Regular.ttf</fontPath>
+      <fontSize>0.016</fontSize>
+      <color>${groupColor}</color>
+    </menuTextSmall>
+    <menuGroup name="menugroup">
+      <fontPath>./../art/fonts/Cabin-Bold.ttf</fontPath>
+      <fontSize>0.018</fontSize>
+      <color>${groupColor}</color>
+     <!-- <separatorColor>${groupSeparatorColor}</separatorColor>-->
+      <backgroundColor>00000000</backgroundColor>
+      <lineSpacing>2.5</lineSpacing>
+    </menuGroup>
+    <menuBackground name="menubg">
+      <color>242424</color>
+      <cornerSize>32 32</cornerSize>
+      <path>./../art/frame.png</path>
+      <scrollbarColor>96969620</scrollbarColor>
+      <scrollbarCorner>0.49</scrollbarCorner>
+      <scrollbarSize>0.003</scrollbarSize>
+      <scrollbarAlignment>innerright</scrollbarAlignment>
+    </menuBackground>
+    <menuIcons name="menuicons">
+      <iconKodi>./../art/icons/Kodi.png</iconKodi>
+      <iconSystem>./../art/icons/System.png</iconSystem>
+      <iconUpdates>./../art/icons/Updates.png</iconUpdates>
+      <iconGames>./../art/icons/Games.png</iconGames>
+      <iconControllers>./../art/icons/Controllers.png</iconControllers>
+      <iconUI>./../art/icons/UI.png</iconUI>
+      <iconSound>./../art/icons/Sound.png</iconSound>
+      <iconNetwork>./../art/icons/Network.png</iconNetwork>
+      <iconScraper>./../art/icons/Scraper.png</iconScraper>
+      <iconAdvanced>./../art/icons/Advanced.png</iconAdvanced>
+      <iconQuit>./../art/icons/Quit.png</iconQuit>
+      <iconRestart>./../art/icons/Restart.png</iconRestart>
+      <iconShutdown>./../art/icons/Shutdown.png</iconShutdown>
+      <iconFastShutdown>./../art/icons/Fastshutdown.png</iconFastShutdown>
+      <iconRetroachievements>./../art/icons/Contest.png</iconRetroachievements>
+      <iconManual>./../art/icons/Manual.png</iconManual>
+    </menuIcons>
+    <menuTextEdit name="menutextedit">
+      <inactive>./../art/textinput_ninepatch.png</inactive>
+      <active>./../art/textinput_ninepatch_active.png</active>
+    </menuTextEdit>
+    <menuButton name="menubutton">
+      <path>./../art/button.png</path>
+      <filledPath>./../art/button_filled.png</filledPath>
+      <cornerSize>8 8</cornerSize>
+    </menuButton>
+  </view>
+</theme>
