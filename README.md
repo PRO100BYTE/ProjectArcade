@@ -1,6 +1,6 @@
 <h1 align="left">
   <br>
-  <a href="https://projects.thedayg0ne.ru/"><img src="https://raw.githubusercontent.com/TheDayG0ne/ProjectArcade/master/resources/images/projectarcade-github.svg" alt="ProjectArcade" width="500"></a>
+  <a href="https://projects.thedayg0ne.ru/"><img src="https://raw.githubusercontent.com/TheDayG0ne/ProjectArcade/master/resources/images/projectarcade-github.png" alt="ProjectArcade" width="500"></a>
 </h1>
 
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -25,8 +25,9 @@ ProjectArcade can also run in Portable Mode. This means you can play games from 
 |   |[DirectX](https://www.microsoft.com/download/details.aspx?id=35)|
 |   |[.NET Framework 6.0 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.14-windows-x64-installer)|
 |   |[.NET Framework 7.0 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-7.0.3-windows-x64-installer)|
-**After installing the dependencies, it is recommended to restart the computer**
 |**Controllers:**|Gamepads with XInput support are recommended. You can test your gamepad here: [Gamepad Tester](https://gamepad-tester.com)|
+
+**After installing the dependencies, it is recommended to restart the computer**
 
 ## 🎮 Supported Platforms
 
@@ -56,6 +57,7 @@ build.bat
 ## 💟 Special Thanks
 
 - [RetroBat](https://github.com/kaylh/RetroBat) - For a great project and informative documentation, and so on...
+- [Fabrice Caruso](https://github.com/fabricecaruso) - For the development of EmulatorLauncher
 - [Hel Mic](https://github.com/lehcimcramtrebor/) - For his wonderful themes.
 - [Batocera](https://www.batocera.org/) - For their wonderful retrogaming dedicated Operating System.
 - [Gitbook](https://www.gitbook.com/) - For supporting ProjectArcade and RetroBat project.
