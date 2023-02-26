@@ -80,16 +80,12 @@ ProjectArcade License Agreement
 
 ProjectArcade is a software for 64-bit versions of Windows designed for retro-gaming and running various emulators of gaming systems.
 
-Copyright (c) 2017-2019 Adrien Chalard "Kayl"
-
-Copyright (c) 2020-2023 RetroBat Team
-
-Copyright (c) 2022-2023 #TheDayG0ne
+Copyright (c) 2017-2019 Adrien Chalard "Kayl", (c) 2020-2023 RetroBat Team, (c) 2022-2023 #TheDayG0ne
 
 ProjectArcade is a free open source project based on the Open-Source EmulationStation and RetroBat project. The software was developed by enthusiasts for non-commercial use, namely a fun pastime. All code and configs written by #TheDayG0ne is distributed under the MIT license, and the source code written by RetroBat Team is distributed under the LGPL v3 and CC BY-NC-SA 4.0 license.
 You can get detailed information here: https://www.gnu.org/licenses.
 
-### ProjectArcade MIT License
+### ProjectArcade License (MIT)
 
 Copyright (c) 2023 TheDayG0ne
 
@@ -111,11 +107,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-### RetroBat LGPL v3 License
+### RetroBat License (LGPL v3 & CC BY-NC-SA 4.0)
 
-Copyright (c) 2017-2019 Adrien Chalard "Kayl"
-
-Copyright (c) 2020-2023 RetroBat Team
+Copyright (c) 2017-2019 Adrien Chalard "Kayl", (c) 2020-2023 RetroBat Team
 
 RetroBat is a Windows softwares distribution dedicated to retrogaming and emulation.
 
