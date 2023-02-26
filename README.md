@@ -65,7 +65,7 @@ build.bat
 - [pajarorrojo](https://github.com/pajarorrojo) - For PlayStation-X theme
 - [20GotoTen](https://github.com/20GotoTen) - For Retrofix theme
 
-** And also - many thanks to 🦇 RetroBat Team: **
+## And also - many thanks to 🦇 RetroBat Team:
 
 - Adrien Chalard "Kayl" - creator of the project, developer
 - Lorenzolamas - community management, graphics (former active)
