@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <customView name="Icons" inherits="Tiles" displayName="${iconsViewName}">
+    <imagegrid name="gamegrid">
+      <autoLayout>0 2</autoLayout>
+      <cellProportion>0.99</cellProportion>
+      <cellProportion verticalScreen="true">0.77</cellProportion>
+      <autoLayout verticalScreen="true">2 0</autoLayout>
+      <margin>0.008 0.010</margin>
+    </imagegrid>
+    <text name="gridtile">
+      <fontSize>0.020</fontSize>
+      <size>1 0.18</size>
+      <padding>0 0.01 0 0.1</padding>
+    </text>
+  </customView>
+</theme>

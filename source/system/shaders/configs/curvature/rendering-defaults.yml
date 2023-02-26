@@ -1,0 +1,61 @@
+## CURVATURE
+default:
+  # libretro
+  shader: crt/crt-geom
+  # emulators using reshader 
+  mednafen: GeomCRT@CRTGeom.fx
+  m2emulator: GeomCRT@CRTGeom.fx
+  supermodel: GeomCRT@CRTGeom.fx
+  hypseus: GeomCRT@CRTGeom.fx
+  daphne: GeomCRT@CRTGeom.fx  
+  oricutron: GeomCRT@CRTGeom.fx
+  applewin: GeomCRT@CRTGeom.fx
+  gsplus: GeomCRT@CRTGeom.fx
+  scummvm: GeomCRT@CRTGeom.fx
+  simcoupe: GeomCRT@CRTGeom.fx
+  demul: GeomCRT@CRTGeom.fx
+  bigpemu: GeomCRT@CRTGeom.fx
+  phoenix: GeomCRT@CRTGeom.fx
+# per system overrides  
+gba:
+  shader: handheld/lcd-grid-v2-gba-color
+gb:
+  shader: handheld/gameboy
+gb2players:
+  shader: handheld/gameboy
+gbc:
+  shader: handheld/lcd-grid-v2-gbc-color
+gbc2players:
+  shader: handheld/lcd-grid-v2-gbc-color
+nds:
+  shader: handheld/lcd-grid-v2-nds-color
+3ds:
+  shader: handheld/lcd-shader
+virtualboy:
+  shader: retro/sharp-bilinear-scanlines
+gc:
+  shader: crt/crt-hyllian-3d
+wii:
+  shader: crt/crt-hyllian-3d
+dreamcast:
+  shader: crt/crt-hyllian-3d
+gamegear:
+  shader: crt-guest-dr-venom-fast
+ngp:
+  shader: handheld/zfast-lcd
+ngpc:
+  shader: handheld/zfast-lcd
+vectrex:
+  shader: retro/sharp-bilinear-scanlines
+lynx:
+  shader: crt/crt-guest-dr-venom-fast
+wswan:
+  shader: handheld/zfast-lcd
+wswanc:
+  shader: handheld/zfast-lcd
+psx:
+  shader: crt/crt-hyllian-3d
+ps2:
+  shader: crt/crt-hyllian-3d
+psp:
+  shader: handheld/lcd-grid-v2-psp-color

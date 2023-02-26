@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <view name="system">
+    <carousel name="systemcarousel">
+      <color>FAFAFFA0</color>
+      <colorEnd>FAFAFFB0</colorEnd>
+      <systemInfoDelay>700</systemInfoDelay>
+      <systemInfoCountOnly>false</systemInfoCountOnly>
+      <pos>0 0.3837</pos>
+      <size>1 0.2325</size>
+      <logoSize verticalScreen="true">0.35 0.1</logoSize>
+      <maxLogoCount verticalScreen="true">1</maxLogoCount>
+      <zIndex>20</zIndex>
+    </carousel>
+    <carousel name="systemcarousel" tinyScreen="true">
+      <pos>0 0.35</pos>
+      <size>1 0.60</size>
+      <maxLogoCount>1</maxLogoCount>
+      <logoSize>0.25 0.15</logoSize>
+      <logoScale>2.6</logoScale>
+      <logoPos>-1 0.1</logoPos>
+    </carousel>
+    <image name="carousel-inner" extra="true">
+      <path>./../../art/carousel.png</path>
+      <color>FFFFFFFF</color>
+      <origin>0 0</origin>
+      <pos>0 0.3837</pos>
+      <size>1 0.2325</size>
+      <zIndex>40</zIndex>
+    </image>
+    <text name="systemInfo">
+      <pos>0 0.64</pos>
+      <size>1 0.25</size>
+      <backgroundColor>00000000</backgroundColor>
+      <color>${systemInfoColor}</color>
+      <glowColor>${glowColor}</glowColor>
+      <glowSize>2</glowSize>
+            
+     
+        <glowSize>1</glowSize>
+      
+      <reflexion>0.20 0.0</reflexion>
+      <fontPath>./../../art/fonts/Cabin-Bold.ttf</fontPath>
+      <fontSize>0.027</fontSize>
+      
+     <!-- <pos>0.03 0.32</pos>
+      <size>0.94 0.12</size>
+      <alignment>right</alignment>
+      <verticalAlignment>top</verticalAlignment>
+      <reflexion>0</reflexion>
+      -->
+            
+      <!--
+      <storyboard>
+        <animation property="opacity" from="0" to="1" duration="350" mode="easeOut"/>
+        <animation property="scale" from="0" to="1" duration="350" mode="easeOut"/>                
+      </storyboard>
+    -->
+    </text>
+    <image name="carousel-shadow" extra="true">
+      <path>./../../art/shadow.png</path>
+      <color>FFFFFF40</color>
+      <pos>0 0.6162</pos>
+      <origin>0 0</origin>
+      <size>1 0.025</size>
+      <zIndex>13</zIndex>
+    </image>
+    <image name="CenterFade" extra="true">
+      <tile>false</tile>
+      <size>1 0.5</size>
+      <pos>0.5 0.5</pos>
+      <origin>0.5 0.5</origin>
+      <path>./../../art/centerfade.png</path>
+      <color>${centerFadeColor}</color>
+      <zIndex>12</zIndex>
+    </image>
+  </view>
+</theme>

@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Theme: es-theme-carbon
+author: Fabrice CARUSO
+license: creative commons CC-BY-NC-SA
+originally based on: "Carbon" by Eric Hettervik (Rookervik)
+originally based on: "simple" by nils bonenberger
+-->
+<theme defaultView="Icons">
+  <formatVersion>7</formatVersion>
+  <view name="basic">
+    <image name="background">
+      <tile>false</tile>
+      <size>1 1</size>
+      <pos>0 0</pos>
+      <origin>0 0</origin>
+      <path>./../art/bg.png</path>
+      <color>${backgroundColor}</color>
+      <zIndex>10</zIndex>      
+    </image>
+    
+    <image name="consolebk" extra="true" ifSubset="systembackground:consoles">
+      <path>./../art/background/${system.theme}.jpg</path>
+      <linearSmooth>true</linearSmooth>
+      <pos>0.5 0.5</pos>
+      <minSize>1 1</minSize>
+      <origin>0.5 0.5</origin>
+      <color>FFFFFF12</color>
+      <zIndex>11</zIndex>
+    </image>
+    
+    <image name="ControllerOverlay" extra="true" ifSubset="systembackground:mini-consoles">
+      <path>./../art/consoles/default.png</path>
+      <path>./../art/consoles/${system.theme}.png</path>
+      <linearSmooth>true</linearSmooth>
+      <pos>0.5 0.5</pos>
+      <maxSize>0.5 0.5</maxSize>
+      <origin>0.5 0.5</origin>
+      <color>FFFFFF09</color>
+      <zIndex>11</zIndex>
+    </image>
+
+    <textlist name="gamelist">    
+      <selectorColor>1c1c1c</selectorColor>
+      <selectorColor>96969620</selectorColor>
+      <selectedColor>${basecolor}</selectedColor>
+      <primaryColor>C0C0C0</primaryColor>
+      <secondaryColor>F0F0F0</secondaryColor>
+      <extraTextColor>555555</extraTextColor> <!-- extraText color is for texts located between [] or () -->
+      <extraTextSelectedColor>A0A0A0</extraTextSelectedColor>
+      <fontPath>./../art/fonts/Cabin-Regular.ttf</fontPath>
+      <fontSize>0.030</fontSize>
+      <pos>0.025 0.18</pos>
+      <size>0.950 0.73</size>
+      <size ifHelpPrompts="false">0.950 0.76</size>
+      <alignment>center</alignment>
+      <horizontalMargin>0.01</horizontalMargin>
+      <forceUppercase>0</forceUppercase>
+      <scrollSound>./../art/sounds/scroll.wav</scrollSound>
+      
+      <selectorColor>${centerFadeColor}</selectorColor>      
+      <selectedColor>FFFFFFFF</selectedColor>
+
+      <scrollbarColor>96969620</scrollbarColor>
+      <scrollbarCorner>0.49</scrollbarCorner>
+      <scrollbarSize>0.0065</scrollbarSize>            
+      <scrollbarAlignment>outerright</scrollbarAlignment> <!-- innerleft -->
+
+      <lines>17</lines>
+      <horizontalMargin>0.005</horizontalMargin>
+      <glowColor>000000A0</glowColor>
+      <glowSize ifArch="windows,x86,x86_64,odroidc4,odroidxu4">1</glowSize>
+    </textlist>
+  </view>
+</theme>
