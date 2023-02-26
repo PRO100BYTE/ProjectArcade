@@ -1,7 +1,0 @@
-default:
-  shader: nes_raw_palette/ntsc-nes
-# Reshader  
-model2:
-  shader: disabled
-model3:
-  shader: disabled
