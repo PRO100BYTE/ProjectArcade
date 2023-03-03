@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<gameList parentHash="19611">
+	<game>
+		<path>./pcsx2.menu</path>
+		<name>PCSX2 (SSE4) (PlayStation 2)</name>
+		<desc>Run PCSX2 Emulator (SSE4) (PlayStation 2).</desc>
+		<image>./media/pcsx2-logo.png</image>
+		<marquee>./media/pcsx2-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate></releasedate>
+		<developer>PCSX2 Team</developer>
+		<publisher>PCSX2 Team</publisher>
+		<genre>Emulator</genre>
+		<playcount>7</playcount>
+		<lastplayed>20230104T173142</lastplayed>
+		<gametime>671</gametime>
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+</gameList>

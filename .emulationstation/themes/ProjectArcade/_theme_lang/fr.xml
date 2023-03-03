@@ -1,0 +1,67 @@
+﻿<!-- Theme by pajarorrojo
+https://github.com/pajarorrojo/es-theme-PlayStation-X 
+-->
+<theme>
+  <formatVersion>7</formatVersion>
+  <variables lang="fr">
+    <theme.welcome>Bienvenue sur Playstation X pour</theme.welcome>
+    <theme.start>Démarrer</theme.start>
+    <theme.mostplayed>Les plus joués :</theme.mostplayed>
+    <theme.items>Nombre d'élements :</theme.items>
+    <theme.collections>Nombre de collections :</theme.collections>
+    <GamesNumber>Joués</GamesNumber>
+    <GamesFavs>Favoris</GamesFavs>
+    <NumberPlayed>Joueurs</NumberPlayed>
+    <big>Grand</big>
+    <medium>Moyen</medium>
+    <small>Petit</small>
+    <blue>Bleu</blue>
+    <black>Noir</black>
+    <red>Rouge</red>
+    <yellow>Jaune</yellow>
+    <green>Vert</green>
+    <purple>Violet</purple>
+    <orange>Orange</orange>
+    <pink>Rose</pink>
+    <default>Défaut</default>
+    <yes>Oui</yes>
+    <no>Non</no>
+    <none>Aucune</none>
+    <never>Jamais</never>
+    <always>Toujours</always>
+    <iconset>iconset</iconset>
+    <theme.frontend>Sélectionnez votre frontend préféré</theme.frontend>
+    <gameBar>Barre d'Informations des Jeux</gameBar>
+    <CarouselImageSize>Taille d'Image du Carrousel</CarouselImageSize>
+    <theme.videoBackground>Videos Systèmes</theme.videoBackground>
+    <theme.system-description>Afficher les descriptions Systèmes ?</theme.system-description>
+    <theme.animated-background>Fond animé (vagues) ?</theme.animated-background>
+    <theme.backgroundVideoOption>En vidéo de fond</theme.backgroundVideoOption>
+    <theme.smallScreenOption>En petit écran</theme.smallScreenOption>
+    <theme.videoaudio>Activer l'audio pour les vidéos système</theme.videoaudio>
+    <theme.videoRandom>Activer Videosnap aléatoire</theme.videoRandom>
+    <ifnospot>S'il n'y a pas de vidéo système</ifnospot>
+    <theme.Avatar>Choisissez votre Avatar</theme.Avatar>
+    <theme.username>Choisissez un Pseudo</theme.username>
+    <custom>Personnalisé</custom>
+    <theme.videoGamelistDelay>Délai Lancement Vidéo</theme.videoGamelistDelay>
+    <VideoOff>Video Off</VideoOff>
+    <theme.systemConsole>Afficher logo et consoles dans systemview ?</theme.systemConsole>
+    <randomGame>Jeu aléatoire</randomGame>
+    <theme.colorset>Jeux de couleurs</theme.colorset>
+    <theme.gridMainorigin>Source d'image principale en vue grille</theme.gridMainorigin>
+    <theme.gridorigin>Source d'image dans la grille</theme.gridorigin>
+    <theme.detailedorigin>Source d'image en vue détaillée</theme.detailedorigin>
+    <theme.gridvideo>Vue vidéosnap</theme.gridvideo>
+    <theme.videoSnapAudio>Activer l'audio pour les vidéosnap</theme.videoSnapAudio>
+    <theme.animatedList>Transition de la liste de jeux animée</theme.animatedList>
+    <theme.gametime>Afficher les infos sur le temps de jeu joué</theme.gametime>
+    <theme.animatedSystem>Transition de la liste de système animée</theme.animatedSystem>
+    <theme.aspect-ratio>Type d'écran détecté (auto)</theme.aspect-ratio>
+    <theme.aspect-ratio if="{screen.ratio} == '0/0'">Sélectionnez type d'écran</theme.aspect-ratio>
+    <theme.aspect-1610>16:10 WXGA (habituel dans les vieux portables)</theme.aspect-1610>
+    <theme.bato35compatilble>Uniquement compatible avec batocera 35 ou supérieur</theme.bato35compatilble>
+    <theme.netplay-required>Veuillez activer netplay pour afficher votre nom d'utilisateur ou sélectionner un autre nick dans les options de thème</theme.netplay-required>
+    <theme.ra-required>Veuillez activer retroachievements pour afficher votre nom d'utilisateur ou sélectionner un autre nick dans les options de thème</theme.ra-required>
+  </variables>
+</theme>

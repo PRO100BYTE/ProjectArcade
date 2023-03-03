@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<gameList parentHash="19611">
+	<game>
+		<path>./ppsspp.menu</path>
+		<name>PPSSPP (PSP, Homebrews)</name>
+		<desc>Run PPSSPP Emulator (PSP, Homebrews).</desc>
+		<image>./media/ppsspp-logo.png</image>
+		<marquee>./media/ppsspp-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate></releasedate>
+		<developer>PPSSPP Team</developer>
+		<publisher>PPSSPP Team</publisher>
+		<genre>Emulator</genre>
+		<playcount>1</playcount>
+		<lastplayed>20230102T231104</lastplayed>
+		<gametime>65</gametime>
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+</gameList>

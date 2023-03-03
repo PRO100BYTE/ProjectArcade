@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<gameList parentHash="19611">
+	<game>
+		<path>./dosbox.menu</path>
+		<name>DOSBox (MS-DOS, Windows 3.x, Windows 95)</name>
+		<desc>Run DOSBox (MS-DOS, Windows 3.x, Windows 95).</desc>
+		<image>./media/dosbox-logo.png</image>
+		<marquee>./media/dosbox-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate></releasedate>
+		<developer>DOSBox Team</developer>
+		<publisher>DOSBox Team</publisher>
+		<genre>Emulator</genre>
+		<playcount>2</playcount>
+		<lastplayed>20230104T181948</lastplayed>
+		<gametime>34</gametime>
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+</gameList>

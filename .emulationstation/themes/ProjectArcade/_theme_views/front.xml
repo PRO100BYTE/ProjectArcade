@@ -1,0 +1,163 @@
+<!-- Theme by pajarorrojo
+https://github.com/pajarorrojo/es-theme-PlayStation-X 
+-->
+<theme>
+   <formatVersion>7</formatVersion>
+   <view name="system">
+      <image name="logo">
+         <path>./_theme_inc/images/caratulas/default.png</path>
+         <path>./_theme_inc/images/caratulas/${system.theme}.jpg</path>
+         <path>./_theme_inc/images/caratulas/${system.theme}.png</path>
+         <tile>false</tile>
+         <linearSmooth>true</linearSmooth>
+         <zIndex>0</zIndex>
+      </image>
+
+      <image name="logo" extra="true" region="us">
+         <path>./_theme_inc/images/caratulas/us/${system.theme}.jpg</path>
+         <path>./_theme_inc/images/caratulas/us/${system.theme}.png</path>
+      </image>
+
+      <image name="logo" extra="true" region="jp">
+         <path>./_theme_inc/images/caratulas/jp/${system.theme}.jpg</path>
+         <path>./_theme_inc/images/caratulas/jp/${system.theme}.png</path>
+       
+      </image>
+
+      <carousel name="systemcarousel">
+         <systemInfoDelay>5</systemInfoDelay>
+         <color>00000000</color>
+         <logoAlignment>top</logoAlignment>
+         <scrollSound>./../_theme_inc/sound-effects/scroll-2.wav</scrollSound>
+         <zIndex>80</zIndex>
+         <defaultTransition>instant</defaultTransition>
+         <transitionSpeed>500</transitionSpeed>
+         <minLogoOpacity ifSubset="video-system:background-option">0.5</minLogoOpacity>
+         <minLogoOpacity ifSubset="video-system:NO|small-screen">0.7</minLogoOpacity>
+      </carousel>
+
+      <image name="marco-activo" extra="static">
+         <path>./../_theme_inc/images/marco-activo-iso.png</path>
+         <alignment>left</alignment>
+         <verticalAlignment>top</verticalAlignment>
+         <zIndex>89</zIndex>
+      </image>
+
+      <text name="start" extra="true">
+         <text>${theme.start}</text>
+         <backgroundColor>00000069</backgroundColor>
+         <alignment>center</alignment>
+         <color>FFFFFF</color>
+         <fontPath>./../_theme_inc/fonts/SST Light.ttf</fontPath>
+         <fontPath ifSubset="aspect-ratio:4-3|5-4" tinyScreen="true">./../_theme_inc/fonts/SST Roman.ttf</fontPath>
+         <zIndex>46</zIndex>
+      </text>
+
+      <text name="system_name" extra="true">
+         <size>0.6 0.001</size>
+         <size ifSubset="aspect-ratio:3-2">0.57 0.001</size>
+         <alignment>left</alignment>
+         <color>FFFFFF</color>
+         <fontPath>./../_theme_inc/fonts/SST Light.ttf</fontPath>
+         <fontPath ifSubset="aspect-ratio:4-3|5-4" tinyScreen="true">./../_theme_inc/fonts/SST Roman.ttf</fontPath>
+         <zIndex>45</zIndex>
+         <glowColor>00000035</glowColor>
+         <glowSize>1</glowSize>
+         <glowOffset>3 2</glowOffset>
+         <fontSize>0.068</fontSize>
+         <fontSize ifSubset="aspect-ratio:16-9">0.068</fontSize>
+         <fontSize ifSubset="aspect-ratio:4-3|5-4">0.055</fontSize>
+         <fontSize ifSubset="aspect-ratio:3-2">0.06</fontSize>
+         <fontSize ifSubset="aspect-ratio:4-3|5-4" tinyScreen="true">0.042</fontSize>
+         <fontSize ifSubset="aspect-ratio:3-2" tinyScreen="true">0.046</fontSize>
+
+         <fontSize ifSubset="aspect-ratio:16-10">0.066</fontSize>
+         <backgroundColor>ff000000</backgroundColor>
+         
+
+      </text>
+
+      <text name="fullName" extra="true">
+         <text>${system.name}</text>
+         <alignment>center</alignment>
+         <color>FFFFFF</color>
+         <fontPath>./../_theme_inc/fonts/SST Bold.ttf</fontPath>
+         <zIndex>45</zIndex>
+         <glowColor>00000035</glowColor>
+         <glowSize>1</glowSize>
+         <glowOffset>3 2</glowOffset>
+         <backgroundColor>${psx-theme-blue4}</backgroundColor>
+         <storyboard>
+            <animation property="opacity" from="0" to="0" duration="100" mode="linear" />
+            <animation property="opacity" from="0" to="1" begin="300" duration="0" mode="linear" />
+         </storyboard>
+      </text>
+
+
+      <!-- FIN CARRUSELES -->
+
+      <image name="background" extra="static">
+         <origin>0 0</origin>
+         <pos>0 0</pos>
+         <size>1 1</size>
+         <zIndex>1</zIndex>
+         <linearSmooth>true</linearSmooth>
+      </image>
+
+      <image name="background-art" extra="true">
+         <origin>0.5 0</origin>
+         <pos>0.5 0</pos>
+         <path>{random:fanart}</path>
+         <path>./_theme_inc/images/background/${system.theme}.jpg</path>
+         <zIndex>40</zIndex>
+         <linearSmooth>true</linearSmooth>
+         <size>1 1</size>
+      </image>
+
+      <image name="background-art" extra="true" region="eu" />
+      <image name="background-art" extra="true" region="us">
+         <path>./_theme_inc/images/background/us/${system.theme}.jpg</path>
+      </image>
+      <image name="background-art" extra="true" region="jp">
+         <path>./_theme_inc/images/background/jp/${system.theme}.jpg</path>
+      </image>
+
+
+      <image name="overlay" extra="static">
+         <path>./_theme_inc/images/overlay.png</path>
+         <origin>0 0</origin>
+         <pos>0 0</pos>
+         <size>1 1</size>
+         <zIndex>42</zIndex>
+         <linearSmooth>true</linearSmooth>
+         <tile>false</tile>
+      </image>
+
+
+      <image name="linea-inferior" extra="static">
+         <path>./_theme_inc/images/pixel-blanco.png</path>
+         <pos>0 0.934</pos>
+         <size>1 0.0011</size>
+         <size tinyScreen="true">1 0.005</size>
+         <color>${sistema.lineainferior}</color>
+         <verticalAlignment>top</verticalAlignment>
+         <alignment>left</alignment>
+         <linearSmooth>true</linearSmooth>
+         <zIndex>99</zIndex>
+      </image>
+
+      <image name="pie-barra" extra="static">
+         <path>./_theme_inc/images/pixel-blanco.png</path>
+         <pos>0 0.934</pos>
+         <size>1 0.2</size>
+         <color>${sistema.pie}</color>
+         <verticalAlignment>top</verticalAlignment>
+         <alignment>left</alignment>
+         <linearSmooth>true</linearSmooth>
+         <zIndex>98</zIndex>
+      </image>
+
+
+   </view>
+
+</theme>

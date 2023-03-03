@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<gameList parentHash="19611">
+	<game>
+		<path>./winuae.menu</path>
+		<name>WinUAE (Amiga)</name>
+		<desc>Run WinUAE (Amiga).</desc>
+		<image>./media/winuae-logo.png</image>
+		<marquee>./media/winuae-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate></releasedate>
+		<developer>WinUAE Team</developer>
+		<publisher>WinUAE Team</publisher>
+		<genre>Emulator</genre>
+		<playcount>1</playcount>
+		<lastplayed>20230106T233026</lastplayed>
+		<gametime>37</gametime>
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+</gameList>
