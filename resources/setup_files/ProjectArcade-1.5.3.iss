@@ -4,7 +4,7 @@
 #define MyAppName "ProjectArcade"
 #define MyAppVersion "1.5.3"
 #define MyAppPublisher "#TheDayG0ne"
-#define MyAppURL "https://projects.thedayg0ne.ru/projectarcade"
+#define MyAppURL "https://projectarcade.ru"
 #define MyPublisherURL "https://thedayg0ne.ru"
 #define MyAppExeName "projectarcade.exe"
 #define MyAppCopyright "Copyright (C) 2023 #TheDayG0ne"

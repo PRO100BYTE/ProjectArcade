@@ -1,9 +1,9 @@
 <h1 align="left">
   <br>
-  <a href="https://projects.thedayg0ne.ru/"><img src="https://raw.githubusercontent.com/TheDayG0ne/ProjectArcade/master/resources/images/projectarcade-github.png" alt="ProjectArcade" width="500"></a>
+  <a href="https://projectarcade.ru/"><img src="https://raw.githubusercontent.com/TheDayG0ne/ProjectArcade/master/resources/images/projectarcade-github.png" alt="ProjectArcade" width="500"></a>
 </h1>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)   [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)   [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)   [![Website](https://img.shields.io/website?down_color=lightgrey&down_message=Offline&up_color=green&up_message=Online&url=https%3A%2F%2Fprojects.thedayg0ne.ru%2Fprojectarcade)](https://projects.thedayg0ne.ru/projectarcade)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)   [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)   [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)   [![Website](https://img.shields.io/website?down_color=lightgrey&down_message=Offline&up_color=green&up_message=Online&url=https%3A%2F%2Fprojectarcade.ru)](https://projectarcade.ru)
 
 ProjectArcade is a software for 64-bit versions of Windows designed for retro-gaming and running various emulators of gaming systems.
 
@@ -22,10 +22,10 @@ ProjectArcade can also run in Portable Mode. This means you can play games from 
 |---|---|
 |**Processor:**|CPU with SSE2 support. Two or more cores, 3GHz or faster, 2008 or later. Intel Core i3 / Core i5 / Core i7 / Core i9 recommended, AMD Ryzen also recommended|
 |**Graphics:**|Modern, with Direct3D 11.1 / OpenGL 4.4 / Vulkan support|
-|**Dependencies:**|[Visual C++ 2005-2022 Redistributable Packages (32 and 64 bit)](https://dl.thedayg0ne.ru/VCRHyb_x86-x64.exe)|
-|   |[DirectX](https://www.microsoft.com/download/details.aspx?id=35)|
-|   |[.NET Framework 6.0 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.14-windows-x64-installer)|
-|   |[.NET Framework 7.0 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-7.0.3-windows-x64-installer)|
+|**Dependencies:**|[Visual C++ 2005-2022 Redistributable Packages (32 and 64 bit)](https://dl.projectarcade.ru/dependencies/vcr/VCRHyb_x86-x64.exe)|
+|   |[DirectX](https://dl.projectarcade.ru/dependencies/directx/dxwebsetup.exe)|
+|   |[.NET Framework 6.0 Desktop Runtime](https://dl.projectarcade.ru/dependencies/netframework/6.0/netruntime-6.0.14_win64.exe)|
+|   |[.NET Framework 7.0 Desktop Runtime](https://dl.projectarcade.ru/dependencies/netframework/7.0/netruntime-7.0.3_win64.exe)|
 |**Controllers:**|Gamepads with XInput support are recommended. You can test your gamepad here: [Gamepad Tester](https://gamepad-tester.com)|
 
 **After installing the dependencies, it is recommended to restart the computer**
@@ -139,7 +139,7 @@ Finally, the license which concerns the entire RetroBat Project as a work, in pa
 ## 💬 Social & Support
 
 ### #TheDayG0ne
-- Official Website: https://projects.thedayg0ne.ru/projectarcade
+- Official Website: https://projectarcade.ru
 - Telegram: https://t.me/thedayg0ne
 - E-mail: me@thedayg0ne.ru
 
