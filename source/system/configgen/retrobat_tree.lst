@@ -147,9 +147,15 @@ emulators\yuzu-early-access\user\config
 emulators\yuzu\user
 emulators\yuzu\user\config
 library
+<<<<<<< Updated upstream
 library\records
 library\records\config
 library\records\output
+=======
+records
+records\config
+records\output
+>>>>>>> Stashed changes
 roms
 saves
 saves\amiga
