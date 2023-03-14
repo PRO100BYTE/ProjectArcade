@@ -38,7 +38,7 @@
 - Added a new theme: ProjectArcade Simple
 - Added new platforms and emulators
 
-**ProjectArcade 1.5.4**
+**ProjectArcade 1.5.4 (beta1) **
 - Minor bug fixes
 - Built-in Ludo - libretro frontend
 - New boot animations
