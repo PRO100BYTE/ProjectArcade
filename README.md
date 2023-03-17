@@ -64,6 +64,7 @@ build.bat
 - [Gitbook](https://www.gitbook.com/) - For supporting ProjectArcade and RetroBat project.
 - [pajarorrojo](https://github.com/pajarorrojo) - For PlayStation-X theme
 - [20GotoTen](https://github.com/20GotoTen) - For Retrofix theme
+- [NoCopyrightSounds](https://ncs.io) - For an excellent copyright-free music library
 
 ## And also - many thanks to 🦇 RetroBat Team:
 
@@ -141,12 +142,13 @@ Finally, the license which concerns the entire RetroBat Project as a work, in pa
 ### #TheDayG0ne
 - Official Website: https://projectarcade.ru
 - Telegram: https://t.me/thedayg0ne
+- VK: https://vk.com/projectarcade
 - E-mail: me@thedayg0ne.ru
+
 
 ### RetroBat Team
 - Official Website: https://www.retrobat.org/
-- Facebook Group: https://social.retrobat.org/facebook
+- Facebook: https://social.retrobat.org/facebook
 - Wiki: https://wiki.retrobat.org/
-- You need help ? You found a bug ? Please visit RetroBat Forum: https://social.retrobat.org/forum
-- Join us on our Discord server: https://social.retrobat.org/discord
-- <a class="twitter-timeline" href="https://twitter.com/RetroBat_Off?ref_src=twsrc%5Etfw">Tweets by RetroBat_Off</a>
+- Forum: https://social.retrobat.org/forum
+- Discord: https://social.retrobat.org/discord
