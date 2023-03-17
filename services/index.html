@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang='ru'>
 <head>			
-	<title>ProjectArcade | Панель управления</title>
+	<title>ProjectArcade WebPanel</title>
 	<link rel="shortcut icon" href="./favicon.png">
 	<link href="main.css" rel="stylesheet">
 </head>
@@ -10,7 +10,7 @@
 
 <div class="title">
 	<img height="24" style="vertical-align: middle;" src="./favicon.png">
-	<span>ProjectArcade | Панель управления</span>
+	<span>ProjectArcade WebPanel</span>
 </div>
 
 <!-- See REST Api list on https://github.com/batocera-linux/batocera-emulationstation/blob/master/es-app/src/services/HttpServerThread.cpp#L25
@@ -42,6 +42,12 @@ function launchGame(game) {
 	xhr.send(game);
 }
 
+function restart() {
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', '/emukill');
+	xhr.send();
+}
+
 function showGames(arr) {
     var out = "<table width=100% border=0 cellpadding=4 cellspacing=0>";
     var i;
@@ -58,7 +64,7 @@ function showGames(arr) {
 			out += '<tr><td><div class="desc">' + arr[i].desc + '</div></td></tr>';
 		}
 		out += '</table>';
-		out += '<button class="playitBtn" onclick="launchGame(\'' + arr[i].path + '\')">Запустить</button>'
+		out += '<button class="playitBtn" onclick="launchGame(\'' + arr[i].path + '\')">Launch</button>'
 		out += '</td>';
 		out += '<tr/>';
     }
@@ -133,10 +139,10 @@ function showSystems(arr) {
 <!-- <img src="resources/vid.jpg"/> -->
 
 <div id="toolbar" class="toolbar">
-	<input class="toolbarbutton" type='button' value='Обновить список игр' onClick='reloadGamelists()'/>
-	<input class="toolbarbutton" type='button' value='Закрыть EmulationStation' onClick='quitES()'/>
-	<input class="toolbarbutton" type='button' value='Перезапустить EmulationStation' onClick='restart()'/>
-	<input class="toolbarbutton" type='button' value='Закрыть запущенный эмулятор' onClick='emuKill()'/>
+	<input class="toolbarbutton" type='button' value='Update game list' onClick='reloadGamelists()'/>
+	<input class="toolbarbutton" type='button' value='Close EmulationStation' onClick='quitES()'/>
+	<input class="toolbarbutton" type='button' value='Restart EmulationStation' onClick='restart()'/>
+	<input class="toolbarbutton" type='button' value='Close running emulator' onClick='emuKill()'/>
 </div>
 
 <table height='100%' width='100%' cellpadding=0 cellspacing=0 border=0>
