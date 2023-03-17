@@ -42,3 +42,8 @@
 - Minor bug fixes
 - Built-in Ludo - libretro frontend
 - New boot animations
+
+**ProjectArcade 1.5.4-beta2**
+- Minor bug fixes
+- New background music
+- Updated Kodi to version 20.1
