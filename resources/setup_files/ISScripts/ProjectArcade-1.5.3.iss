@@ -32,7 +32,7 @@ DisableWelcomePage=no
 VersionInfoVersion=1.5.3
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputDir=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupbuilds\1.5.4-beta1\
+OutputDir=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupbuilds\1.5.3\
 OutputBaseFilename=ProjectArcade-1.5.3_setup
 SetupIconFile=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\projectarcade.ico
 Compression=lzma
