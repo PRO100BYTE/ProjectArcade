@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ProjectArcade"
-#define MyAppVersion "1.5.3"
+#define MyAppVersion "1.5.4-beta1"
 #define MyAppPublisher "#TheDayG0ne"
 #define MyAppURL "https://projectarcade.ru"
 #define MyPublisherURL "https://thedayg0ne.ru"
@@ -23,35 +23,35 @@ AppUpdatesURL={#MyAppURL}
 AppCopyright={#MyAppCopyright}
 DefaultDirName=C:\ProjectArcade
 DisableProgramGroupPage=yes
-LicenseFile=C:\Users\TheDayG0ne\Desktop\projectarcade-setupfiles\LICENSE.txt
-InfoBeforeFile=C:\Users\TheDayG0ne\Desktop\projectarcade-setupfiles\REQUIREMENTS.txt
-UninstallDisplayIcon=C:\Users\TheDayG0ne\Desktop\projectarcade-setupfiles\projectarcade.ico
-WizardImageFile=C:\Users\TheDayG0ne\Desktop\projectarcade-setupfiles\projectarcade_wizard.bmp
-WizardSmallImageFile=C:\Users\TheDayG0ne\Desktop\projectarcade-setupfiles\pa-headerlogo.bmp
+LicenseFile=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\LICENSE.txt
+InfoBeforeFile=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\REQUIREMENTS.txt
+UninstallDisplayIcon=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\projectarcade.ico
+WizardImageFile=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\projectarcade_wizard.bmp
+WizardSmallImageFile=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\pa-headerlogo.bmp
 DisableWelcomePage=no
-VersionInfoVersion=1.5.3
+VersionInfoVersion=1.5.4
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputDir=C:\Users\TheDayG0ne\Desktop\projectarcade-setupbuilds\1.5.3\
-OutputBaseFilename=ProjectArcade-1.5.3_setup
-SetupIconFile=C:\Users\TheDayG0ne\Desktop\projectarcade-setupfiles\projectarcade.ico
+OutputDir=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupbuilds\1.5.4-beta1\
+OutputBaseFilename=ProjectArcade-1.5.4-beta1_setup
+SetupIconFile=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\projectarcade.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 
 [Languages]
-Name: "english"; MessagesFile: "C:\Users\TheDayG0ne\Desktop\projectarcade-setupfiles\english.isl"
-Name: "russian"; MessagesFile: "C:\Users\TheDayG0ne\Desktop\projectarcade-setupfiles\russian.isl"
+Name: "english"; MessagesFile: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\english.isl"
+Name: "russian"; MessagesFile: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\russian.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-1.5.3_build\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-1.5.3_build\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-1.5.3_build\projectarcade.ini"; DestDir: "{app}"; Flags: ignoreversion; Attribs: readonly
-Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-1.5.3_build\emulationstation\about.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; Attribs: readonly
-Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-1.5.3_build\emulationstation\version.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; Attribs: readonly 
+Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-builds\1.5.4-beta1\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-builds\1.5.4-beta1\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-builds\1.5.4-beta1\projectarcade.ini"; DestDir: "{app}"; Flags: ignoreversion; Attribs: readonly
+Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-builds\1.5.4-beta1\emulationstation\about.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; Attribs: readonly
+Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-builds\1.5.4-beta1\emulationstation\version.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; Attribs: readonly 
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
