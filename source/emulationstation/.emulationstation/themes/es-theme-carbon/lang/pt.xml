@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+ <!-- Portuguese -->
+  <variables lang="pt">
+    <tilesViewName>Miniaturas</tilesViewName>
+    <basicGridName>Grade</basicGridName>
+    <carouselViewName>Carrossel</carouselViewName>
+    <blue>Azul</blue>
+    <red>Vermelho</red>
+    <green>Verde</green>
+    <yellow>Amarelo</yellow>
+    <gray>Cinzento</gray>
+    <none>Nenhum</none>
+    <roundBorderSubsetName>Bordas arredondadas</roundBorderSubsetName>
+    <blinkBorderSubsetName>Bordas intermitentes</blinkBorderSubsetName>
+    <yes>Sim</yes>
+    <no>Não</no>
+    <systemBackgroundName>Plano de fundo</systemBackgroundName>
+    <systemViewName>Visualização do sistema</systemViewName>
+    <previewBarSubsetName>Painel de visualização</previewBarSubsetName>
+    <videoboxesSubsetName>Mostrar vídeo no modo de caixa</videoboxesSubsetName>
+    <zoomboxesSubsetName>Caixas de zoom</zoomboxesSubsetName>
+    <hideselectionSubsetName>Esconder seleção</hideselectionSubsetName>
+    <optimizesmallscreensSubsetName>Otimizar telas pequenas</optimizesmallscreensSubsetName>
+    <animationsSubsetName>Animações de transição</animationsSubsetName>
+    <systemViewExInfos>Informações de sistema aprimoradas</systemViewExInfos>
+    <helpSubsetName>Ícones de ajuda</helpSubsetName>
+    <glowSubsetName>Seleção com Halo</glowSubsetName>
+    <colored>Colorido</colored>
+    <subset.colorset>Esquemas de cores</subset.colorset>
+    <subset.shader>Efeitos de TV</subset.shader>
+  </variables>  
+</theme>

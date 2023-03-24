@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+   <customView name="Icons">
+    <imagegrid name="gamegrid">
+      <cellProportion>0.7</cellProportion>
+    </imagegrid>
+  </customView>
+  <customView name="Tiles">
+    <imagegrid name="gamegrid">
+      <cellProportion>0.77</cellProportion>
+    </imagegrid>
+  </customView>
+</theme>

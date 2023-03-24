@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+
+  <customView name="Carousel,Boxes,Tiles,Icons,grid">
+    <imagegrid name="gamegrid">
+      <showVideoAtDelay>-1</showVideoAtDelay>
+    </imagegrid>
+  </customView>
+
+  <customView name="Carousel,Boxes,Tiles,Icons,grid">
+    <image name="gamelistBackground" extra="true">
+      <path>./../../art/filter.png</path>
+      <color>000000A0</color>
+      <origin>0 0</origin>
+      <pos>0.663 0.16</pos>
+      <size>0.337 0.774</size>
+      <size ifSubset="gameBar:yes">0.29 0.774</size>
+      <zIndex>12</zIndex>
+    </image>
+    
+		<image name="gamelistLineZ" extra="true">
+			<path>./../../art/white.png</path>
+			<color>${glowColor}</color>
+			<origin>0 0</origin>
+			<pos>0.66 0.16</pos>
+			<size>0.003 0.775</size>
+			<zIndex>14</zIndex>
+		</image>
+		
+    <image name="md_image">
+      <visible>false</visible>
+    </image>
+    <text name="md_name">
+      <color>ffffffff</color>
+      <pos>0.68 0.18</pos>
+      <size>0.30 0.05</size>
+      <color>F0F0F0</color>
+      <fontSize>0.038</fontSize>
+      <fontPath>./../../art/fonts/Cabin-Bold.ttf</fontPath>
+      <alignment>center</alignment>
+      <glowColor>${glowColor}</glowColor>
+      <glowSize>2</glowSize>
+<glowOffset>1 1</glowOffset>
+      <lineSpacing>1.1</lineSpacing>
+    </text>
+
+    <text name="md_name" ifSubset="gameBar:yes">
+		  <origin>0.5 0.5</origin>
+		  <pos>0.808 0.22</pos>
+		  <size>0.27 0</size>
+		</text>
+   
+    <text name="md_developer">
+      <color>EFEFFF</color>
+      <pos>0.705 0.875</pos>
+      <size>0.28 0.05</size>
+      <alignment>left</alignment>
+      <fontSize>0.025</fontSize>
+    </text>
+    <text name="md_developer" ifSubset="gameBar:yes">
+     
+      <pos>0.68 0.875</pos>
+		  <size>0.28 0.05</size>
+		</text>
+    
+    <video name="md_video">
+      <pos>0.83 0.455</pos>
+      <maxSize>0.29 0.39</maxSize>
+      <origin>0.5 0.5</origin>
+      <delay>1</delay>
+      <showSnapshotNoVideo>true</showSnapshotNoVideo>
+      <showSnapshotDelay>true</showSnapshotDelay>
+      <loops>0</loops>
+      <roundCorners>0.02</roundCorners>
+    </video>
+
+    <video name="md_video" ifSubset="gameBar:yes">
+      <pos>0.808 0.45</pos>
+      <maxSize>0.26 0.39</maxSize>
+    </video>
+    
+    <!--
+    <image name="tv_overlay" extra="true">
+      <pos>0.68 0.25</pos>
+      <size>0.30 0.40</size>
+      <path>./../../art/tv.png</path>
+      <zIndex>140</zIndex>
+    </image>-->
+    <text name="md_description">
+      <pos>0.68 0.678</pos>
+      <size>0.30 0.20</size>
+      <fontSize>0.025</fontSize>
+      <color>A0A0B0</color>
+<lineSpacing>1.3</lineSpacing>
+
+    </text>
+    <text name="md_description" ifSubset="gameBar:yes">
+      <origin>0.5 0</origin>
+      <pos>0.808 0.665</pos>
+      <size>0.26 0.2</size>
+    </text>
+    <rating name="md_rating" ifSubset="gameBar:no">
+      <pos>0.9 0.886</pos>
+      <size>0.085 0.03</size>
+      <color>FFFF00</color>
+      <unfilledColor>808080</unfilledColor>
+      <horizontalAlignment>right</horizontalAlignment>
+    </rating>
+    <image name="md_kidgame" ifSubset="gameBar:no">
+      <path>./../../art/kid.svg</path>
+      <pos>0.882 0.901</pos>
+      <maxSize>0.02 0.03</maxSize>      
+      <origin>0.5 0.5</origin>
+      <color>A0A0B0</color>
+      <zIndex>150</zIndex>
+    </image>
+    <image name="md_hidden" ifSubset="gameBar:no">
+      <path>./../../art/hidden.svg</path>
+      <pos>0.975 0.205</pos>
+      <maxSize>0.02 0.03</maxSize>      
+      <origin>0.5 0.5</origin>
+      <color>A0A0B0</color>
+      <zIndex>150</zIndex>
+    </image>
+    <image name="md_flag" ifSubset="gameBar:no"> 
+       <origin>0 0.5</origin>
+       <pos>0.68 0.9</pos>
+       <maxSize>0.02 0.05</maxSize>
+    </image>
+  </customView>
+  
+  <customView name="Carousel, Boxes,Tiles,Icons,grid">
+    <imagegrid name="gamegrid">
+      <pos>0 0.16</pos>
+      <size>0.66 0.84</size>
+    </imagegrid>
+		<imagegrid name="gamegrid" ifSubset="infoBar:false">
+      <pos>0.02 0.16</pos>
+      <size>0.63 0.84</size>
+		</imagegrid>    
+  </customView>
+  
+  <customView name="Carousel">
+    <imagegrid name="gamegrid">
+      <autoLayout>3 1</autoLayout>
+      <padding>0.01 0.18 0.01 0.24</padding>
+    </imagegrid>
+  </customView>
+    
+</theme>

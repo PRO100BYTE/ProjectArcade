@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <include>./default.xml</include>
+  <customView name="system,basic,detailed,gamecarousel,grid,Carousel,Tiles,Boxes,Icons">
+    <helpsystem name="help">
+      <iconColor>${baseColor}</iconColor>
+      <iconA>:/help/button_b.svg</iconA>
+      <iconB>:/help/button_a.svg</iconB>
+      <iconX>:/help/button_y.svg</iconX>
+      <iconY>:/help/button_x.svg</iconY>
+    </helpsystem>
+  </customView>
+</theme>

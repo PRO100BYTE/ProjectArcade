@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <variables>
+    <animatedBackground>Animated background</animatedBackground>
+  </variables>
+  <variables lang="fr">
+    <animatedBackground>Animation du fond</animatedBackground>
+  </variables>
+  <subset tinyScreen="false" name="animatedBackground" displayName="${animatedBackground}">
+    <!-- default to yes for fast platforms only -->
+    <include ifArch="windows,x86,x86_64,odroidc4,odroidxu4" name="yes" displayName="${yes}">./animatedbackground.xml</include>
+    <include name="no" displayName="${no}"/>
+    <include ifNotArch="windows,x86,x86_64,odroidc4,odroidxu4" name="yes" displayName="${yes}">./animatedbackground.xml</include>
+  </subset>
+</theme>

@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <include>./animatedcoverssubset.xml</include>
+  <view name="system">
+    <carousel name="systemcarousel">
+      <defaultTransition>fade &amp; slide</defaultTransition>
+    </carousel>
+    <image name="background" extra="true">
+      <visible>false</visible>
+    </image>
+    <image name="backgroundMachines" extra="true">
+      <tile>false</tile>
+      <linearSmooth>true</linearSmooth>
+      <path>{random:fanart}</path>
+      <path>./../../art/background/${system.theme}.jpg</path>
+      <color>FFFFFFFF</color>
+      <pos>0.5 0.5</pos>
+      <origin>0.5 0.5</origin>
+      <minSize>1 1</minSize>
+      <zIndex>11</zIndex>
+    </image>
+    <image name="backgroundFade" extra="static">
+      <tile>false</tile>
+      <linearSmooth>true</linearSmooth>
+      <path>./../../art/backfade.png</path>
+      <color>FFFFFFFF</color>
+      <pos>0.5 0.5</pos>
+      <origin>0.5 0.5</origin>
+      <minSize>1 1</minSize>
+      <zIndex>12</zIndex>
+    </image>
+    <image name="backgroundMachines" extra="true" region="eu"/>
+    <image name="backgroundMachines" extra="true" region="us">
+      <path>./../../art/background/us/${system.theme}.jpg</path>
+    </image>
+    <image name="backgroundMachines" extra="true" region="jp">
+      <path>./../../art/background/jp/${system.theme}.jpg</path>
+    </image>
+    <image name="ControllerOverlay" extra="true">
+      <visible>false</visible>
+    </image>
+    <text name="systemInfo">
+      <glowColor>00000022</glowColor>
+      <zIndex>12</zIndex>
+    </text>
+    <image name="CenterFade" extra="true">
+      <color>000000B0</color>
+      <zIndex>12</zIndex>
+    </image>
+  </view>
+</theme>

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <customView name="Tiles,Icons">
+    <gridtile name="default">
+      <backgroundCornerSize>0 0</backgroundCornerSize>
+    </gridtile>
+    <gridtile name="selected">
+      <backgroundCornerSize>0 0</backgroundCornerSize>
+    </gridtile>
+    <image name="gridtile.image">
+      <roundCorners>0</roundCorners>
+    </image>
+    <ninepatch name="gridtile.background:selected">
+      <padding ifSubset="glowsel:no">0 0</padding>
+      <cornerSize ifSubset="glowsel:no">0 0</cornerSize>
+      <path ifSubset="glowsel:no">:/frame.png</path>
+      <path ifSubset="glowsel:yes">./../../art/framewselsq.png</path>
+    </ninepatch>
+  </customView>
+</theme>
