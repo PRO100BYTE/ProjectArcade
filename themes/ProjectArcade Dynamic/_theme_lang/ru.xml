@@ -1,68 +1,80 @@
+п»ї<!-- Theme by pajarorrojo
+https://github.com/pajarorrojo/es-theme-PlayStation-X 
+-->
 <theme>
-	<formatVersion>7</formatVersion>
-	<variables>
-		<theme.welcome>Добро пожаловать в ProjectArcade, основанный на </theme.welcome>
-		<theme.start>Старт</theme.start>
-		<theme.mostplayed>Most played:</theme.mostplayed>
-		<theme.items>Всего:</theme.items>
-		<theme.collections>Коллекции:</theme.collections>
-		<GamesNumber>Игры</GamesNumber>
-		<GamesFavs>Избранное</GamesFavs>
-		<NumberPlayed>Запускалось</NumberPlayed>
-		<blue>Синий</blue>
-		<black>Черный</black>
-		<red>Красный</red>
-		<yellow>Желтый</yellow>
-		<green>Зеленый</green>
-		<purple>Фиолетовый</purple>
-		<orange>Оранжевый</orange>
-		<pink>Розовый</pink>
-		<default>По умолчанию</default>
-		<big>Большой</big>
-		<medium>Средний</medium>
-		<small>Маленький</small>
-		<yes>Да</yes>
-		<no>Нет</no>
-		<none>Нет</none>
-		<never>Никогда</never>
-		<always>Всегда</always>
-		<iconset>iconset</iconset>
-		<theme.frontend>Выберите свой любимый фронтенд</theme.frontend>
-		<gameBar>Показать панель с информацией об игре</gameBar>
-		<CarouselImageSize>Размер картинок в карусели</CarouselImageSize>
-		<theme.videoBackground>Показывать видео в системном меню</theme.videoBackground>
-		<theme.system-description>Показывать описание в системном меню</theme.system-description>
-		<theme.animated-background>Анимированный фон (волны)theme.animated-background>
-		<theme.backgroundVideoOption>Фоновое видео</theme.backgroundVideoOption>
-		<theme.windowVideoOption>Видео в окне</theme.windowVideoOption>
-		<theme.insideVideoOption>Видео внутри плитки</theme.insideVideoOption>
-		<theme.smallScreenOption>Небольшой экран</theme.smallScreenOption>
-		<theme.videoaudio>Включить звук в системных видео</theme.videoaudio>
-		<theme.videoRandom>Показывать случайное видео</theme.videoRandom>
-		<ifnospot>If no system video exist</ifnospot>
-		<theme.Avatar>Выберите аватар</theme.Avatar>
-		<theme.username>Выберите никнейм</theme.username>
-		<custom>Пользовательский</custom>
-		<theme.videoGamelistDelay>Задержка видео в списке игр</theme.videoGamelistDelay>
-		<VideoOff>Видео отключено</VideoOff>
-		<theme.systemConsole>Показывать логотипы и консоли в системном меню</theme.systemConsole>
-		<randomGame>Рандомная игра</randomGame>
-		<theme.colorset>Выбор цвета темы</theme.colorset>
-		<theme.secondaryColorset>Вторичный цвет</theme.secondaryColorset>
-		<theme.gridorigin>Источник изображения в сетке</theme.gridorigin>
-		<theme.gridMainoriginГлавное изображение в виде сетки</theme.gridMainorigin>
-		<theme.detailedorigin>Источник изображения в детальном виде</theme.detailedorigin>
-		<theme.gridvideo>Показывать видео в списке игр</theme.gridvideo>
-		<theme.videoSnapAudio>Включать звук в игровых видео</theme.videoSnapAudio>
-		<theme.animatedList>Анимированные переходы в списке игр</theme.animatedList>
-		<theme.gametime>Информация о времени игры в списке игр</theme.gametime>
-		<theme.animatedSystem>Анимированные переходы в системном представлении</theme.animatedSystem>
-		<theme.aspect-ratio>Определено соотношение сторон экрана (автоматически)</theme.aspect-ratio>
-		<theme.aspect-ratio if="{screen.ratio} == '0/0'">Выберите свой тип экрана</theme.aspect-ratio>
-		<theme.aspect-1610>16:10 WXGA (обычно в ноутбуках)</theme.aspect-1610>
-		<theme.oversizeVideoOption>Увеличенное видео</theme.oversizeVideoOption>
-		<theme.bato35compatilble>Совместимо только с Batocera версии 35 и выше</theme.bato35compatilble>
-		<theme.netplay-required>Пожалуйста, включите NetPlay, чтобы показать ваш никнейм или выберите другой ник в настройках темы</theme.netplay-required>
-		<theme.ra-required>Пожалуйста, включите retroachievements, чтобы показать ваше имя пользователя или выберите другой ник в настройках темы</theme.ra-required>
-	</variables>
+  <formatVersion>7</formatVersion>
+  <variables lang="ru">
+    <theme.welcome>Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ РІ Playstation X РґР»СЏ</theme.welcome>
+    <theme.start>РќР°С‡Р°С‚СЊ</theme.start>
+    <theme.mostplayed>РЎР°РјС‹Рµ РёРіСЂР°РµРјС‹Рµ:</theme.mostplayed>
+    <theme.items>Р­Р»РµРјРµРЅС‚С‹:</theme.items>
+    <theme.collections>РљРѕР»Р»РµРєС†РёРё:</theme.collections>
+    <GamesNumber>РРіСЂС‹</GamesNumber>
+    <GamesFavs>РР·Р±СЂР°РЅРЅС‹Рµ</GamesFavs>
+    <NumberPlayed>РЎС‹РіСЂР°РЅРѕ</NumberPlayed>
+    <blue>СЃРёРЅРёР№</blue>
+    <black>С‡РµСЂРЅС‹Р№</black>
+    <red>РєСЂР°СЃРЅС‹Р№</red>
+    <yellow>Р¶РµР»С‚С‹Р№</yellow>
+    <green>Р·РµР»РµРЅС‹Р№</green>
+    <purple>С„РёРѕР»РµС‚РѕРІС‹Р№</purple>
+    <orange>РѕСЂР°РЅР¶РµРІС‹Р№</orange>
+    <pink>СЂРѕР·РѕРІС‹Р№</pink>
+    <default>СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№</default>
+    <big>Р±РѕР»СЊС€РѕР№</big>
+    <medium>СЃСЂРµРґРЅРёР№</medium>
+    <small>РјР°Р»РµРЅСЊРєРёР№</small>
+    <yes>РґР°</yes>
+    <no>РЅРµС‚</no>
+    <none>РќРµС‚</none>
+    <never>РќРёРєРѕРіРґР°</never>
+    <always>Р’СЃРµРіРґР°</always>
+    <iconset>РЅР°Р±РѕСЂ РёРєРѕРЅРѕРє</iconset>
+    <theme.frontend>Р’С‹Р±РµСЂРёС‚Рµ СЃРІРѕР№ Р»СЋР±РёРјС‹Р№ РёРЅС‚РµСЂС„РµР№СЃ</theme.frontend>
+    <gameBar>РџРѕРєР°Р·Р°С‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ РѕР± РёРіСЂРµ</gameBar>
+    <CarouselImageSize>Р Р°Р·РјРµСЂ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РІ РєР°СЂСѓСЃРµР»Рё</CarouselImageSize>
+    <theme.videoBackground>РџРѕРєР°Р·Р°С‚СЊ РІРёРґРµРѕ РЅР° СЌРєСЂР°РЅРµ СЃРёСЃС‚РµРјС‹</theme.videoBackground>
+    <theme.system-description>РџРѕРєР°Р·Р°С‚СЊ РѕРїРёСЃР°РЅРёСЏ СЃРёСЃС‚РµРјС‹</theme.system-description>
+    <theme.animated-background>РђРЅРёРјРёСЂРѕРІР°РЅРЅС‹Р№ С„РѕРЅ (РІРѕР»РЅС‹)</theme.animated-background>
+    <theme.backgroundVideoOption>Р¤РѕРЅРѕРІРѕРµ РІРёРґРµРѕ</theme.backgroundVideoOption>
+    <theme.windowVideoOption>Р’РёРґРµРѕ РІ РѕРєРЅРµ</theme.windowVideoOption>
+    <theme.insideVideoOption>Р’РЅСѓС‚СЂРё С‚Р°Р№Р»Р°</theme.insideVideoOption>
+    <theme.smallScreenOption>РњР°Р»РµРЅСЊРєРёР№ СЌРєСЂР°РЅ</theme.smallScreenOption>
+    <theme.videoaudio>Р’РєР»СЋС‡РёС‚СЊ Р°СѓРґРёРѕ РІ СЃРёСЃС‚РµРјРЅС‹С… РІРёРґРµРѕ</theme.videoaudio>
+    <theme.videoRandom>РџРѕРєР°Р·Р°С‚СЊ СЃР»СѓС‡Р°Р№РЅРѕРµ РІРёРґРµРѕРёР·РѕР±СЂР°Р¶РµРЅРёРµ</theme.videoRandom>
+    <ifnospot>Р•СЃР»Рё РЅРµС‚ СЃРёСЃС‚РµРјРЅРѕРіРѕ РІРёРґРµРѕ</ifnospot>
+    <theme.Avatar>Р’С‹Р±РµСЂРёС‚Рµ СЃРІРѕРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ РђРІР°С‚Р°СЂР°</theme.Avatar>
+    <theme.username>Р’С‹Р±РµСЂРёС‚Рµ Nick</theme.username>
+    <custom>РЅР°СЃС‚СЂРѕРµРЅРЅС‹Р№</custom>
+    <theme.videoGamelistDelay>Р—Р°РґРµСЂР¶РєР° РІРёРґРµРѕ РІ СЃРїРёСЃРєРµ РёРіСЂ</theme.videoGamelistDelay>
+    <VideoOff>РќРµ РѕС‚РѕР±СЂР°Р¶Р°С‚СЊ РІРёРґРµРѕ</VideoOff>
+    <theme.systemConsole>РџРѕРєР°Р·С‹РІР°С‚СЊ Р»РѕРіРѕС‚РёРї Рё РєРѕРЅСЃРѕР»Рё РІ СЃРёСЃС‚РµРјРЅРѕРј РІРёРґРµ</theme.systemConsole>
+    <randomGame>РЎР»СѓС‡Р°Р№РЅР°СЏ РёРіСЂР°</randomGame>
+    <theme.colorset>РќР°Р±РѕСЂ С†РІРµС‚РѕРІ С‚РµРјС‹</theme.colorset>
+    <theme.secondaryColorset>Р’С‚РѕСЂРёС‡РЅС‹Р№ С†РІРµС‚</theme.secondaryColorset>
+    <theme.gridvideo>РћС‚РѕР±СЂР°Р¶Р°С‚СЊ РІРёРґРµРѕРёРіСЂС‹</theme.gridvideo>
+    <theme.videoSnapAudio>Р’РєР»СЋС‡РёС‚СЊ Р·РІСѓРє РІ РІРёРґРµРѕРёРіСЂР°С…</theme.videoSnapAudio>
+    <theme.animatedList>РђРЅРёРјРёСЂРѕРІР°РЅРЅС‹Рµ РїРµСЂРµС…РѕРґС‹ РІ СЃРїРёСЃРєРµ РёРіСЂ</theme.animatedList>
+    <theme.animatedSystem>РђРЅРёРјРёСЂРѕРІР°РЅРЅС‹Рµ РїРµСЂРµС…РѕРґС‹ РІ СЃРёСЃС‚РµРјРЅРѕРј РІРёРґРµ</theme.animatedSystem>
+    <theme.aspect-ratio>Р’С‹Р±РµСЂРёС‚Рµ С‚РёРї СЌРєСЂР°РЅР°</theme.aspect-ratio>
+    <theme.oversizeVideoOption>РЈРІРµР»РёС‡РµРЅРЅРѕРµ РІРёРґРµРѕ</theme.oversizeVideoOption>
+    <theme.bato35compatilble>РЎРѕРІРјРµСЃС‚РёРј С‚РѕР»СЊРєРѕ СЃ batocera 35 РёР»Рё РІС‹С€Рµ</theme.bato35compatilble>
+    <theme.netplay-required>РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРєР»СЋС‡РёС‚Рµ СЃРµС‚РµРІСѓСЋ РёРіСЂСѓ, С‡С‚РѕР±С‹ РїРѕРєР°Р·Р°С‚СЊ СЃРІРѕРµ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РёР»Рё РІС‹Р±РµСЂРёС‚Рµ РґСЂСѓРіРѕР№ РЅРёРє РІ РЅР°СЃС‚СЂРѕР№РєР°С… С‚РµРјС‹</theme.netplay-required>
+    <theme.ra-required>РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРєР»СЋС‡РёС‚Рµ retroachievements, С‡С‚РѕР±С‹ РїРѕРєР°Р·Р°С‚СЊ СЃРІРѕРµ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РёР»Рё РІС‹Р±РµСЂРёС‚Рµ РґСЂСѓРіРѕР№ РЅРёРє РІ РЅР°СЃС‚СЂРѕР№РєР°С… С‚РµРјС‹</theme.ra-required>
+    <theme.hotkey>РџРѕРєР°Р·Р°С‚СЊ РїРѕРјРѕС‰СЊ РїРѕ РіРѕСЂСЏС‡РёРј РєР»Р°РІРёС€Р°Рј РЅР° СЌРєСЂР°РЅРµ РїСЂРёРІРµС‚СЃС‚РІРёСЏ</theme.hotkey>
+    <theme.hotkey-x86>РџРѕРєР°Р·Р°С‚СЊ Р±С‹СЃС‚СЂСѓСЋ СЃРїСЂР°РІРєСѓ РїРѕ РіРѕСЂСЏС‡РёРј РєР»Р°РІРёС€Р°Рј</theme.hotkey-x86>
+    <theme.hotkey.gamesplash>РўРѕР»СЊРєРѕ РЅР° СЌРєСЂР°РЅРµ Р·Р°РіСЂСѓР·РєРё РёРіСЂС‹</theme.hotkey.gamesplash>
+    <theme.hotkey.splash>РўРѕР»СЊРєРѕ РЅР° СЌРєСЂР°РЅРµ РїСЂРёРІРµС‚СЃС‚РІРёСЏ</theme.hotkey.splash>
+    <theme.hotkey.both>РќР° РѕР±РѕРёС… СЌРєСЂР°РЅР°С…</theme.hotkey.both>
+    <theme.detected>РѕР±РЅР°СЂСѓР¶РµРЅРѕ</theme.detected>
+    <theme.detailedorigin>РР·РѕР±СЂР°Р¶РµРЅРёРµ РІ РґРµС‚Р°Р»СЊРЅРѕРј РїСЂРѕСЃРјРѕС‚СЂРµ</theme.detailedorigin>
+    <theme.gridMainorigin>Р“Р»Р°РІРЅРѕРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ РІ РІРёРґРµ СЃРµС‚РєРё</theme.gridMainorigin>
+    <theme.gridorigin>РР·РѕР±СЂР°Р¶РµРЅРёСЏ РІ СЃРµС‚РєРµ</theme.gridorigin>
+    <theme.carouselMainOrigin>Р“Р»Р°РІРЅРѕРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ РІ РІРёРґРµ РєР°СЂСѓСЃРµР»Рё</theme.carouselMainOrigin>
+    <theme.carouselOrigin>РР·РѕР±СЂР°Р¶РµРЅРёСЏ РІ РєР°СЂСѓСЃРµР»Рё</theme.carouselOrigin>
+    <theme.systemBackground>РР·РѕР±СЂР°Р¶РµРЅРёРµ С„РѕРЅР° РІ РІРёРґРµ СЃРёСЃС‚РµРј</theme.systemBackground>
+    <randomFanart>РЎР»СѓС‡Р°Р№РЅС‹Р№ С„Р°РЅР°СЂС‚</randomFanart>
+    <theme.gamelistBackground>Р¤РѕРЅРѕРІРѕРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ РІ СЃРїРёСЃРєРµ РёРіСЂ</theme.gamelistBackground>
+    <theme.forced>РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅС‹Р№</theme.forced>
+  </variables>
 </theme>
