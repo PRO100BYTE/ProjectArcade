@@ -1,0 +1,13 @@
+<theme>
+   <formatVersion>7</formatVersion>
+   <variables>
+      <menuSelectedColor>ffffff</menuSelectedColor>
+      <menuSelectorColor>00ff00a6</menuSelectorColor>
+      <menuSelectorColorEnd>00ff00</menuSelectorColorEnd>
+      <sistema.lineainferior>00ff00</sistema.lineainferior>
+      <splash.progressbarActive>00ff00</splash.progressbarActive>
+      <gamelistSelectorColor>00ff00</gamelistSelectorColor>
+      <backgroundgridSelect>00ff00</backgroundgridSelect>
+   </variables>
+
+</theme>
