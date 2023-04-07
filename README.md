@@ -7,11 +7,11 @@
 
 ProjectArcade is a software for 64-bit versions of Windows designed for retro-gaming and running various emulators of gaming systems.
 
-ProjectArcade is a free open source project based on the Open-Source EmulationStation and RetroBat project. The software was developed by enthusiasts for non-commercial use, namely a fun pastime. All code and configs written by #TheDayG0ne is distributed under the MIT license, and the source code written by RetroBat Team is distributed under the LGPL v3 and CC BY-NC-SA 4.0 license.
+ProjectArcade is a free open source project based on the Open-Source [EmulationStation](https://github.com/fabricecaruso/batocera-emulationstation), [emulatorLauncher](https://github.com/fabricecaruso/batocera-ports) and [RetroBat](https://github.com/kaylh/Retrobat) projects. The software was developed by enthusiasts for non-commercial use, namely a fun pastime. All code and configs written by #TheDayG0ne is distributed under the MIT license, and the source code written by RetroBat Team is distributed under the LGPL v3 and CC BY-NC-SA 4.0 license.
 
 With it you will be able to quickly run games from many compatible ROM collections. This saves hours of configuration and installation time, leaving you free to play your favourite retro games.
 
-ProjectArcade thanks to RetroBat developments automatically downloads and installs all the relevant software needed to have the best retro gaming experience on your Windows PC.
+ProjectArcade automatically downloads and installs all the relevant software needed to have the best retro gaming experience on your Windows PC.
 
 ProjectArcade can also run in Portable Mode. This means you can play games from an external hard drive or from any removable storage device, as long as the computer meets the minimum requirements.
 
@@ -56,13 +56,12 @@ build.bat
 
 ## 💟 Special Thanks
 
-- [RetroBat](https://github.com/kaylh/RetroBat) - For a great project and informative documentation, and so on...
-- [Fabrice Caruso](https://github.com/fabricecaruso) - For the development of EmulatorLauncher
-- [Hel Mic](https://github.com/lehcimcramtrebor/) - For his wonderful themes.
-- [Batocera](https://www.batocera.org/) - For their wonderful retrogaming dedicated Operating System.
-- [Gitbook](https://www.gitbook.com/) - For supporting ProjectArcade and RetroBat project.
-- [pajarorrojo](https://github.com/pajarorrojo) - For PlayStation-X theme
-- [20GotoTen](https://github.com/20GotoTen) - For Retrofix theme
+- [kaylh](https://github.com/kaylh) - For a great RetroBat project and informative documentation, and so on...
+- [Fabrice Caruso](https://github.com/fabricecaruso) - For the development of EmulatorLauncher and Batocera scripts port
+- [Hel Mic](https://github.com/lehcimcramtrebor) - For his wonderful themes.
+- [Batocera](https://www.batocera.org) - For their wonderful retrogaming dedicated Operating System.
+- [pajarorrojo](https://github.com/pajarorrojo) - For PlayStation-X theme and support
+- [mluizvitor](https://github.com/mluizvitor) - For Elementerial theme
 - [NoCopyrightSounds](https://ncs.io) - For an excellent copyright-free music library
 
 ## And also - many thanks to 🦇 RetroBat Team:
@@ -130,20 +129,26 @@ Finally, the license which concerns the entire RetroBat Project as a work, in pa
 
 - RetroBat (c) 2017-2019 Adrien Chalard "Kayl", 2020-2023 RetroBat Team (LGPL v3 and CC BY-NC-SA 4.0 License)
 - EmulationStation (C) 2014 Alec Lofquist, contributions from community (MIT License).
+- EmulatorLauncher (C) Fabrice Caruso 
+- Batocera-ports (C) Fabrice Caruso
 - Carbon Theme (c) Fabrice Caruso (CC BY-NC-SA License). Originally based on the work of Eric Hettervik (Original Carbon Theme) and Nils Bonenberger (Simple Theme).
 - WiimoteGun (c) Fabrice Caruso (GPL3 License).
 - RetroArch by Libretro Team (GPL3 License).
 - PlayStation-X theme by pajarorrojo (CC BY-NC-SA 4.0 License)
-- Retrofix theme by 20GotoTen (CC BY-NC-SA 4.0 License)
+- Elementerial theme by mluizvitor (MIT License)
 
 ## 💬 Social & Support
 
 ### #TheDayG0ne
-- Official Website: https://projectarcade.ru
+- Site: https://thedayg0ne.ru
 - Telegram: https://t.me/thedayg0ne
-- VK: https://vk.com/projectarcade
+- VK: https://vk.com/thedayg0ne
 - E-mail: me@thedayg0ne.ru
 
+### ProjectArcade
+- Official Website: https://projectarcade.ru
+- Telegram: https://t.me/projectarcade_support
+- VK: https://vk.com/projectarcade
 
 ### RetroBat Team
 - Official Website: https://www.retrobat.org/
