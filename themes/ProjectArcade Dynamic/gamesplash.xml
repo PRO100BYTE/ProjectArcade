@@ -9,8 +9,8 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 
 		<image name="background-default" extra="true">
 			<linearSmooth>true</linearSmooth>
-			<path ifSubset="colorset:blue">./_theme_options/colorsets/blue/background.jpg</path>
-			<path ifSubset="colorset:black">./_theme_options/colorsets/black/background.jpg</path>
+			<path ifSubset="colorset:blue">./_theme_options/colorsets/blue/overlay.png</path>
+			<path ifSubset="colorset:black">./_theme_options/colorsets/black/overlay.png</path>
 			<origin>0.5 0.5</origin>
 			<pos>0.5 0.5</pos>
 			<size>0 1</size>
@@ -24,6 +24,7 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 			<maxSize ifSubset="aspect-ratio:4-3|5-4">0.2 0.2</maxSize>
 			<path ifSubset="frontend:batocera">./_theme_inc/images/batocera-logo-splash.svg</path>
 			<path ifSubset="frontend:retrobat">./_theme_inc/images/retrobat-logo.png</path>
+			<path ifSubset="frontend:projectarcade">./_theme_inc/images/projectarcade-logo.png</path>
 			<path ifSubset="frontend:batocera-plus">./_theme_inc/images/batocera_plus_logo.png</path>
 			<path ifSubset="frontend:emuelec">./_theme_inc/images/emuelec-logo-splash.png</path>
 			<linearSmooth>true</linearSmooth>

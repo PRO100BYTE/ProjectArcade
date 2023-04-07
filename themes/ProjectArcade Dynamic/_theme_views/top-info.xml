@@ -53,32 +53,6 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 
    </view>
    <view name="system">
-      <image name="logo-front" extra="static">
-         <path ifSubset="frontend:batocera">./_theme_inc/images/logo-bato-front.svg</path>
-         <path ifSubset="frontend:retrobat">./_theme_inc/images/retrobat-logo.png</path>
-         <path ifSubset="frontend:batocera-plus">./_theme_inc/images/batocera_plus_logo.png</path>
-         <path ifSubset="frontend:emuelec">./_theme_inc/images/emuelec-logo.png</path>
-         <pos>0.009 0.012</pos>
-         <maxSize>0.096</maxSize>
-         <color>ffffff</color>
-         <verticalAlignment>top</verticalAlignment>
-         <alignment>left</alignment>
-         <linearSmooth>true</linearSmooth>
-         <zIndex>99</zIndex>
-      </image>
-
-
-      <image name="plus-picto" extra="static">
-         <path>./_theme_inc/images/plus-picto-bato.svg</path>
-         <pos>0.086 0.045</pos>
-         <pos ifSubset="frontend:no-frontend">0.02 0.045</pos>
-         <maxSize>0.050</maxSize>
-         <color>ffffff</color>
-         <verticalAlignment>top</verticalAlignment>
-         <alignment>left</alignment>
-         <linearSmooth>true</linearSmooth>
-         <zIndex>99</zIndex>
-      </image>
 
       <image name="linea-superior" extra="static">
          <path>./_theme_inc/images/pixel-blanco.png</path>
