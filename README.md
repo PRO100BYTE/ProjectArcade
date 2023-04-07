@@ -67,12 +67,12 @@ build.bat
 
 ## And also - many thanks to 🦇 RetroBat Team:
 
-- Adrien Chalard "Kayl" - creator of the project, developer
-- Lorenzolamas - community management, graphics (former active)
-- Fabrice Caruso - lead developer, theme creation
-- GetUpOr - community, support
+- [Adrien Chalard "Kayl"](https://github.com/kaylh) - creator of the project, developer
+- [Lorenzolamas](https://github.com/lorenzolamas) - community management, graphics (former active)
+- [Fabrice Caruso](https://github.com/fabricecaruso) - lead developer, theme creation
+- [GetUpOr](https://github.com/getupor) - community, support
 - RetroBoy - community, support
-- Tartifless - developer, documentation
+- [Tartifless](https://github.com/Tartifless) - developer, documentation
 
 ## ⚖ Licenses
 
