@@ -34,7 +34,7 @@
 
 **ProjectArcade 1.5.3**
 - Minor bug fixes
-- Redesigned the standard ProjectArcade theme
+- Redesigned the ProjectArcade Dynamic theme
 - Added a new theme: ProjectArcade Simple
 - Added new platforms and emulators
 
@@ -47,3 +47,11 @@
 - Minor bug fixes
 - New background music
 - Updated Kodi to version 20.1
+
+**ProjectArcade 1.5.4-beta3**
+- Main ProjectArcade theme renamed to ProjectArcade Dynamic
+- New theme: ProjectArcade Material
+- The RetroBat Store has been replaced with the ProjectArcade Content Store
+- Updated emulatorLauncher design; the interface has been translated into Russian
+- Now emulatorLauncher downloads emulators from ProjectArcade servers without using RetroBat resources
+- The ability to download skins has been added to the ProjectArcade Content Store
