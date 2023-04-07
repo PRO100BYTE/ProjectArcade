@@ -1,0 +1,15 @@
+C:\Users\TheDayG0ne\EmulationStation\emulatorLauncher.exe.config
+C:\Users\TheDayG0ne\EmulationStation\emulatorLauncher.exe
+C:\Users\TheDayG0ne\EmulationStation\emulatorLauncher.pdb
+C:\Users\TheDayG0ne\EmulationStation\fr\emulatorLauncher.resources.dll
+C:\Users\TheDayG0ne\Desktop\emulatorLauncher\obj\Debug\emulatorLauncher.csproj.AssemblyReference.cache
+C:\Users\TheDayG0ne\Desktop\emulatorLauncher\obj\Debug\emulatorLauncher.csproj.SuggestedBindingRedirects.cache
+C:\Users\TheDayG0ne\Desktop\emulatorLauncher\obj\Debug\emulatorLauncher.Properties.Resources.resources
+C:\Users\TheDayG0ne\Desktop\emulatorLauncher\obj\Debug\emulatorLauncher.InstallerFrm.resources
+C:\Users\TheDayG0ne\Desktop\emulatorLauncher\obj\Debug\emulatorLauncher.Properties.Resources.fr.resources
+C:\Users\TheDayG0ne\Desktop\emulatorLauncher\obj\Debug\emulatorLauncher.csproj.GenerateResource.cache
+C:\Users\TheDayG0ne\Desktop\emulatorLauncher\obj\Debug\emulatorLauncher.csproj.CoreCompileInputs.cache
+C:\Users\TheDayG0ne\Desktop\emulatorLauncher\obj\Debug\fr\emulatorLauncher.resources.dll
+C:\Users\TheDayG0ne\Desktop\emulatorLauncher\obj\Debug\emulatorLauncher.csproj.CopyComplete
+C:\Users\TheDayG0ne\Desktop\emulatorLauncher\obj\Debug\emulatorLauncher.exe
+C:\Users\TheDayG0ne\Desktop\emulatorLauncher\obj\Debug\emulatorLauncher.pdb
