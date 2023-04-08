@@ -2,6 +2,10 @@
 
 This repository contains a script written in C# that downloads and runs emulators for ProjectArcade.
 
+## Build status
+
+[![Build status](https://ci.appveyor.com/api/projects/status/6s94v160gg07p93e?svg=true)](https://ci.appveyor.com/project/TheDayG0ne/projectarcade-emulatorlauncher)
+
 ## Build script
 
 To use this script you will need:
@@ -33,4 +37,3 @@ Huge thanks to these people:
 ## License
 
 This project is distributed under the MIT license.
-
