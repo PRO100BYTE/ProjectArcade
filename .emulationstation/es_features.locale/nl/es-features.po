@@ -102,6 +102,11 @@ msgctxt "game_options"
 msgid "Very High"
 msgstr "Erg Hoog"
 
+# . TRANSLATION: libretro/mesen, libretro/neocd, libretro/o2em, duckstation
+msgctxt "game_options"
+msgid "CONSOLE REGION"
+msgstr "CONSOLE REGION"
+
 # . TRANSLATION: libretro/desmume, libretro/fbneo, libretro/flycast, libretro/mame078plus, libretro/mgba, ...
 msgctxt "game_options"
 msgid "FRAMESKIP"
@@ -512,6 +517,11 @@ msgctxt "game_options"
 msgid "AUDIO FILTER"
 msgstr "AUDIO FILTER"
 
+# . TRANSLATION: libretro/pcsx_rearmed
+msgctxt "game_options"
+msgid "On (Speed hack)"
+msgstr "Aan (Speed Hack)"
+
 # . TRANSLATION: libretro/puae, libretro/puae2021
 msgctxt "game_options"
 msgid "CPU COMPATIBILITY"
@@ -803,102 +813,6 @@ msgid "VOLUME GAIN"
 msgstr ""
 
 msgctxt "game_options"
-msgid "+1"
-msgstr ""
-
-msgctxt "game_options"
-msgid "+2"
-msgstr ""
-
-msgctxt "game_options"
-msgid "+3"
-msgstr ""
-
-msgctxt "game_options"
-msgid "+4"
-msgstr ""
-
-msgctxt "game_options"
-msgid "+5"
-msgstr ""
-
-msgctxt "game_options"
-msgid "+6"
-msgstr ""
-
-msgctxt "game_options"
-msgid "+7"
-msgstr ""
-
-msgctxt "game_options"
-msgid "+8"
-msgstr ""
-
-msgctxt "game_options"
-msgid "+9"
-msgstr ""
-
-msgctxt "game_options"
-msgid "+10"
-msgstr ""
-
-msgctxt "game_options"
-msgid "+11"
-msgstr ""
-
-msgctxt "game_options"
-msgid "+12"
-msgstr ""
-
-msgctxt "game_options"
-msgid "-12"
-msgstr ""
-
-msgctxt "game_options"
-msgid "-11"
-msgstr ""
-
-msgctxt "game_options"
-msgid "-10"
-msgstr ""
-
-msgctxt "game_options"
-msgid "-9"
-msgstr ""
-
-msgctxt "game_options"
-msgid "-8"
-msgstr ""
-
-msgctxt "game_options"
-msgid "-7"
-msgstr ""
-
-msgctxt "game_options"
-msgid "-6"
-msgstr ""
-
-msgctxt "game_options"
-msgid "-5"
-msgstr ""
-
-msgctxt "game_options"
-msgid "-4"
-msgstr ""
-
-msgctxt "game_options"
-msgid "-3"
-msgstr ""
-
-msgctxt "game_options"
-msgid "-2"
-msgstr ""
-
-msgctxt "game_options"
-msgid "-1"
-msgstr ""
-
-msgctxt "game_options"
 msgid "MIXER VOLUME GAIN"
 msgstr ""
 
@@ -983,7 +897,7 @@ msgid "SHOW MENU ELEMENTS"
 msgstr ""
 
 msgctxt "game_options"
-msgid "Show or hide RetroArch settings. 'Auto' is the recommended config."
+msgid "Show or hide RetroArch settings. 'Config' depends on ES interface mode."
 msgstr ""
 
 msgctxt "game_options"
@@ -992,6 +906,10 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "minimal"
+msgstr ""
+
+msgctxt "game_options"
+msgid "recommended"
 msgstr ""
 
 msgctxt "game_options"
@@ -1004,30 +922,6 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "Display or not on-screen notifications."
-msgstr ""
-
-msgctxt "game_options"
-msgid "DRAW STATISTICS"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Display different levels of informations about statistics of performance."
-msgstr ""
-
-msgctxt "game_options"
-msgid "FPS ONLY"
-msgstr ""
-
-msgctxt "game_options"
-msgid "MEMORY USAGE ONLY"
-msgstr ""
-
-msgctxt "game_options"
-msgid "FPS + MEMORY USAGE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "TECHNICAL STATS"
 msgstr ""
 
 msgctxt "game_options"
@@ -1155,7 +1049,7 @@ msgid "VIDEO"
 msgstr ""
 
 msgctxt "game_options"
-msgid "The driver 'vulkan' will generally offer better performance if hardware compatible. Some libretro cores will force the choosen driver."
+msgid "Use 'vulkan' for the best performance if the hardware is compatible."
 msgstr ""
 
 msgctxt "game_options"
@@ -1215,7 +1109,7 @@ msgid "CONTROLLERS"
 msgstr ""
 
 msgctxt "game_options"
-msgid "The driver 'xinput' will enable features like rumble effects. Choose 'sdl' for compatibility with a wide range of controllers."
+msgid "Use 'xinput' for almost all modern controllers. Use 'sdl' for compatibility."
 msgstr ""
 
 msgctxt "game_options"
@@ -1239,7 +1133,7 @@ msgid "ALWAYS DELETE UNCOMPRESSED FOLDERS"
 msgstr ""
 
 msgctxt "game_options"
-msgid "FORMAT"
+msgid "REGION"
 msgstr ""
 
 msgctxt "game_options"
@@ -1264,18 +1158,6 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "Improve data transfert of emulated SIO port."
-msgstr ""
-
-msgctxt "game_options"
-msgid "Improve the resolution at the cost of increased performance requirements."
-msgstr ""
-
-msgctxt "game_options"
-msgid "NATIVE (400x240)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "6X (ULTRA HD)"
 msgstr ""
 
 msgctxt "game_options"
@@ -1311,7 +1193,19 @@ msgid "Set the bottom screen as prominent."
 msgstr ""
 
 msgctxt "game_options"
-msgid "REGION"
+msgid "Improve the resolution at the cost of increased performance requirements."
+msgstr ""
+
+msgctxt "game_options"
+msgid "VISUAL RENDERING"
+msgstr ""
+
+msgctxt "game_options"
+msgid "NATIVE (400x240)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "6X (ULTRA HD)"
 msgstr ""
 
 msgctxt "game_options"
@@ -1391,10 +1285,6 @@ msgid "Enhance the quality of textures on surface."
 msgstr ""
 
 msgctxt "game_options"
-msgid "VISUAL RENDERING"
-msgstr ""
-
-msgctxt "game_options"
 msgid "CUSTOM TEXTURES"
 msgstr ""
 
@@ -1412,10 +1302,6 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "簡化字 (Chinese - traditional)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "FORCE PAL 60HZ"
 msgstr ""
 
 msgctxt "game_options"
@@ -1439,27 +1325,7 @@ msgid "Display the emulated framebuffer at a widescreen aspect ratio. Get best r
 msgstr ""
 
 msgctxt "game_options"
-msgid "SKIP BIOS"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Skips the BIOS boot animation displayed when loading content."
-msgstr ""
-
-msgctxt "game_options"
 msgid "Enable controller's rumble effects."
-msgstr ""
-
-msgctxt "game_options"
-msgid "SENSOR BAR POSITION"
-msgstr ""
-
-msgctxt "game_options"
-msgid "TOP"
-msgstr ""
-
-msgctxt "game_options"
-msgid "BOTTOM"
 msgstr ""
 
 msgctxt "game_options"
@@ -2047,22 +1913,6 @@ msgid "TURKEY"
 msgstr ""
 
 msgctxt "game_options"
-msgid "GAMEPAD AUTO MAPPING"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Try to detect the game and apply a controller mapping."
-msgstr ""
-
-msgctxt "game_options"
-msgid "BIND UNUSED BUTTONS"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Bind all unused buttons to keyboard keys."
-msgstr ""
-
-msgctxt "game_options"
 msgid "AUTO ROTATE"
 msgstr ""
 
@@ -2164,14 +2014,6 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "COMPOSITE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "POWERVR2 POST-PROCESSING FILTER"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Simulate effects specific to the PowerVR2 GPU and analog video signals."
 msgstr ""
 
 msgctxt "game_options"
@@ -2747,6 +2589,14 @@ msgid "Eliminates position-dependent distortion and warping of textures."
 msgstr ""
 
 msgctxt "game_options"
+msgid "SKIP BIOS"
+msgstr ""
+
+msgctxt "game_options"
+msgid "Skips the PlayStation BIOS boot animation normally displayed when loading content."
+msgstr ""
+
+msgctxt "game_options"
 msgid "FORCE ANALOG STICKS"
 msgstr ""
 
@@ -2755,11 +2605,7 @@ msgid "If disabled, DualShock can be toggled between DIGITAL/ANALOG with START+S
 msgstr ""
 
 msgctxt "game_options"
-msgid "ENHANCED"
-msgstr ""
-
-msgctxt "game_options"
-msgid "ENHANCED (SPEED HACK)"
+msgid "ENHANCED RESOLUTION"
 msgstr ""
 
 msgctxt "game_options"
@@ -3127,11 +2973,11 @@ msgid "CONTROLLER PAK (P4)"
 msgstr ""
 
 msgctxt "game_options"
-msgid "Select the IPL BIOS to run a game depending on its region. Needs 'IPL_JAP.n64', 'IPL_USA.n64' and 'IPL_DEV.n64' in bios\Mupen64plus folder."
+msgid "LOW"
 msgstr ""
 
 msgctxt "game_options"
-msgid "DEVKIT"
+msgid "HIGH"
 msgstr ""
 
 msgctxt "game_options"
@@ -3195,7 +3041,7 @@ msgid "LINEAR"
 msgstr ""
 
 msgctxt "game_options"
-msgid "SUPERFX CHIP OVERCLOCK"
+msgid "EMULATED SUPERFX OVERCLOCK"
 msgstr ""
 
 msgctxt "game_options"
@@ -3236,6 +3082,10 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "UNIVERSE BIOS"
+msgstr ""
+
+msgctxt "game_options"
+msgid "NTSC FILTER"
 msgstr ""
 
 msgctxt "game_options"
@@ -3291,7 +3141,7 @@ msgid "ACCURATE"
 msgstr ""
 
 msgctxt "game_options"
-msgid "FORCE HARDWARE"
+msgid "EMULATED HARDWARE"
 msgstr ""
 
 msgctxt "game_options"
@@ -3771,6 +3621,18 @@ msgid "Enable for Doom to run at its correct resolution"
 msgstr ""
 
 msgctxt "game_options"
+msgid "Fit to the original ratio of the game."
+msgstr ""
+
+msgctxt "game_options"
+msgid "GLOBAL"
+msgstr ""
+
+msgctxt "game_options"
+msgid "GAME SPECIFIC"
+msgstr ""
+
+msgctxt "game_options"
 msgid "Efficient graphics filters improving the rendering of games."
 msgstr ""
 
@@ -3820,18 +3682,6 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "SCANLINE 4X"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Fit to the original ratio of the game."
-msgstr ""
-
-msgctxt "game_options"
-msgid "GLOBAL"
-msgstr ""
-
-msgctxt "game_options"
-msgid "GAME SPECIFIC"
 msgstr ""
 
 msgctxt "game_options"
@@ -3907,7 +3757,7 @@ msgid "WAVE FILTER"
 msgstr ""
 
 msgctxt "game_options"
-msgid "STRETCH (WIDESCREEN HACK)"
+msgid "STRETCH"
 msgstr ""
 
 msgctxt "game_options"
@@ -3924,122 +3774,6 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "SOFTWARE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "MANUAL HACKS"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Enable manual hacks below, otherwise hacks will be apllied automatically."
-msgstr ""
-
-msgctxt "game_options"
-msgid "LOWER GS PRECISION (HACK)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Avoid gap between pixels when upscaling. Fix Wild Arms text, SoulCalibur ghosting."
-msgstr ""
-
-msgctxt "game_options"
-msgid "HALF-SCREEN (HACK)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "'Auto' will controls the half-screen fix detection on texture shuffling."
-msgstr ""
-
-msgctxt "game_options"
-msgid "FORCE DISABLE (For Xenosaga games)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "FORCE ENABLE (If issues on Auto)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "HALF PIXEL OFFSET (HACK)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Might fix some misaligned fog, bloom or blend effect."
-msgstr ""
-
-msgctxt "game_options"
-msgid "NORMAL (VERTEX)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "SPECIAL (TEXTURE)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "SPECIAL (TEXTURE AGRESSIVE)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "ROUND SPRITE (HACK)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Correct the sampling of 2D sprite textures when upscaling."
-msgstr ""
-
-msgctxt "game_options"
-msgid "HALF"
-msgstr ""
-
-msgctxt "game_options"
-msgid "ALIGN SPRITE (HACK)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Fix issues with upscaling in Namco games (Ace Combat, Tekken, SoulCalibur...)."
-msgstr ""
-
-msgctxt "game_options"
-msgid "MERGE SPRITE (HACK)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Replaces post-processing multiple paving sprites by a single fat sprite."
-msgstr ""
-
-msgctxt "game_options"
-msgid "TEXTURE OFFSETS (HACK)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Offset for the ST/UV texture coordinates."
-msgstr ""
-
-msgctxt "game_options"
-msgid "X:0500 Y:0500 (Persona 3, Haunting Ground)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "X:0000 Y:1000 (Xenosaga)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "SAFE FEATURES (HACK)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Disabling safe features can help various games such as Xenosaga, Kingdom Hearts..."
-msgstr ""
-
-msgctxt "game_options"
-msgid "SKIPDRAW (HACK)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "A shadows and colors fix needed for some games such as Tony Hawk Proving Ground."
-msgstr ""
-
-msgctxt "game_options"
-msgid "STRETCH"
 msgstr ""
 
 msgctxt "game_options"
@@ -4076,18 +3810,6 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "SSE4"
-msgstr ""
-
-msgctxt "game_options"
-msgid "CRC LEVEL (HACK)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Controls the number of Auto-CRC fixes and hacks applied to games."
-msgstr ""
-
-msgctxt "game_options"
-msgid "AGRESSIVE"
 msgstr ""
 
 msgctxt "game_options"
@@ -4143,11 +3865,139 @@ msgid "When disabled the CPU will convert directly the texture to 32 bit. Basica
 msgstr ""
 
 msgctxt "game_options"
+msgid "BOOT FROM BIOS"
+msgstr ""
+
+msgctxt "game_options"
+msgid "Skip BIOS or not when booting a game."
+msgstr ""
+
+msgctxt "game_options"
 msgid "SPEED HACKS"
 msgstr ""
 
 msgctxt "game_options"
 msgid "Significantly improves performances for CPU with 3+ cores."
+msgstr ""
+
+msgctxt "game_options"
+msgid "LOWER GS PRECISION (FIX)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "Avoid gap between pixels when upscaling. Fix Wild Arms text, SoulCalibur ghosting."
+msgstr ""
+
+msgctxt "game_options"
+msgid "HALF-SCREEN (FIX)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "'Auto' will controls the half-screen fix detection on texture shuffling."
+msgstr ""
+
+msgctxt "game_options"
+msgid "FORCE DISABLE (For Xenosaga games)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "FORCE ENABLE (If issues on Auto)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "HALF PIXEL OFFSET (FIX)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "Might fix some misaligned fog, bloom or blend effect."
+msgstr ""
+
+msgctxt "game_options"
+msgid "NORMAL (VERTEX)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "SPECIAL (TEXTURE)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "SPECIAL (TEXTURE AGRESSIVE)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "ROUND SPRITE (FIX)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "Correct the sampling of 2D sprite textures when upscaling."
+msgstr ""
+
+msgctxt "game_options"
+msgid "HALF"
+msgstr ""
+
+msgctxt "game_options"
+msgid "ALIGN SPRITE (FIX)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "Fix issues with upscaling in Namco games (Ace Combat, Tekken, SoulCalibur...)."
+msgstr ""
+
+msgctxt "game_options"
+msgid "MERGE SPRITE (FIX)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "Replaces post-processing multiple paving sprites by a single fat sprite."
+msgstr ""
+
+msgctxt "game_options"
+msgid "TEXTURE OFFSETS (FIX)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "Offset for the ST/UV texture coordinates."
+msgstr ""
+
+msgctxt "game_options"
+msgid "X:0500 Y:0500 (Persona 3, Haunting Ground)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "X:0000 Y:1000 (Xenosaga)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "SAFE FEATURES (FIX)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "Disabling safe features can help various games such as Xenosaga, Kingdom Hearts..."
+msgstr ""
+
+msgctxt "game_options"
+msgid "SKIPDRAW (FIX)"
+msgstr ""
+
+msgctxt "game_options"
+msgid "A shadows and colors fix needed for some games such as Tony Hawk Proving Ground."
+msgstr ""
+
+msgctxt "game_options"
+msgid "CRC LEVEL"
+msgstr ""
+
+msgctxt "game_options"
+msgid "Controls the number of Auto-CRC fixes and hacks applied to games."
+msgstr ""
+
+msgctxt "game_options"
+msgid "AGRESSIVE"
+msgstr ""
+
+msgctxt "game_options"
+msgid "DRAW STATISTICS"
 msgstr ""
 
 msgctxt "game_options"
@@ -4168,22 +4018,6 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "Set Anti Aliasing for rendered content. A dangerous option to enable in Dolphin. Setting this too high will quickly cause a bandwidth bottleneck on your GPU. Worse yet, these settings may cause various graphical effects in games to be sampled incorrectly."
-msgstr ""
-
-msgctxt "game_options"
-msgid "ANTI-ALIASING MODE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "SSAA offers better quality at the cost of performance."
-msgstr ""
-
-msgctxt "game_options"
-msgid "MSAA"
-msgstr ""
-
-msgctxt "game_options"
-msgid "SSAA"
 msgstr ""
 
 msgctxt "game_options"
@@ -4215,43 +4049,7 @@ msgid "Improve the loading of discs of the emulated game."
 msgstr ""
 
 msgctxt "game_options"
-msgid "SKIP EFB ACCESS (HACK)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Improve performance in some games but can disable graphical effects and gameplay related features."
-msgstr ""
-
-msgctxt "game_options"
-msgid "IGNORE EFB FORMAT (HACK)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Improve performance in many game. Disabling this may avoid graphical defect in some other games."
-msgstr ""
-
-msgctxt "game_options"
-msgid "STORE EFB COPIES (HACK)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Many games need copies to textures only, but if you're seeing blacked out or missing graphics, you might need to choose copies to RAM."
-msgstr ""
-
-msgctxt "game_options"
-msgid "TO TEXTURE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "TO TEXTURE AND RAM"
-msgstr ""
-
-msgctxt "game_options"
-msgid "DON'T DEFER COPIES TO RAM"
-msgstr ""
-
-msgctxt "game_options"
-msgid "SCALED EFB COPY (HACK)"
+msgid "SCALED EFB COPY"
 msgstr ""
 
 msgctxt "game_options"
@@ -4264,6 +4062,22 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "Filter all textures. Including any that the game explicitly sets as unfiltered. Enabled by default."
+msgstr ""
+
+msgctxt "game_options"
+msgid "CONTROLLER BUTTONS"
+msgstr ""
+
+msgctxt "game_options"
+msgid "Set the button position convention."
+msgstr ""
+
+msgctxt "game_options"
+msgid "ORGINAL"
+msgstr ""
+
+msgctxt "game_options"
+msgid "INVERTS A AND B"
 msgstr ""
 
 msgctxt "game_options"
@@ -4283,83 +4097,7 @@ msgid "DIRECTX 12"
 msgstr ""
 
 msgctxt "game_options"
-msgid "INVERT A AND B"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WIIMOTE TYPE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "EMULATED"
-msgstr ""
-
-msgctxt "game_options"
-msgid "REAL"
-msgstr ""
-
-msgctxt "game_options"
-msgid "EMULATED DEVICES"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Emulate a specific motion control. The '/' means the action for L-stick/R-stick."
-msgstr ""
-
-msgctxt "game_options"
-msgid "CLASSIC CONTROLLER"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WIIMOTE: HORIZONTAL"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WIIMOTE: CURSOR/SWING"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WIIMOTE: CURSOR/TILT"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WIIMOTE: SWING/CURSOR"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WIIMOTE: TILT/CURSOR"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WIIMOTE: SWING/TILT"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WIIMOTE: TILT/SWING"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WIIMOTE: CURSOR/NUNCHUK"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WIIMOTE: NUNCHUK/CURSOR"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WIIMOTE: SWING/NUNCHUK"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WIIMOTE: NUNCHUK/SWING"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WIIMOTE: TILT/NUNCHUK"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WIIMOTE: NUNCHUK/TILT"
+msgid "EMULATED WIIMOTES"
 msgstr ""
 
 msgctxt "game_options"
@@ -4388,6 +4126,10 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "ENABLE BACKGLASS"
+msgstr ""
+
+msgctxt "game_options"
+msgid "SHADER"
 msgstr ""
 
 msgctxt "game_options"
@@ -4451,10 +4193,6 @@ msgid "Forces the precision of colours output to the console's framebuffer."
 msgstr ""
 
 msgctxt "game_options"
-msgid "Use 'xinput' for almost all modern controllers. Use 'sdl' for compatibility."
-msgstr ""
-
-msgctxt "game_options"
 msgid "DINPUT"
 msgstr ""
 
@@ -4464,370 +4202,6 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "VIDEO DRIVER"
-msgstr ""
-
-msgctxt "game_options"
-msgid "1280x720 (Recommended)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Leave this on 16:9 unless you have a 4:3 monitor."
-msgstr ""
-
-msgctxt "game_options"
-msgid "FRAMELIMIT"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Only use framelimiter if a game runs too fast without it. Some games may crash if the framerate is too high. If that happens, set value to anything other than Off."
-msgstr ""
-
-msgctxt "game_options"
-msgid "INFINITE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Emulates PS3 multisampling layout. Can fix some visual artifacts in some games."
-msgstr ""
-
-msgctxt "game_options"
-msgid "SHADER MODE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "LEGACY (SINGLE THREADED)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "ASYNC (MULTI THREADED)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "ASYNC WITH INTERPRETER"
-msgstr ""
-
-msgctxt "game_options"
-msgid "SHADER INTERPRETER ONLY"
-msgstr ""
-
-msgctxt "game_options"
-msgid "SHADER QUALITY"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Low shader quality can improve performance but cause glitches."
-msgstr ""
-
-msgctxt "game_options"
-msgid "HIGH"
-msgstr ""
-
-msgctxt "game_options"
-msgid "LOW"
-msgstr ""
-
-msgctxt "game_options"
-msgid "ZCULL ACCURACY"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Precise is the most accurate and relaxed can increase performance but break some games."
-msgstr ""
-
-msgctxt "game_options"
-msgid "PRECISE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "APPROXIMATE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "RELAXED"
-msgstr ""
-
-msgctxt "game_options"
-msgid "WRITE COLOR BUFFERS"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Enable this option if you get missing graphics or broken lighting ingame."
-msgstr ""
-
-msgctxt "game_options"
-msgid "WRITE DEPTH BUFFERS"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Writes depth buffer values to vm memory. Default off."
-msgstr ""
-
-msgctxt "game_options"
-msgid "READ COLOR BUFFERS"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Initializes render target memory using vm memory. Default off."
-msgstr ""
-
-msgctxt "game_options"
-msgid "READ DEPTH BUFFERS"
-msgstr ""
-
-msgctxt "game_options"
-msgid "VSYNC"
-msgstr ""
-
-msgctxt "game_options"
-msgid "By having this off you might obtain a higher frame rate at the cost of tearing artifacts in the game."
-msgstr ""
-
-msgctxt "game_options"
-msgid "SCREEN SYNC"
-msgstr ""
-
-msgctxt "game_options"
-msgid "ANISOTROPIC FILTER"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Modern GPUs can handle this setting fine, even at 16x. Keep this on Auto if you want to use the original settings used by a real PS3."
-msgstr ""
-
-msgctxt "game_options"
-msgid "AUTO"
-msgstr ""
-
-msgctxt "game_options"
-msgid "STRETCH TO DISPLAY AREA"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Overrides the aspect ratio and stretches the image to the full display area. Useful for games that have an ultrawide (21:9 or 32:9) patch available."
-msgstr ""
-
-msgctxt "game_options"
-msgid "STRICT RENDERING MODE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Enforces strict compliance to the API specification. Might result in degraded performance in some games. Can resolve rare cases of missing graphics and flickering."
-msgstr ""
-
-msgctxt "game_options"
-msgid "DISABLE VERTEX CACHE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Disables the vertex cache. Might resolve missing or flickering graphics output. May degrade performance."
-msgstr ""
-
-msgctxt "game_options"
-msgid "MULTITHREADED RSX"
-msgstr ""
-
-msgctxt "game_options"
-msgid "May improve performance for some high-core processors. May cause slowdown in some situations due to the extra worker thread load."
-msgstr ""
-
-msgctxt "game_options"
-msgid "ENABLE 3D"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Enables 3D stereo rendering."
-msgstr ""
-
-msgctxt "game_options"
-msgid "FSR UPSCALING"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Enable AMD FidelityFX upscaling, only works with VULKAN and an AMD graphics card."
-msgstr ""
-
-msgctxt "game_options"
-msgid "ASYNCHRONOUS TEXTURE STREAMING"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Can improve performance on more powerful GPUs that have spare headroom. Only works with Vulkan renderer."
-msgstr ""
-
-msgctxt "game_options"
-msgid "AUDIO CHANNELS"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Configure this setting if you want to switch between stereo and surround sound."
-msgstr ""
-
-msgctxt "game_options"
-msgid "STEREO"
-msgstr ""
-
-msgctxt "game_options"
-msgid "SURROUND 5.1"
-msgstr ""
-
-msgctxt "game_options"
-msgid "SURROUND 7.1"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Choose which graphics API library to use. Vulkan is better, when supported."
-msgstr ""
-
-msgctxt "game_options"
-msgid "XAudio2 is the best alternative."
-msgstr ""
-
-msgctxt "game_options"
-msgid "XAUDIO2"
-msgstr ""
-
-msgctxt "game_options"
-msgid "CUBEB"
-msgstr ""
-
-msgctxt "game_options"
-msgid "AMERICA"
-msgstr ""
-
-msgctxt "game_options"
-msgid "SOUTHEAST ASIA"
-msgstr ""
-
-msgctxt "game_options"
-msgid "PPU DECODER"
-msgstr ""
-
-msgctxt "game_options"
-msgid "LLVM is fastest, use the Interpreter settings if there are issues."
-msgstr ""
-
-msgctxt "game_options"
-msgid "LLVM Recompiler"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Interpreter (static)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Interpreter (dynamic)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "PPU LVM PRECOMPILATION"
-msgstr ""
-
-msgctxt "game_options"
-msgid "If disabled, these modules will only be compiled when needed. Depending on the game, this might interrupt the gameplay unexpectedly and possibly frequently."
-msgstr ""
-
-msgctxt "game_options"
-msgid "SPU DECODER"
-msgstr ""
-
-msgctxt "game_options"
-msgid "LLVM is the fastest option with very good compatibility. If you experience issues, use the ASMJIT Recompiler."
-msgstr ""
-
-msgctxt "game_options"
-msgid "ASMJIT Recompiler"
-msgstr ""
-
-msgctxt "game_options"
-msgid "LOWER SPU THREAD PRIORITY"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Runs SPU threads with lower priority than PPU threads. Default off"
-msgstr ""
-
-msgctxt "game_options"
-msgid "PREFERRED SPU THREADS"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Some SPU stages are sensitive to race conditions and allowing a limited number at a time helps alleviate performance stalls. Setting this to a smaller value might improve performance and reduce stuttering in some games."
-msgstr ""
-
-msgctxt "game_options"
-msgid "ENABLE SPU LOOP DETECTION"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Try to detect loop conditions in SPU kernels and use them as scheduling hints. Default off"
-msgstr ""
-
-msgctxt "game_options"
-msgid "SPU BLOCK SIZE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "This option controls the SPU analyser, particularly the size of compiled units.Use the safe mode for maximum compatibility."
-msgstr ""
-
-msgctxt "game_options"
-msgid "SAFE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "MEGA"
-msgstr ""
-
-msgctxt "game_options"
-msgid "GIGA"
-msgstr ""
-
-msgctxt "game_options"
-msgid "ACCURATE RSX RESERVATION ACCESS"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Improves stability in some games but reduces performance."
-msgstr ""
-
-msgctxt "game_options"
-msgid "ACCURATE XFLOAT"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Higher accuracy fixes bugs in some games at cost of performance. Only used if SPU decoder is set to Dynamic or LLVM."
-msgstr ""
-
-msgctxt "game_options"
-msgid "FULL WIDTH AVX-512"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Enables the use of code with full width AVX-512.Only available with CPUs that support AVX-512."
-msgstr ""
-
-msgctxt "game_options"
-msgid "ACCURATE PPU VECTOR NAN"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Respect Non-Java Mode bit values for vector ops in PPU backends. If unsure, do not modify this setting. Default off."
-msgstr ""
-
-msgctxt "game_options"
-msgid "START GAME IN FULLSCREEN"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Start game in fullscreen, default yes."
-msgstr ""
-
-msgctxt "game_options"
-msgid "PERFORMANCE STATISTICS"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Show performance statistics overlay in-game."
 msgstr ""
 
 msgctxt "game_options"
@@ -4863,18 +4237,6 @@ msgid "The maximum RAM memory available for the system."
 msgstr ""
 
 msgctxt "game_options"
-msgid "ENABLE MOTION"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Can only be used if the controller is compatible with motion control."
-msgstr ""
-
-msgctxt "game_options"
-msgid "Invert A/B and X/Y buttons on Xbox controllers."
-msgstr ""
-
-msgctxt "game_options"
 msgid "Improve fidelity of 3D models at the cost of increased performance requirements."
 msgstr ""
 
@@ -4904,90 +4266,6 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "AMD's FidelityFX Super Resolution"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Native (720p/1080p)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "GRAPHICS BACKEND MULTITHREADING"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Executes Graphics backend on second thread, improves performance, reduces stutter and speeds up shader compilation."
-msgstr ""
-
-msgctxt "game_options"
-msgid "SHADER CACHE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Reduces stuttering by enabling shader cache."
-msgstr ""
-
-msgctxt "game_options"
-msgid "TEXTURE RECOMPRESSION"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Reduces VRAM usage at the cost of quality, may increase stuttering."
-msgstr ""
-
-msgctxt "game_options"
-msgid "ENABLE PPTC"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Reduces stuttering and speeds up boot after first boot."
-msgstr ""
-
-msgctxt "game_options"
-msgid "FS INTEGRITY CHECKS"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Checks for corrupt files when booting a game."
-msgstr ""
-
-msgctxt "game_options"
-msgid "MEMORY MANAGER MODE"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Greatly affects CPU performance."
-msgstr ""
-
-msgctxt "game_options"
-msgid "HOST (fast)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "HOST UNCHECKED (fastest)"
-msgstr ""
-
-msgctxt "game_options"
-msgid "EXPAND DRAM"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Increase DRAM size from 4GB to 6GB, only needed for 4K or hires texture packs."
-msgstr ""
-
-msgctxt "game_options"
-msgid "IGNORE MISSING SERVICES"
-msgstr ""
-
-msgctxt "game_options"
-msgid "Ignore Horizon OS Services, can solve crashes on some games."
-msgstr ""
-
-msgctxt "game_options"
-msgid "OPENAL"
-msgstr ""
-
-msgctxt "game_options"
-msgid "SOUNDIO"
 msgstr ""
 
 msgctxt "game_options"
