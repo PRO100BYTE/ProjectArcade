@@ -131,7 +131,7 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ядро &apos;{0}&apos; не установлено.
+        ///   Ищет локализованную строку, похожую на Ядро {0} не установлено.
         ///Установить сейчас ?.
         /// </summary>
         internal static string CoreNotInstalled {
@@ -160,7 +160,7 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Эмулятор &apos;{0}&apos; не установлен.
+        ///   Ищет локализованную строку, похожую на Эмулятор {0} не установлен.
         ///Установить сейчас ?.
         /// </summary>
         internal static string EmulatorNotInstalled {

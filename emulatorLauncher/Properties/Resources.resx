@@ -161,7 +161,7 @@
     <value>Нет</value>
   </data>
   <data name="EmulatorNotInstalled" xml:space="preserve">
-    <value>Эмулятор '{0}' не установлен.
+    <value>Эмулятор {0} не установлен.
 Установить сейчас ?</value>
   </data>
   <data name="UpdateAvailable" xml:space="preserve">
@@ -177,7 +177,7 @@
     <value>Да</value>
   </data>
   <data name="CoreNotInstalled" xml:space="preserve">
-    <value>Ядро '{0}' не установлено.
+    <value>Ядро {0} не установлено.
 Установить сейчас ?</value>
   </data>
   <data name="Ok" xml:space="preserve">

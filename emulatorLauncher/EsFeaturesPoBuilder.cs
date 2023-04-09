@@ -83,7 +83,7 @@ namespace emulatorLauncher
 
                 file.Save();
             }
-            MessageBox.Show("Translations updated :\r\n" + root, null, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Локализации обновлены:\r\n" + root, null, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private static List<string> GetEsFeaturesStrings()
