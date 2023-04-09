@@ -86,40 +86,6 @@
 		<region>wr</region>
 	</game>
 	<game>
-		<path>./dolphin-emu.menu</path>
-		<name>Dolphin (GameCube,Wii,WAD)</name>
-		<desc>Run Dolphin Emulator (GameCube, Wii, WAD).</desc>
-		<image>./media/dolphin-logo.png</image>
-		<marquee>./media/dolphin-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Dolphin Team</developer>
-		<publisher>Dolphin Team</publisher>
-		<genre>Emulator</genre>
-		<playcount />
-		<lastplayed />
-		<gametime />
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
-		<path>./dolphin-triforce.menu</path>
-		<name>DolphinWX (Triforce)</name>
-		<desc>Run DolphinWX Emulator (Triforce).</desc>
-		<image>./media/dolphin-logo.png</image>
-		<marquee>./media/dolphin-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Dolphin Community</developer>
-		<publisher>Dolphin Community</publisher>
-		<genre>Emulator</genre>
-		<playcount />
-		<lastplayed />
-		<gametime />
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
 		<path>./dosbox.menu</path>
 		<name>DOSBox (MS-DOS, Windows 3.x, Windows 95)</name>
 		<desc>Run DOSBox (MS-DOS, Windows 3.x, Windows 95).</desc>
@@ -159,23 +125,6 @@
 		<marquee>./media/mesen-logo.png</marquee>
 		<developer>Unknown</developer>
 		<publisher>Unknown</publisher>
-		<genre>Emulator</genre>
-		<playcount />
-		<lastplayed />
-		<gametime />
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
-		<path>./mgba.menu</path>
-		<name>mGBA (GameBoy Advance)</name>
-		<desc>Run mGBA Emulator (GameBoy Advance).</desc>
-		<image>./media/mgba-logo.png</image>
-		<marquee>./media/mgba-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>mGBA Team</developer>
-		<publisher>mGBA Team</publisher>
 		<genre>Emulator</genre>
 		<playcount />
 		<lastplayed />
@@ -354,57 +303,6 @@
 		<region>wr</region>
 	</game>
 	<game>
-		<path>./xenia_canary.menu</path>
-		<name>Xenia Canary (XBOX 360)</name>
-		<desc>Run Xenia Canary (Xbox 360).</desc>
-		<image>./media/xenia-logo.png</image>
-		<marquee>./media/xenia-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Xenia Team</developer>
-		<publisher>Xenia Team</publisher>
-		<genre>Emulator</genre>
-		<playcount />
-		<lastplayed />
-		<gametime />
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
-		<path>./xenia.menu</path>
-		<name>Xenia (XBOX 360)</name>
-		<desc>Run Xenia (Xbox 360).</desc>
-		<image>./media/xenia-logo.png</image>
-		<marquee>./media/xenia-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Xenia Team</developer>
-		<publisher>Xenia Team</publisher>
-		<genre>Emulator</genre>
-		<playcount />
-		<lastplayed />
-		<gametime />
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
-		<path>./daphne.menu</path>
-		<name>Daphne Loader (Laserdisc)</name>
-		<desc>Run Daphne Loader (Laserdisc).</desc>
-		<image>./media/daphne-logo.png</image>
-		<marquee>./media/daphne-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Unknown</developer>
-		<publisher>Unknown</publisher>
-		<genre>Emulator</genre>
-		<playcount />
-		<lastplayed />
-		<gametime />
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
 		<path>./fpinball.menu</path>
 		<name>Future Pinball</name>
 		<desc>Run Future Pinball.</desc>
@@ -456,23 +354,6 @@
 		<region>wr</region>
 	</game>
 	<game>
-		<path>./phoenix.menu</path>
-		<name>Phoenix (3DO &amp; jaguar emulator)</name>
-		<desc>Run Phoenix  (3DO &amp; jaguar Emulator).</desc>
-		<image>./media/phoenix.png</image>
-		<marquee>./media/phoenix.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Altmer</developer>
-		<publisher>Altmer</publisher>
-		<genre>Emulator</genre>
-		<playcount />
-		<lastplayed />
-		<gametime />
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
 		<path>./supermodel.menu</path>
 		<name>Supermodel (MODEL 3)</name>
 		<desc>Run Supermodel (Model 3).</desc>
@@ -483,23 +364,6 @@
 		<publisher>Supermodel Team</publisher>
 		<genre>Emulator</genre>
 		<releasedate />
-		<playcount />
-		<lastplayed />
-		<gametime />
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
-		<path>./cxbx-reloaded.menu</path>
-		<name>CxBx Reloaded (XBOX, Chihiro)</name>
-		<desc>Run CxBx Reloaded Emulator (Xbox, Chihiro).</desc>
-		<image>./media/cxbxr-logo.png</image>
-		<marquee>./media/cxbxr-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Xemu Team</developer>
-		<publisher>Xemu Team</publisher>
-		<genre>Emulator</genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -567,23 +431,6 @@
 		<releasedate />
 		<developer>Duckstation Team</developer>
 		<publisher>Duckstation Team</publisher>
-		<genre>Emulator</genre>
-		<playcount />
-		<lastplayed />
-		<gametime />
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-		<game>
-		<path>./ludo.menu</path>
-		<name>Ludo</name>
-		<desc>Run Ludo (libretro frontend).</desc>
-		<image>./media/ludo-logo.png</image>
-		<marquee>./media/ludo-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Ludo Team</developer>
-		<publisher>Ludo Team</publisher>
 		<genre>Emulator</genre>
 		<playcount />
 		<lastplayed />
@@ -778,18 +625,188 @@
 		<region>wr</region>
 	</game>
 	<game>
+		<path>./dolphin-triforce.menu</path>
+		<name>DolphinWX (Triforce)</name>
+		<desc>Run DolphinWX Emulator (Triforce).</desc>
+		<image>./media/dolphin-logo.png</image>
+		<marquee>./media/dolphin-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Dolphin Community</developer>
+		<publisher>Dolphin Community</publisher>
+		<genre>Emulator</genre>
+		<playcount>3</playcount>
+		<lastplayed>20230406T212858</lastplayed>
+		<gametime>85</gametime>
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
 		<path>./dosbox_pure_libretro.menu</path>
 		<name>DOSBox Pure Libretro (MS-DOS)</name>
 		<desc>Run DOSBox Pure Libretro.</desc>
 		<image>./media/dosbox_pure_libretro-logo.png</image>
 		<rating>0</rating>
-		<releasedate></releasedate>
+		<releasedate />
 		<developer>DOSBox Pure Team</developer>
 		<publisher>DOSBox Pure Team</publisher>
 		<genre>Emulator</genre>
+		<playcount>2</playcount>
+		<lastplayed>20230406T211023</lastplayed>
+		<gametime>66</gametime>
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./mgba.menu</path>
+		<name>mGBA (GameBoy Advance)</name>
+		<desc>Run mGBA Emulator (GameBoy Advance).</desc>
+		<image>./media/mgba-logo.png</image>
+		<marquee>./media/mgba-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>mGBA Team</developer>
+		<publisher>mGBA Team</publisher>
+		<genre>Emulator</genre>
 		<playcount>1</playcount>
-		<lastplayed>20230313T202140</lastplayed>
-		<gametime>34</gametime>
+		<lastplayed>20230406T230506</lastplayed>
+		<gametime>48</gametime>
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./phoenix.menu</path>
+		<name>Phoenix (3DO &amp; jaguar emulator)</name>
+		<desc>Run Phoenix  (3DO &amp; jaguar Emulator).</desc>
+		<image>./media/phoenix.png</image>
+		<marquee>./media/phoenix.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Altmer</developer>
+		<publisher>Altmer</publisher>
+		<genre>Emulator</genre>
+		<playcount>1</playcount>
+		<lastplayed>20230406T225438</lastplayed>
+		<gametime>27</gametime>
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./daphne.menu</path>
+		<name>Daphne Loader (Laserdisc)</name>
+		<desc>Run Daphne Loader (Laserdisc).</desc>
+		<image>./media/daphne-logo.png</image>
+		<marquee>./media/daphne-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Unknown</developer>
+		<publisher>Unknown</publisher>
+		<genre>Emulator</genre>
+		<playcount>1</playcount>
+		<lastplayed>20230406T231849</lastplayed>
+		<gametime>18</gametime>
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./dolphin-emu.menu</path>
+		<name>Dolphin (GameCube,Wii,WAD)</name>
+		<desc>Run Dolphin Emulator (GameCube, Wii, WAD).</desc>
+		<image>./media/dolphin-logo.png</image>
+		<marquee>./media/dolphin-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Dolphin Team</developer>
+		<publisher>Dolphin Team</publisher>
+		<genre>Emulator</genre>
+		<playcount>3</playcount>
+		<lastplayed>20230406T231502</lastplayed>
+		<gametime>65</gametime>
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./openmsx.menu</path>
+		<name>openMSX (MSX homecomputers)</name>
+		<desc>Run openMSX emulator.</desc>
+		<image>./media/openmsx-logo.png</image>
+		<marquee>./media/openmsx-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>openMSX Team</developer>
+		<publisher>openMSX Team</publisher>
+		<genre>Emulator</genre>
+		<playcount>1</playcount>
+		<lastplayed>20230407T221013</lastplayed>
+		<gametime>12</gametime>
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./cxbx-reloaded.menu</path>
+		<name>CxBx Reloaded (XBOX, Chihiro)</name>
+		<desc>Run CxBx Reloaded Emulator (Xbox, Chihiro).</desc>
+		<image>./media/cxbxr-logo.png</image>
+		<marquee>./media/cxbxr-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Xemu Team</developer>
+		<publisher>Xemu Team</publisher>
+		<genre>Emulator</genre>
+		<playcount>1</playcount>
+		<lastplayed>20230407T232832</lastplayed>
+		<gametime>40</gametime>
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./xenia.menu</path>
+		<name>Xenia (XBOX 360)</name>
+		<desc>Run Xenia (Xbox 360).</desc>
+		<image>./media/xenia-logo.png</image>
+		<marquee>./media/xenia-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Xenia Team</developer>
+		<publisher>Xenia Team</publisher>
+		<genre>Emulator</genre>
+		<playcount>2</playcount>
+		<lastplayed>20230407T232742</lastplayed>
+		<gametime>1154</gametime>
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./xenia_canary.menu</path>
+		<name>Xenia Canary (XBOX 360)</name>
+		<desc>Run Xenia Canary (Xbox 360).</desc>
+		<image>./media/xenia-logo.png</image>
+		<marquee>./media/xenia-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Xenia Team</developer>
+		<publisher>Xenia Team</publisher>
+		<genre>Emulator</genre>
+		<playcount>1</playcount>
+		<lastplayed>20230407T232707</lastplayed>
+		<gametime>127</gametime>
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./ludo.menu</path>
+		<name>Ludo (Libretro frontend)</name>
+		<desc>Run Ludo (libretro frontend).</desc>
+		<image>./media/ludo-logo.png</image>
+		<marquee>./media/ludo-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate></releasedate>
+		<developer>Ludo Team</developer>
+		<publisher>Ludo Team</publisher>
+		<genre>Emulator</genre>
+		<playcount>4</playcount>
+		<lastplayed>20230409T192158</lastplayed>
+		<gametime>124</gametime>
 		<lang>en</lang>
 		<region>wr</region>
 	</game>
