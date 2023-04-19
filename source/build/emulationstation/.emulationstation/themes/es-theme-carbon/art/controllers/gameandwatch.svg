@@ -1,0 +1,26 @@
+<svg height="357.064" viewBox="0 0 747.072 428.477" width="622.56" xmlns="http://www.w3.org/2000/svg">
+    <g fill="none" stroke="#f4f4f4">
+        <g stroke-width="2.4" transform="translate(-12.328 -67.206)">
+            <rect height="426.477" rx="6.513" width="745.072" x="13.328" y="68.206"/>
+            <rect height="398.354" rx="6.513" ry="6.513" width="717.13" x="27.533" y="81.763"/>
+            <rect height="255.924" rx="13.928" ry="13.807" width="380.769" x="195.996" y="150.018"/>
+            <rect height="322.053" rx="6.513" ry="6.513" width="430.174" x="170.155" y="118.691"/>
+        </g>
+        <g stroke-width="1.2" transform="translate(-12.328 -67.206)">
+            <path d="M315.036 422.527H195.869c-7.21 0-13.016-4.773-13.016-10.702V147.39c0-5.928 5.805-10.701 13.016-10.701h130.886m118.787 0H576c7.21 0 13.016 4.773 13.016 10.701v264.436c0 5.929-5.805 10.702-13.016 10.702H457.532"/>
+            <rect height="74.487" rx="6.513" width="88.804" x="46.171" y="128.392"/>
+        </g>
+    </g>
+    <g fill="none" stroke="#f4f4f4" transform="translate(-12.328 -67.206)">
+        <g stroke-width="2.4">
+            <rect height="18.705" rx="6.513" width="32.213" x="645.561" y="110.118"/>
+            <rect height="18.705" rx="6.513" width="32.213" x="645.561" y="160.118"/>
+            <rect height="18.705" rx="6.513" width="32.213" x="645.561" y="212.118"/>
+        </g>
+        <ellipse cx="710.888" cy="145.577" rx="7.75" ry="6.85" stroke-width="1.2"/>
+        <ellipse cx="710.783" cy="196.544" rx="7.75" ry="6.85" stroke-width="1.2"/>
+        <circle cx="673.035" cy="374.703" r="26" stroke-width="2.4"/>
+        <circle cx="99.035" cy="374.703" r="26" stroke-width="2.4"/>
+    </g>
+    <text fill="#f4f4f4" fill-opacity=".5" font-family="TrasksHand" font-size="3.2" stroke-width="1.2" x="540.503" y="404.087" transform="translate(-12.328 -67.206)"><tspan x="540.503" y="404.087">John Loreth 2022</tspan></text>
+</svg>
