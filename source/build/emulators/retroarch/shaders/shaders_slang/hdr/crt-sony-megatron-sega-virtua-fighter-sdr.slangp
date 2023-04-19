@@ -1,0 +1,5 @@
+#reference "crt-sony-megatron-sega-virtua-fighter-hdr.slangp"
+
+hcrt_hdr = "0.000000"
+
+hcrt_gamma_in = "-0.200000"
