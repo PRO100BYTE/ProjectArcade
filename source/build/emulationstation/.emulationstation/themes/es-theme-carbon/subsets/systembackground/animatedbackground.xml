@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <view name="system">
+    <image name="staticBackground">
+      <pos>0.5 0.5</pos>
+      <size>1.2 2.37</size>
+      <origin>0.5 0.5</origin>
+      <path>./../../art/background.jpg</path>
+      <color>A0A0A028</color>
+      <zIndex>19</zIndex>
+      <storyboard>
+        <animation property="rotation" from="0" to="360" duration="80000" mode="linear" repeat="forever"/>
+      </storyboard>
+    </image>
+<!--
+    <image name="staticBackground2">
+      <pos>0.5 0.5</pos>
+      <size>1.23 3</size>
+      <origin>0.5 0.5</origin>
+      <path>./../../art/background.jpg</path>
+      <color>A0A0A009</color>
+      <zIndex>19</zIndex>
+      <storyboard>
+        <animation property="rotation" from="180" to="440" duration="150000" mode="linear" repeat="forever"/>
+      </storyboard>
+    </image> -->
+  </view>
+  <view name="basic, grid">
+    <image name="animBk" extra="true">
+      <pos>0.5 0.5</pos>
+      <size>1.2 2.38</size>
+      <origin>0.5 0.5</origin>
+      <path>./../../art/background.jpg</path>
+      <color>A0A0A028</color>
+      <zIndex>19</zIndex>
+      <storyboard>
+        <animation property="rotation" from="0" to="360" duration="120000" mode="linear" repeat="forever"/>
+      </storyboard>
+    </image>
+  </view>
+  <view name="detailed">
+    <image name="animBk" extra="true">
+      <pos>0.75 0.5</pos>
+      <size>2.38 2.38</size>
+      <origin>0.5 0.5</origin>
+      <path>./../../art/background.jpg</path>
+      <color>A0A0A00A</color>
+      <zIndex>19</zIndex>
+      <storyboard>
+        <animation property="rotation" from="0" to="360" duration="120000" mode="linear" repeat="forever"/>
+      </storyboard>
+    </image>
+  </view>
+  <view name="detailed">
+    <image name="animBk" extra="true">
+      <color>A0A0A018</color>
+    </image>
+  </view>
+  <view name="grid">
+    <image name="animBk" extra="true">
+      <zIndex>11</zIndex>
+    </image>
+  </view>
+</theme>

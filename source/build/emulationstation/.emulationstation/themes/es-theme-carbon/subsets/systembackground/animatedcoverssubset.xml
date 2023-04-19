@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <variables>
+    <animatedCovers>Random boxes</animatedCovers>
+  </variables>
+  <variables lang="fr">
+    <animatedCovers>Boites aléatoires</animatedCovers>
+  </variables>
+  <variables lang="es">
+    <animatedCovers>Cajas aleatorias</animatedCovers>
+  </variables>
+  <subset name="animatedCovers" displayName="${animatedCovers}" tinyScreen="false" ifSubset="systemview:horizontal|darkened|transparent|legacy">
+    <include name="no" displayName="${no}"/>
+    <include name="yes" displayName="${yes}">./animatedcovers.xml</include>
+  </subset>
+</theme>

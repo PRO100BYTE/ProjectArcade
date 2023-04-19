@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <view name="grid,detailed,gamecarousel">
+    <control name="pergame1, md_fanart, md_name, md_image, md_video, md_description, md_genre, md_developer, md_publisher, md_lastplayed, md_lbl_developer, md_lbl_publisher, md_lbl_lastplayed, md_lbl_playcount, md_lbl_players, md_lbl_releasedate">
+      <clipRect>0 0.16 1 0.78</clipRect>
+      <storyboard event="open">
+        <animation property="opacity" from="0" to="1" duration="400" mode="easeIn"/>
+      </storyboard>
+      <storyboard event="activateNext">
+        <animation property="offsetY" from="0.78" to="0" duration="400" mode="easeOutCubic"/>
+        <animation property="opacity" from="0" to="1" duration="400" mode="easeOut"/>
+      </storyboard>
+      <storyboard event="activatePrev">
+        <animation property="offsetY" from="-0.78" to="0" duration="400" mode="easeOutCubic"/>
+        <animation property="opacity" from="0" to="1" duration="400" mode="easeOut"/>
+      </storyboard>
+      <storyboard event="deactivateNext">
+        <animation property="offsetY" to="-0.78" duration="400" mode="easeOutCubic"/>
+        <animation property="opacity" to="0" duration="400" mode="easeOut"/>
+      </storyboard>
+      <storyboard event="deactivatePrev">
+        <animation property="offsetY" to="0.78" duration="400" mode="easeOutCubic"/>
+        <animation property="opacity" to="0" duration="400" mode="easeOut"/>
+      </storyboard>
+    </control>
+    <control name="md_rating, md_releasedate, md_players, md_kidgame, md_notkidgame, md_manual, md_nomanual, md_cheevos,md_notcheevos, md_savestate, md_nosavestate, md_flag">
+      <clipRect>0 0.16 1 0.78</clipRect>
+      <storyboard event="open">
+        <animation property="opacity" from="0" to="1" duration="400" mode="easeIn"/>
+      </storyboard>
+      <storyboard event="activate">
+        <animation property="opacity" from="0" to="1" duration="400" mode="easeOut"/>
+      </storyboard>
+      <storyboard event="deactivate">
+        <animation property="opacity" from="1" to="0" duration="400" mode="easeOut"/>
+      </storyboard>
+    </control>
+    <!--
+    <image name="clipRectTest" extra="true">
+      <tile>false</tile>
+      <pos>0.53 0.16</pos>
+      <size>0.47 0.78</size>
+      <origin>0 0</origin>
+      <path>./../art/white.png</path>
+      <color>FF00FF80</color>
+      <zIndex>12</zIndex>
+    </image>
+    -->
+  </view>
+  <view ifSubset="gameBar:no" name="detailed">
+    <control name="md_rating, md_releasedate, md_players, md_kidgame, md_notkidgame, md_manual, md_nomanual, md_cheevos,md_notcheevos, md_savestate, md_nosavestate, md_flag">
+      <clipRect>0 0.16 1 0.78</clipRect>
+      <storyboard event="open">
+        <animation property="opacity" from="0" to="1" duration="400" mode="easeIn"/>
+      </storyboard>
+      <storyboard event="activateNext">
+        <animation property="offsetY" from="0.78" to="0" duration="400" mode="easeOut"/>
+        <animation property="opacity" from="0" to="1" duration="400" mode="linear"/>
+      </storyboard>
+      <storyboard event="activatePrev">
+        <animation property="offsetY" from="-0.78" to="0" duration="400" mode="easeOut"/>
+        <animation property="opacity" from="0" to="1" duration="400" mode="linear"/>
+      </storyboard>
+      <storyboard event="deactivateNext">
+        <animation property="offsetY" to="-0.78" duration="400" mode="easeOut"/>
+        <animation property="opacity" to="0" duration="400" mode="linear"/>
+      </storyboard>
+      <storyboard event="deactivatePrev">
+        <animation property="offsetY" to="0.78" duration="400" mode="easeOut"/>
+        <animation property="opacity" to="0" duration="400" mode="linear"/>
+      </storyboard>
+    </control>
+  </view>
+  <view ifSubset="gameBar:no, previewbar:yes" name="grid,gamecarousel">
+    <control name="md_rating, md_releasedate, md_flag">
+      <clipRect>0 0.16 1 0.78</clipRect>
+      <storyboard event="open">
+        <animation property="opacity" from="0" to="1" duration="400" mode="easeIn"/>
+      </storyboard>
+      <storyboard event="activateNext">
+        <animation property="offsetY" from="0.78" to="0" duration="400" mode="easeOutCubic"/>
+        <animation property="opacity" from="0" to="1" duration="400" mode="easeOut"/>
+      </storyboard>
+      <storyboard event="activatePrev">
+        <animation property="offsetY" from="-0.78" to="0" duration="400" mode="easeOutCubic"/>
+        <animation property="opacity" from="0" to="1" duration="400" mode="easeOut"/>
+      </storyboard>
+      <storyboard event="deactivateNext">
+        <animation property="offsetY" to="-0.78" duration="400" mode="easeOutCubic"/>
+        <animation property="opacity" to="0" duration="400" mode="easeOut"/>
+      </storyboard>
+      <storyboard event="deactivatePrev">
+        <animation property="offsetY" to="0.78" duration="400" mode="easeOutCubic"/>
+        <animation property="opacity" to="0" duration="400" mode="easeOut"/>
+      </storyboard>
+    </control>
+  </view>
+  
+  <!-- Disable storyboards for Carousel if previewbar is disabled -->
+  <customView name="Carousel" ifSubset="previewbar:no">
+    <control name="md_rating, md_releasedate, md_players, md_kidgame, md_notkidgame, md_manual, md_nomanual, md_cheevos,md_notcheevos, md_savestate, md_nosavestate, md_flag, md_fanart, md_name, md_image, md_video, md_description, md_genre, md_developer, md_publisher, md_lastplayed, md_lbl_developer, md_lbl_publisher, md_lbl_lastplayed, md_lbl_playcount, md_lbl_players, md_lbl_releasedate">
+      <clipRect>0 0 1 1</clipRect>
+      <storyboard event="open"/>
+      <storyboard event="activateNext"/>
+      <storyboard event="activatePrev"/>
+      <storyboard event="deactivateNext"/>
+      <storyboard event="deactivatePrev"/>
+      <storyboard event="activate"/>
+      <storyboard event="deactivate"/>
+    </control>
+  </customView>
+  
+</theme>

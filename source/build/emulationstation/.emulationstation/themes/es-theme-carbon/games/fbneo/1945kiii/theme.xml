@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <!-- Sample per-game customization
+  <view name="detailed">
+    <image name="image" extra="true" importProperties="md_video">
+      <path>./1945kiii-thumb.png</path>
+    </image>
+    <control name="md_video">
+      <visible>false</visible>
+    </control>
+  </view>
+  -->
+</theme>

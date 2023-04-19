@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <view name="system">
+    <text name="systemInfo" ifSubset="systemview:horizontal|darkened|legacy|transparent">
+      <pos>0.03 0.32</pos>
+      <size>0.94 0.12</size>
+      <alignment>right</alignment>
+      <verticalAlignment>top</verticalAlignment>
+      <reflexion>0</reflexion>
+    </text>
+    <image name="box1" extra="true">
+      <origin>0.5 0.5</origin>
+      <pos>0.92 0.78</pos>
+      <maxSize>0.11 0.24</maxSize>
+      <y ifSubset="systemview:legacy">0.805</y>
+      <h ifSubset="systemview:legacy">0.215</h>
+      <zIndex>30</zIndex>
+      <path>{random:thumbnail}</path>
+      <color>FFFFFFFF</color>
+      <origin>0.5 0.5</origin>
+      <roundCorners>0.05</roundCorners>
+      <visible>true</visible>
+      <opacity>0</opacity>
+      <scale>0</scale>
+      <scaleOrigin>0 0.5</scaleOrigin>
+      <storyboard repeat="forever">
+        <animation property="opacity" from="0" to="1" begin="350" duration="1000" mode="linear"/>
+        <animation property="scale" from="0" to="1" begin="350" duration="1000" mode="bump"/>
+        <animation property="scaleOrigin" to="0" begin="9000" duration="0"/>
+        <animation property="scale" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="opacity" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="rotation" from="0" to="720" begin="9000" duration="1000" mode="easeOut"/>
+      </storyboard>
+    </image>
+    <image name="box2" extra="true">
+      <pos>0.8 0.78</pos>
+      <origin>0.5 0.5</origin>
+      <maxSize>0.11 0.24</maxSize>
+      <y ifSubset="systemview:legacy">0.805</y>
+      <h ifSubset="systemview:legacy">0.215</h>
+      <zIndex>29</zIndex>
+      <path>{random:thumbnail}</path>
+      <color>FFFFFFFF</color>
+      <origin>0.5 0.5</origin>
+      <roundCorners>0.05</roundCorners>
+      <visible>true</visible>
+      <opacity>0</opacity>
+      <scaleOrigin>0 0.5</scaleOrigin>
+      <storyboard repeat="forever">
+        <animation property="opacity" from="0" to="1" begin="700" duration="1000" mode="linear"/>
+        <animation property="scale" from="0" to="1" begin="700" duration="1000" mode="bump"/>
+        <animation property="scaleOrigin" to="0" begin="9000" duration="0"/>
+        <animation property="scale" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="opacity" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="rotation" from="0" to="720" begin="9000" duration="1000" mode="easeOut"/>
+      </storyboard>
+    </image>
+    <image name="box3" extra="true">
+      <pos>0.68 0.78</pos>
+      <origin>0.5 0.5</origin>
+      <maxSize>0.11 0.24</maxSize>
+      <y ifSubset="systemview:legacy">0.805</y>
+      <h ifSubset="systemview:legacy">0.215</h>
+      <zIndex>28</zIndex>
+      <path>{random:thumbnail}</path>
+      <color>FFFFFFFF</color>
+      <origin>0.5 0.5</origin>
+      <roundCorners>0.05</roundCorners>
+      <opacity>0</opacity>
+      <scaleOrigin>0 0.5</scaleOrigin>
+      <storyboard repeat="forever">
+        <animation property="opacity" from="0" to="1" begin="1050" duration="1000" mode="linear"/>
+        <animation property="scale" from="0" to="1" begin="1050" duration="1000" mode="bump"/>
+        <animation property="scaleOrigin" to="0" begin="9000" duration="0"/>
+        <animation property="scale" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="opacity" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="rotation" from="0" to="720" begin="9000" duration="1000" mode="easeOut"/>
+      </storyboard>
+    </image>
+    <image name="box4" extra="true">
+      <pos>0.56 0.78</pos>
+      <origin>0.5 0.5</origin>
+      <maxSize>0.11 0.24</maxSize>
+      <y ifSubset="systemview:legacy">0.805</y>
+      <h ifSubset="systemview:legacy">0.215</h>
+      <zIndex>27</zIndex>
+      <path>{random:thumbnail}</path>
+      <color>FFFFFFFF</color>
+      <origin>0.5 0.5</origin>
+      <roundCorners>0.05</roundCorners>
+      <opacity>0</opacity>
+      <scaleOrigin>0 0.5</scaleOrigin>
+      <storyboard repeat="forever">
+        <animation property="opacity" from="0" to="1" begin="1400" duration="1000" mode="linear"/>
+        <animation property="scale" from="0" to="1" begin="1400" duration="1000" mode="bump"/>
+        <animation property="scaleOrigin" to="0" begin="9000" duration="0"/>
+        <animation property="scale" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="opacity" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="rotation" from="0" to="720" begin="9000" duration="1000" mode="easeOut"/>
+      </storyboard>
+    </image>
+    <image name="box5" extra="true">
+      <pos>0.44 0.78</pos>
+      <origin>0.5 0.5</origin>
+      <maxSize>0.11 0.24</maxSize>
+      <y ifSubset="systemview:legacy">0.805</y>
+      <h ifSubset="systemview:legacy">0.215</h>
+      <zIndex>26</zIndex>
+      <path>{random:thumbnail}</path>
+      <color>FFFFFFFF</color>
+      <origin>0.5 0.5</origin>
+      <roundCorners>0.05</roundCorners>
+      <opacity>0</opacity>
+      <scaleOrigin>0 0.5</scaleOrigin>
+      <storyboard repeat="forever">
+        <animation property="opacity" from="0" to="1" begin="1750" duration="1000" mode="linear"/>
+        <animation property="scale" from="0" to="1" begin="1750" duration="1000" mode="bump"/>
+        <animation property="scaleOrigin" to="0" begin="9000" duration="0"/>
+        <animation property="scale" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="opacity" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="rotation" from="0" to="720" begin="9000" duration="1000" mode="easeOut"/>
+      </storyboard>
+    </image>
+    <image name="box6" extra="true">
+      <pos>0.32 0.78</pos>
+      <origin>0.5 0.5</origin>
+      <maxSize>0.11 0.24</maxSize>
+      <y ifSubset="systemview:legacy">0.805</y>
+      <h ifSubset="systemview:legacy">0.215</h>
+      <zIndex>25</zIndex>
+      <path>{random:thumbnail}</path>
+      <color>FFFFFFFF</color>
+      <origin>0.5 0.5</origin>
+      <roundCorners>0.05</roundCorners>
+      <opacity>0</opacity>
+      <scaleOrigin>0 0.5</scaleOrigin>
+      <storyboard repeat="forever">
+        <animation property="opacity" from="0" to="1" begin="2200" duration="1000" mode="linear"/>
+        <animation property="scale" from="0" to="1" begin="2200" duration="1000" mode="bump"/>
+        <animation property="scaleOrigin" to="0" begin="9000" duration="0"/>
+        <animation property="scale" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="opacity" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="rotation" from="0" to="720" begin="9000" duration="1000" mode="easeOut"/>
+      </storyboard>
+    </image>
+    <image name="box7" extra="true">
+      <pos>0.20 0.78</pos>
+      <origin>0.5 0.5</origin>
+      <maxSize>0.11 0.24</maxSize>
+      <y ifSubset="systemview:legacy">0.805</y>
+      <h ifSubset="systemview:legacy">0.215</h>
+      <zIndex>24</zIndex>
+      <path>{random:thumbnail}</path>
+      <color>FFFFFFFF</color>
+      <origin>0.5 0.5</origin>
+      <roundCorners>0.05</roundCorners>
+      <opacity>0</opacity>
+      <scaleOrigin>0 0.5</scaleOrigin>
+      <storyboard repeat="forever">
+        <animation property="opacity" from="0" to="1" begin="2550" duration="1000" mode="linear"/>
+        <animation property="scale" from="0" to="1" begin="2550" duration="1000" mode="bump"/>
+        <animation property="scaleOrigin" to="0" begin="9000" duration="0"/>
+        <animation property="scale" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="opacity" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="rotation" from="0" to="720" begin="9000" duration="1000" mode="easeOut"/>
+      </storyboard>
+    </image>
+    <image name="box8" extra="true">
+      <pos>0.08 0.78</pos>
+      <origin>0.5 0.5</origin>
+      <maxSize>0.11 0.24</maxSize>
+      <y ifSubset="systemview:legacy">0.805</y>
+      <h ifSubset="systemview:legacy">0.215</h>
+      <zIndex>23</zIndex>
+      <path>{random:thumbnail}</path>
+      <color>FFFFFFFF</color>
+      <origin>0.5 0.5</origin>
+      <roundCorners>0.05</roundCorners>
+      <opacity>0</opacity>
+      <scaleOrigin>0.5 0.5</scaleOrigin>
+      <storyboard repeat="forever">
+        <animation property="opacity" from="0" to="1" begin="2900" duration="1000" mode="linear"/>
+        <animation property="scale" from="0" to="1" begin="2900" duration="1000" mode="bump"/>
+        <animation property="scaleOrigin" to="0" begin="9000" duration="0"/>
+        <animation property="scale" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="opacity" from="1" to="0" begin="9000" duration="1000" mode="easeOut"/>
+        <animation property="rotation" from="0" to="720" begin="9000" duration="1000" mode="easeOut"/>
+      </storyboard>
+    </image>
+  </view>
+  <feature supported="manufacturer">
+    <view name="system">
+      <text name="systemInfoEx" extra="true">
+        <visible>false</visible>
+      </text>
+    </view>
+  </feature>
+</theme>

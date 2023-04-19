@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <view name="system">
+    <image name="ControllerOverlay" extra="true">
+      <opacity>0</opacity>
+      <scale>0</scale>
+      <storyboard>
+        <animation property="scale" from="0" to="1" begin="400" duration="250" mode="easeInOut"/>
+        <animation property="opacity" from="0" to="1" begin="400" duration="250" mode="linear"/>
+      </storyboard>
+    </image>
+    <carousel name="systemcarousel">
+      <defaultTransition>fade &amp; slide</defaultTransition>
+    </carousel>
+  </view>
+  <view name="basic, detailed">
+    <textlist name="gamelist">
+      <scaleOrigin>0.5 0.25</scaleOrigin>
+      <storyboard>
+        <animation property="scale" from="0" to="1" duration="350" mode="easeOut"/>
+      </storyboard>
+    </textlist>
+  </view>
+  <view name="grid">
+    <imagegrid name="gamegrid">
+      <scaleOrigin>0.5 0.25</scaleOrigin>
+      <storyboard>
+        <animation property="opacity" from="0" to="1" duration="350" mode="easeIn"/>
+        <animation property="scale" from="0" to="1" duration="350" mode="easeOut"/>
+      </storyboard>
+    </imagegrid>
+  </view>
+
+  <view name="basic, detailed, grid">
+    <image name="logo">
+      <storyboard>
+        <animation property="y" from="0.05" begin="0" duration="350" mode="easeOut"/>
+        <animation property="opacity" from="0" to="1" duration="350" mode="easeIn"/>
+        <animation property="scale" from="0" to="1" duration="350" mode="easeOut"/>
+      </storyboard>
+    </image>
+  </view>
+  
+  <feature supported="manufacturer">
+    <view name="system">
+      <text name="systemInfoEx" extra="true">      
+        <storyboard>
+          <animation property="opacity" from="0" to="0" duration="1" mode="linear"/>
+        
+          <animation property="opacity" from="0" to="1" begin="750" duration="250" mode="easeIn"/>
+          <animation property="scale" from="0" to="1" begin="750" duration="250" mode="easeOut"/> 
+          
+       <!--   <animation property="y" from="0.75" begin="750" duration="250" mode="easeOut"/> -->
+        </storyboard>
+      </text>
+    </view>
+  </feature>
+</theme>

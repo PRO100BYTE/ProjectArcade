@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+  <view name="system">
+    <carousel name="systemcarousel">
+      <color>00000060</color>
+      <colorEnd>00000070</colorEnd>
+      <systemInfoDelay>700</systemInfoDelay>
+      <systemInfoCountOnly>false</systemInfoCountOnly>
+      <pos>0 0.3837</pos>
+      <size>1 0.2325</size>
+      <zIndex>20</zIndex>
+      <logoSize>0.17 0.1</logoSize>
+      <logoScale>1.6</logoScale>
+      <transitionSpeed>650</transitionSpeed>
+      <minLogoOpacity>0.6</minLogoOpacity>
+      <logoSize verticalScreen="true">0.35 0.1</logoSize>
+      <maxLogoCount verticalScreen="true">1</maxLogoCount>
+    </carousel>
+    <image name="logo">
+      <path>./../../art/logos/${system.theme}-w.svg</path>
+    </image>
+    <image name="logo" region="us">
+      <path>./../../art/logos/us/${system.theme}.svg</path>
+      <path>./../../art/logos/us/${system.theme}-w.svg</path>
+    </image>
+    <image name="logo" region="jp">
+      <path>./../../art/logos/jp/${system.theme}.svg</path>
+      <path>./../../art/logos/jp/${system.theme}-w.svg</path>
+    </image>
+    <image name="carousel-topline" extra="true" tinyScreen="false">
+      <path>./../../art/white.png</path>
+      <color>${baseColor}</color>
+      <origin>0 0</origin>
+      <pos>0 0.3817</pos>
+      <size>1 0.005</size>
+      <zIndex>45</zIndex>
+    </image>
+    <image name="carousel-bottomline" extra="true" tinyScreen="false">
+      <path>./../../art/white.png</path>
+      <color>${baseColor}</color>
+      <origin>0 0</origin>
+      <pos>0 0.6101</pos>
+      <size>1 0.005</size>
+      <zIndex>45</zIndex>
+    </image>
+    <carousel name="systemcarousel" tinyScreen="true">
+      <pos>0 0.35</pos>
+      <size>1 0.60</size>
+      <maxLogoCount>1</maxLogoCount>
+      <logoSize>0.25 0.15</logoSize>
+      <logoScale>2.6</logoScale>
+      <logoPos>-1 0.1</logoPos>
+    </carousel>
+    
+    <!--
+    <image name="carousel-inner" extra="true">
+      <path>./../../art/carousel.png</path>
+      <color>FFFFFFFF</color>
+      <origin>0 0</origin>
+      <pos>0 0.3837</pos>
+      <size>1 0.2325</size>
+      <zIndex>40</zIndex>
+    </image>
+    -->
+    <text name="systemInfo">
+      <pos>0 0.64</pos>
+      <size>1 0.25</size>
+      <backgroundColor>00000000</backgroundColor>
+      <color>${systemInfoColor}</color>
+      <glowColor>${glowColor}</glowColor>
+      <glowSize>2</glowSize>
+      <glowSize>1</glowSize>
+      <reflexion>0.20 0.0</reflexion>
+      <fontPath>./../../art/fonts/Cabin-Bold.ttf</fontPath>
+      <fontSize>0.027</fontSize>
+    </text>
+    <image name="carousel-shadow" extra="true">
+      <path>./../../art/shadow.png</path>
+      <color>FFFFFF40</color>
+      <pos>0 0.6161</pos>
+      <origin>0 0</origin>
+      <size>1 0.025</size>
+      <zIndex>13</zIndex>
+    </image>
+    <image name="CenterFade" extra="true">
+      <tile>false</tile>
+      <size>1 0.5</size>
+      <pos>0.5 0.5</pos>
+      <origin>0.5 0.5</origin>
+      <path>./../../art/centerfade.png</path>
+      <color>${centerFadeColor}</color>
+      <zIndex>12</zIndex>
+    </image>
+  </view>
+</theme>
