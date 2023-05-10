@@ -3,14 +3,14 @@
 	<game>
 		<path>./applewin.menu</path>
 		<name>AppleWin (Apple II)</name>
-		<desc>Run AppleWin Emulator (Apple II).</desc>
+		<desc>Запустить эмулятор AppleWin (Apple II).</desc>
 		<image>./media/applewin-logo.png</image>
 		<marquee>./media/applewin-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>AppleWin Team</developer>
 		<publisher>AppleWin Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -20,14 +20,14 @@
 	<game>
 		<path>./bigpemu.menu</path>
 		<name>BigPEmu (Jaguar)</name>
-		<desc>Run BigPEmu Emulator (Jaguar).</desc>
+		<desc>Запустить эмулятор BigPEmu (Jaguar).</desc>
 		<image>./media/bigpemu-logo.png</image>
 		<marquee>./media/bigpemu-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Rich Whitehouse</developer>
 		<publisher>Rich Whitehouse</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -37,14 +37,14 @@
 	<game>
 		<path>./cemu.menu</path>
 		<name>Cemu (Wii U)</name>
-		<desc>Run Cemu Emulator (Wii U).</desc>
+		<desc>Запустить эмулятор Cemu (Wii U).</desc>
 		<image>./media/cemu-logo.png</image>
 		<marquee>./media/cemu-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Cemu Team</developer>
 		<publisher>Cemu Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -54,14 +54,14 @@
 	<game>
 		<path>./citra.menu</path>
 		<name>Citra (3DS)</name>
-		<desc>Run Citra Emulator (Nintendo 3DS).</desc>
+		<desc>Запустить эмулятор Citra (Nintendo 3DS).</desc>
 		<image>./media/citra-logo.png</image>
 		<marquee>./media/citra-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Citra Team</developer>
 		<publisher>Citra Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -71,14 +71,48 @@
 	<game>
 		<path>./demul-old.menu</path>
 		<name>Demul Old DX11 Plugin (Gaelco)</name>
-		<desc>Run Demul Old DX11 Plugin (Gaelco).</desc>
+		<desc>Запустить Demul Old DX11 Plugin (Gaelco).</desc>
 		<image>./media/demulold-logo.png</image>
 		<marquee>./media/demulold-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Demul Team</developer>
 		<publisher>Demul Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./dolphin-emu.menu</path>
+		<name>Dolphin (GameCube,Wii,WAD)</name>
+		<desc>Запустить эмулятор Dolphin (GameCube, Wii, WAD).</desc>
+		<image>./media/dolphin-logo.png</image>
+		<marquee>./media/dolphin-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Dolphin Team</developer>
+		<publisher>Dolphin Team</publisher>
+		<genre></genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./dolphin-triforce.menu</path>
+		<name>DolphinWX (Triforce)</name>
+		<desc>Запустить эмулятор DolphinWX (Triforce).</desc>
+		<image>./media/dolphin-logo.png</image>
+		<marquee>./media/dolphin-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Dolphin Community</developer>
+		<publisher>Dolphin Community</publisher>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -88,14 +122,14 @@
 	<game>
 		<path>./dosbox.menu</path>
 		<name>DOSBox (MS-DOS, Windows 3.x, Windows 95)</name>
-		<desc>Run DOSBox (MS-DOS, Windows 3.x, Windows 95).</desc>
+		<desc>Запустить DOSBox (MS-DOS, Windows 3.x, Windows 95).</desc>
 		<image>./media/dosbox-logo.png</image>
 		<marquee>./media/dosbox-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>DOSBox Team</developer>
 		<publisher>DOSBox Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -103,14 +137,14 @@
 		<region>wr</region>
 	</game>
 	<game>
-		<path>./m2emulator.menu</path>
-		<name>M2Emulator (Model 2)</name>
-		<desc>Run M2Emulator (Model 2).</desc>
-		<image>./media/m2emulator-logo.png</image>
-		<marquee>./media/m2emulator-logo.png</marquee>
+		<path>./m2.menu</path>
+		<name>M2 (Model 2)</name>
+		<desc>Запустить M2 (Model 2).</desc>
+		<image>./media/m2-logo.png</image>
+		<marquee>./media/m2-logo.png</marquee>
 		<developer>Nebula Team</developer>
 		<publisher>Nebula Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -120,12 +154,29 @@
 	<game>
 		<path>./mesen.menu</path>
 		<name>Mesen (FDS, NES)</name>
-		<desc>Run Mesen (FDS, NES).</desc>
+		<desc>Запустить Mesen (FDS, NES).</desc>
 		<image>./media/mesen-logo.png</image>
 		<marquee>./media/mesen-logo.png</marquee>
 		<developer>Unknown</developer>
 		<publisher>Unknown</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./mgba.menu</path>
+		<name>mGBA (GameBoy Advance)</name>
+		<desc>Запустить эмулятор mGBA (GameBoy Advance).</desc>
+		<image>./media/mgba-logo.png</image>
+		<marquee>./media/mgba-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>mGBA Team</developer>
+		<publisher>mGBA Team</publisher>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -135,14 +186,14 @@
 	<game>
 		<path>./pcsx2-16.menu</path>
 		<name>PCSX2 (v1.6) (PlayStation 2)</name>
-		<desc>Run PCSX2 Emulator (v1.6) (PlayStation 2).</desc>
+		<desc>Запустить эмулятор PCSX2 (v1.6) (PlayStation 2).</desc>
 		<image>./media/pcsx2-16-logo.png</image>
 		<marquee>./media/pcsx2-16-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>PCSX2 Team</developer>
 		<publisher>PCSX2 Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -152,14 +203,14 @@
 	<game>
 		<path>./pcsx2.menu</path>
 		<name>PCSX2 (SSE4) (PlayStation 2)</name>
-		<desc>Run PCSX2 Emulator (SSE4) (PlayStation 2).</desc>
+		<desc>Запустить эмулятор PCSX2 (SSE4) (PlayStation 2).</desc>
 		<image>./media/pcsx2-logo.png</image>
 		<marquee>./media/pcsx2-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>PCSX2 Team</developer>
 		<publisher>PCSX2 Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -169,14 +220,14 @@
 	<game>
 		<path>./pcsx2-avx2.menu</path>
 		<name>PCSX2 (AVX2) (PlayStation 2)</name>
-		<desc>Run PCSX2 Emulator (AVX2) (PlayStation 2).</desc>
+		<desc>Запустить эмулятор PCSX2 (AVX2) (PlayStation 2).</desc>
 		<image>./media/pcsx2-logo.png</image>
 		<marquee>./media/pcsx2-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>PCSX2 Team</developer>
 		<publisher>PCSX2 Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -186,14 +237,14 @@
 	<game>
 		<path>./ppsspp.menu</path>
 		<name>PPSSPP (PSP, Homebrews)</name>
-		<desc>Run PPSSPP Emulator (PSP, Homebrews).</desc>
+		<desc>Запустить эмулятор PPSSPP (PSP, Homebrews).</desc>
 		<image>./media/ppsspp-logo.png</image>
 		<marquee>./media/ppsspp-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>PPSSPP Team</developer>
 		<publisher>PPSSPP Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -203,14 +254,14 @@
 	<game>
 		<path>./project64.menu</path>
 		<name>Project 64 (Nintendo 64)</name>
-		<desc>Run Project 64 (Nintendo 64). This software is not provided by ProjectArcade. You can download it here: https://www.pj64-emu.com/windows-downloads</desc>
+		<desc>Запустить эмулятор Project 64 (Nintendo 64). Это ПО не предоставляется ProjectArcade. Вы можете скачать его отсюда: https://www.pj64-emu.com/windows-downloads</desc>
 		<image>./media/project64-logo.png</image>
 		<marquee>./media/project64-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Project 64</developer>
 		<publisher>Project 64</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -220,14 +271,14 @@
 	<game>
 		<path>./raine.menu</path>
 		<name>Raine (Arcade, Neo Geo, Neo Geo CD)</name>
-		<desc>Run Raine Emulator (Arcade, Neo Geo, Neo Geo CD).</desc>
+		<desc>Запустить эмулятор Raine (Arcade, Neo Geo, Neo Geo CD).</desc>
 		<image>./media/raine-logo.png</image>
 		<marquee>./media/raine-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Raine</developer>
 		<publisher>Raine</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -237,14 +288,14 @@
 	<game>
 		<path>./redream.menu</path>
 		<name>Redream (Dreamcast)</name>
-		<desc>Run Redream Emulator (Dreamcast).</desc>
+		<desc>Запустить эмулятор Redream (Dreamcast).</desc>
 		<image>./media/redream-logo.png</image>
 		<marquee>./media/redream-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Redream</developer>
 		<publisher>Redream</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -254,14 +305,14 @@
 	<game>
 		<path>./rpcs3.menu</path>
 		<name>RPCS3 (PlayStation 3)</name>
-		<desc>Run RPCS3 (PlayStation 3).</desc>
+		<desc>Запустить эмулятор RPCS3 (PlayStation 3).</desc>
 		<image>./media/rpcs3-logo.png</image>
 		<marquee>./media/rpcs3-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>RPCS3 Team</developer>
 		<publisher>RPCS3 Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -271,14 +322,14 @@
 	<game>
 		<path>./scummvm.menu</path>
 		<name>ScummVM</name>
-		<desc>Run ScummVM.</desc>
+		<desc>Запустить ScummVM.</desc>
 		<image>./media/scummvm.png</image>
 		<marquee>./media/scummvm.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>ScummVM Team</developer>
 		<publisher>ScummVM Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -288,14 +339,65 @@
 	<game>
 		<path>./scummvm_libretro.menu</path>
 		<name>ScummVM Libretro</name>
-		<desc>Run ScummVM Libretro.</desc>
+		<desc>Запустить ScummVM Libretro.</desc>
 		<image>./media/scummvm_libretro-logo.png</image>
 		<marquee>./media/scummvm_libretro-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>ScummVM Team</developer>
 		<publisher>ScummVM Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./xenia_canary.menu</path>
+		<name>Xenia Canary (XBOX 360)</name>
+		<desc>Запустить эмулятор Xenia Canary (Xbox 360).</desc>
+		<image>./media/xenia-logo.png</image>
+		<marquee>./media/xenia-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Xenia Team</developer>
+		<publisher>Xenia Team</publisher>
+		<genre></genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./xenia.menu</path>
+		<name>Xenia (XBOX 360)</name>
+		<desc>Запустить эмулятор Xenia (Xbox 360).</desc>
+		<image>./media/xenia-logo.png</image>
+		<marquee>./media/xenia-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Xenia Team</developer>
+		<publisher>Xenia Team</publisher>
+		<genre></genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./daphne.menu</path>
+		<name>Daphne Loader (Laserdisc)</name>
+		<desc>Запустить Daphne Loader (Laserdisc).</desc>
+		<image>./media/daphne-logo.png</image>
+		<marquee>./media/daphne-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Unknown</developer>
+		<publisher>Unknown</publisher>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -305,14 +407,14 @@
 	<game>
 		<path>./fpinball.menu</path>
 		<name>Future Pinball</name>
-		<desc>Run Future Pinball.</desc>
+		<desc>Запустить Future Pinball.</desc>
 		<image>./media/fpinball-logo.png</image>
 		<marquee>./media/fpinball-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Unknown</developer>
 		<publisher>Unknown</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -322,14 +424,14 @@
 	<game>
 		<path>./vpinball.menu</path>
 		<name>Visual Pinball</name>
-		<desc>Run Visual Pinball.</desc>
+		<desc>Запустить Visual Pinball.</desc>
 		<image>./media/vpinball-logo.png</image>
 		<marquee>./media/vpinball-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Unknown</developer>
 		<publisher>Unknown</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -339,14 +441,31 @@
 	<game>
 		<path>./demul.menu</path>
 		<name>Demul (Dreamcast, Naomi 1 &amp; 2, Atomiswave, Hikaru)</name>
-		<desc>Run Demul (Dreamcast, Naomi 1 &amp; 2, Atomiswave, Hikaru).</desc>
+		<desc>Запустить эмулятор Demul (Dreamcast, Naomi 1 &amp; 2, Atomiswave, Hikaru).</desc>
 		<image>./media/demul-logo.png</image>
 		<marquee>./media/demul-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Demul Team</developer>
 		<publisher>Demul Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./phoenix.menu</path>
+		<name>Phoenix (3DO &amp; jaguar )</name>
+		<desc>Запустить эмулятор Phoenix (3DO &amp; jaguar ).</desc>
+		<image>./media/phoenix.png</image>
+		<marquee>./media/phoenix.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Altmer</developer>
+		<publisher>Altmer</publisher>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -356,14 +475,31 @@
 	<game>
 		<path>./supermodel.menu</path>
 		<name>Supermodel (MODEL 3)</name>
-		<desc>Run Supermodel (Model 3).</desc>
+		<desc>Запустить эмулятор Supermodel (Model 3).</desc>
 		<image>./media/supermodel-logo.png</image>
 		<marquee>./media/supermodel-logo.png</marquee>
 		<rating>0</rating>
 		<developer>Supermodel Team</developer>
 		<publisher>Supermodel Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<releasedate />
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./cxbx-reloaded.menu</path>
+		<name>CxBx Reloaded (XBOX, Chihiro)</name>
+		<desc>Запустить эмулятор CxBx Reloaded (Xbox, Chihiro).</desc>
+		<image>./media/cxbxr-logo.png</image>
+		<marquee>./media/cxbxr-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Xemu Team</developer>
+		<publisher>Xemu Team</publisher>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -373,14 +509,14 @@
 	<game>
 		<path>./winuae.menu</path>
 		<name>WinUAE (Amiga)</name>
-		<desc>Run WinUAE (Amiga).</desc>
+		<desc>Запустить эмулятор WinUAE (Amiga).</desc>
 		<image>./media/winuae-logo.png</image>
 		<marquee>./media/winuae-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>WinUAE Team</developer>
 		<publisher>WinUAE Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -390,7 +526,7 @@
 	<game>
 		<path>./pico8.menu</path>
 		<name>PICO-8</name>
-		<desc>Run PICO-8 (Fantasy Console). This software is not provided by ProjectArcade. You can purchase it there: https://lexaloffle.itch.io/pico-8/</desc>
+		<desc>Запустить эмулятор PICO-8 (Fantasy Console). Это ПО не предоставляется ProjectArcade. Вы можете приобрести его здесь: https://lexaloffle.itch.io/pico-8/</desc>
 		<image>./media/pico8-logo.png</image>
 		<marquee>./media/pico8-logo.png</marquee>
 		<rating>0</rating>
@@ -407,14 +543,14 @@
 	<game>
 		<path>./snes9x.menu</path>
 		<name>SNES9X (Super NES)</name>
-		<desc>Run SNES9X (Super NES).</desc>
+		<desc>Запустить эмулятор SNES9X (Super NES).</desc>
 		<image>./media/snes9x-logo.png</image>
 		<marquee>./media/snes9x-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>SNES9X Team</developer>
 		<publisher>SNES9X Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -424,14 +560,14 @@
 	<game>
 		<path>./duckstation.menu</path>
 		<name>Duckstation (PlayStation)</name>
-		<desc>Run Duckstation Emulator (PlayStation).</desc>
+		<desc>Запустить эмулятор Duckstation (PlayStation).</desc>
 		<image>./media/duckstation-logo.png</image>
 		<marquee>./media/duckstation-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Duckstation Team</developer>
 		<publisher>Duckstation Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -441,14 +577,14 @@
 	<game>
 		<path>./mame.menu</path>
 		<name>MAME (Multiple Arcade Machine Emulator)</name>
-		<desc>Run MAME (Multiple Arcade Machine Emulator).</desc>
+		<desc>Запустить эмулятор MAME (Multiple Arcade Machine Emulator).</desc>
 		<image>./media/mame-logo.png</image>
 		<marquee>./media/mame-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>MAME Team</developer>
 		<publisher>MAME Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -458,14 +594,14 @@
 	<game>
 		<path>./ryujinx.menu</path>
 		<name>Ryujinx (Switch)</name>
-		<desc>Run Ryujinx (Switch). This software is not provided by ProjectArcade. You can download it here: https://ryujinx.org/download</desc>
+		<desc>Запустить эмулятор Ryujinx (Switch). Это ПО не предоставляется ProjectArcade. Вы можете скачать его отсюда: https://ryujinx.org/download</desc>
 		<image>./media/ryujinx-logo.png</image>
 		<marquee>./media/ryujinx-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Ryujinx Team</developer>
 		<publisher>Ryujinx Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount>1</playcount>
 		<lastplayed />
 		<gametime />
@@ -475,14 +611,14 @@
 	<game>
 		<path>./xemu.menu</path>
 		<name>Xemu (Xbox, Chihiro)</name>
-		<desc>Run Xemu (Xbox, Chihiro).</desc>
+		<desc>Запустить эмулятор Xemu (Xbox, Chihiro).</desc>
 		<image>./media/xemu-logo.png</image>
 		<marquee>./media/xemu-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Xemu Team</developer>
 		<publisher>Xemu Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -492,14 +628,14 @@
 	<game>
 		<path>./yuzu.menu</path>
 		<name>Yuzu (Switch)</name>
-		<desc>Run Yuzu (Switch). This software is not provided by ProjectArcade. You can download it here: https://yuzu-emu.org/downloads/</desc>
+		<desc>Запустить эмулятор Yuzu (Switch). Это ПО не предоставляется ProjectArcade. Вы можете скачать его отсюда: https://yuzu-emu.org/downloads/</desc>
 		<image>./media/yuzu-logo.png</image>
 		<marquee>./media/yuzu-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Yuzu Team</developer>
 		<publisher>Yuzu Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -509,14 +645,14 @@
 	<game>
 		<path>./yuzu-early-access.menu</path>
 		<name>Yuzu Early Access (Switch)</name>
-		<desc>Run Yuzu Early Access (Switch). This software is not provided by ProjectArcade.</desc>
+		<desc>Запустить эмулятор Yuzu Early Access (Switch). Это ПО не предоставляется ProjectArcade.</desc>
 		<image>./media/yuzuEA-logo.png</image>
 		<marquee>./media/yuzuEA-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Yuzu Team</developer>
 		<publisher>Yuzu Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -526,14 +662,14 @@
 	<game>
 		<path>./retroarch.menu</path>
 		<name>RetroArch (Multi Cores Emulator)</name>
-		<desc>Run RetroArch (Multi Cores Emulator).</desc>
+		<desc>Запустить RetroArch (Multi Cores Emulator).</desc>
 		<image>./media/retroarch-logo.png</image>
 		<marquee>./media/retroarch-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Libretro Team</developer>
 		<publisher>Libretro Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -543,13 +679,13 @@
 	<game>
 		<path>./tsugaru.menu</path>
 		<name>Tsugaru (FM Towns)</name>
-		<desc>Run Tsugaru (FM Towns).</desc>
+		<desc>Запустить эмулятор Tsugaru (FM Towns).</desc>
 		<image>./media/tsugaru-logo.png</image>
 		<marquee>./media/tsugaru-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Captain Ys</developer>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -559,14 +695,14 @@
 	<game>
 		<path>./nosgba.menu</path>
 		<name>No$GBA (GameBoy Advance 2 Players)</name>
-		<desc>Run No$GBA (GameBoy Advance 2 Players).</desc>
+		<desc>Запустить эмулятор No$GBA (GameBoy Advance 2 Players).</desc>
 		<image>./media/nosgba-logo.png</image>
 		<marquee>./media/nosgba-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>NoGBA Team</developer>
 		<publisher>NoGBA Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -576,14 +712,14 @@
 	<game>
 		<path>./3dsen.menu</path>
 		<name>3DSen (NES 3D)</name>
-		<desc>Run 3DSen (nes 3D). This software is not provided by ProjectArcade. You can purshase it here: https://geod.itch.io/3dsenpc/</desc>
+		<desc>Запустить 3DSen (NES 3D). Это ПО не предоставляется ProjectArcade. Вы можете купить его здесь: https://geod.itch.io/3dsenpc/</desc>
 		<image>./media/3dsen-logo.png</image>
 		<marquee>./media/3dsen-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Geod Studio</developer>
 		<publisher>Geod Studio</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -593,14 +729,14 @@
 	<game>
 		<path>./teknoparrot.menu</path>
 		<name>TeknoParrot (Arcade)</name>
-		<desc>Run TeknoParrot (Arcade). This software is not provided by ProjectArcade. You can download it here: https://teknoparrot.com/Home/Download</desc>
+		<desc>Запустить TeknoParrot (Arcade). Это ПО не предоставляется ProjectArcade. Вы можете скачать его отсюда: https://teknoparrot.com/Home/Download</desc>
 		<image>./media/teknoparrot-logo.png</image>
 		<marquee>./media/teknoparrot-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>TeknoGods</developer>
 		<publisher>TeknoGods</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -610,14 +746,14 @@
 	<game>
 		<path>./vita3k.menu</path>
 		<name>Vita 3K (PS Vita)</name>
-		<desc>Run Vita 3K Emulator (PS Vita).</desc>
+		<desc>Запустить эмулятор Vita 3K (PS Vita).</desc>
 		<image>./media/vita3k-logo.png</image>
 		<marquee>./media/vita3k-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>Vita3K Team</developer>
 		<publisher>Vita3K Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -625,110 +761,42 @@
 		<region>wr</region>
 	</game>
 	<game>
-		<path>./dolphin-triforce.menu</path>
-		<name>DolphinWX (Triforce)</name>
-		<desc>Run DolphinWX Emulator (Triforce).</desc>
-		<image>./media/dolphin-logo.png</image>
-		<marquee>./media/dolphin-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Dolphin Community</developer>
-		<publisher>Dolphin Community</publisher>
-		<genre>Emulator</genre>
-		<playcount>3</playcount>
-		<lastplayed>20230406T212858</lastplayed>
-		<gametime>85</gametime>
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
 		<path>./dosbox_pure_libretro.menu</path>
 		<name>DOSBox Pure Libretro (MS-DOS)</name>
-		<desc>Run DOSBox Pure Libretro.</desc>
+		<desc>Запустить DOSBox Pure Libretro.</desc>
 		<image>./media/dosbox_pure_libretro-logo.png</image>
 		<rating>0</rating>
 		<releasedate />
 		<developer>DOSBox Pure Team</developer>
 		<publisher>DOSBox Pure Team</publisher>
-		<genre>Emulator</genre>
+		<genre></genre>
 		<playcount>2</playcount>
-		<lastplayed>20230406T211023</lastplayed>
-		<gametime>66</gametime>
+		<lastplayed>20230407T160229</lastplayed>
+		<gametime>111</gametime>
 		<lang>en</lang>
 		<region>wr</region>
 	</game>
 	<game>
-		<path>./mgba.menu</path>
-		<name>mGBA (GameBoy Advance)</name>
-		<desc>Run mGBA Emulator (GameBoy Advance).</desc>
-		<image>./media/mgba-logo.png</image>
-		<marquee>./media/mgba-logo.png</marquee>
+		<path>./ludo.menu</path>
+		<name>Ludo</name>
+		<desc>Запустить Ludo (libretro фронтенд).</desc>
+		<image>./media/ludo-logo.png</image>
+		<marquee>./media/ludo-logo.png</marquee>
 		<rating>0</rating>
-		<releasedate />
-		<developer>mGBA Team</developer>
-		<publisher>mGBA Team</publisher>
-		<genre>Emulator</genre>
+		<releasedate></releasedate>
+		<developer>Ludo Team</developer>
+		<publisher>Ludo Team</publisher>
+		<genre></genre>
 		<playcount>1</playcount>
-		<lastplayed>20230406T230506</lastplayed>
-		<gametime>48</gametime>
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
-		<path>./phoenix.menu</path>
-		<name>Phoenix (3DO &amp; jaguar emulator)</name>
-		<desc>Run Phoenix  (3DO &amp; jaguar Emulator).</desc>
-		<image>./media/phoenix.png</image>
-		<marquee>./media/phoenix.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Altmer</developer>
-		<publisher>Altmer</publisher>
-		<genre>Emulator</genre>
-		<playcount>1</playcount>
-		<lastplayed>20230406T225438</lastplayed>
-		<gametime>27</gametime>
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
-		<path>./daphne.menu</path>
-		<name>Daphne Loader (Laserdisc)</name>
-		<desc>Run Daphne Loader (Laserdisc).</desc>
-		<image>./media/daphne-logo.png</image>
-		<marquee>./media/daphne-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Unknown</developer>
-		<publisher>Unknown</publisher>
-		<genre>Emulator</genre>
-		<playcount>1</playcount>
-		<lastplayed>20230406T231849</lastplayed>
-		<gametime>18</gametime>
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
-		<path>./dolphin-emu.menu</path>
-		<name>Dolphin (GameCube,Wii,WAD)</name>
-		<desc>Run Dolphin Emulator (GameCube, Wii, WAD).</desc>
-		<image>./media/dolphin-logo.png</image>
-		<marquee>./media/dolphin-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Dolphin Team</developer>
-		<publisher>Dolphin Team</publisher>
-		<genre>Emulator</genre>
-		<playcount>3</playcount>
-		<lastplayed>20230406T231502</lastplayed>
-		<gametime>65</gametime>
+		<lastplayed>20230423T152549</lastplayed>
+		<gametime>15</gametime>
 		<lang>en</lang>
 		<region>wr</region>
 	</game>
 	<game>
 		<path>./openmsx.menu</path>
 		<name>openMSX (MSX homecomputers)</name>
-		<desc>Run openMSX emulator.</desc>
+		<desc>Запустить эмулятор openMSX.</desc>
 		<image>./media/openmsx-logo.png</image>
 		<marquee>./media/openmsx-logo.png</marquee>
 		<rating>0</rating>
@@ -739,74 +807,6 @@
 		<playcount>1</playcount>
 		<lastplayed>20230407T221013</lastplayed>
 		<gametime>12</gametime>
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
-		<path>./cxbx-reloaded.menu</path>
-		<name>CxBx Reloaded (XBOX, Chihiro)</name>
-		<desc>Run CxBx Reloaded Emulator (Xbox, Chihiro).</desc>
-		<image>./media/cxbxr-logo.png</image>
-		<marquee>./media/cxbxr-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Xemu Team</developer>
-		<publisher>Xemu Team</publisher>
-		<genre>Emulator</genre>
-		<playcount>1</playcount>
-		<lastplayed>20230407T232832</lastplayed>
-		<gametime>40</gametime>
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
-		<path>./xenia.menu</path>
-		<name>Xenia (XBOX 360)</name>
-		<desc>Run Xenia (Xbox 360).</desc>
-		<image>./media/xenia-logo.png</image>
-		<marquee>./media/xenia-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Xenia Team</developer>
-		<publisher>Xenia Team</publisher>
-		<genre>Emulator</genre>
-		<playcount>2</playcount>
-		<lastplayed>20230407T232742</lastplayed>
-		<gametime>1154</gametime>
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
-		<path>./xenia_canary.menu</path>
-		<name>Xenia Canary (XBOX 360)</name>
-		<desc>Run Xenia Canary (Xbox 360).</desc>
-		<image>./media/xenia-logo.png</image>
-		<marquee>./media/xenia-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate />
-		<developer>Xenia Team</developer>
-		<publisher>Xenia Team</publisher>
-		<genre>Emulator</genre>
-		<playcount>1</playcount>
-		<lastplayed>20230407T232707</lastplayed>
-		<gametime>127</gametime>
-		<lang>en</lang>
-		<region>wr</region>
-	</game>
-	<game>
-		<path>./ludo.menu</path>
-		<name>Ludo (Libretro frontend)</name>
-		<desc>Run Ludo (libretro frontend).</desc>
-		<image>./media/ludo-logo.png</image>
-		<marquee>./media/ludo-logo.png</marquee>
-		<rating>0</rating>
-		<releasedate></releasedate>
-		<developer>Ludo Team</developer>
-		<publisher>Ludo Team</publisher>
-		<genre>Emulator</genre>
-		<playcount>4</playcount>
-		<lastplayed>20230409T192158</lastplayed>
-		<gametime>124</gametime>
 		<lang>en</lang>
 		<region>wr</region>
 	</game>
