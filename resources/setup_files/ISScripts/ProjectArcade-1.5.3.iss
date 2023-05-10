@@ -23,35 +23,35 @@ AppUpdatesURL={#MyAppURL}
 AppCopyright={#MyAppCopyright}
 DefaultDirName=C:\ProjectArcade
 DisableProgramGroupPage=yes
-LicenseFile=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\LICENSE.txt
-InfoBeforeFile=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\REQUIREMENTS.txt
-UninstallDisplayIcon=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\projectarcade.ico
-WizardImageFile=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\projectarcade_wizard.bmp
-WizardSmallImageFile=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\pa-headerlogo.bmp
+LicenseFile=E:\Projects\Software\ProjectArcade\ProjectArcade-setupfiles\LICENSE.txt
+InfoBeforeFile=E:\Projects\Software\ProjectArcade\ProjectArcade-setupfiles\REQUIREMENTS.txt
+UninstallDisplayIcon=E:\Projects\Software\ProjectArcade\ProjectArcade-setupfiles\projectarcade.ico
+WizardImageFile=E:\Projects\Software\ProjectArcade\ProjectArcade-setupfiles\projectarcade_wizard.bmp
+WizardSmallImageFile=E:\Projects\Software\ProjectArcade\ProjectArcade-setupfiles\pa-headerlogo.bmp
 DisableWelcomePage=no
 VersionInfoVersion=1.5.3
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputDir=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupbuilds\1.5.3\
+OutputDir=E:\Projects\Software\ProjectArcade\ProjectArcade-setupbuilds\1.5.3\
 OutputBaseFilename=ProjectArcade-1.5.3_setup
-SetupIconFile=C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\projectarcade.ico
+SetupIconFile=E:\Projects\Software\ProjectArcade\ProjectArcade-setupfiles\projectarcade.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 
 [Languages]
-Name: "english"; MessagesFile: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\english.isl"
-Name: "russian"; MessagesFile: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-setupfiles\russian.isl"
+Name: "english"; MessagesFile: "E:\Projects\Software\ProjectArcade\ProjectArcade-setupfiles\english.isl"
+Name: "russian"; MessagesFile: "E:\Projects\Software\ProjectArcade\ProjectArcade-setupfiles\russian.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-builds\1.5.3\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-builds\1.5.3\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-builds\1.5.3\projectarcade.ini"; DestDir: "{app}"; Flags: ignoreversion; Attribs: readonly
-Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-builds\1.5.3\emulationstation\about.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; Attribs: readonly
-Source: "C:\Users\TheDayG0ne\Desktop\ProjectArcade-builds\1.5.3\emulationstation\version.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; Attribs: readonly 
+Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.3\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.3\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.3\projectarcade.ini"; DestDir: "{app}"; Flags: ignoreversion; Attribs: readonly
+Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.3\emulationstation\about.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; Attribs: readonly
+Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.3\emulationstation\version.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; Attribs: readonly 
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ProjectArcade"
-#define MyAppVersion "1.5.4-beta1"
+#define MyAppVersion "1.5.4-beta3"
 #define MyAppPublisher "#TheDayG0ne"
 #define MyAppURL "https://projectarcade.ru"
 #define MyPublisherURL "https://thedayg0ne.ru"
@@ -32,8 +32,8 @@ DisableWelcomePage=no
 VersionInfoVersion=1.5.4
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputDir=E:\Projects\Software\ProjectArcade\ProjectArcade-setupbuilds\1.5.4-beta1\
-OutputBaseFilename=ProjectArcade-1.5.4-beta1_setup
+OutputDir=E:\Projects\Software\ProjectArcade\ProjectArcade-setupbuilds\1.5.4-beta3\
+OutputBaseFilename=ProjectArcade-1.5.4-beta3_setup
 SetupIconFile=E:\Projects\Software\ProjectArcade\ProjectArcade-setupfiles\projectarcade.ico
 Compression=lzma
 SolidCompression=yes
@@ -47,11 +47,11 @@ Name: "russian"; MessagesFile: "E:\Projects\Software\ProjectArcade\ProjectArcade
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.4-beta1\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.4-beta1\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.4-beta1\projectarcade.ini"; DestDir: "{app}"; Flags: ignoreversion; Attribs: readonly
-Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.4-beta1\emulationstation\about.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; Attribs: readonly
-Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.4-beta1\emulationstation\version.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; Attribs: readonly 
+Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.4-beta3\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.4-beta3\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.4-beta3\projectarcade.ini"; DestDir: "{app}"; Flags: ignoreversion; Attribs: readonly
+Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.4-beta3\emulationstation\about.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; Attribs: readonly
+Source: "E:\Projects\Software\ProjectArcade\ProjectArcade-builds\1.5.4-beta3\emulationstation\version.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; Attribs: readonly 
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
