@@ -55,3 +55,9 @@
 - Updated emulatorLauncher design; the interface has been translated into Russian
 - Now emulatorLauncher downloads emulators from ProjectArcade servers without using RetroBat resources
 - The ability to download skins has been added to the ProjectArcade Content Store
+
+**ProjectArcade 1.5.4**
+- Minor bug fixes
+- New emulators: OpenMSX, Flycast
+- Updated Russian localization in EmulationStation
+- Reduced the size of the shell in the installed form
