@@ -16,4 +16,4 @@ Otherwise, you can start a new project off RetroBat or ProjectArcade sources if 
 Finally, the license which concerns the entire RetroBat and ProjectArcade projects as a work, in particular the written or graphic content broadcast on its various media, is conditioned by the terms of the CC BY-NC-SA 4.0 license.
 See https://creativecommons.org/licenses/by-nc-sa/4.0.
 
-## A small easter egg for the guys from the RetroBat team: you are the best :)
+A small easter egg for the guys from the RetroBat team: you are the best :)
