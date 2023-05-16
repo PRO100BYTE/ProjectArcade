@@ -3,9 +3,7 @@
 ProjectArcade is a software for 64-bit versions of Windows designed for retro-gaming and running various emulators of gaming systems.
 
 Copyright (c) 2017-2019 Adrien Chalard "Kayl"
-
 Copyright (c) 2020-2023 RetroBat Team
-
 Copyright (c) 2022-2023 #TheDayG0ne
 
 ProjectArcade is a free open source project based on the Open-Source [EmulationStation](https://github.com/fabricecaruso/batocera-emulationstation), [emulatorLauncher](https://github.com/fabricecaruso/batocera-ports) and [RetroBat](https://github.com/kaylh/Retrobat) projects. The software was developed by enthusiasts for non-commercial use, namely a fun pastime. All code and configs written by #TheDayG0ne is distributed under the LGPL v3 license, and the source code written by Adrien Chalard "Kayl" and RetroBat Team is distributed under the LGPL v3 and CC BY-NC-SA 4.0 license.
