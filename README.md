@@ -56,34 +56,23 @@ build.bat
 
 ## 💟 Special Thanks
 
-- [kaylh](https://github.com/kaylh) - For a great RetroBat project and informative documentation, and so on...
-- [Fabrice Caruso](https://github.com/fabricecaruso) - For the development of EmulatorLauncher and Batocera scripts port
 - [Hel Mic](https://github.com/lehcimcramtrebor) - For his wonderful themes.
 - [Batocera](https://www.batocera.org) - For their wonderful retrogaming dedicated Operating System.
 - [pajarorrojo](https://github.com/pajarorrojo) - For PlayStation-X theme and support
 - [mluizvitor](https://github.com/mluizvitor) - For Elementerial theme
 - [NoCopyrightSounds](https://ncs.io) - For an excellent copyright-free music library
 
-## And also - many thanks to 🦇 RetroBat Team:
-
-- [Adrien Chalard "Kayl"](https://github.com/kaylh) - creator of the project, developer
+## Special thanks to the 🦇 RetroBat Team for their work:
+- [Adrien Chalard "Kayl"](https://github.com/kaylh) - creator of the RetroBat project, developer
 - [Lorenzolamas](https://github.com/lorenzolamas) - community management, graphics (former active)
 - [Fabrice Caruso](https://github.com/fabricecaruso) - lead developer, theme creation
 - [GetUpOr](https://github.com/getupor) - community, support
 - RetroBoy - community, support
 - [Tartifless](https://github.com/Tartifless) - developer, documentation
 
-## ⚖ Licenses
+## ⚖ License
 
 ProjectArcade License Agreement
-
-ProjectArcade is a software for 64-bit versions of Windows designed for retro-gaming and running various emulators of gaming systems.
-
-Copyright (c) 2017-2019 Adrien Chalard "Kayl", (c) 2020-2023 RetroBat Team, (c) 2022-2023 #TheDayG0ne
-
-ProjectArcade is a free open source project based on the Open-Source EmulationStation and RetroBat project. The software was developed by enthusiasts for non-commercial use, namely a fun pastime. All code, configs and themes created or written by #TheDayG0ne is distributed under the MIT license, and the source code written by RetroBat Team is distributed under the LGPL v3 and CC BY-NC-SA 4.0 license. All other software and scripts used belongs to their creators under their licenses
-
-### ProjectArcade License
 
 ProjectArcade is a software for 64-bit versions of Windows designed for retro-gaming and running various emulators of gaming systems.
 
@@ -123,20 +112,6 @@ RetroBat - https://github.com/kaylh/Retrobat
 
 ## 💬 Social & Support
 
-### #TheDayG0ne
-- Site: https://thedayg0ne.ru
-- Telegram: https://t.me/thedayg0ne
-- VK: https://vk.com/thedayg0ne
-- E-mail: me@thedayg0ne.ru
-
 ### ProjectArcade
 - Official Website: https://projectarcade.ru
-- Telegram: https://t.me/projectarcade_support
 - VK: https://vk.com/projectarcade
-
-### RetroBat Team
-- Official Website: https://www.retrobat.org/
-- Facebook: https://social.retrobat.org/facebook
-- Wiki: https://wiki.retrobat.org/
-- Forum: https://social.retrobat.org/forum
-- Discord: https://social.retrobat.org/discord
