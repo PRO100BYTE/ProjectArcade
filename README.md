@@ -112,6 +112,5 @@ RetroBat - https://github.com/kaylh/Retrobat
 
 ## 💬 Social & Support
 
-### ProjectArcade
 - Official Website: https://projectarcade.ru
 - VK: https://vk.com/projectarcade
