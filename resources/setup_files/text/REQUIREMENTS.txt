@@ -8,5 +8,7 @@ Dependencies
 
 - Visual C++ 2005-2022 Redistributable Packages (32 and 64 bit)
 - DirectX
-- .NET Framework 6.0 Desktop Runtime
-- .NET Framework 7.0 Desktop Runtime
+- .NET Framework 6.0 Desktop Runtime (optional)
+- .NET Framework 7.0 Desktop Runtime (optional)
+
+More information can be found on the project's GitHub: https://github.com/TheDayG0ne/ProjectArcade
