@@ -23,8 +23,8 @@ ProjectArcade can also run in Portable Mode. This means you can play games from 
 |**Graphics:**|Modern, with Direct3D 11.1 / OpenGL 4.4 / Vulkan support|
 |**Dependencies:**|[Visual C++ 2005-2022 Redistributable Packages (32 and 64 bit)](https://dl.projectarcade.ru/dependencies/vcr/VCRHyb_x86-x64.exe)|
 |   |[DirectX](https://dl.projectarcade.ru/dependencies/directx/directx_websetup.exe)|
-|   |[.NET Framework 6.0 Desktop Runtime](https://dl.projectarcade.ru/dependencies/netframework/6.0/netruntime-6.0.14_win64.exe)|
-|   |[.NET Framework 7.0 Desktop Runtime](https://dl.projectarcade.ru/dependencies/netframework/7.0/netruntime-7.0.3_win64.exe)|
+|   |[.NET Framework 6.0 Desktop Runtime (optional)](https://dl.projectarcade.ru/dependencies/netframework/6.0/netruntime-6.0.14_win64.exe)|
+|   |[.NET Framework 7.0 Desktop Runtime (optional)](https://dl.projectarcade.ru/dependencies/netframework/7.0/netruntime-7.0.3_win64.exe)|
 |**Controllers:**|Gamepads with XInput support are recommended. You can test your gamepad here: [Gamepad Tester](https://gamepad-tester.com)|
 
 **After installing the dependencies, it is recommended to restart the computer**
