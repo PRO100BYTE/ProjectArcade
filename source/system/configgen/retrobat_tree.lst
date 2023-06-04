@@ -35,6 +35,8 @@ bios\Mupen64plus\cache
 bios\Mupen64plus\dump
 bios\Mupen64plus\hires_texture
 bios\neocd
+bios\openmsx
+bios\openmsx\share
 bios\pcsx2
 bios\pcsx2\bios
 bios\pcsx2\textures
@@ -45,6 +47,7 @@ bios\raine\emudx
 bios\same_cdi
 bios\same_cdi\bios
 cheats
+cheats\duckstation
 cheats\mame
 cheats\pcsx2
 cheats\pcsx2\cheats
@@ -78,6 +81,9 @@ emulators\cemu\mlc01
 emulators\citra
 emulators\citra\user
 emulators\citra\user\config
+emulators\citra-canary
+emulators\citra-canary\user
+emulators\citra-canary\user\config
 emulators\cxbx-reloaded
 emulators\cxbx-reloaded\EmuDisk
 emulators\daphne
@@ -107,6 +113,8 @@ emulators\mame\ini
 emulators\mednafen
 emulators\mesen
 emulators\mgba
+emulators\mupen64
+emulators\mupen64\Config
 emulators\nosgba
 emulators\openbor
 emulators\oricutron
@@ -174,6 +182,7 @@ saves\gba\mgba
 saves\mame
 saves\mame\artwork
 saves\mame\ctrlr
+saves\mame\fmtowns
 saves\mame\nvram
 saves\mame\states
 saves\mastersystem
@@ -195,16 +204,21 @@ saves\psp\PSP\TEXTURES
 saves\psx
 saves\psx\duckstation
 saves\psx\duckstation\memcards
+saves\psx\duckstation\sstates
 saves\saturn
 saves\saturn\kronos
 saves\segacd
 saves\segacd\kega-fusion
 saves\snes
 saves\snes\snes9x
-saves\yuzu
-saves\yuzu\sdmc
+saves\switch
+saves\switch\dump
+saves\switch\load
+saves\switch\nand
+saves\switch\sdmc
 screenshots
 screenshots\citra
+screenshots\duckstation
 screenshots\pcsx2
 screenshots\winuae
 screenshots\yuzu

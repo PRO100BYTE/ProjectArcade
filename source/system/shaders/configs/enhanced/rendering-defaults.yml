@@ -15,7 +15,12 @@ default:
   simcoupe: HQ4X@HQ4X.fx  
   demul: HQ4X@HQ4X.fx
   phoenix: HQ4X@HQ4X.fx
-  bigpemu: HQ4X@HQ4X.fx  
+  bigpemu: HQ4X@HQ4X.fx
+  demul: HQ4X@HQ4X.fx
+  demul-old: HQ4X@HQ4X.fx
+  solarus: HQ4X@HQ4X.fx
+  redream: HQ4X@HQ4X.fx
+  raine: HQ4X@HQ4X.fx
 # per system overrides  
 n64:
   shader: anti-aliasing/fxaa
@@ -42,6 +47,7 @@ wii:
 # Sega
 dreamcast:
   shader: anti-aliasing/enhanced-fxaa-tvout
+  redream: HQ4X@HQ4X.fx
 gamegear:
   shader: crt-guest-dr-venom-fast
 saturn:

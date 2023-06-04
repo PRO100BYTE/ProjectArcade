@@ -4,6 +4,7 @@ arcadeflashweb
 bigpemu
 cemu
 citra
+citra-canary
 cxbx-reloaded
 daphne
 demul
@@ -22,8 +23,10 @@ m2emulator
 mednafen
 mesen
 mgba
+mupen64
 nosgba
 openbor
+openmsx
 oricutron
 pcsx2
 pcsx2-16

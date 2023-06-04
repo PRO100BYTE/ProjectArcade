@@ -4,24 +4,23 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-16 12:57+0100\n"
 "PO-Revision-Date: \n"
-"Last-Translator: \n"
 "Language-Team: Retrobat\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.0\n"
 
 # . TRANSLATION: shared, mame
 msgctxt "game_options"
 msgid "VIDEO MODE"
-msgstr "Разрешение"
+msgstr "РАЗРЕШЕНИЕ"
 
 # . TRANSLATION: shared, dolphin, mupen64plus, pcsx2, demul
 msgctxt "game_options"
 msgid "GAME ASPECT RATIO"
-msgstr "Соотношение сторон игры"
+msgstr "СООТНОШЕНИЕ СТОРОН ИГРЫ"
 
 # . TRANSLATION: shared, pcsx2
 msgctxt "game_options"
@@ -51,7 +50,7 @@ msgstr "Пользовательское"
 # . TRANSLATION: shared, duckstation
 msgctxt "game_options"
 msgid "REWIND"
-msgstr "Перемотка"
+msgstr "ПЕРЕМОТКА"
 
 # . TRANSLATION: shared, shared, shared, shared, shared, ...
 msgctxt "game_options"
@@ -66,22 +65,22 @@ msgstr "Выкл"
 # . TRANSLATION: shared
 msgctxt "game_options"
 msgid "SHADER SET"
-msgstr "Набор шейдеров"
+msgstr "НАБОР ШЕЙДЕРОВ"
 
 # . TRANSLATION: shared
 msgctxt "game_options"
 msgid "SMOOTH GAMES (BILINEAR FILTERING)"
-msgstr "Сглаживание игр (билинеарная фильтрация)"
+msgstr "СГЛАЖИВАНИЕ ИГР (БИЛИНЕАРНАЯ ФИЛЬТРАЦИЯ)"
 
 # . TRANSLATION: shared
 msgctxt "game_options"
 msgid "INTEGER SCALING (PIXEL PERFECT)"
-msgstr "Целочисленное масштабирование (pixel perfect)"
+msgstr "ЦЕЛОЕ МАСШТАБИРОВАНИЕ (ИДЕАЛЬНО)"
 
 # . TRANSLATION: shared, shared, shared, shared, shared, ...
 msgctxt "game_options"
 msgid "DECORATIONS"
-msgstr "Рамки (оверлеи)"
+msgstr "РАМКИ (ОВЕРЛЕИ)"
 
 # . TRANSLATION: shared, shared, libretro/mesen-s, libretro/mesen, libretro/mesen, ...
 msgctxt "game_options"
@@ -91,42 +90,42 @@ msgstr "Нет"
 # . TRANSLATION: shared
 msgctxt "game_options"
 msgid "ENABLE AI TRANSLATION SERVICE"
-msgstr "Включить сервис AI перевода"
+msgstr "ВКЛЮЧИТЬ СЕРВИС ПЕРЕВОДА AI"
 
 # . TRANSLATION: shared
 msgctxt "game_options"
 msgid "TARGET LANGUAGE"
-msgstr "Язык перевода"
+msgstr "ЯЗЫК ПЕРЕВОДА"
 
 # . TRANSLATION: shared
 msgctxt "game_options"
 msgid "AI TRANSLATION SERVICE URL"
-msgstr "URL сервиса AI перевода"
+msgstr "URL СЕРВИСА ПЕРЕВОДА AI"
 
 # . TRANSLATION: shared
 msgctxt "game_options"
 msgid "PAUSE ON TRANSLATED SCREEN"
-msgstr "Пауза в окне перевода"
+msgstr "ПАУЗА В ОКНЕ ПЕРЕВОДА"
 
 # . TRANSLATION: shared, shared, shared, shared, shared
 msgctxt "game_options"
 msgid "LATENCY REDUCTION"
-msgstr "Уменьшение задержки"
+msgstr "УМЕНЬШЕНИЕ ЗАДЕРЖКИ"
 
 # . TRANSLATION: shared
 msgctxt "game_options"
 msgid "RUN-AHEAD FRAMES"
-msgstr "Запуск кадров вперед"
+msgstr "КАДРЫ ОБГОНА (RUN-AHEAD)"
 
 # . TRANSLATION: shared
 msgctxt "game_options"
 msgid "AUTOMATIC FRAME DELAY"
-msgstr "Автоматическая задержка кадра"
+msgstr "АВТОМАТИЧЕСКАЯ ЗАДЕРЖКА КАДРА"
 
 # . TRANSLATION: libretro/81, libretro/gambatte
 msgctxt "game_options"
 msgid "COLORIZATION"
-msgstr "Окрашивание цветом"
+msgstr "КОЛОРИЗАЦИЯ"
 
 # . TRANSLATION: libretro/81, libretro/81, libretro/fceumm, libretro/fceumm, libretro/genesisplusgx, ...
 msgctxt "game_options"
@@ -136,22 +135,22 @@ msgstr "Автообнаружение"
 # . TRANSLATION: libretro/atari800
 msgctxt "game_options"
 msgid "SIO ACCELERATION"
-msgstr "SIO ускорение"
+msgstr "SIO УСКОРЕНИЕ"
 
 # . TRANSLATION: libretro/atari800
 msgctxt "game_options"
 msgid "INTERNAL RESOLUTION"
-msgstr "Внутреннее разрешение"
+msgstr "ВНУТРЕННЕЕ РАЗРЕШЕНИЕ"
 
 # . TRANSLATION: libretro/bluemsx, libretro/mesen, libretro/fceumm, libretro/genesisplusgx, libretro/mednafen_supergrafx, ...
 msgctxt "game_options"
 msgid "REDUCE SPRITE FLICKERING"
-msgstr "Сократить мерцание спрайтов"
+msgstr "УМЕНЬШИТЬ МЕРЦАНИЕ СПРАЙТОВ"
 
 # . TRANSLATION: libretro/mesen-s, libretro/mesen, libretro/fceumm, libretro/same_cdi, libretro/mame, ...
 msgctxt "game_options"
 msgid "Enhancement. Reduces system slowdown. Causes issues in some games."
-msgstr "Улучшение. Снижает замедление системы. Вызывает проблемы в некоторых играх."
+msgstr "Улучшение. Уменьшает замедление системы. Вызывает проблемы в некоторых играх."
 
 # . TRANSLATION: libretro/mesen-s, libretro/mesen, libretro/fceumm, amiberry, mupen64plus
 msgctxt "game_options"
@@ -171,7 +170,7 @@ msgstr "Очень высокий"
 # . TRANSLATION: libretro/mesen, libretro/neocd, libretro/o2em, duckstation
 msgctxt "game_options"
 msgid "CONSOLE REGION"
-msgstr "Регион консоли"
+msgstr "РЕГИОН КОНСОЛИ"
 
 # . TRANSLATION: libretro/mesen
 msgctxt "game_options"
@@ -181,62 +180,62 @@ msgstr "Dendy"
 # . TRANSLATION: libretro/mesen
 msgctxt "game_options"
 msgid "NTSC FILTER"
-msgstr "NTSC фильтр"
+msgstr "NTSC ФИЛЬТР"
 
 # . TRANSLATION: libretro/desmume, libretro/fbneo, libretro/flycast, libretro/mame078plus, libretro/mgba, ...
 msgctxt "game_options"
 msgid "FRAMESKIP"
-msgstr "Пропуск кадров"
+msgstr "ПРОПУСК КАДРОВ"
 
 # . TRANSLATION: libretro/dosbox, libretro/dosbox_pure, libretro/swanstation, libretro/duckstation, libretro/fceumm, ...
 msgctxt "game_options"
 msgid "CONTROLLER 1 TYPE"
-msgstr "Тип 1 контроллера"
+msgstr "ТИП КОНТРОЛЛЕРА 1"
 
 # . TRANSLATION: libretro/dosbox, libretro/dosbox_pure, libretro/swanstation, libretro/duckstation, libretro/fceumm, ...
 msgctxt "game_options"
 msgid "CONTROLLER 2 TYPE"
-msgstr "Тип 2 контроллера"
+msgstr "ТИП КОНТРОЛЛЕРА 2"
 
 # . TRANSLATION: libretro/dosbox_pure
 msgctxt "game_options"
 msgid "CPU TYPE"
-msgstr "Тип процессора"
+msgstr "ТИП CPU"
 
 # . TRANSLATION: libretro/dosbox_pure, libretro/mame, libretro/px68k, mame/uzem
 msgctxt "game_options"
 msgid "4MB"
-msgstr "4 Мб"
+msgstr "4MB"
 
 # . TRANSLATION: libretro/dosbox_pure, libretro/mame, libretro/px68k, mame/uzem
 msgctxt "game_options"
 msgid "8MB"
-msgstr "8 Мб"
+msgstr "8MB"
 
 # . TRANSLATION: libretro/dosbox_pure, libretro/mame, libretro/np2kai, mame/uzem
 msgctxt "game_options"
 msgid "16MB"
-msgstr "16 Мб"
+msgstr "16MB"
 
 # . TRANSLATION: libretro/dosbox_pure
 msgctxt "game_options"
 msgid "24MB"
-msgstr "24 Мб"
+msgstr "24MB"
 
 # . TRANSLATION: libretro/dosbox_pure, libretro/mame, libretro/np2kai, mame/uzem
 msgctxt "game_options"
 msgid "32MB"
-msgstr "32 Мб"
+msgstr "32MB"
 
 # . TRANSLATION: libretro/dosbox_pure, libretro/mame, libretro/np2kai, mame/uzem
 msgctxt "game_options"
 msgid "64MB"
-msgstr "64 Мб"
+msgstr "64MB"
 
 # . TRANSLATION: libretro/dosbox_pure, libretro/mame, mame/uzem
 msgctxt "game_options"
 msgid "128MB"
-msgstr "128 Мб"
+msgstr "128MB"
 
 # . TRANSLATION: libretro/dosbox_pure, hatari
 msgctxt "game_options"
@@ -256,12 +255,12 @@ msgstr "Билинейный"
 # . TRANSLATION: libretro/swanstation, libretro/duckstation, libretro/fceumm, libretro/nestopia, duckstation
 msgctxt "game_options"
 msgid "Zooms in to hide black borders. Borders are different per game."
-msgstr "Увеличивает изображение, чтобы скрыть черные рамки. Рамки отличаются в каждой игре."
+msgstr "Увеличивает масштаб, чтобы скрыть черные границы. Границы различаются в зависимости от игры."
 
 # . TRANSLATION: libretro/swanstation, libretro/duckstation, libretro/fceumm, libretro/nestopia, libretro/o2em, ...
 msgctxt "game_options"
 msgid "CROP OVERSCAN"
-msgstr "Обрезка изображения"
+msgstr "КАДРИРОВАНИЕ"
 
 # . TRANSLATION: libretro/swanstation, libretro/swanstation, libretro/duckstation, libretro/duckstation, libretro/mednafen_psx, ...
 msgctxt "game_options"
@@ -291,7 +290,7 @@ msgstr "NeGcon"
 # . TRANSLATION: libretro/fbneo, libretro/mame078plus
 msgctxt "game_options"
 msgid "Console AES World"
-msgstr "Консоль AES World"
+msgstr "Консоль AES World "
 
 # . TRANSLATION: libretro/fbneo, libretro/mame078plus
 msgctxt "game_options"
@@ -356,17 +355,17 @@ msgstr "2x-VBlank"
 # . TRANSLATION: libretro/flycast, dolphin, dolphin_triforce, flycast, mupen64plus, ...
 msgctxt "game_options"
 msgid "ANISOTROPIC FILTERING"
-msgstr "Анизотропная фильтрация"
+msgstr "АНИЗОТРОПНАЯ ФИЛЬТРАЦИЯ"
 
 # . TRANSLATION: libretro/flycast, libretro/flycast
 msgctxt "game_options"
 msgid "SCREEN ORIENTATION"
-msgstr "Ориентация экрана"
+msgstr "ОРИЕНТАЦИЯ ЭКРАНА"
 
 # . TRANSLATION: libretro/fuse, hatari
 msgctxt "game_options"
 msgid "MODEL"
-msgstr "Модель"
+msgstr "МОДЕЛЬ"
 
 # . TRANSLATION: libretro/gambatte, libretro/genesisplusgx, libretro/o2em, libretro/pokemini, libretro/potator
 msgctxt "game_options"
@@ -386,7 +385,7 @@ msgstr "GB - DMG"
 # . TRANSLATION: libretro/gambatte, libretro/potator
 msgctxt "game_options"
 msgid "GB - Light"
-msgstr "GB - Светлый"
+msgstr "GB - Свет"
 
 # . TRANSLATION: libretro/gambatte, libretro/potator
 msgctxt "game_options"
@@ -456,12 +455,12 @@ msgstr "GBC - Жёлтый"
 # . TRANSLATION: libretro/genesisplusgx, redream
 msgctxt "game_options"
 msgid "REGION"
-msgstr "Регион"
+msgstr "РЕГИОН"
 
 # . TRANSLATION: libretro/genesisplusgx, libretro/genesisplusgx
 msgctxt "game_options"
 msgid "CD ADD-ON"
-msgstr "Дополнение CD"
+msgstr "CD ADD-ON"
 
 # . TRANSLATION: libretro/genesisplusgx
 msgctxt "game_options"
@@ -471,12 +470,12 @@ msgstr "LCD GHOSTING ФИЛЬТР"
 # . TRANSLATION: libretro/mame078plus
 msgctxt "game_options"
 msgid "Analog"
-msgstr "Аналог"
+msgstr "Аналоговая"
 
 # . TRANSLATION: libretro/mame078plus
 msgctxt "game_options"
 msgid "Digital"
-msgstr "Цифровой"
+msgstr "Цифровая"
 
 # . TRANSLATION: libretro/mupen64plus-next
 msgctxt "game_options"
@@ -511,7 +510,7 @@ msgstr "Резкость 2"
 # . TRANSLATION: libretro/mupen64plus-next
 msgctxt "game_options"
 msgid "CPU CORE"
-msgstr "Ядро процессора"
+msgstr "ЯДРО ПРОЦЕССОРА"
 
 # . TRANSLATION: libretro/neocd, flycast/uzem, redream
 msgctxt "game_options"
@@ -536,12 +535,12 @@ msgstr "CDZ"
 # . TRANSLATION: libretro/nestopia
 msgctxt "game_options"
 msgid "4 PLAYER ADAPTER"
-msgstr "Адаптер на 4 игрока"
+msgstr "АДАПТЕР НА 4 ИГРОКА"
 
 # . TRANSLATION: libretro/o2em
 msgctxt "game_options"
 msgid "EMULATED SYSTEM"
-msgstr "Эмулируемая система"
+msgstr "ЭМУЛЯЦИЯ СИСТЕМЫ"
 
 # . TRANSLATION: libretro/o2em
 msgctxt "game_options"
@@ -566,7 +565,7 @@ msgstr "Некоторые игры принимают ввод с порта 2 
 # . TRANSLATION: libretro/o2em
 msgctxt "game_options"
 msgid "SWAP GAMEPADS"
-msgstr "Поменять геймпады"
+msgstr "ПОМЕНЯТЬ ГЕЙМПАДЫ"
 
 # . TRANSLATION: libretro/o2em, libretro/picodrive
 msgctxt "game_options"
@@ -576,7 +575,7 @@ msgstr "Увеличение, чтобы скрыть черные рамки."
 # . TRANSLATION: libretro/o2em
 msgctxt "game_options"
 msgid "CRT GHOSTING EFFECT"
-msgstr "ЭЛТ эффект \"призрачного\" изображения"
+msgstr "CRT GHOSTING ЭФФЕКТ"
 
 # . TRANSLATION: libretro/o2em
 msgctxt "game_options"
@@ -606,7 +605,7 @@ msgstr "Смягчить звуковой эффект хеша в некото�
 # . TRANSLATION: libretro/o2em
 msgctxt "game_options"
 msgid "AUDIO FILTER"
-msgstr "Аудиофильтр"
+msgstr "АУДИО ФИЛЬТР"
 
 # . TRANSLATION: libretro/pcsx_rearmed
 msgctxt "game_options"
@@ -616,12 +615,12 @@ msgstr "Вкл (спидхак)"
 # . TRANSLATION: libretro/puae, libretro/puae2021
 msgctxt "game_options"
 msgid "CPU COMPATIBILITY"
-msgstr "Совместимость процессора"
+msgstr "СОВМЕСТИМОСТЬ CPU"
 
 # . TRANSLATION: libretro/puae, libretro/puae2021, duckstation, flycast, openbor
 msgctxt "game_options"
 msgid "Normal"
-msgstr "Нормальный"
+msgstr "Нормальный "
 
 # . TRANSLATION: libretro/puae, libretro/puae2021, libretro/vice_x64, libretro/vice_x64sc, libretro/vice_x128, ...
 msgctxt "game_options"
@@ -641,37 +640,37 @@ msgstr "ещё больше"
 # . TRANSLATION: libretro/tyrquake, cemu, dolphin, dolphin_triforce, duckstation, ...
 msgctxt "game_options"
 msgid "RUMBLE"
-msgstr "Вибрация"
+msgstr "ВИБРАЦИЯ"
 
 # . TRANSLATION: dolphin, dolphin_triforce
 msgctxt "game_options"
 msgid "ANTI-ALIASING"
-msgstr "Сглаживание"
+msgstr "СГЛАЖИВАНИЕ"
 
 # . TRANSLATION: dolphin, melonds
 msgctxt "game_options"
 msgid "ENABLE CHEATS"
-msgstr "Включить читы"
+msgstr "ВКЛЮЧИТЬ ЧИТЫ"
 
 # . TRANSLATION: dolphin, dolphin_triforce
 msgctxt "game_options"
 msgid "MEMORY MANAGEMENT UNIT"
-msgstr "Блок управления памятью"
+msgstr "БЛОК УПРАВЛЕНИЯ ПАМЯТЬЮ"
 
 # . TRANSLATION: flycast/uzem, sonic2013, soniccd
 msgctxt "game_options"
 msgid "English"
-msgstr "Английский"
+msgstr "English"
 
 # . TRANSLATION: hatari, redream, sonic2013, soniccd
 msgctxt "game_options"
 msgid "LANGUAGE"
-msgstr "Язык"
+msgstr "ЯЗЫК"
 
 # . TRANSLATION: melonds
 msgctxt "game_options"
 msgid "INTEGER SCALING"
-msgstr "Целочисленное масштабирование"
+msgstr "ЦЕЛОЕ МАСШТАБИРОВАНИЕ"
 
 # . TRANSLATION: moonlight
 msgctxt "game_options"
@@ -686,12 +685,12 @@ msgstr "ближайшая"
 # . TRANSLATION: redream
 msgctxt "game_options"
 msgid "Composite"
-msgstr "Композит"
+msgstr "Composite"
 
 # . TRANSLATION: supermodel
 msgctxt "game_options"
 msgid "QUAD RENDERING"
-msgstr "Quad rendering"
+msgstr "QUAD RENDERING"
 
 # . TRANSLATION: supermodel
 msgctxt "game_options"
@@ -711,1463 +710,1463 @@ msgstr "P1 и P2"
 # . TRANSLATION: wine
 msgctxt "game_options"
 msgid "ENABLE MOUSE"
-msgstr "Включить мышь"
+msgstr "ВКЛЮЧИТЬ МЫШЬ"
 
 msgctxt "game_options"
 msgid "90°"
-msgstr "90 градусов"
+msgstr ""
 
 msgctxt "game_options"
 msgid "180°"
-msgstr "180 градусов"
+msgstr ""
 
 msgctxt "game_options"
 msgid "270°"
-msgstr "270 градусов"
+msgstr ""
 
 msgctxt "game_options"
 msgid "VIDEO ROTATION"
-msgstr "Поворот видео"
+msgstr ""
 
 msgctxt "game_options"
 msgid "MONITOR INDEX"
-msgstr "Индекс монитора"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Games will be displayed on the monitor corresponding to the selected index."
-msgstr "Игры будут отображаться на мониторе, соответствующем выбранному индексу."
+msgstr ""
 
 msgctxt "game_options"
 msgid "CRT SCREEN OUTPUT"
-msgstr "Вывод на ЭЛТ экран"
+msgstr ""
 
 msgctxt "game_options"
 msgid "15KHz"
-msgstr "15 КГц"
+msgstr ""
 
 msgctxt "game_options"
 msgid "31KHz (Standard)"
-msgstr "31 КГц (Стандартный)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "31KHz (120Hz)"
-msgstr "31 КГц (120 Гц)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "CRT SCREEN RESOLUTION"
-msgstr "Разрешение ЭЛТ экрана"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Native"
-msgstr "Родной"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Dynamic"
-msgstr "Динамический"
+msgstr ""
 
 msgctxt "game_options"
 msgid "GRAPHIC CARD INDEX"
-msgstr "Индекс видеокарты"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Change this only if multiple GPU are used by your system."
-msgstr "Измените это только если ваша система использует несколько видеокарт."
+msgstr ""
 
 msgctxt "game_options"
 msgid "VERTICAL SYNC"
-msgstr "Вертикальная синхронизация"
+msgstr ""
 
 msgctxt "game_options"
 msgid "no"
-msgstr "нет"
+msgstr ""
 
 msgctxt "game_options"
 msgid "yes"
-msgstr "да"
+msgstr ""
 
 msgctxt "game_options"
 msgid "adaptative"
-msgstr "адаптивный"
+msgstr ""
 
 msgctxt "game_options"
 msgid "HARD SYNC"
-msgstr "Жесткая синхронизация"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Hard-sync GPU and CPU. Reduce latency at the cost of inscreased performance requirements."
-msgstr "Жестко синхронизируйте GPU и ЦП. Снизьте задержку за счет увеличения требований к производительности."
+msgstr ""
 
 msgctxt "game_options"
 msgid "1 frame"
-msgstr "1 кадр"
+msgstr ""
 
 msgctxt "game_options"
 msgid "2 frames"
-msgstr "2 кадра"
+msgstr ""
 
 msgctxt "game_options"
 msgid "3 frames"
-msgstr "3 кадра"
+msgstr ""
 
 msgctxt "game_options"
 msgid "4 frames"
-msgstr "4 кадра"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SWAP INTERVAL"
-msgstr "Сменить интервал"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Set this to effectively halve monitor refresh rate."
-msgstr "Установите это, чтобы эффективно уменьшить частоту обновления монитора вдвое."
+msgstr ""
 
 msgctxt "game_options"
 msgid "BLACK FRAMES INSERTION"
-msgstr "Вставка черных кадров"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Usefull on some high refresh rate screen to eliminate ghosting."
-msgstr "Полезно на некоторых экранах с высокой частотой обновления, чтобы устранить эффект остаточного изображения."
+msgstr ""
 
 msgctxt "game_options"
 msgid "G-SYNC/FREESYNC COMPATIBILITY"
-msgstr "Совместимость с G-Sync/FreeSync"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Sync to exact content framerate. Only for G-Sync/FreeSync/HDMI-2.1-VRR compatible monitors."
-msgstr "Синхронизировать с точной частотой кадров содержимого. Только для мониторов, совместимых с G-Sync/FreeSync/HDMI-2.1-VRR."
+msgstr ""
 
 msgctxt "game_options"
 msgid "RESAMPLER"
-msgstr "Ресемплер"
+msgstr ""
 
 msgctxt "game_options"
 msgid "sinc"
-msgstr "sinc"
+msgstr ""
 
 msgctxt "game_options"
 msgid "CC"
-msgstr "CC"
+msgstr ""
 
 msgctxt "game_options"
 msgid "none"
-msgstr "нет"
+msgstr ""
 
 msgctxt "game_options"
 msgid "QUALITY"
-msgstr "Качество"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Lowest"
-msgstr "Минимальное"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Lower"
-msgstr "Низкое"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Normal (default)"
-msgstr "Нормальное (по умолчанию)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Higher"
-msgstr "Высокое"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Highest"
-msgstr "Максимальное"
+msgstr ""
 
 msgctxt "game_options"
 msgid "VOLUME GAIN"
-msgstr "Увеличение громкости"
+msgstr ""
 
 msgctxt "game_options"
 msgid "MIXER VOLUME GAIN"
-msgstr "Увеличение громкости микшера"
+msgstr ""
 
 msgctxt "game_options"
 msgid "DSP PLUGIN"
-msgstr "DSP плагин"
+msgstr ""
 
 msgctxt "game_options"
 msgid "BASS BOOST"
-msgstr "Усиление баса"
+msgstr ""
 
 msgctxt "game_options"
 msgid "CHIPTUNE ENHANCE"
-msgstr "Улучшение Chiptune"
+msgstr ""
 
 msgctxt "game_options"
 msgid "CHORUS"
-msgstr "Хорус"
+msgstr ""
 
 msgctxt "game_options"
 msgid "CRYSTALIZER"
-msgstr "Кристаллизатор"
+msgstr ""
 
 msgctxt "game_options"
 msgid "ECHO"
-msgstr "Эхо"
+msgstr ""
 
 msgctxt "game_options"
 msgid "ECHO REVERB"
-msgstr "Эхо реверберация"
+msgstr ""
 
 msgctxt "game_options"
 msgid "EQ"
-msgstr "Эквалайзер"
+msgstr ""
 
 msgctxt "game_options"
 msgid "HIGH SHELF DAMPEN"
-msgstr "Смягчение высоких частот"
+msgstr ""
 
 msgctxt "game_options"
 msgid "IIR"
-msgstr "БИХ"
+msgstr ""
 
 msgctxt "game_options"
 msgid "LOW PASS CPS"
-msgstr "Низкочастотный фильтр CPS"
+msgstr ""
 
 msgctxt "game_options"
 msgid "MONO"
-msgstr "Моно"
+msgstr ""
 
 msgctxt "game_options"
 msgid "PANNING"
-msgstr "Панорамирование"
+msgstr ""
 
 msgctxt "game_options"
 msgid "PHASER"
-msgstr "Phaser"
+msgstr ""
 
 msgctxt "game_options"
 msgid "REVERB"
-msgstr "Reverb"
+msgstr ""
 
 msgctxt "game_options"
 msgid "TREMOLO"
-msgstr "Tremolo"
+msgstr ""
 
 msgctxt "game_options"
 msgid "VIBRATO"
-msgstr "Vibrato"
+msgstr ""
 
 msgctxt "game_options"
 msgid "WAHWAH"
-msgstr "Wah-wah"
+msgstr ""
 
 msgctxt "game_options"
 msgid "AUTO SAVE/LOAD"
-msgstr "Автоматическое сохранение/загрузка"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SHOW MENU ELEMENTS"
-msgstr "Показать элементы меню"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Show or hide RetroArch settings. 'Config' depends on ES interface mode."
-msgstr "Показать или скрыть настройки RetroArch. Режим «Config» зависит от режима интерфейса ES."
+msgstr ""
 
 msgctxt "game_options"
 msgid "USER INTERFACE"
-msgstr "Пользовательский интерфейс"
+msgstr ""
 
 msgctxt "game_options"
 msgid "minimal"
-msgstr "минимальный"
+msgstr ""
 
 msgctxt "game_options"
 msgid "recommended"
-msgstr "рекомендуемый"
+msgstr ""
 
 msgctxt "game_options"
 msgid "full"
-msgstr "полный"
+msgstr ""
 
 msgctxt "game_options"
 msgid "NOTIFICATIONS"
-msgstr "Уведомления"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Display or not on-screen notifications."
-msgstr "Отображать или нет всплывающие уведомления на экране."
+msgstr ""
 
 msgctxt "game_options"
 msgid "PRESS HOTKEYS TWICE TO EXIT"
-msgstr "Нажмите горячие клавиши дважды для выхода"
+msgstr ""
 
 msgctxt "game_options"
 msgid "RUN-AHEAD USE SECOND INSTANCE"
-msgstr "Использовать второй экземпляр для предварительного выполнения"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Automatically decrease frame delay temporarily to prevent frame drops. Turn off if this worsens audio/video stuttering."
-msgstr "Автоматически снизить задержку кадра временно, чтобы предотвратить падение кадров. Выключите, если это ухудшает заикание аудио/видео."
+msgstr ""
 
 msgctxt "game_options"
 msgid "Dansk"
-msgstr "Датский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Deutsch"
-msgstr "Немецкий"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Español"
-msgstr "Испанский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Français"
-msgstr "Французский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Hrvatski"
-msgstr "Хорватский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Italiano"
-msgstr "Итальянский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Magyar"
-msgstr "Венгерский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Nederlands"
-msgstr "Голландский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Norsk"
-msgstr "Норвежский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Polski"
-msgstr "Польский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Português"
-msgstr "Португальский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Română"
-msgstr "Румынский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Svenska"
-msgstr "Шведский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Türkçe"
-msgstr "Турецкий"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Čeština"
-msgstr "Чешский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Ελληνικά (Greek)"
-msgstr "Греческий"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Русский (Russian)"
-msgstr "Русский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "日本語 (Japanese)"
-msgstr "Японский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "简体中文 (Chinese)"
-msgstr "Китайский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "한국어 (Korean)"
-msgstr "Корейский"
+msgstr ""
 
 msgctxt "game_options"
 msgid "LIGHTGUN"
-msgstr "Световой пистолет"
+msgstr ""
 
 msgctxt "game_options"
 msgid "AUTOCONFIGURE CONTROLLERS"
-msgstr "Автонастройка контроллеров"
+msgstr ""
 
 msgctxt "game_options"
 msgid "VIDEO"
-msgstr "Видео"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Use 'vulkan' for the best performance if the hardware is compatible."
-msgstr "Используйте 'vulkan' для лучшей производительности, если аппаратное обеспечение совместимо."
+msgstr ""
 
 msgctxt "game_options"
 msgid "opengl"
-msgstr "OpenGL"
+msgstr ""
 
 msgctxt "game_options"
 msgid "opengl core"
-msgstr "OpenGL Core"
+msgstr ""
 
 msgctxt "game_options"
 msgid "directx 12"
-msgstr "DirectX 12"
+msgstr ""
 
 msgctxt "game_options"
 msgid "directx 11"
-msgstr "DirectX 11"
+msgstr ""
 
 msgctxt "game_options"
 msgid "directx 10"
-msgstr "DirectX 10"
+msgstr ""
 
 msgctxt "game_options"
 msgid "directx 9"
-msgstr "DirectX 9"
+msgstr ""
 
 msgctxt "game_options"
 msgid "vulkan"
-msgstr "Vulkan"
+msgstr ""
 
 msgctxt "game_options"
 msgid "AUDIO"
-msgstr "Звук"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Choose the audio driver compatible with the hardware."
-msgstr "Выберите аудиодрайвер, совместимый с аппаратным обеспечением."
+msgstr ""
 
 msgctxt "game_options"
 msgid "xaudio"
-msgstr "XAudio"
+msgstr ""
 
 msgctxt "game_options"
 msgid "directsound"
-msgstr "DirectSound"
+msgstr ""
 
 msgctxt "game_options"
 msgid "wasapi"
-msgstr "WASAPI"
+msgstr ""
 
 msgctxt "game_options"
 msgid "CONTROLLERS"
-msgstr "Контроллеры"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Use 'xinput' for almost all modern controllers. Use 'sdl' for compatibility."
-msgstr "Используйте 'xinput' для почти всех современных контроллеров. Используйте 'sdl' для совместимости."
+msgstr ""
 
 msgctxt "game_options"
 msgid "DECOMPRESSION"
-msgstr "Распаковка"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Sets behaviour for decompressed folders (squashfs, 7z)"
-msgstr "Определяет поведение для распакованных папок (squashfs, 7z)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "ASK"
-msgstr "Спросить"
+msgstr ""
 
 msgctxt "game_options"
 msgid "KEEP UNCOMPRESSED FOLDERS"
-msgstr "Сохранять несжатые папки"
+msgstr ""
 
 msgctxt "game_options"
 msgid "ALWAYS DELETE UNCOMPRESSED FOLDERS"
-msgstr "Всегда удалять несжатые папки"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Select a video format for output."
-msgstr "Выберите формат видео для вывода."
+msgstr ""
 
 msgctxt "game_options"
 msgid "ARTIFACTING FIX"
-msgstr "Исправление артефактов"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Remove odd composite green/blue artifacting that appears on real hardware."
-msgstr "Удалить нечеткие составные зеленые/синие артефакты, которые появляются на реальном оборудовании."
+msgstr ""
 
 msgctxt "game_options"
 msgid "Choose which Atari system to emulate."
-msgstr "Выберите, какую систему Atari эмулировать."
+msgstr ""
 
 msgctxt "game_options"
 msgid "EMULATION"
-msgstr "Эмуляция"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Improve data transfert of emulated SIO port."
-msgstr "Улучшить передачу данных эмулированного порта SIO."
+msgstr ""
 
 msgctxt "game_options"
 msgid "SCREEN LAYOUT POSITIONING"
-msgstr "Расположение экрана"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Choose the disposition of the emulated screens."
-msgstr "Выберите расположение эмулируемых экранов."
+msgstr ""
 
 msgctxt "game_options"
 msgid "TOP-BOTTOM SCREEN"
-msgstr "Экран сверху и снизу"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SINGLE SCREEN ONLY"
-msgstr "Только один экран"
+msgstr ""
 
 msgctxt "game_options"
 msgid "LARGE SCREEN / SMALL SCREEN"
-msgstr "Большой экран / маленький экран"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SIDE BY SIDE"
-msgstr "Рядом"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SWAP SCREEN"
-msgstr "Сменить экран"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Set the bottom screen as prominent."
-msgstr "Установить нижний экран как основной."
+msgstr ""
 
 msgctxt "game_options"
 msgid "Improve the resolution at the cost of increased performance requirements."
-msgstr "Улучшить разрешение за счет увеличения требований к производительности."
+msgstr ""
 
 msgctxt "game_options"
 msgid "VISUAL RENDERING"
-msgstr "Визуализация"
+msgstr ""
 
 msgctxt "game_options"
 msgid "NATIVE (400x240)"
-msgstr "Родное (400x240)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "6X (ULTRA HD)"
-msgstr "6x (Ultra HD)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Force the region of the system."
-msgstr "Принудительно определить регион системы."
+msgstr ""
 
 msgctxt "game_options"
 msgid "AUSTRALIA"
-msgstr "Австралия"
+msgstr ""
 
 msgctxt "game_options"
 msgid "CHINA"
-msgstr "Китай"
+msgstr ""
 
 msgctxt "game_options"
 msgid "EUROPE"
-msgstr "Европа"
+msgstr ""
 
 msgctxt "game_options"
 msgid "JAPAN"
-msgstr "Япония"
+msgstr ""
 
 msgctxt "game_options"
 msgid "KOREA"
-msgstr "Корея"
+msgstr ""
 
 msgctxt "game_options"
 msgid "TAIWAN"
-msgstr "Тайвань"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SHOW MOUSE POINTER"
-msgstr "Показать указатель мыши"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Show the mouse pointer on the emulated touchscreen."
-msgstr "Отобразить указатель мыши на эмулированном сенсорном экране."
+msgstr ""
 
 msgctxt "game_options"
 msgid "CONTROLS"
-msgstr "Управление"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Choose if the mouse input is active or not."
-msgstr "Выберите, активен ли ввод мыши или нет."
+msgstr ""
 
 msgctxt "game_options"
 msgid "COMPILE SHADERS BEFORE STARTING"
-msgstr "Компилировать шейдеры перед началом работы"
+msgstr ""
 
 msgctxt "game_options"
 msgid "May reduce stuttering a the cost of longuer delay to start a game."
-msgstr "Может снизить заикание за счет более долгой задержки запуска игры."
+msgstr ""
 
 msgctxt "game_options"
 msgid "SHADERS COMPILATION METHOD"
-msgstr "Метод компиляции шейдеров"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Reduce stuttering a the cost of much longuer delay to start a game and high GPU usage."
-msgstr "Снизить заикание за счет гораздо более длительной задержки на запуск игры и высоких нагрузок на GPU."
+msgstr ""
 
 msgctxt "game_options"
 msgid "SPECIALIZED"
-msgstr "Специализированный"
+msgstr ""
 
 msgctxt "game_options"
 msgid "HYBRID"
-msgstr "Гибридный"
+msgstr ""
 
 msgctxt "game_options"
 msgid "EXCLUSIVE"
-msgstr "Эксклюзивный"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enhance the quality of textures on surface."
-msgstr "Улучшить качество текстур на поверхности."
+msgstr ""
 
 msgctxt "game_options"
 msgid "CUSTOM TEXTURES"
-msgstr "Пользовательские текстуры"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Replace original textures with custom textures pack."
-msgstr "Заменить оригинальные текстуры на пользовательские текстурные пакеты."
+msgstr ""
 
 msgctxt "game_options"
 msgid "CUSTOM TEXTURES CACHING"
-msgstr "Кеширование пользовательских текстур"
+msgstr ""
 
 msgctxt "game_options"
 msgid "简化字 (Chinese - simplified)"
-msgstr "Китайский упрощенный"
+msgstr ""
 
 msgctxt "game_options"
 msgid "簡化字 (Chinese - traditional)"
-msgstr "Китайский традиционный"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enable the effects of the chosen Action Replay and Gecko codes for a game."
-msgstr "Активировать эффекты выбранных кодов Action Replay и Gecko для игры."
+msgstr ""
 
 msgctxt "game_options"
 msgid "CORE NOTIFICATIONS"
-msgstr "Уведомления ядра"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Show core specific notifications."
-msgstr "Показать уведомления, специфические для ядра."
+msgstr ""
 
 msgctxt "game_options"
 msgid "WIDESCREEN"
-msgstr "Широкоэкранный"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Display the emulated framebuffer at a widescreen aspect ratio. Get best results with full 3D games."
-msgstr "Отобразите эмулируемый буфер кадров в широкоформатном соотношении сторон. Лучшие результаты достигаются при использовании полных 3D-игр."
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enable controller's rumble effects."
-msgstr "Включить эффекты вибрации контроллера."
+msgstr ""
 
 msgctxt "game_options"
 msgid "GAME ASPECT RATIO (CORE)"
-msgstr "Соотношение сторон игры (ядро)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "ORIGINAL"
-msgstr "Оригинальное"
+msgstr ""
 
 msgctxt "game_options"
 msgid "CORRECTED"
-msgstr "Исправленное"
+msgstr ""
 
 msgctxt "game_options"
 msgid "FORCE 60FPS"
-msgstr "Принудительные 60 кадров в секунду"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Use this if you encounter screen tearing or VSync issue."
-msgstr "Используйте это, если вы столкнулись с проблемой искажения экрана или проблемой синхронизации кадров (VSync)."
+msgstr ""
 
 msgctxt "game_options"
 msgid "EMULATED GRAPHIC CHIP"
-msgstr "Эмулируемый графический чип"
+msgstr ""
 
 msgctxt "game_options"
 msgid "The type of emulated graphic chip."
-msgstr "Тип эмулируемого графического чипа."
+msgstr ""
 
 msgctxt "game_options"
 msgid "TANDY"
-msgstr "Tandy"
+msgstr ""
 
 msgctxt "game_options"
 msgid "HERCULES"
-msgstr "Hercules"
+msgstr ""
 
 msgctxt "game_options"
 msgid "PCJR"
-msgstr "PCjr"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SVGA MODE"
-msgstr "Режим SVGA"
+msgstr ""
 
 msgctxt "game_options"
 msgid "The SVGA variation that is being emulated."
-msgstr "Вариация SVGA, которая эмулируется."
+msgstr ""
 
 msgctxt "game_options"
 msgid "S3 TRIO64"
-msgstr "S3 Trio64"
+msgstr ""
 
 msgctxt "game_options"
 msgid "S3 TRIO64 NO LINES BUFFER HACK"
-msgstr "S3 Trio64 без хака буфера линий"
+msgstr ""
 
 msgctxt "game_options"
 msgid "S3 TRIO64 VESA 1.3"
-msgstr "S3 Trio64 VESA 1.3"
+msgstr ""
 
 msgctxt "game_options"
 msgid "TSENG LABS ET3000"
-msgstr "Tseng Labs ET3000"
+msgstr ""
 
 msgctxt "game_options"
 msgid "TSENG LABS ET4000"
-msgstr "Tseng Labs ET4000"
+msgstr ""
 
 msgctxt "game_options"
 msgid "PARADISE PVGA1A"
-msgstr "Paradise PVGA1A"
+msgstr ""
 
 msgctxt "game_options"
 msgid "CGA MODE"
-msgstr "Режим CGA"
+msgstr ""
 
 msgctxt "game_options"
 msgid "The CGA variation that is being emulated."
-msgstr "Вариация CGA, которая эмулируется."
+msgstr ""
 
 msgctxt "game_options"
 msgid "EARLY MODEL - COMPOSITE MODE AUTO"
-msgstr "Ранняя модель - автоматический композитный режим"
+msgstr ""
 
 msgctxt "game_options"
 msgid "EARLY MODEL - COMPOSITE MODE ON"
-msgstr "Ранняя модель - композитный режим включен"
+msgstr ""
 
 msgctxt "game_options"
 msgid "EARLY MODEL - COMPOSITE MODE OFF"
-msgstr "Ранняя модель - композитный режим выключен"
+msgstr ""
 
 msgctxt "game_options"
 msgid "LATE MODEL - COMPOSITE MODE AUTO"
-msgstr "Поздняя модель - автоматический композитный режим"
+msgstr ""
 
 msgctxt "game_options"
 msgid "LATE MODEL - COMPOSITE MODE ON"
-msgstr "Поздняя модель - композитный режим включен"
+msgstr ""
 
 msgctxt "game_options"
 msgid "LATE MODEL - COMPOSITE MODE OFF"
-msgstr "Поздняя модель - композитный режим выключен"
+msgstr ""
 
 msgctxt "game_options"
 msgid "HERCULES COLOR MODE"
-msgstr "Режим цвета Hercules"
+msgstr ""
 
 msgctxt "game_options"
 msgid "The color scheme for Hercules emulation."
-msgstr "Цветовая схема для эмуляции Hercules."
+msgstr ""
 
 msgctxt "game_options"
 msgid "BLACK AND WHITE"
-msgstr "Чёрно-белый"
+msgstr ""
 
 msgctxt "game_options"
 msgid "BLACK AND AMBER"
-msgstr "Черный и янтарный"
+msgstr ""
 
 msgctxt "game_options"
 msgid "BLACK AND GREEN"
-msgstr "Черный и зеленый"
+msgstr ""
 
 msgctxt "game_options"
 msgid "3DFX VOODOO ACCELERATOR"
-msgstr "Ускоритель 3Dfx Voodoo"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enable certain games with support for the 3Dfx Voodoo accelerator."
-msgstr "Включить определенные игры с поддержкой ускорителя 3Dfx Voodoo."
+msgstr ""
 
 msgctxt "game_options"
 msgid "4MB Memory"
-msgstr "4 Мб памяти"
+msgstr ""
 
 msgctxt "game_options"
 msgid "12MB Memory"
-msgstr "12 Мб памяти"
+msgstr ""
 
 msgctxt "game_options"
 msgid "3DFX VOODOO PERFORMANCE"
-msgstr "Производительность 3Dfx Voodoo"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Tweak the behavior of the 3Dfx Voodoo emulation."
-msgstr "Измените поведение эмуляции 3Dfx Voodoo."
+msgstr ""
 
 msgctxt "game_options"
 msgid "Multi-Threading"
-msgstr "Многопоточность"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Multi-Threading (Low Quality)"
-msgstr "Многопоточность (низкое качество)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Low Quality"
-msgstr "Низкое качество"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SOUNDBLASTER TYPE"
-msgstr "Тип SoundBlaster"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Type of emulated SoundBlaster card."
-msgstr "Тип эмулированной звуковой карты SoundBlaster."
+msgstr ""
 
 msgctxt "game_options"
 msgid "SOUNDBLASTER 16"
-msgstr "SoundBlaster 16"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SOUNDBLASTER PRO 2"
-msgstr "SoundBlaster Pro 2"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SOUNDBLASTER PRO"
-msgstr "SoundBlaster Pro"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SOUNDBLASTER 2.0"
-msgstr "SoundBlaster 2.0"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SOUNDBLASTER 1.0"
-msgstr "SoundBlaster 1.0"
+msgstr ""
 
 msgctxt "game_options"
 msgid "GAMEBLASTER"
-msgstr "GameBlaster"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SOUNDBLASTER SETTINGS"
-msgstr "Настройки SoundBlaster"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Set the adress, interrupt, low 8 bit and high 16 bit DMA."
-msgstr "Установите адрес, прерывания, низкие 8 бит и высокие 16 бит DMA."
+msgstr ""
 
 msgctxt "game_options"
 msgid "Port 220 IRQ 7 DMA 1/5"
-msgstr "Порт 220 IRQ 7 DMA 1/5"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Port 220 IRQ 5 DMA 1/5"
-msgstr "Порт 220 IRQ 5 DMA 1/5"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Port 240 IRQ 7 DMA 1/5"
-msgstr "Порт 240 IRQ 7 DMA 1/5"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Port 240 IRQ 7 DMA 3/7"
-msgstr "Порт 240 IRQ 7 DMA 3/7"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Port 240 IRQ 2 DMA 3/7"
-msgstr "Порт 240 IRQ 2 DMA 3/7"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Port 240 IRQ 5 DMA 3/5"
-msgstr "Порт 240 IRQ 5 DMA 3/5"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Port 240 IRQ 5 DMA 1/5"
-msgstr "Порт 240 IRQ 5 DMA 1/5"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Port 240 IRQ 10 DMA 3/7"
-msgstr "Порт 240 IRQ 10 DMA 3/7"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Port 280 IRQ 10 DMA 0/6"
-msgstr "Порт 280 IRQ 10 DMA 0/6"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Port 210 IRQ 5 DMA 1/5"
-msgstr "Порт 210 IRQ 5 DMA 1/5"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SOUNDBLASTER ADLIB PROVIDER"
-msgstr "Провайдер SoundBlaster AdLib"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Provider for the Adlib emulation. DEFAULT has good quality and low perf requirements."
-msgstr "Провайдер для эмуляции AdLib. По умолчанию имеет хорошее качество и низкие требования к производительности."
+msgstr ""
 
 msgctxt "game_options"
 msgid "HIGH QUALITY NUKED OPL3"
-msgstr "Высококачественный Nuked OPL3"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SOUNDBLASTER FM MODE"
-msgstr "FM режим SoundBlaster"
+msgstr ""
 
 msgctxt "game_options"
 msgid "The SoundBlaster emulated FM synth mode."
-msgstr "SoundBlaster эмулирует режим FM-синтезатора."
+msgstr ""
 
 msgctxt "game_options"
 msgid "CMS"
-msgstr "CMS"
+msgstr ""
 
 msgctxt "game_options"
 msgid "OPL-2"
-msgstr "OPL-2"
+msgstr ""
 
 msgctxt "game_options"
 msgid "DUAL OPL-2"
-msgstr "Dual OPL-2"
+msgstr ""
 
 msgctxt "game_options"
 msgid "OPL-3"
-msgstr "OPL-3"
+msgstr ""
 
 msgctxt "game_options"
 msgid "OPL-3 GOLD"
-msgstr "OPL-3 Gold"
+msgstr ""
 
 msgctxt "game_options"
 msgid "MIDI OUTPUT"
-msgstr "Выход MIDI"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Select the soundfont file or interface used for MIDI output."
-msgstr "Выберите файл soundfont или интерфейс, используемый для вывода MIDI."
+msgstr ""
 
 msgctxt "game_options"
 msgid "ROLAND_SC-55"
-msgstr "Roland SC-55"
+msgstr ""
 
 msgctxt "game_options"
 msgid "FRONTEND MIDI DRIVER"
-msgstr "Фронтенд драйвер MIDI"
+msgstr ""
 
 msgctxt "game_options"
 msgid "GRAVIS ULTRASOUND"
-msgstr "Gravis Ultrasound"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enable GUS emulation. Settings are fixed to port 240, IRQ 5, DMA 3."
-msgstr "Включите эмуляцию GUS. Настройки фиксированы на порте 240, IRQ 5, DMA 3."
+msgstr ""
 
 msgctxt "game_options"
 msgid "LOAD DOSBOX.CONF"
-msgstr "Загрузить файл dosbox.conf"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Try to use legacy dosbox.conf config file instead of core options."
-msgstr "Попробуйте использовать файл конфигурации legacy dosbox.conf вместо параметров ядра."
+msgstr ""
 
 msgctxt "game_options"
 msgid "dosbox.conf (in zip or folder)"
-msgstr "dosbox.conf (in zip or folder)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "*game_name*.conf (next to zip or folder)"
-msgstr "файл *game_name*.conf (рядом с zip-файлом или папкой)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Emulation method used. AUTO for mixed features with max performance and compatibility."
-msgstr "Используемый метод эмуляции. Auto для смешанных функций с максимальной производительностью и совместимостью."
+msgstr ""
 
 msgctxt "game_options"
 msgid "386 (SLOW)"
-msgstr "386 (Медленный)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "386 (PREFETCH)"
-msgstr "386 (Предзагрузка)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "486 (SLOW)"
-msgstr "486 (Медленный)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "PENTIUM (SLOW)"
-msgstr "Pentium (Медленный)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "CPU CYCLES"
-msgstr "Циклы процессора"
+msgstr ""
 
 msgctxt "game_options"
 msgid "The raw performance to emulate."
-msgstr "Необработанная производительность для эмуляции."
+msgstr ""
 
 msgctxt "game_options"
 msgid "MAX"
-msgstr "Максимум"
+msgstr ""
 
 msgctxt "game_options"
 msgid "8086/8088 - 4.77MHZ (315 CPS)"
-msgstr "8086/8088 - 4,77 МГц (315 циклов в секунду)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "286 - 6MHZ (1320 CPS)"
-msgstr "286 - 6 МГц (1320 циклов в секунду)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "286 - 12.5MHZ (2750 CPS)"
-msgstr "286 - 12,5 МГц (2750 циклов в секунду)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "386 - 20MHZ (4720 CPS)"
-msgstr "386 - 20 МГц (4720 циклов в секунду)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "386DX - 33MHZ (7800 CPS)"
-msgstr "386DX - 33 МГц (7800 циклов в секунду)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "486DX - 33MHZ (13400 CPS)"
-msgstr "486DX - 33 МГц (13400 циклов в секунду)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "486DX2 - 66MHZ (26800 CPS)"
-msgstr "486DX2 - 66 МГц (26800 циклов в секунду)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "PENTIUM - 100MHZ (77000 CPS)"
-msgstr "Pentium - 100 МГц (77000 циклов в секунду)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "PENTIUM II - 300MHZ (200000 CPS)"
-msgstr "Pentium II - 300 МГц (200000 циклов в секунду)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "PENTIUM III - 600MHZ (500000 CPS)"
-msgstr "Pentium III - 600 МГц (500000 циклов в секунду)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "ATHLON - 1.2GHZ (1000000 CPS)"
-msgstr "Athlon - 1,2 ГГц (1000000 циклов в секунду)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Emulated CPU type. AUTO is the fastest choice."
-msgstr "Тип эмулируемого процессора. Auto - самый быстрый тип."
+msgstr ""
 
 msgctxt "game_options"
 msgid "DYNAMIC RECOMPILATION"
-msgstr "Динамическая рекомпиляция"
+msgstr ""
 
 msgctxt "game_options"
 msgid "NORMAL (INTERPRETER)"
-msgstr "Нормальный (интерпретатор)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SIMPLE (INTERPRETER)"
-msgstr "Простой (интерпретатор)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "HIGH MEMORY"
-msgstr "Верхняя память"
+msgstr ""
 
 msgctxt "game_options"
 msgid "The amount of high memory size the emulated machine has."
-msgstr "Количество верхней памяти, которой располагает эмулируемая машина."
+msgstr ""
 
 msgctxt "game_options"
 msgid "DISCARD DISK MODIFICATION"
-msgstr "Отклонить изменение диска"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Modifications to the C: drive will not be saved permanently."
-msgstr "Изменения на диске C не будут сохранены."
+msgstr ""
 
 msgctxt "game_options"
 msgid "FORCE NORMAL CORE IN OS"
-msgstr "Принудительное нормальное ядро в ОС"
+msgstr ""
 
 msgctxt "game_options"
 msgid "The normal core can be more stable when running installed OS."
-msgstr "Обычное ядро может быть более стабильным при использовании установленной ОС."
+msgstr ""
 
 msgctxt "game_options"
 msgid "CORE PERFORMANCE STATISTICS"
-msgstr "Основная статистика производительности"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Set the behavior of the start menu when autostarted game exit."
-msgstr "Установить поведение меню \"Пуск\" при выходе из игры с автозапуском."
+msgstr ""
 
 msgctxt "game_options"
 msgid "SIMPLE"
-msgstr "Простой"
+msgstr ""
 
 msgctxt "game_options"
 msgid "DETAILED"
-msgstr "Подробный"
+msgstr ""
 
 msgctxt "game_options"
 msgid "ON-SCREEN KEYBOARD"
-msgstr "Экранная клавиатура"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enable the On Screen Keyboard feature which can be activated with the L3 button."
-msgstr "Включите функцию экранной клавиатуры, которую можно активировать с помощью кнопки L3."
+msgstr ""
 
 msgctxt "game_options"
 msgid "DOSBOX START MENU"
-msgstr "Меню запуска DOSBox"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SHUTDOWN CORE IMMEDIATELY"
-msgstr "Выключить ядро немедленно"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SHUTDOWN CORE AFTER 3 SECS"
-msgstr "Выключить ядро через 3 секунды"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SHUTDOWN CORE AFTER 5 SECS"
-msgstr "Выключить ядро через 5 секунд"
+msgstr ""
 
 msgctxt "game_options"
 msgid "IGNORE AUTOSTART"
-msgstr "Игнорировать автозапуск"
+msgstr ""
 
 msgctxt "game_options"
 msgid "KEYBOARD LAYOUT"
-msgstr "Раскладка клавиатуры"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Select the keyboard layout."
-msgstr "Выберите раскладку клавиатуры."
+msgstr ""
 
 msgctxt "game_options"
 msgid "BRAZIL"
-msgstr "Бразилия"
+msgstr ""
 
 msgctxt "game_options"
 msgid "CROATIA"
-msgstr "Хорватия"
+msgstr ""
 
 msgctxt "game_options"
 msgid "CZECH REPUBLIC"
-msgstr "Чешская республика"
+msgstr ""
 
 msgctxt "game_options"
 msgid "DENMARK"
-msgstr "Дания"
+msgstr ""
 
 msgctxt "game_options"
 msgid "FINLAND"
-msgstr "Финляндия"
+msgstr ""
 
 msgctxt "game_options"
 msgid "FRANCE"
-msgstr "Франция"
+msgstr ""
 
 msgctxt "game_options"
 msgid "GERMANY"
-msgstr "Германия"
+msgstr ""
 
 msgctxt "game_options"
 msgid "GREECE"
-msgstr "Греция"
+msgstr ""
 
 msgctxt "game_options"
 msgid "HUNGARY"
-msgstr "Венгерия"
+msgstr ""
 
 msgctxt "game_options"
 msgid "ICELAND"
-msgstr "Исландия"
+msgstr ""
 
 msgctxt "game_options"
 msgid "ITALY"
-msgstr "Италия"
+msgstr ""
 
 msgctxt "game_options"
 msgid "NETHERLAND"
-msgstr "Нидерланды"
+msgstr ""
 
 msgctxt "game_options"
 msgid "NORWAY"
-msgstr "Норвегия"
+msgstr ""
 
 msgctxt "game_options"
 msgid "POLAND"
-msgstr "Польша"
+msgstr ""
 
 msgctxt "game_options"
 msgid "PORTUGAL"
-msgstr "Португалия"
+msgstr ""
 
 msgctxt "game_options"
 msgid "RUSSIA"
-msgstr "Россия"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SLOVAKIA"
-msgstr "Словакия"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SLOVENIA"
-msgstr "Словения"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SPAIN"
-msgstr "Испания"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SWEDEN"
-msgstr "Швеция"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SWITZELAND (DE)"
-msgstr "Швейцария (DE)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SWITZELAND (FR)"
-msgstr "Швейцария (FR)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "TURKEY"
-msgstr "Турция"
+msgstr ""
 
 msgctxt "game_options"
 msgid "AUTO ROTATE"
-msgstr "Автоповорот"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Automaticaly rotate display for vertical games."
-msgstr "Автоматически поворачивать дисплей для вертикальных игр."
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enables a low pass audio filter to soften the harsh sound of some games."
-msgstr "Включает низкочастотный звуковой фильтр для смягчения резкого звука некоторых игр."
+msgstr ""
 
 msgctxt "game_options"
 msgid "AUDIO FILTER LEVEL"
-msgstr "Уровень аудиофильтра"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Specifies the cut-off frequency of the low-pass audio filter."
-msgstr "Определяет частоту среза фильтра нижних частот аудио."
+msgstr ""
 
 msgctxt "game_options"
 msgid "CPU OVERCLOCK"
-msgstr "Разгон процессора"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Force the frequency of the emulated CPU. Can reduce slowdown, but may cause glitches."
-msgstr "Принудительно установить частоту эмулируемого процессора. Это может уменьшить снижение производительности, но может привести к ошибкам."
+msgstr ""
 
 msgctxt "game_options"
 msgid "ENABLE HISCORES"
-msgstr "Активировать высокие очки"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Saves the hiscores in supported games."
-msgstr "Сохраняет лучшие результаты в поддерживаемых играх."
+msgstr ""
 
 msgctxt "game_options"
 msgid "CONTROLS TYPE"
-msgstr "Тип управления"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Set default controler mapping."
-msgstr "Установить стандартное сопоставление контроллера."
+msgstr ""
 
 msgctxt "game_options"
 msgid "gamepad"
-msgstr "геймпад"
+msgstr ""
 
 msgctxt "game_options"
 msgid "arcade"
-msgstr "аркадный"
+msgstr ""
 
 msgctxt "game_options"
 msgid "PLAYER 1 CONTROLS"
-msgstr "Управление 1 игрока"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Set default controler mapping for player 1."
-msgstr "Установите сопоставление контроллера по умолчанию для первого игрока."
+msgstr ""
 
 msgctxt "game_options"
 msgid "PLAYER 1 LATERAL BUTTONS"
-msgstr "Боковые кнопки 1 игрока"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Remap the lateral buttons scheme for player 1."
-msgstr "Переназначить схему боковых кнопок для первого игрока."
+msgstr ""
 
 msgctxt "game_options"
 msgid "L1/R1"
-msgstr "L1 / R1"
+msgstr ""
 
 msgctxt "game_options"
 msgid "L2/R2"
-msgstr "L2 / R2"
+msgstr ""
 
 msgctxt "game_options"
 msgid "PLAYER 2 CONTROLS"
-msgstr "Управление 2 игрока"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Set default controler mapping for player 2."
-msgstr "Установите сопоставление контроллера по умолчанию для второго игрока."
+msgstr ""
 
 msgctxt "game_options"
 msgid "PLAYER 2 LATERAL BUTTONS"
-msgstr "Боковые кнопки 2 игрока"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Remap the lateral buttons scheme for player 2."
-msgstr "Переназначить схему боковых кнопок для второго игрока."
+msgstr ""
 
 msgctxt "game_options"
 msgid "EMULATED VIDEO SIGNAL"
-msgstr "Эмулированный видеосигнал"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Apply a video filter to mimic various signals."
-msgstr "Примените видеофильтр для имитации различных сигналов."
+msgstr ""
 
 msgctxt "game_options"
 msgid "COMPOSITE"
-msgstr "Композит"
+msgstr ""
 
 msgctxt "game_options"
 msgid "TEXTURES ENHANCEMENT"
-msgstr "Улучшение текстур"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enhance hand drawn 2D pixel art graphics."
-msgstr "Усовершенствуйте вручную нарисованные 2D графические изображения пикселей."
+msgstr ""
 
 msgctxt "game_options"
 msgid "MIP MAPPING"
-msgstr "MIP-текстурирование"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Uses the proper mipmap levels. Enhance graphics accuracy."
-msgstr "Используйте правильные уровни MipMap. Улучшит точность графики."
+msgstr ""
 
 msgctxt "game_options"
 msgid "RENDER-TO-TEXTURE BUFFER"
-msgstr "Буфер рендеринга на текстуру"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enhance graphics accuracy at the cost of inscreased performance requirements."
-msgstr "Улучшить точность графики за счет увеличения требований к производительности."
+msgstr ""
 
 msgctxt "game_options"
 msgid "ALPHA SORTING"
-msgstr "Alpha сортировка"
+msgstr ""
 
 msgctxt "game_options"
 msgid "per-strip (fast, least accurate)"
-msgstr "per-strip (быстрый, наименее точный)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "per-triangle (normal)"
-msgstr "per-triangle (нормальный)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "per-pixel (accurate)"
-msgstr "per-pixel (точное)"
+msgstr ""
 
 msgctxt "game_options"
-msgid "Replace original textures with custom textures pack in 'bios\\dc\textures'."
-msgstr "Замените оригинальные текстуры пакетом пользовательских текстур в 'bios\\dc\textures'."
+msgid "Replace original textures with custom textures pack in 'bios\dc\textures'."
+msgstr ""
 
 msgctxt "game_options"
 msgid "DUMP TEXTURES"
-msgstr "Выгрузка текстур"
+msgstr ""
 
 msgctxt "game_options"
-msgid "Dump textures to 'bios\\dc\texdump'."
-msgstr "Выгрузка текстур в 'bios\\dc\texdump'."
+msgid "Dump textures to 'bios\dc\texdump'."
+msgstr ""
 
 msgctxt "game_options"
 msgid "DSP EMULATION"
-msgstr "DSP эмуляция"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enable Digital Sound Processor. Enhance sound accuracy at the cost of inscreased performance requirements."
-msgstr "Включите цифровой звуковой процессор. Улучшает точность звука за счет увеличения требований к производительности."
+msgstr ""
 
 msgctxt "game_options"
 msgid "SAVE FILES"
-msgstr "Сохранить файлы"
+msgstr ""
 
 msgctxt "game_options"
 msgid "4 VMUs (ALL)"
-msgstr "4 VMUs (все)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "1 VMU (SINGLE)"
-msgstr "1 VMU (одиночный)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "4 VMUs (SINGLE)"
-msgstr "4 VMUs (одиночный)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "WINDOWS CE GAME COMPATIBILITY"
-msgstr "Совместимость игр для Windows CE"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enable full MMU emulation for Windows CE games."
-msgstr "Включить полную эмуляцию MMU для игр Windows CE."
+msgstr ""
 
 msgctxt "game_options"
 msgid "HLE BIOS"
-msgstr "BIOS высокого уровня"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Force use of hight-level BIOS emulation."
-msgstr "Принудительное использование эмуляции BIOS на высоком уровне."
+msgstr ""
 
 msgctxt "game_options"
 msgid "BOOT TO BIOS"
-msgstr "Загрузка в BIOS"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Boot directly into the Dreamcast BIOS menu."
-msgstr "Загрузитесь непосредственно в меню BIOS Dreamcast."
+msgstr ""
 
 msgctxt "game_options"
 msgid "SERVICE MODE"
-msgstr "Сервисный режим"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enable Service button to enter settings."
-msgstr "Включить сервисную кнопку для входа в настройки."
+msgstr ""
 
 msgctxt "game_options"
 msgid "FREE PLAY"
-msgstr "Бесплатная игра"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Modify the coin setting to Free Play."
-msgstr "Измените настройки монеты на \"Бесплатная игра\""
+msgstr ""
 
 msgctxt "game_options"
 msgid "OVERSCAN"
@@ -3374,8 +3373,8 @@ msgid "Deposterize fixes small in-texture glitches that may happen when the text
 msgstr ""
 
 msgctxt "game_options"
-msgid "Replace original textures with custom textures pack (\\saves\\psp\\PSP\\TEXTURES\\%GAMEID%)."
-msgstr "Замените оригинальные текстуры пакетом пользовательских текстур (\\saves\\psp\\PSP\\TEXTURES\\%GAMEID%)"
+msgid "Replace original textures with custom textures pack (\saves\psp\PSP\TEXTURES\%GAMEID%)."
+msgstr ""
 
 msgctxt "game_options"
 msgid "IO TIMING METHOD"
@@ -4207,120 +4206,121 @@ msgstr ""
 
 msgctxt "game_options"
 msgid "TRUE COLORS - 24 BITS"
-msgstr "True Color (24 bit)"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Forces the precision of colours output to the console's framebuffer."
-msgstr "Принудительно задает точность вывода цветов на буфер экрана консоли."
+msgstr ""
 
 msgctxt "game_options"
 msgid "DINPUT"
-msgstr "DInput"
+msgstr ""
 
 msgctxt "game_options"
 msgid "FASTBOOT"
-msgstr "Быстрая загрузка"
+msgstr ""
 
 msgctxt "game_options"
 msgid "VIDEO DRIVER"
-msgstr "Видеодрайвер"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enable widescreen may cause rendering issues"
-msgstr "Включение широкоформатного режима может вызвать проблемы с рендерингом"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enable proper quad rendering. For higher end systems."
-msgstr "Включить правильный рендеринг квадратов. Для систем более высокого уровня."
+msgstr ""
 
 msgctxt "game_options"
 msgid "CROSSHAIRS"
-msgstr "Прицелы"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enable crosshairs in shooting games"
-msgstr "Включить прицел в шутерах"
+msgstr ""
 
 msgctxt "game_options"
 msgid "ENABLE FORCE FEEDBACK"
-msgstr "Включить тактильный отклик"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Enable force feedback for supported controllers"
-msgstr "Включить тактильный отклик для поддерживаемых контроллеров"
+msgstr ""
 
 msgctxt "game_options"
 msgid "center"
-msgstr "центр"
+msgstr ""
 
 msgctxt "game_options"
 msgid "The maximum RAM memory available for the system."
-msgstr "Максимальный объём оперативной памяти, доступный системе."
+msgstr ""
 
 msgctxt "game_options"
 msgid "Improve fidelity of 3D models at the cost of increased performance requirements."
-msgstr "Улучшить точность 3D-моделей за счет увеличения требований к производительности."
+msgstr ""
 
 msgctxt "game_options"
 msgid "FXAA"
-msgstr "FXAA"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SCALING FILTER"
-msgstr "Фильтр масштабирования"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Set scaling filter for rendered content."
-msgstr "Установить фильтр масштабирования для отображаемого содержимого."
+msgstr ""
 
 msgctxt "game_options"
 msgid "Bicubic"
-msgstr "Бикубический"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Gaussian"
-msgstr "По Гауссу"
+msgstr ""
 
 msgctxt "game_options"
 msgid "ScaleForce"
-msgstr "ScaleForce"
+msgstr ""
 
 msgctxt "game_options"
 msgid "AMD's FidelityFX Super Resolution"
-msgstr "AMD FidelityFX Super Resolution"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SCALER"
-msgstr "Масштабировщик"
+msgstr ""
 
 msgctxt "game_options"
 msgid "HQ"
-msgstr "HQ"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Edge"
-msgstr "Edge"
+msgstr ""
 
 msgctxt "game_options"
 msgid "AdvMame"
-msgstr "AdvMAME"
+msgstr ""
 
 msgctxt "game_options"
 msgid "Sai"
-msgstr "Sai"
+msgstr ""
 
 msgctxt "game_options"
 msgid "SuperSai"
-msgstr "SuperSai"
+msgstr ""
 
 msgctxt "game_options"
 msgid "PM"
-msgstr "PM"
+msgstr ""
 
 msgctxt "game_options"
 msgid "DotMatrix"
-msgstr "DotMatrix"
+msgstr ""
 
 msgctxt "game_options"
 msgid "TV"
-msgstr "ТВ"
+msgstr ""
+

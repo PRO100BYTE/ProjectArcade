@@ -14,6 +14,10 @@ default:
   scummvm: CRTNewPixie@CRT-NewPixie.fx  
   simcoupe: CRTNewPixie@CRT-NewPixie.fx
   demul: CRTNewPixie@CRT-NewPixie.fx
+  demul-old: CRTNewPixie@CRT-NewPixie.fx
   phoenix: CRTNewPixie@CRT-NewPixie.fx
   bigpemu: CRTNewPixie@CRT-NewPixie.fx
+  solarus: CRTNewPixie@CRT-NewPixie.fx
+  redream: CRTNewPixie@CRT-NewPixie.fx
+  raine: CRTNewPixie@CRT-NewPixie.fx
 
