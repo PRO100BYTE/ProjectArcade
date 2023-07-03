@@ -35,25 +35,6 @@ ProjectArcade can also run in Portable Mode. This means you can play games from 
 
 **ProjectArcade or RetroBat will never provide copyrighted/commercial ROMs or BIOS files.**
 
-## 🧰 Build Instructions
-
-Do you want to build your own version of RetroBat or create a fork based on it? Then this guide is for you.
-
-The batch script `build.bat` will download all the softwares required, set the config files and build the RetroBat Setup from `setup.nsi` sources script.
-
-- Download and install [Git for Windows](https://gitforwindows.org/) (follow default setup settings).
-
-- Open CMD Windows Terminal and run the following commands to clone recursively the RetroBat git with its submodules and run build.bat to launch the build routine:
-```
-git clone --recursive https://github.com/kaylh/RetroBat.git
-```
-```
-cd RetroBat
-build.bat
-```
-- Once the build process is done, you will find the RetroBat Setup in the build directory.
-
-
 ## 💟 Special Thanks
 
 - [Hel Mic](https://github.com/lehcimcramtrebor) - For his wonderful themes.
@@ -62,7 +43,7 @@ build.bat
 - [mluizvitor](https://github.com/mluizvitor) - For Elementerial theme
 - [NoCopyrightSounds](https://ncs.io) - For an excellent copyright-free music library
 
-## Special thanks to the 🦇 RetroBat Team for their work:
+## Also, special thanks to the 🦇 RetroBat Team for their work:
 - [Adrien Chalard "Kayl"](https://github.com/kaylh) - creator of the RetroBat project, developer
 - [Lorenzolamas](https://github.com/lorenzolamas) - community management, graphics (former active)
 - [Fabrice Caruso](https://github.com/fabricecaruso) - lead developer, theme creation
@@ -93,17 +74,16 @@ See https://creativecommons.org/licenses/by-nc-sa/4.0.
 A small easter egg for the guys from the RetroBat team: you are the best :)
 
 Links to used projects:
-EmulationStation - https://github.com/fabricecaruso/batocera-emulationstation
-emulatorLauncher - https://github.com/fabricecaruso/batocera-ports
-RetroBat - https://github.com/kaylh/Retrobat
+EmulationStation - https://github.com/fabricecaruso/batocera-emulationstation and https://github.com/RetroBat-Official/emulationstation
+emulatorLauncher - https://github.com/fabricecaruso/batocera-ports and https://github.com/RetroBat-Official/emulatorlauncher
+RetroBat Launcher (MFA) - https://github.com/RetroBat-Official/retrobat-mfa-launcher
 
 
 ## © Credits
 
 - RetroBat (c) 2017-2019 Adrien Chalard "Kayl", 2020-2023 RetroBat Team (LGPL v3 and CC BY-NC-SA 4.0 License)
 - EmulationStation (C) 2014 Alec Lofquist, contributions from community (MIT License).
-- EmulatorLauncher (C) Fabrice Caruso 
-- Batocera-ports (C) Fabrice Caruso
+- EmulatorLauncher (C) Fabrice Caruso, RetroBat Team
 - Carbon Theme (c) Fabrice Caruso (CC BY-NC-SA License). Originally based on the work of Eric Hettervik (Original Carbon Theme) and Nils Bonenberger (Simple Theme).
 - WiimoteGun (c) Fabrice Caruso (GPL3 License).
 - RetroArch by Libretro Team (GPL3 License).
