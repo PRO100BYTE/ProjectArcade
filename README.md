@@ -75,11 +75,8 @@ See https://creativecommons.org/licenses/by-nc-sa/4.0.
 A small easter egg for the guys from the RetroBat team: you are the best :)
 
 Links to used projects:
-
-EmulationStation - https://github.com/fabricecaruso/batocera-emulationstation and https://github.com/RetroBat-Official/emulationstation
-
-emulatorLauncher - https://github.com/fabricecaruso/batocera-ports and https://github.com/RetroBat-Official/emulatorlauncher
-
+EmulationStation - https://github.com/RetroBat-Official/emulationstation
+emulatorLauncher - https://github.com/RetroBat-Official/emulatorlauncher
 RetroBat Launcher (MFA) - https://github.com/RetroBat-Official/retrobat-mfa-launcher
 
 
