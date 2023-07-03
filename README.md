@@ -3,7 +3,8 @@
   <a href="https://projectarcade.ru/"><img src="https://raw.githubusercontent.com/TheDayG0ne/ProjectArcade/master/resources/images/projectarcade-github.png" alt="ProjectArcade" width="500"></a>
 </h1>
 
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)   [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)   ![Based on RetroBat](https://img.shields.io/badge/Based%20on-RetroBat-brightgreen)   ![GitHub release](https://img.shields.io/github/v/release/TheDayG0ne/ProjectArcade?display_name=release)
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)   [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)   ![Based on RetroBat](https://img.shields.io/badge/RetroBat%20-%20Based%20on?logoColor=brightgreen&label=Based%20on&link=https%3A%2F%2Fgithub.com%2FRetroBat-Official)
+   ![GitHub release](https://img.shields.io/github/v/release/TheDayG0ne/ProjectArcade?display_name=release)
 
 ProjectArcade is a software for 64-bit versions of Windows designed for retro-gaming and running various emulators of gaming systems.
 
@@ -43,7 +44,7 @@ ProjectArcade can also run in Portable Mode. This means you can play games from 
 - [mluizvitor](https://github.com/mluizvitor) - For Elementerial theme
 - [NoCopyrightSounds](https://ncs.io) - For an excellent copyright-free music library
 
-## Also, special thanks to the 🦇 RetroBat Team for their work:
+## Also, special thanks to the 🦇 [RetroBat Team](https://github.com/RetroBat-Official) for their work:
 - [Adrien Chalard "Kayl"](https://github.com/kaylh) - creator of the RetroBat project, developer
 - [Lorenzolamas](https://github.com/lorenzolamas) - community management, graphics (former active)
 - [Fabrice Caruso](https://github.com/fabricecaruso) - lead developer, theme creation
