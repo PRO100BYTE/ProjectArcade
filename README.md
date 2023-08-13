@@ -4,11 +4,11 @@
 </h1>
 
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)   [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)   ![Based on RetroBat](https://img.shields.io/badge/RetroBat%20-%20Based%20on?logoColor=brightgreen&label=Based%20on&link=https%3A%2F%2Fgithub.com%2FRetroBat-Official)
-   ![GitHub release](https://img.shields.io/github/v/release/TheDayG0ne/ProjectArcade?display_name=release)
+   [![itch.io](https://img.shields.io/badge/Itch.io-FA5C5C?logo=itchdotio&logoColor=white)](https://thedayg0ne.itch.io/projectarcade)   [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)   ![GitHub release](https://img.shields.io/github/v/release/TheDayG0ne/ProjectArcade?display_name=release)
 
 ProjectArcade is a software for 64-bit versions of Windows designed for retro-gaming and running various emulators of gaming systems.
 
-ProjectArcade is a free open source project based on the Open-Source [EmulationStation](https://github.com/RetroBat-Official/emulationstation), [emulatorLauncher](https://github.com/RetroBat-Official/emulatorlauncher) and [RetroBat](https://github.com/RetroBat-Official) projects. The software was developed by enthusiasts for non-commercial use, namely a fun pastime. All code written by #TheDayG0ne, Adrien Chalard "Kayl", and the RetroBat team, unless licensed under the source project's license, is licensed under the LGPL v3.
+ProjectArcade is a free open source project based on the Open-Source [EmulationStation](https://github.com/RetroBat-Official/emulationstation), [emulatorLauncher](https://github.com/RetroBat-Official/emulatorlauncher) and [RetroBat](https://github.com/RetroBat-Official) projects. The software was developed by enthusiasts for non-commercial use, namely a fun pastime. All code written by #TheDayG0ne, Adrien Chalard "Kayl", the RetroBat team and the PRO100BYTE Team, unless licensed under the source project's license, is licensed under the LGPL v3.
 
 With it you will be able to quickly run games from many compatible ROM collections. This saves hours of configuration and installation time, leaving you free to play your favourite retro games.
 
@@ -62,11 +62,11 @@ Copyright (c) 2017-2019 Adrien Chalard "Kayl"
 Copyright (c) 2020-2023 RetroBat Team
 Copyright (c) 2022-2023 #TheDayG0ne
 
-ProjectArcade is a free open source project based on the Open-Source EmulationStation, emulatorLauncher and RetroBat projects. The software was developed by enthusiasts for non-commercial use, namely a fun pastime. All code written by #TheDayG0ne, Adrien Chalard "Kayl", and the RetroBat team, unless licensed under the source project's license, is licensed under the LGPL v3.
+ProjectArcade is a free open source project based on the Open-Source EmulationStation, emulatorLauncher and RetroBat projects. The software was developed by enthusiasts for non-commercial use, namely a fun pastime. All code written by #TheDayG0ne, Adrien Chalard "Kayl", the RetroBat team and the PRO100BYTE Team, unless licensed under the source project's license, is licensed under the LGPL v3.
 
 It is not allowed to sell ProjectArcade or RetroBat on a pre-installed machine or on any storage devices. 
 ProjectArcade includes softwares which cannot be associated with any commercial activities.
-Shipping ProjectArcade or RetroBat with additional proprietary and copyrighted content is illegal, strictly forbidden and strongly discouraged by the RetroBat Team and #TheDayG0ne.
+Shipping ProjectArcade or RetroBat with additional proprietary and copyrighted content is illegal, strictly forbidden and strongly discouraged by the RetroBat Team and PRO100BYTE Team.
 Otherwise, you can start a new project off RetroBat or ProjectArcade sources if you follow the same conditions.
 
 Finally, the license which concerns the entire RetroBat and ProjectArcade projects as a work, in particular the written or graphic content broadcast on its various media, is conditioned by the terms of the CC BY-NC-SA 4.0 license.
@@ -93,5 +93,8 @@ A small easter egg for the guys from the RetroBat team: you are the best :)
 
 ## 💬 Social & Support
 
-- Official Website: https://projectarcade.ru
-- VK: https://vk.com/projectarcade
+- ProjectArcade Website: https://projectarcade.ru
+- Team Website: https://pro100byte.ru
+- E-mail: community@pro100byte.ru
+- Itch.io: https://thedayg0ne.itch.io/projectarcade
+- SourceForge: https://sourceforge.net/projects/projectarcade/
