@@ -59,8 +59,12 @@ ProjectArcade License Agreement
 ProjectArcade is a software for 64-bit versions of Windows designed for retro-gaming and running various emulators of gaming systems.
 
 Copyright (c) 2017-2019 Adrien Chalard "Kayl"
+
 Copyright (c) 2020-2023 RetroBat Team
+
 Copyright (c) 2022-2023 #TheDayG0ne
+
+Copyright (c) 2023 PRO100BYTE Team
 
 ProjectArcade is a free open source project based on the Open-Source EmulationStation, emulatorLauncher and RetroBat projects. The software was developed by enthusiasts for non-commercial use, namely a fun pastime. All code written by #TheDayG0ne, Adrien Chalard "Kayl", the RetroBat team and the PRO100BYTE Team, unless licensed under the source project's license, is licensed under the LGPL v3.
 
