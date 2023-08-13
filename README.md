@@ -46,7 +46,7 @@ ProjectArcade can also run in Portable Mode. This means you can play games from 
 
 ## Also, special thanks to the 🦇 [RetroBat Team](https://github.com/RetroBat-Official) for their work:
 - [Adrien Chalard "Kayl"](https://github.com/kaylh) - creator of the RetroBat project, developer
-- [Lorenzolamas](https://github.com/lorenzolamas) - community management, graphics (former active)
+- [Lorenzolamas](https://github.com/lorenzolamas) - co-founder, community, graphics
 - [Fabrice Caruso](https://github.com/fabricecaruso) - lead developer, theme creation
 - [GetUpOr](https://github.com/getupor) - community, support
 - RetroBoy - community, support
