@@ -1,10 +1,10 @@
 <h1 align="left">
   <br>
-  <a href="https://projectarcade.ru/"><img src="https://raw.githubusercontent.com/TheDayG0ne/ProjectArcade/master/resources/images/projectarcade-github.png" alt="ProjectArcade" width="500"></a>
+  <a href="https://projectarcade.ru/"><img src="https://raw.githubusercontent.com/PRO100BYTE/ProjectArcade/master/resources/images/pa-logo-wbg.png" alt="ProjectArcade" width="500"></a>
 </h1>
 
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)   [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)   ![Based on RetroBat](https://img.shields.io/badge/RetroBat%20-%20Based%20on?logoColor=brightgreen&label=Based%20on&link=https%3A%2F%2Fgithub.com%2FRetroBat-Official)
-   [![itch.io](https://img.shields.io/badge/Itch.io-FA5C5C?logo=itchdotio&logoColor=white)](https://thedayg0ne.itch.io/projectarcade)   [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)   ![GitHub release](https://img.shields.io/github/v/release/TheDayG0ne/ProjectArcade?display_name=release)
+   [![itch.io](https://img.shields.io/badge/Itch.io-FA5C5C?logo=itchdotio&logoColor=white)](https://thedayg0ne.itch.io/projectarcade)   [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)   ![GitHub release](https://img.shields.io/github/v/release/PRO100BYTE/ProjectArcade?display_name=release)
 
 ProjectArcade is a software for 64-bit versions of Windows designed for retro-gaming and running various emulators of gaming systems.
 
