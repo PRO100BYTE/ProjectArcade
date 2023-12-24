@@ -1,0 +1,14 @@
+*.csproj.user
+*.suo
+bin/
+obj/
+Debug/
+.vs/
+EmulationStation/
+emulatorLauncher/*.csproj.user
+emulatorLauncher/*.suo
+emulatorLauncher/bin/
+emulatorLauncher/obj/
+emulatorLauncher/Debug/
+emulatorLauncher/.vs/
+emulatorLauncher/EmulationStation/
