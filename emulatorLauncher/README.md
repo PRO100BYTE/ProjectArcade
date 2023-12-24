@@ -36,4 +36,4 @@ Huge thanks to these people:
 
 ## License
 
-This project is distributed under the MIT license. Details can be found in the LICENSE file
+This project is distributed under the LGPL v3 license

@@ -1,0 +1,451 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BD82A5AA-00AD-40BF-BAE6-EF29FA1FC7C1}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>EmulatorLauncher</RootNamespace>
+    <AssemblyName>emulatorLauncher</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\EmulationStation\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisLogFile>..\..\EmulationStation\emulatorLauncher.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Release\emulatorLauncher.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.118.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Management" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Bezels\BezelFiles.cs" />
+    <Compile Include="Common\SaveStatesWatcher.cs" />
+    <Compile Include="Common\ScreenShotsWatcher.cs" />
+    <Compile Include="Controller.cs" />
+    <Compile Include="EsFeaturesPoBuilder.cs" />
+    <Compile Include="Bezels\FakeBezelFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EsSaveStatesExtensions.cs" />
+    <Compile Include="Generators\Xm6pro.Generator.cs" />
+    <Compile Include="Generators\Flycast.Generator.cs" />
+    <Compile Include="Generators\Flycast.Controllers.cs">
+      <DependentUpon>Flycast.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Cemu.Controllers.cs">
+      <DependentUpon>Cemu.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Eka2l1.Generator.cs" />
+    <Compile Include="Generators\Mupen64.Generator.cs" />
+    <Compile Include="Generators\Mupen64.Controllers.cs">
+      <DependentUpon>Mupen64.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Mupen64.SaveStatesMonitor.cs">
+      <DependentUpon>Mupen64.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Simple64.Generator.cs" />
+    <Compile Include="Generators\Simple64.Controllers.cs">
+      <DependentUpon>Simple64.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\ZEsarUX.Generator.cs" />
+    <Compile Include="Generators\ZEsarUX.Controllers.cs">
+      <DependentUpon>ZEsarUX.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\ScummVm.Generator.cs" />
+    <Compile Include="Generators\ForceEngine.Generator.cs" />
+    <Compile Include="Generators\RetrobatLauncher.Generator.cs" />
+    <Compile Include="Generators\MessSystem.cs" />
+    <Compile Include="Generators\vita3k.Generator.cs" />
+    <Compile Include="Installer.cs" />
+    <Compile Include="Generators\Nes3d.Generator.cs" />
+    <Compile Include="Generators\Phoenix.Generator.cs" />
+    <Compile Include="Generators\Hatari.Generator.cs" />
+    <Compile Include="Generators\PinballFX3.Generator.cs" />
+    <Compile Include="Generators\PinballFX.Generator.cs" />
+    <Compile Include="Generators\Play.Generator.cs" />
+    <Compile Include="Generators\ZaccariaPinball.Generator.cs" />
+    <Compile Include="Generators\Love.Generator.cs" />
+    <Compile Include="Generators\XEmu.Generator.cs" />
+    <Compile Include="Generators\AppleWin.Generator.cs" />
+    <Compile Include="Generators\AmigaForever.Generator.cs" />
+    <Compile Include="Generators\ArcadeFlashWeb.Generator.cs" />
+    <Compile Include="Generators\Jynx.Generator.cs" />
+    <Compile Include="Generators\Ruffle.Generator.cs" />
+    <Compile Include="Generators\Stella.Generator.cs" />
+    <Compile Include="Generators\Stella.Controllers.cs">
+      <DependentUpon>Stella.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Cemu.Generator.cs" />
+    <Compile Include="Generators\EasyRpg.Generator.cs" />
+    <Compile Include="Generators\GsPlus.Generator.cs" />
+    <Compile Include="Generators\Duckstation.Generator.cs" />
+    <Compile Include="Generators\Duckstation.Controllers.cs">
+      <DependentUpon>Duckstation.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\DuckStation.SaveStatesMonitor.cs">
+      <DependentUpon>Duckstation.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\KegaFusion.Generator.cs" />
+    <Compile Include="Generators\MelonDS.Generator.cs" />
+    <Compile Include="Generators\MelonDS.Controllers.cs">
+      <DependentUpon>MelonDS.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Mesen.Generator.cs" />
+    <Compile Include="Generators\Mesen.Controllers.cs">
+      <DependentUpon>Mesen.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Ryujinx.Generator.cs" />
+    <Compile Include="Generators\Ryujinx.Controllers.cs">
+      <DependentUpon>Ryujinx.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\TeknoParrot.Generator.cs" />
+    <Compile Include="Generators\TeknoParrot.Controllers.cs">
+      <DependentUpon>TeknoParrot.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Tsugaru.Generator.cs" />
+    <Compile Include="Generators\Yuzu.Generator.cs" />
+    <Compile Include="Generators\Yuzu.Controllers.cs">
+      <DependentUpon>Yuzu.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Mame64.Generator.cs" />
+    <Compile Include="Generators\Mame64.Bezels.cs">
+      <DependentUpon>Mame64.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Mame64.Controllers.cs">
+      <DependentUpon>Mame64.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Daphne.Generator.cs" />
+    <Compile Include="Generators\Oricutron.Generator.cs" />
+    <Compile Include="Generators\Solarus.Generator.cs" />
+    <Compile Include="Generators\Demul.Generator.cs" />
+    <Compile Include="Generators\Eduke32.Generator.cs" />
+    <Compile Include="Generators\ExeLauncher.Generator.cs" />
+    <Compile Include="Generators\EpicLauncher.Generator.cs">
+      <DependentUpon>ExeLauncher.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\AmazonLauncher.Generator.cs">
+      <DependentUpon>ExeLauncher.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\SteamLauncher.Generator.cs">
+      <DependentUpon>ExeLauncher.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\mGBA.Generator.cs" />
+    <Compile Include="Generators\Mednafen.Generator.cs" />
+    <Compile Include="Generators\Mednafen.Controllers.cs">
+      <DependentUpon>Mednafen.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Redream.Generator.cs" />
+    <Compile Include="Generators\Redream.Controllers.cs">
+      <DependentUpon>Redream.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Raine.Generator.cs" />
+    <Compile Include="Generators\Cxbx.Generator.cs" />
+    <Compile Include="Generators\Cxbx.Controllers.cs">
+      <DependentUpon>Cxbx.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\SimCoupe.Generator.cs" />
+    <Compile Include="Generators\Model3.Generator.cs" />
+    <Compile Include="Generators\Model3.Controllers.cs">
+      <DependentUpon>Model3.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Dolphin.Generator.cs" />
+    <Compile Include="Generators\Dolphin.Controllers.cs">
+      <DependentUpon>Dolphin.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Dolphin.SaveStatesMonitor.cs">
+      <DependentUpon>Dolphin.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Ppsspp.Generator.cs" />
+    <Compile Include="Generators\Ppsspp.Controllers.cs">
+      <DependentUpon>Ppsspp.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Ppsspp.SaveStatesMonitor.cs">
+      <DependentUpon>Ppsspp.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\DosBox.Generator.cs" />
+    <Compile Include="Generators\Fpinball.Generator.cs" />
+    <Compile Include="Generators\Pcsx2.Generator.cs" />
+    <Compile Include="Generators\Pcsx2.Controllers.cs">
+      <DependentUpon>Pcsx2.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Pcsx2.SaveStatesMonitor.cs">
+      <DependentUpon>Pcsx2.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Pico8.Generator.cs" />
+    <Compile Include="Generators\Rpcs3.Generator.cs" />
+    <Compile Include="Generators\Rpcs3.Controllers.cs">
+      <DependentUpon>Rpcs3.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\OpenBor.Generator.cs" />
+    <Compile Include="Generators\OpenBor.Controllers.cs">
+      <DependentUpon>OpenBor.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Model2.Generator.cs" />
+    <Compile Include="Generators\Model2.Controllers.cs">
+      <DependentUpon>Model2.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Uae.Generator.cs" />
+    <Compile Include="Generators\Snes9x.Generator.cs" />
+    <Compile Include="Generators\Citra.Generator.cs" />
+    <Compile Include="Generators\Citra.Controllers.cs">
+      <DependentUpon>Citra.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Xenia.Generator.cs" />
+    <Compile Include="Generators\BigPEmu.Generator.cs" />
+    <Compile Include="Generators\Project64.Generator.cs" />
+    <Compile Include="Generators\VPinball.Generator.cs" />
+    <Compile Include="Generators\NosGba.Generator.cs" />
+    <Compile Include="Generators\OpenMSX.Generator.cs" />
+    <Compile Include="Generators\OpenMSX.Controllers.cs">
+      <DependentUpon>OpenMSX.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Zinc.Generator.cs" />
+    <Compile Include="Generators\Zinc.Controllers.cs">
+      <DependentUpon>Zinc.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\SSF.Generator.cs" />
+    <Compile Include="MameVersionDetector.cs" />
+    <Compile Include="PadToKey\EvMapyKeysFile.cs" />
+    <Compile Include="PadToKey\JoyInputState.cs" />
+    <Compile Include="PadToKey\JoystickListener.cs" />
+    <Compile Include="PadToKey\Joysticks.cs" />
+    <Compile Include="PadToKey\PadToKey.cs" />
+    <Compile Include="PadToKey\SendKeys.cs" />
+    <Compile Include="Properties\Resources.fr.Designer.cs">
+      <DependentUpon>Resources.fr.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Properties\Resources.ru.Designer.cs">
+      <DependentUpon>Resources.ru.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Reshader\ReshadeManager.cs" />
+    <Compile Include="SplashVideo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Steam\KeyValue.cs" />
+    <Compile Include="Steam\SteamAppInfo.cs" />
+    <Compile Include="Steam\ValveKeyValue\Abstraction\IParsingVisitationListener.cs" />
+    <Compile Include="Steam\ValveKeyValue\Abstraction\IVisitationListener.cs" />
+    <Compile Include="Steam\ValveKeyValue\Abstraction\KVObjectVisitor.cs" />
+    <Compile Include="Steam\ValveKeyValue\Deserialization\IVisitingReader.cs" />
+    <Compile Include="Steam\ValveKeyValue\Deserialization\KeyValues1\KV1BinaryReader.cs" />
+    <Compile Include="Steam\ValveKeyValue\Deserialization\KeyValues1\KV1TextReader.cs" />
+    <Compile Include="Steam\ValveKeyValue\Deserialization\KeyValues1\KV1TextReaderState.cs" />
+    <Compile Include="Steam\ValveKeyValue\Deserialization\KeyValues1\KV1TextReaderStateMachine.cs" />
+    <Compile Include="Steam\ValveKeyValue\Deserialization\KeyValues1\KV1TokenReader.cs" />
+    <Compile Include="Steam\ValveKeyValue\Deserialization\KVAppendingObjectBuilder.cs" />
+    <Compile Include="Steam\ValveKeyValue\Deserialization\KVMergingObjectBuilder.cs" />
+    <Compile Include="Steam\ValveKeyValue\Deserialization\KVObjectBuilder.cs" />
+    <Compile Include="Steam\ValveKeyValue\Deserialization\KVPartialState.cs" />
+    <Compile Include="Steam\ValveKeyValue\Deserialization\KVPartialState{TState}.cs" />
+    <Compile Include="Steam\ValveKeyValue\IIncludedFileLoader.cs" />
+    <Compile Include="Steam\ValveKeyValue\KeyValueException.cs" />
+    <Compile Include="Steam\ValveKeyValue\KeyValues1\KV1BinaryNodeType.cs" />
+    <Compile Include="Steam\ValveKeyValue\KVCollectionValue.cs" />
+    <Compile Include="Steam\ValveKeyValue\KVConditionEvaluator.cs" />
+    <Compile Include="Steam\ValveKeyValue\KVObject.cs" />
+    <Compile Include="Steam\ValveKeyValue\KVObjectValue.cs" />
+    <Compile Include="Steam\ValveKeyValue\KVObject_IEnumerable.cs" />
+    <Compile Include="Steam\ValveKeyValue\KVSerializationFormat.cs" />
+    <Compile Include="Steam\ValveKeyValue\KVSerializer.cs" />
+    <Compile Include="Steam\ValveKeyValue\KVSerializerOptions.cs" />
+    <Compile Include="Steam\ValveKeyValue\KVToken.cs" />
+    <Compile Include="Steam\ValveKeyValue\KVTokenType.cs" />
+    <Compile Include="Steam\ValveKeyValue\KVValue.cs" />
+    <Compile Include="Steam\ValveKeyValue\KVValueType.cs" />
+    <Compile Include="Steam\ValveKeyValue\KVValue_operators.cs" />
+    <Compile Include="Steam\ValveKeyValue\Require.cs" />
+    <Compile Include="Teknoparrot\ConfigTemplate.cs" />
+    <Compile Include="Teknoparrot\Description.cs" />
+    <Compile Include="Teknoparrot\EmulationProfile.cs" />
+    <Compile Include="Teknoparrot\EmulatorType.cs" />
+    <Compile Include="Teknoparrot\GameProfile.cs" />
+    <Compile Include="Teknoparrot\JoystickHelper.cs" />
+    <Compile Include="Teknoparrot\JoystickMapping.cs" />
+    <Compile Include="VPinball\KeyboardManager.cs" />
+    <Compile Include="Common\SystemDefaults.cs" />
+    <Compile Include="Common\Generator.cs" />
+    <Compile Include="Generators\LibRetro.Generator.cs" />
+    <Compile Include="Generators\LibRetro.StateFileManager.cs">
+      <DependentUpon>LibRetro.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Libretro.Controllers.cs">
+      <DependentUpon>LibRetro.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\LibRetro.CoreOptions.cs">
+      <DependentUpon>LibRetro.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\LibRetro.Guns.cs">
+      <DependentUpon>LibRetro.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Bizhawk.Generator.cs" />
+    <Compile Include="Generators\Bizhawk.Controllers.cs">
+      <DependentUpon>Bizhawk.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Bizhawk.CoreOptions.cs">
+      <DependentUpon>Bizhawk.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Bizhawk.Guns.cs">
+      <DependentUpon>Bizhawk.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Ares.Generator.cs" />
+    <Compile Include="Generators\Ares.Controllers.cs">
+      <DependentUpon>Ares.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Common\SystemShaders.cs" />
+    <Compile Include="InstallerFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InstallerFrm.Designer.cs">
+      <DependentUpon>InstallerFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VPinball\LoadingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VPinball\ScreenRes.cs" />
+    <EmbeddedResource Include="Properties\Resources.fr.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.fr.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.ru.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.ru.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InstallerFrm.resx">
+      <DependentUpon>InstallerFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="..\.emulationstation\es_features.cfg">
+      <Link>es_features.cfg</Link>
+    </None>
+    <None Include="..\.emulationstation\es_savestates.cfg">
+      <Link>es_savestates.cfg</Link>
+    </None>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="Reshader\ReShade.ini" />
+    <None Include="Resources\configgen-defaults.yml" />
+    <None Include="Resources\eeprom.bin" />
+    <None Include="Resources\hidtodinput.cfg">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Resources\libretrocoreguns.yml" />
+    <None Include="Resources\mame.ini" />
+    <None Include="Reshader\ReShade.fxh" />
+    <None Include="Reshader\ReShadeUI.fxh" />
+    <None Include="Resources\mamecrcs.xml.gz" />
+    <None Include="Resources\reshader.x64.gz" />
+    <None Include="Resources\reshader.x86.gz" />
+    <None Include="Resources\SQLite.Interop.x64.gz" />
+    <None Include="Resources\SQLite.Interop.x86.gz" />
+    <None Include="Resources\xbox_hdd.qcow2.zip" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="icon.ico" />
+    <None Include="Resources\blacklisted-words.txt" />
+    <None Include="Resources\retrobat.png" />
+    <None Include="Reshader\Bezel.fx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EmulatorLauncher.Common\EmulatorLauncher.Common.csproj">
+      <Project>{A51ED514-5156-42D4-AD7E-82BCA96FEE05}</Project>
+      <Name>EmulatorLauncher.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if $(ConfigurationName) == Debug (
+ECHO Copy es_features.cfg to "$(TargetDir).emulationstation"
+xcopy /Y /Q "$(SolutionDir).emulationstation\es_features.cfg" "$(TargetDir).emulationstation\"
+xcopy /Y /Q "$(SolutionDir).emulationstation\es_savestates.cfg" "$(TargetDir).emulationstation\"
+)
+
+if $(ConfigurationName) == Release (
+"$(SolutionDir)ILMerge.exe" /out:"$(TargetDir)$(TargetFileName)" "$(TargetDir)$(TargetFileName)" /ndebug /wildcards "$(TargetDir)System.Data.SQLite.dll" /targetplatform:v4,%25systemroot%25\Microsoft.NET\Framework\v4.0.30319
+)</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
