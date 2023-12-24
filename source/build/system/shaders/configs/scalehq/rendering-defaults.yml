@@ -1,7 +1,0 @@
-default:
-  shader: scalehq/2xScaleHQ
-# Reshader  
-model2:
-  shader: disabled
-model3:
-  shader: disabled

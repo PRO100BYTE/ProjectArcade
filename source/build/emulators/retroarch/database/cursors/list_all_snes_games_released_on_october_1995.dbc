@@ -1,3 +1,0 @@
-name = "Search SNES games released on October 1995"
-query = "{'releasemonth':10,'releaseyear':1995}"
-rdb = "Nintendo - Super Nintendo Entertainment System.rdb"
