@@ -20,4 +20,7 @@ default:
   solarus: CRTNewPixie@CRT-NewPixie.fx
   redream: CRTNewPixie@CRT-NewPixie.fx
   raine: CRTNewPixie@CRT-NewPixie.fx
+  duckstation: CRTNewPixie@CRT-NewPixie.fx
+  mupen64: CRTNewPixie@CRT-NewPixie.fx
+  xemu: CRTNewPixie@CRT-NewPixie.fx
 

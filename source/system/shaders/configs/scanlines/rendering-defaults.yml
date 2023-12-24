@@ -16,11 +16,13 @@ default:
   demul: ScanlinesAbs@scanlines-abs.fx
   phoenix: ScanlinesAbs@scanlines-abs.fx
   bigpemu: ScanlinesAbs@scanlines-abs.fx
-  demul: ScanlinesAbs@scanlines-abs.fx
   demul-old: ScanlinesAbs@scanlines-abs.fx
   solarus: ScanlinesAbs@scanlines-abs.fx
   redream: ScanlinesAbs@scanlines-abs.fx
   raine: ScanlinesAbs@scanlines-abs.fx
+  duckstation: ScanlinesAbs@scanlines-abs.fx
+  mupen64: ScanlinesAbs@scanlines-abs.fx
+  xemu: ScanlinesAbs@scanlines-abs.fx
 n64:
   shader: interpolation/sharp-bilinear-scanlines
 gba:
@@ -56,9 +58,12 @@ gw:
   shader: handheld/lcd-grid-v2
 lynx:
   shader: handheld/lcd-grid-v2
+  mednafen: ScanlinesAbs@scanlines-abs.fx
 wswan:
   shader: handheld/lcd-grid-v2
+  mednafen: ScanlinesAbs@scanlines-abs.fx
 wswanc:
   shader: handheld/lcd-grid-v2
+  mednafen: ScanlinesAbs@scanlines-abs.fx
 psp:
   shader: handheld/lcd-grid-v2

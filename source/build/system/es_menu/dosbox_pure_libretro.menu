@@ -1,2 +1,0 @@
-\retroarch\retroarch.exe
--L ".\..\..\emulators\retroarch\cores\dosbox_pure_libretro.dll" ".\..\..\roms\dos"

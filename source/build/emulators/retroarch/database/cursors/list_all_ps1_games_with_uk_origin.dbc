@@ -1,3 +1,0 @@
-name = "List all PS1 games with UK origin"
-query = "{'origin':'UK'}"
-rdb = "Sony - PlayStation.rdb"

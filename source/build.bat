@@ -12,8 +12,8 @@ to set the default configuration and to build the setup from sources.
 
 :: ---- BUILDER OPTION ----
 
-set retrobat_version=5.1.0
-set retroarch_version=1.10.3
+set retrobat_version=6.0.0
+set retroarch_version=1.16.0
 
 set get_batgui=0
 set get_batocera_ports=1
@@ -22,8 +22,7 @@ set get_decorations=1
 set get_default_theme=1
 set get_emulationstation=1
 set get_emulators=0
-set get_lrcores=0
-set get_mega_bezels=0
+set get_lrcores=1
 set get_retroarch=1
 set get_retrobat_binaries=1
 set get_system=1
@@ -39,10 +38,12 @@ set archive_compression=3
 
 :: ---- LOOP LIST ----
 
-set deps_list=(git makensis 7za strip wget)
-set submodules_list=(bios default_theme decorations system)
-set packages_list=(retrobat_binaries batgui emulationstation batocera_ports mega_bezels retroarch roms wiimotegun)
-set legacy_cores_list=(4do emuscv imageviewer mame2014 mame2016 px68k)
+set setup_compiler=ISCC
+
+set deps_list=(git !setup_compiler! 7za wget curl)
+set submodules_list=(bios decorations system)
+set packages_list=(retrobat_binaries batgui emulationstation default_theme batocera_ports mega_bezels retroarch roms wiimotegun)
+set legacy_cores_list=(4do emuscv hatarib imageviewer mame2014 mame2016)
 set emulators_black_list=(3dsen pico8 retroarch ryujinx steam teknoparrot yuzu yuzu-early-access)
 
 :: ---- GET STARTED ----
@@ -50,7 +51,7 @@ set emulators_black_list=(3dsen pico8 retroarch ryujinx steam teknoparrot yuzu y
 set script_type=builder
 set user_choice=0
 set git_branch=master
-set branch=stable
+set branch=beta
 set release_version=null
 set log_file=build.log
 set exit_timeout=0
@@ -287,10 +288,11 @@ for %%i in %deps_list% do (
 	(set/A found_%%i=0)
 	(set/A found_total=!found_total!+1)
 	(set package_name=%%i)
-	(set buildtools_path=!root_path!\buildtools\msys)
+	(set buildtools_path=!root_path!\system\tools)
 	
 	if "!package_name!"=="git" (set buildtools_path=!git_path!)
-	if "!package_name!"=="makensis" (set buildtools_path=!root_path!\buildtools\nsis)
+	if "!package_name!"=="makensis" (set "buildtools_path=%ProgramFiles(x86)%\NSIS" & set "compiler_path=!buildtools_path!")
+	if "!package_name!"=="ISCC" (set "buildtools_path=%ProgramFiles(x86)%\Inno Setup 6" & set "compiler_path=!buildtools_path!")
 	
 	if exist "!buildtools_path!\!package_name!.exe" (
 	
@@ -376,6 +378,7 @@ for %%i in %packages_list% do (
 		if "!package_name!"=="batocera_ports" (set package_file=batocera-ports.zip)
 		if "!package_name!"=="retroarch" (set package_file=RetroArch.7z)
 		if "!package_name!"=="wiimotegun" (set package_file=WiimoteGun.zip)
+		if "!package_name!"=="default_theme" (set package_file=master.zip)
 		
 		call :download
 		call :hash_file
@@ -460,6 +463,8 @@ if exist "!build_path!\retrobat.exe" (
 
 if exist "!build_path!\retrobat.ini" del/Q "!build_path!\retrobat.ini"
 
+if exist "!system_path!\templates\emulationstation\es_features.locale\." xcopy "!system_path!\templates\emulationstation\es_features.locale" "!emulationstation_path!\es_features.locale\" /s /e /v /y
+
 if exist "!system_path!\resources\emulationstation\video\*.mp4" xcopy /v /y "!system_path!\resources\emulationstation\video\*.mp4" "!build_path!\emulationstation\.emulationstation\video"
 if exist "!system_path!\resources\emulationstation\music\*.ogg" xcopy /v /y "!system_path!\resources\emulationstation\music\*.ogg" "!build_path!\emulationstation\.emulationstation\music"
 
@@ -497,15 +502,17 @@ set package_file=%name%-v%release_version%-setup.exe
 
 if not exist "!build_path!\%package_file%" (
 
-	"!buildtools_path!\..\nsis\makensis.exe" /V4 /DRELEASE_VERSION=%release_version%  "!root_path!\setup.nsi"
+	if "%setup_compiler%"=="makensis" ("!compiler_path!\makensis.exe" /V4 /DRELEASE_VERSION=%release_version%  "!root_path!\installer\setup.nsi")
+	if "%setup_compiler%"=="ISCC" if "%archx%"=="x86_64" ("!compiler_path!\ISCC.exe" /DMyAppVersion=%release_version% /DMyAppArchitecture=x64 /DSourceDir="!build_path!" /DInstallRootUrl="%installroot_url%/repo/%arch%" "!root_path!\installer\installer.iss")
+	if "%setup_compiler%"=="ISCC" if "%archx%"=="x86" ("!compiler_path!\ISCC.exe" /DMyAppVersion=%release_version% /DMyAppArchitecture=x86 /DSourceDir="!build_path!" /DInstallRootUrl="%installroot_url%/repo/%arch%" "!root_path!\installer\installer.iss")
 )
 
 timeout/t 2 >nul
  
-if exist "!root_path!\%package_file%" (
+if exist "!root_path!\installer\%package_file%" (
 
 	(set/A exit_code=0)
-	move /Y "!root_path!\%package_file%" "!build_path!"
+	move /Y "!root_path!\installer\%package_file%" "!build_path!"
 	(echo %date% %time% [INFO] Build "%package_file%" in "!build_path!")>> "!root_path!\%log_file%"
 )
 
@@ -689,8 +696,8 @@ if exist "!hash_path!\!package_file!" (
 	)
 
 	if "!task!" == "get_packages" (
-		(echo !package_name!_sha256=!file_hash!)>> "!build_path!\hash_list.txt"
-		(echo %date% %time% [INFO] !package_name!_sha256=!file_hash! ^> "!build_path!\hash_list.txt")>> "!root_path!\%log_file%"
+REM		(echo !package_name!_sha256=!file_hash!)>> "!build_path!\hash_list.txt"
+REM		(echo %date% %time% [INFO] !package_name!_sha256=!file_hash! ^> "!build_path!\hash_list.txt")>> "!root_path!\%log_file%"
 	)
 	
 	if not "!task!" == "get_packages" (

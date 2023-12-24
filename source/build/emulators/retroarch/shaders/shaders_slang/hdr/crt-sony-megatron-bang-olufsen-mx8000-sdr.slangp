@@ -1,5 +1,0 @@
-#reference "crt-sony-megatron-bang-olufsen-mx8000-hdr.slangp"
-
-hcrt_hdr = "0.000000"
-
-hcrt_gamma_in = "-0.200000"

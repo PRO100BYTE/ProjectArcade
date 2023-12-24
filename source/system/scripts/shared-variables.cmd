@@ -33,7 +33,7 @@ if not "%script_type%" == "builder" (
 	(echo batocera_ports_path=!root_path!\emulationstation)>> "%tmp_infos_file%"
 	(echo bios_path=!root_path!\bios)>> "%tmp_infos_file%"
 	(echo decorations_path=!root_path!\system\decorations)>> "%tmp_infos_file%"
-	(echo default_theme_path=!root_path!\emulationstation\.emulationstation\themes\es-theme-carbon)>> "%tmp_infos_file%"
+	(echo default_theme_path=!root_path!\emulationstation\.emulationstation\themes)>> "%tmp_infos_file%"
 	(echo download_path=!root_path!\system\download)>> "%tmp_infos_file%"
 	(echo emulationstation_path=!root_path!\emulationstation)>> "%tmp_infos_file%"
 	(echo emulators_path=!root_path!\emulators)>> "%tmp_infos_file%"
@@ -48,6 +48,7 @@ if not "%script_type%" == "builder" (
 	(echo shaders_path=!root_path!\system\shaders)>> "%tmp_infos_file%"
 	(echo system_path=!root_path!\system)>> "%tmp_infos_file%"
 	(echo wiimotegun_path=!root_path!\emulationstation)>> "%tmp_infos_file%"
+	(echo modules_path=!root_path!\system\tools)>> "%tmp_infos_file%"
 
 ) else (
 
@@ -55,7 +56,7 @@ if not "%script_type%" == "builder" (
 	(echo batocera_ports_path=!build_path!\emulationstation)>> "%tmp_infos_file%"
 	(echo bios_path=!build_path!\bios)>> "%tmp_infos_file%"
 	(echo decorations_path=!build_path!\system\decorations)>> "%tmp_infos_file%"
-	(echo default_theme_path=!build_path!\emulationstation\.emulationstation\themes\es-theme-carbon)>> "%tmp_infos_file%"
+	(echo default_theme_path=!build_path!\emulationstation\.emulationstation\themes)>> "%tmp_infos_file%"
 	(echo download_path=!build_path!\system\download)>> "%tmp_infos_file%"
 	(echo emulationstation_path=!build_path!\emulationstation)>> "%tmp_infos_file%"
 	(echo emulators_path=!build_path!\emulators)>> "%tmp_infos_file%"
@@ -70,6 +71,7 @@ if not "%script_type%" == "builder" (
 	(echo shaders_path=!build_path!\system\shaders)>> "%tmp_infos_file%"
 	(echo system_path=!build_path!\system)>> "%tmp_infos_file%"
 	(echo wiimotegun_path=!build_path!\emulationstation)>> "%tmp_infos_file%"
+	(echo modules_path=!root_path!\system\tools)>> "%tmp_infos_file%"
 )
 	
 :: ---- URLS ----
@@ -83,14 +85,15 @@ if not "%script_type%" == "builder" (
 ) else (
 
 	(echo batgui_url=%installroot_url%/repo/%arch%/%branch%)>> "%tmp_infos_file%"
-	(echo batocera_ports_url=https://github.com/fabricecaruso/batocera-ports/releases/download/continuous)>> "%tmp_infos_file%"	
-	(echo emulationstation_url=https://github.com/fabricecaruso/batocera-emulationstation/releases/download/continuous-master)>> "%tmp_infos_file%"
+	(echo batocera_ports_url=https://github.com/RetroBat-Official/emulatorlauncher/releases/download/continuous)>> "%tmp_infos_file%"	
+	(echo emulationstation_url=https://github.com/RetroBat-Official/emulationstation/releases/download/continuous-master)>> "%tmp_infos_file%"
 	(echo emulators_url=%installroot_url%/repo/%arch%/%branch%/emulators)>> "%tmp_infos_file%"
 	(echo lrcores_url=https://buildbot.libretro.com/nightly/windows/%archx%/latest)>> "%tmp_infos_file%"
 	(echo mega_bezels_url=%installroot_url%/repo/medias)>> "%tmp_infos_file%"
 	(echo retroarch_url=https://buildbot.libretro.com/stable/%retroarch_version%/windows/%archx%)>> "%tmp_infos_file%"
 	(echo retrobat_binaries_url=%installroot_url%/repo/tools)>> "%tmp_infos_file%"
 	(echo wiimotegun_url=https://github.com/fabricecaruso/WiimoteGun/releases/download/v1.0)>> "%tmp_infos_file%"
+	(echo default_theme_url=https://github.com/fabricecaruso/es-theme-carbon/archive/refs/heads/)>> "%tmp_infos_file%"
 
 )
 
@@ -107,11 +110,11 @@ if exist "%root_path%\emulationstation\%version_file_local%" (
 
 if not "%script_type%" == "builder" if not "%extract_pkg%" == "es" (
 
-	if exist "%root_path%\system\modules\rb_updater\%version_file_remote%" del/Q "%root_path%\system\modules\rb_updater\%version_file_remote%" >nul
-	if exist "%root_path%\system\modules\rb_updater\%version_file_remote%.*" del/Q "%root_path%\system\modules\rb_updater\%version_file_remote%.*" >nul
-	"%root_path%\system\modules\rb_updater\wget" --no-check-certificate --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 3 -P "%root_path%\system\modules\rb_updater" %installroot_url%/repo/%arch%/%branch%/%version_local%/%version_file_remote% -q
+	if exist "%root_path%\system\tools\%version_file_remote%" del/Q "%root_path%\system\tools\%version_file_remote%" >nul
+	if exist "%root_path%\system\tools\%version_file_remote%.*" del/Q "%root_path%\system\tools\%version_file_remote%.*" >nul
+	"%root_path%\system\tools\wget" --no-check-certificate --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 3 -P "%root_path%\system\tools" %installroot_url%/repo/%arch%/%branch%/%version_local%/%version_file_remote% -q
 
-	if not exist "%root_path%\system\modules\rb_updater\%version_file_remote%" (
+	if not exist "%root_path%\system\tools\%version_file_remote%" (
 	
 		(set exit_msg=error: missing version file)
 		(set/A exit_code=2)
@@ -123,9 +126,9 @@ if not "%script_type%" == "builder" if not "%extract_pkg%" == "es" (
 	)
 )
 
-if exist "%root_path%\system\modules\rb_updater\%version_file_remote%" (
+if exist "%root_path%\system\tools\%version_file_remote%" (
 	
-	set/P version_remote=<"%root_path%\system\modules\rb_updater\%version_file_remote%"
+	set/P version_remote=<"%root_path%\system\tools\%version_file_remote%"
 	(echo version_remote=!version_remote!)>> "%tmp_infos_file%"
 	
 )
