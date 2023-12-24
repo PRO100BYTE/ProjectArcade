@@ -123,18 +123,15 @@ namespace EmulatorLauncher
 
         public static string GetUpdateUrl(string fileName)
         {
-            string installerUrl = RegistryKeyEx.GetRegistryValue(
-                RegistryKeyEx.CurrentUser,
-                @"SOFTWARE\RetroBat",
-                "InstallRootUrl") as string;
+            string installerUrl = "https://dl.projectarcade.ru/";
 
             if (string.IsNullOrEmpty(installerUrl))
                 return string.Empty;
 
             if (installerUrl.EndsWith("/"))
-                installerUrl = installerUrl + UpdatesType + "/emulators/" + fileName;
+                installerUrl = installerUrl + "/store/emulators/" + fileName;
             else
-                installerUrl = installerUrl + "/" + UpdatesType + "/emulators/" + fileName;
+                installerUrl = installerUrl + "/" + "/store/emulators/" + fileName;
 
             return installerUrl;
         }
