@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
-using emulatorLauncher.PadToKeyboard;
-using emulatorLauncher.Tools;
+using EmulatorLauncher.PadToKeyboard;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
+using EmulatorLauncher.Common.EmulationStation;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class OricutronGenerator : Generator
     {
@@ -38,25 +40,37 @@ namespace emulatorLauncher
                 cfg["rendermode"] = "opengl";
                 cfg.Save(Path.Combine(path, "oricutron.cfg"), true);
             }
+
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
+            List<string> commandArray = new List<string>();
             
+            if (fullscreen)
+                commandArray.Add("--fullscreen");
+
+            commandArray.Add("--rendermode");
+            commandArray.Add("opengl");
+
             if (Path.GetExtension(rom).ToLower() == ".dsk")
+                commandArray.Add("--disk");
+            else
             {
-                return new ProcessStartInfo()
-                {
-                    FileName = exe,
-                    WorkingDirectory = path,
-                    Arguments = "--fullscreen --rendermode opengl --disk \"" + rom + "\"",
-                };
+                commandArray.Add("--turbotape");
+                commandArray.Add("on");
+                commandArray.Add("--tape");
             }
+
+            commandArray.Add("\"" + rom + "\"");
+
+            string args = string.Join(" ", commandArray);
 
 			return new ProcessStartInfo()
 				{
 					FileName = exe,
 					WorkingDirectory = path,
-                    Arguments = "--fullscreen --rendermode opengl --turbotape on --tape \"" + rom + "\"",
+                    Arguments = args,
 				};
         }
-
 
         public override int RunAndWait(ProcessStartInfo path)
         {

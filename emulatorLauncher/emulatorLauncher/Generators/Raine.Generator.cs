@@ -4,34 +4,13 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
-using System.Windows.Forms;
-using System.Drawing;
-using System.Management;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class RaineGenerator : Generator
     {
-        public RaineGenerator()
-        {
-            DependsOnDesktopResolution = true;
-        }
-
-        public override int RunAndWait(ProcessStartInfo path)
-        {
-            FakeBezelFrm bezel = null;
-
-            if (_bezelFileInfo != null)
-                bezel = _bezelFileInfo.ShowFakeBezel(_resolution);
-
-            int ret = base.RunAndWait(path);
-
-            if (bezel != null)
-                bezel.Dispose();
-
-            return ret;
-        }
-
         private string _path;
         private BezelFiles _bezelFileInfo;
         private ScreenResolution _resolution;
@@ -54,22 +33,62 @@ namespace emulatorLauncher
                 rom = Path.GetFileNameWithoutExtension(rom);
             }
 
-            SetupSettings();
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
-            if (SystemConfig["ratio"] == "ON")
+            //Applying bezels
+            if (!ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, _path, resolution))
                 _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
 
             _resolution = resolution;
+
+            SetupSettings(fullscreen);
+
+            var commandArray = new List<string>();
+            
+            commandArray.Add("-n");
+
+            if (fullscreen)
+            {
+                commandArray.Add("-fs");
+                commandArray.Add("1");
+            }
+            else
+            {
+                commandArray.Add("-fs");
+                commandArray.Add("0");
+            }
+
+            commandArray.Add("\"" + rom + "\"");
+
+            string args = string.Join(" ", commandArray);
 
             return new ProcessStartInfo()
             {
                 FileName = exe,
                 WorkingDirectory = _path,
-                Arguments = "-n -fs 1 \"" + rom + "\"",
+                Arguments = args,
             };
         }
 
-        private void SetupSettings()
+        public override int RunAndWait(ProcessStartInfo path)
+        {
+            FakeBezelFrm bezel = null;
+
+            if (_bezelFileInfo != null)
+                bezel = _bezelFileInfo.ShowFakeBezel(_resolution);
+
+            int ret = base.RunAndWait(path);
+
+            if (bezel != null)
+                bezel.Dispose();
+
+            if (ret == 1)
+                return 0;
+
+            return ret;
+        }
+
+        private void SetupSettings(bool fullscreen)
         {
             string iniFile = Path.Combine(_path, "config", "raine32_sdl.cfg");
 
@@ -104,10 +123,14 @@ namespace emulatorLauncher
                     ini.WriteValue("Display", "video_mode", "0");
                     ini.WriteValue("Display", "ogl_render", "1");
 
+                    /*
                     if (SystemConfig.isOptSet("Set_Shader") && !string.IsNullOrEmpty(SystemConfig["Set_Shader"]))
                         ini.WriteValue("Display", "ogl_shader", _path + "\\" + SystemConfig["Set_Shader"]);
                     else
                         ini.WriteValue("Display", "ogl_shader", "None");
+                    */
+
+                    ini.WriteValue("Display", "fullscreen", fullscreen ? "1" : "0");
 
                     if (SystemConfig.isOptSet("ratio") && !string.IsNullOrEmpty(SystemConfig["ratio"]))
                         ini.WriteValue("Display", "fix_aspect_ratio", SystemConfig["ratio"]);

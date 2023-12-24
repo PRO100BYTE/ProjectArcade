@@ -6,12 +6,29 @@ using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Linq.Expressions;
-using SharpDX.XInput;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
+using EmulatorLauncher.Common.Joysticks;
+using EmulatorLauncher.Common.Lightguns;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     partial class Model3Generator : Generator
     {
+
+        /// <summary>
+        /// Cf. https://github.com/trzy/Supermodel
+        /// </summary>
+        /// <param name="ini"></param>
+        private void UpdateSdlControllersWithHints(IniFile pcsx2ini)
+        {
+            var hints = new List<string>();
+            hints.Add("SDL_JOYSTICK_HIDAPI_WII = 1");
+
+            SdlGameController.ReloadWithHints(string.Join(",", hints));
+            Program.Controllers.ForEach(c => c.ResetSdlController());
+        }
+
         /// <summary>
         /// Create controller configuration
         /// </summary>
@@ -20,6 +37,8 @@ namespace emulatorLauncher
         {
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
+
+            UpdateSdlControllersWithHints(ini);
 
             //.ini file for supermodel has entry for 2 players.
             //If 2 controllers or more are connected : get controllers from p1 and p2
@@ -60,13 +79,11 @@ namespace emulatorLauncher
             //initialize controller index, supermodel uses directinput controller index (+1)
             //only index of player 1 is initialized as there might be only 1 controller at that point
             int j2index = -1;
-            int j1index = c1.SdlController !=null ? c1.SdlController.Index : c1.DeviceIndex;
+            int j1index = c1.SdlController !=null ? c1.SdlController.Index + 1 : c1.DeviceIndex + 1;
 
             //If a secod controller is connected, get controller index of player 2, if there is no 2nd controller, just increment the index
             if (c2 != null && c2.Config != null)
-                j2index = c2.SdlController != null ? c2.SdlController.Index : c2.DeviceIndex;
-            else
-                j2index = j1index + 1;
+                j2index = c2.SdlController != null ? c2.SdlController.Index + 1 : c2.DeviceIndex + 1;
 
             //initialize tech : as default we will use sdl instead of dinput, as there are less differences in button mappings in sdl !
             string tech = "sdl";
@@ -82,47 +99,135 @@ namespace emulatorLauncher
                 tech = "xinput";
             
             //Check if controllers are NINTENDO, will be used to revert buttons for sdl
-            if (c1.VendorID == Tools.USB_VENDOR.NINTENDO)
+            if (c1.VendorID == USB_VENDOR.NINTENDO)
                 n1 = "nintendo";
-            if (c2 != null && c2.Config != null && c2.VendorID == Tools.USB_VENDOR.NINTENDO)
+            if (c2 != null && c2.Config != null && c2.VendorID == USB_VENDOR.NINTENDO)
                 n2 = "nintendo";
 
-            //Now write buttons mapping for generic sdl case (when player 1 controller is NOT XINPUT
+            // Override tech if option is set in es_features
+            if (SystemConfig.isOptSet("inputdriver") && SystemConfig["inputdriver"] == "nintendo")
+            {
+                tech = "sdl";
+                n1 = "nintendo";
+                n2 = "nintendo";
+            }
+            else if (SystemConfig.isOptSet("inputdriver") && SystemConfig["inputdriver"] == "sdl")
+                tech = "sdl";
+            else if (SystemConfig.isOptSet("inputdriver") && SystemConfig["inputdriver"] == "xinput")
+                tech = "xinput";
+
+            int gunCount = RawLightgun.GetUsableLightGunCount();
+            var guns = RawLightgun.GetRawLightguns();
+
+            bool multigun = SystemConfig.isOptSet("multigun") && SystemConfig.getOptBoolean("multigun");
+            string mouseIndex1 = "1";
+            string mouseIndex2 = "2";
+
+            if (gunCount > 0 && guns.Length > 0)
+            {
+                mouseIndex1 = (guns[0].Index + 1).ToString();
+                if (gunCount > 1 && guns.Length > 1)
+                    mouseIndex2 = (guns[1].Index + 1).ToString();
+            }
+
+            if (SystemConfig.isOptSet("supermodel_gun1") && !string.IsNullOrEmpty(SystemConfig["supermodel_gun1"]))
+                mouseIndex1 = SystemConfig["supermodel_gun1"];
+            if (SystemConfig.isOptSet("supermodel_gun2") && !string.IsNullOrEmpty(SystemConfig["supermodel_gun2"]))
+                mouseIndex2 = SystemConfig["supermodel_gun2"];
+
+            string mouse1 = "MOUSE" + mouseIndex1;
+            string mouse2 = "MOUSE" + mouseIndex2;
+
+            if (!multigun)
+            {
+                mouse1 = mouse2 = "MOUSE";
+                ini.WriteValue(" Global ", "Crosshairs", "1");
+            }
+            else
+                ini.WriteValue(" Global ", "Crosshairs", "3");
+
+            // Force player index if option is set in es_features
+            if (SystemConfig.isOptSet("model3_p1index") && !string.IsNullOrEmpty(SystemConfig["model3_p1index"]))
+                j1index = SystemConfig["model3_p1index"].ToInteger();
+            if (SystemConfig.isOptSet("model3_p2index") && !string.IsNullOrEmpty(SystemConfig["model3_p2index"]))
+                j2index = SystemConfig["model3_p2index"].ToInteger();
+
+            bool multiplayer = j2index != -1;
+            bool enableServiceMenu = SystemConfig.isOptSet("m3_service") && SystemConfig.getOptBoolean("m3_service");
+
+            //Now write buttons mapping for generic sdl case (when player 1 controller is NOT XINPUT)
             if (tech == "sdl")
             {
-                ini.WriteValue(" Global ", "InputSystem", "sdl");
+                if (multigun)
+                    ini.WriteValue(" Global ", "InputSystem", "rawinput");
+                else
+                    ini.WriteValue(" Global ", "InputSystem", "sdl");
 
                 //common - start to start and select to input coins
-                //service menu and test menu can be accessed via L3 and R3 buttons
-                ini.WriteValue(" Global ", "InputStart1", "\"KEY_1,JOY" + j1index + "_BUTTON7\"");
-                ini.WriteValue(" Global ", "InputStart2", "\"KEY_2,JOY" + j2index + "_BUTTON7\"");
-                ini.WriteValue(" Global ", "InputCoin1", "\"KEY_3,JOY" + j1index + "_BUTTON5\"");
-                ini.WriteValue(" Global ", "InputCoin2", "\"KEY_4,JOY" + j2index + "_BUTTON5\"");
-                ini.WriteValue(" Global ", "InputServiceA", "\"KEY_5,JOY" + j1index + "_BUTTON8\"");
-                ini.WriteValue(" Global ", "InputServiceB", "\"KEY_7,JOY" + j2index + "_BUTTON8\"");
-                ini.WriteValue(" Global ", "InputTestA", "\"KEY_6,JOY" + j1index + "_BUTTON9\"");
-                ini.WriteValue(" Global ", "InputTestB", "\"KEY_8,JOY" + j2index + "_BUTTON9\"");
+                //service menu and test menu can be accessed via L3 and R3 buttons if option is enabled
 
+                ini.WriteValue(" Global ", "InputStart1", "\"KEY_1,JOY" + j1index + "_BUTTON7\"");
+                ini.WriteValue(" Global ", "InputCoin1", "\"KEY_3,JOY" + j1index + "_BUTTON5\"");
+                ini.WriteValue(" Global ", "InputServiceA", enableServiceMenu ? "\"KEY_5,JOY" + j1index + "_BUTTON8\"" : "\"KEY_5\"");
+                ini.WriteValue(" Global ", "InputTestA", enableServiceMenu ? "\"KEY_6,JOY" + j1index + "_BUTTON9\"" : "\"KEY_6\"");
+
+                if (multiplayer)
+                {
+                    ini.WriteValue(" Global ", "InputStart2", "\"KEY_2,JOY" + j2index + "_BUTTON7\"");
+                    ini.WriteValue(" Global ", "InputCoin2", "\"KEY_4,JOY" + j2index + "_BUTTON5\"");
+                    ini.WriteValue(" Global ", "InputServiceB", enableServiceMenu ? "\"KEY_7,JOY" + j2index + "_BUTTON8\"" : "\"KEY_7\"");
+                    ini.WriteValue(" Global ", "InputTestB", enableServiceMenu ? "\"KEY_8,JOY" + j2index + "_BUTTON9\"" : "\"KEY_8\"");
+                }
+                else
+                {
+                    ini.Remove(" Global ", "InputStart2");
+                    ini.Remove(" Global ", "InputCoin2");
+                    ini.Remove(" Global ", "InputServiceB");
+                    ini.Remove(" Global ", "InputTestB");
+                }
+                    
                 //4-way digital joysticks - directional stick
                 ini.WriteValue(" Global ", "InputJoyUp", "\"JOY" + j1index + "_YAXIS_NEG,JOY" + j1index + "_POV1_UP\"");
                 ini.WriteValue(" Global ", "InputJoyDown", "\"JOY" + j1index + "_YAXIS_POS,JOY" + j1index + "_POV1_DOWN\"");
                 ini.WriteValue(" Global ", "InputJoyLeft", "\"JOY" + j1index + "_XAXIS_NEG,JOY" + j1index + "_POV1_LEFT\"");
                 ini.WriteValue(" Global ", "InputJoyRight", "\"JOY" + j1index + "_XAXIS_POS,JOY" + j1index + "_POV1_RIGHT\"");
-                ini.WriteValue(" Global ", "InputJoyUp2", "\"JOY" + j2index + "_YAXIS_NEG,JOY" + j2index + "_POV1_UP\"");
-                ini.WriteValue(" Global ", "InputJoyDown2", "\"JOY" + j2index + "_YAXIS_POS,JOY" + j2index + "_POV1_DOWN\"");
-                ini.WriteValue(" Global ", "InputJoyLeft2", "\"JOY" + j2index + "_XAXIS_NEG,JOY" + j2index + "_POV1_LEFT\"");
-                ini.WriteValue(" Global ", "InputJoyRight2", "\"JOY" + j2index + "_XAXIS_POS,JOY" + j2index + "_POV1_RIGHT\"");
-
+                
+                if (multiplayer)
+                {
+                    ini.WriteValue(" Global ", "InputJoyUp2", "\"JOY" + j2index + "_YAXIS_NEG,JOY" + j2index + "_POV1_UP\"");
+                    ini.WriteValue(" Global ", "InputJoyDown2", "\"JOY" + j2index + "_YAXIS_POS,JOY" + j2index + "_POV1_DOWN\"");
+                    ini.WriteValue(" Global ", "InputJoyLeft2", "\"JOY" + j2index + "_XAXIS_NEG,JOY" + j2index + "_POV1_LEFT\"");
+                    ini.WriteValue(" Global ", "InputJoyRight2", "\"JOY" + j2index + "_XAXIS_POS,JOY" + j2index + "_POV1_RIGHT\"");
+                }
+                else
+                {
+                    ini.Remove(" Global ", "InputJoyUp2");
+                    ini.Remove(" Global ", "InputJoyDown2");
+                    ini.Remove(" Global ", "InputJoyLeft2");
+                    ini.Remove(" Global ", "InputJoyRight2");
+                }
+                
                 //Fighting game buttons - used for virtua fighters will be mapped with the 4 buttons
                 ini.WriteValue(" Global ", "InputPunch", n1 == "nintendo" ? "\"JOY" + j1index + "_BUTTON4\"" : "\"JOY" + j1index + "_BUTTON3\"");
                 ini.WriteValue(" Global ", "InputKick", n1 == "nintendo" ? "\"JOY" + j1index + "_BUTTON3\"" : "\"JOY" + j1index + "_BUTTON4\"");
                 ini.WriteValue(" Global ", "InputGuard", n1 == "nintendo" ? "\"JOY" + j1index + "_BUTTON2\"" : "\"JOY" + j1index + "_BUTTON1\"");
                 ini.WriteValue(" Global ", "InputEscape", n1 == "nintendo" ? "\"JOY" + j1index + "_BUTTON1\"" : "\"JOY" + j1index + "_BUTTON2\"");
-                ini.WriteValue(" Global ", "InputPunch2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON4\"" : "\"JOY" + j2index + "_BUTTON3\"");
-                ini.WriteValue(" Global ", "InputKick2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON3\"" : "\"JOY" + j2index + "_BUTTON4\"");
-                ini.WriteValue(" Global ", "InputGuard2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON2\"" : "\"JOY" + j2index + "_BUTTON1\"");
-                ini.WriteValue(" Global ", "InputEscape2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON1\"" : "\"JOY" + j2index + "_BUTTON2\"");
-
+                
+                if (multiplayer)
+                {
+                    ini.WriteValue(" Global ", "InputPunch2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON4\"" : "\"JOY" + j2index + "_BUTTON3\"");
+                    ini.WriteValue(" Global ", "InputKick2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON3\"" : "\"JOY" + j2index + "_BUTTON4\"");
+                    ini.WriteValue(" Global ", "InputGuard2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON2\"" : "\"JOY" + j2index + "_BUTTON1\"");
+                    ini.WriteValue(" Global ", "InputEscape2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON1\"" : "\"JOY" + j2index + "_BUTTON2\"");
+                }
+                else
+                {
+                    ini.Remove(" Global ", "InputPunch2");
+                    ini.Remove(" Global ", "InputKick2");
+                    ini.Remove(" Global ", "InputGuard2");
+                    ini.Remove(" Global ", "InputEscape2");
+                }
+                
                 //Spikeout buttons
                 ini.WriteValue(" Global ", "InputShift", n1 == "nintendo" ? "\"JOY" + j1index + "_BUTTON1,JOY" + j1index + "_BUTTON11\"" : "\"JOY" + j1index + "_BUTTON2,JOY" + j1index + "_BUTTON11\"");
                 ini.WriteValue(" Global ", "InputBeat", n1 == "nintendo" ? "\"JOY" + j1index + "_BUTTON2\"" : "\"JOY" + j1index + "_BUTTON1\"");
@@ -133,9 +238,20 @@ namespace emulatorLauncher
                 ini.WriteValue(" Global ", "InputShortPass", n1 == "nintendo" ? "\"JOY" + j1index + "_BUTTON4\"" : "\"JOY" + j1index + "_BUTTON3\"");
                 ini.WriteValue(" Global ", "InputLongPass", n1 == "nintendo" ? "\"JOY" + j1index + "_BUTTON2\"" : "\"JOY" + j1index + "_BUTTON1\"");
                 ini.WriteValue(" Global ", "InputShoot", n1 == "nintendo" ? "\"JOY" + j1index + "_BUTTON1\"" : "\"JOY" + j1index + "_BUTTON2\"");
-                ini.WriteValue(" Global ", "InputShortPass2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON4\"" : "\"JOY" + j2index + "_BUTTON3\"");
-                ini.WriteValue(" Global ", "InputLongPass2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON2\"" : "\"JOY" + j2index + "_BUTTON1\"");
-                ini.WriteValue(" Global ", "InputShoot2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON1\"" : "\"JOY" + j2index + "_BUTTON2\"");
+
+                if (multiplayer)
+                {
+                    ini.WriteValue(" Global ", "InputShortPass2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON4\"" : "\"JOY" + j2index + "_BUTTON3\"");
+                    ini.WriteValue(" Global ", "InputLongPass2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON2\"" : "\"JOY" + j2index + "_BUTTON1\"");
+                    ini.WriteValue(" Global ", "InputShoot2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON1\"" : "\"JOY" + j2index + "_BUTTON2\"");
+                }
+                else
+                {
+                    ini.Remove(" Global ", "InputShortPass2");
+                    ini.Remove(" Global ", "InputLongPass2");
+                    ini.Remove(" Global ", "InputShoot2");
+                }
+                
 
                 //Steering wheel - left analog stick horizontal axis
                 ini.WriteValue(" Global ", "InputSteeringLeft", "\"NONE\"");
@@ -204,10 +320,10 @@ namespace emulatorLauncher
                 ini.WriteValue(" Global ", "InputAnalogJoyRight", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogJoyUp", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogJoyDown", "\"NONE\"");
-                ini.WriteValue(" Global ", "InputAnalogJoyX", "\"JOY" + j1index + "_XAXIS_INV,MOUSE_XAXIS_INV\"");
-                ini.WriteValue(" Global ", "InputAnalogJoyY", "\"JOY" + j1index + "_YAXIS_INV,MOUSE_YAXIS\"");
-                ini.WriteValue(" Global ", "InputAnalogJoyTrigger", n1 == "nintendo" ? "\"JOY" + j1index + "_RZAXIS_POS,JOY" + j1index + "_BUTTON4,MOUSE_LEFT_BUTTON\"" : "\"JOY" + j1index + "_RZAXIS_POS,JOY" + j1index + "_BUTTON3,MOUSE_LEFT_BUTTON\"");
-                ini.WriteValue(" Global ", "InputAnalogJoyEvent", n1 == "nintendo" ? "\"JOY" + j1index + "_BUTTON2,MOUSE_RIGHT_BUTTON\"" : "\"JOY" + j1index + "_BUTTON1,MOUSE_RIGHT_BUTTON\"");
+                ini.WriteValue(" Global ", "InputAnalogJoyX", "\"JOY" + j1index + "_XAXIS_INV," + mouse1 + "_XAXIS_INV\"");
+                ini.WriteValue(" Global ", "InputAnalogJoyY", "\"JOY" + j1index + "_YAXIS_INV," + mouse1 + "_YAXIS\"");
+                ini.WriteValue(" Global ", "InputAnalogJoyTrigger", n1 == "nintendo" ? "\"JOY" + j1index + "_RZAXIS_POS,JOY" + j1index + "_BUTTON4," + mouse1 + "_LEFT_BUTTON\"" : "\"JOY" + j1index + "_RZAXIS_POS,JOY" + j1index + "_BUTTON3," + mouse1 + "_LEFT_BUTTON\"");
+                ini.WriteValue(" Global ", "InputAnalogJoyEvent", n1 == "nintendo" ? "\"JOY" + j1index + "_BUTTON2," + mouse1 + "_RIGHT_BUTTON\"" : "\"JOY" + j1index + "_BUTTON1," + mouse1 + "_RIGHT_BUTTON\"");
                 ini.WriteValue(" Global ", "InputAnalogJoyTrigger2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogJoyEvent2", "\"NONE\"");
 
@@ -216,38 +332,61 @@ namespace emulatorLauncher
                 ini.WriteValue(" Global ", "InputGunRight", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputGunUp", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputGunDown", "\"NONE\"");
-                ini.WriteValue(" Global ", "InputGunX", "\"MOUSE1_XAXIS\"");
-                ini.WriteValue(" Global ", "InputGunY", "\"MOUSE1_YAXIS\"");
-                ini.WriteValue(" Global ", "InputTrigger", "\"MOUSE1_LEFT_BUTTON\"");
-                ini.WriteValue(" Global ", "InputOffscreen", "\"MOUSE1_RIGHT_BUTTON\"");
+                ini.WriteValue(" Global ", "InputGunX", "\"" + mouse1 + "_XAXIS\"");
+                ini.WriteValue(" Global ", "InputGunY", "\"" + mouse1 + "_YAXIS\"");
+                ini.WriteValue(" Global ", "InputTrigger", "\"" + mouse1 + "_LEFT_BUTTON\"");
+                ini.WriteValue(" Global ", "InputOffscreen", "\"" + mouse1 + "_RIGHT_BUTTON\"");
                 ini.WriteValue(" Global ", "InputAutoTrigger", "1");
                 ini.WriteValue(" Global ", "InputGunLeft2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputGunRight2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputGunUp2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputGunDown2", "\"NONE\"");
-                ini.WriteValue(" Global ", "InputGunX2", "\"MOUSE2_XAXIS\"");
-                ini.WriteValue(" Global ", "InputGunY2", "\"MOUSE2_YAXIS\"");
-                ini.WriteValue(" Global ", "InputTrigger2", "\"MOUSE2_LEFT_BUTTON\"");
-                ini.WriteValue(" Global ", "InputOffscreen2", "\"MOUSE2_RIGHT_BUTTON\"");
-                ini.WriteValue(" Global ", "InputAutoTrigger2", "1");
+                
+                if (multigun)
+                {
+                    ini.WriteValue(" Global ", "InputGunX2", "\"" + mouse2 + "_XAXIS\"");
+                    ini.WriteValue(" Global ", "InputGunY2", "\"" + mouse2 + "_YAXIS\"");
+                    ini.WriteValue(" Global ", "InputTrigger2", "\"" + mouse2 + "_LEFT_BUTTON\"");
+                    ini.WriteValue(" Global ", "InputOffscreen2", "\"" + mouse2 + "_RIGHT_BUTTON\"");
+                    ini.WriteValue(" Global ", "InputAutoTrigger2", "1");
+                }
+                else
+                {
+                    ini.WriteValue(" Global ", "InputGunX2", "\"NONE\"");
+                    ini.WriteValue(" Global ", "InputGunY2", "\"NONE\"");
+                    ini.WriteValue(" Global ", "InputTrigger2", "\"NONE\"");
+                    ini.WriteValue(" Global ", "InputOffscreen2", "\"NONE\"");
+                    ini.WriteValue(" Global ", "InputAutoTrigger2", "1");
+                }
 
                 //Analog guns (Ocean Hunter, LA Machineguns) - MOUSE
                 ini.WriteValue(" Global ", "InputAnalogGunLeft", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogGunRight", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogGunUp", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogGunDown", "\"NONE\"");
-                ini.WriteValue(" Global ", "InputAnalogGunX", "\"MOUSE1_XAXIS\"");
-                ini.WriteValue(" Global ", "InputAnalogGunY", "\"MOUSE1_YAXIS\"");
-                ini.WriteValue(" Global ", "InputAnalogTriggerLeft", "\"MOUSE1_LEFT_BUTTON\"");
-                ini.WriteValue(" Global ", "InputAnalogTriggerRight", "\"MOUSE1_RIGHT_BUTTON\"");
+                ini.WriteValue(" Global ", "InputAnalogGunX", "\"" + mouse1 + "_XAXIS\"");
+                ini.WriteValue(" Global ", "InputAnalogGunY", "\"" + mouse1 + "_YAXIS\"");
+                ini.WriteValue(" Global ", "InputAnalogTriggerLeft", "\"" + mouse1 + "_LEFT_BUTTON\"");
+                ini.WriteValue(" Global ", "InputAnalogTriggerRight", "\"" + mouse1 + "_RIGHT_BUTTON\"");
                 ini.WriteValue(" Global ", "InputAnalogGunLeft2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogGunRight2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogGunUp2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogGunDown2", "\"NONE\"");
-                ini.WriteValue(" Global ", "InputAnalogGunX2", "\"MOUSE2_XAXIS\"");
-                ini.WriteValue(" Global ", "InputAnalogGunY2", "\"MOUSE2_YAXIS\"");
-                ini.WriteValue(" Global ", "InputAnalogTriggerLeft2", "\"MOUSE2_LEFT_BUTTON\"");
-                ini.WriteValue(" Global ", "InputAnalogTriggerRight2", "\"MOUSE2_RIGHT_BUTTON\"");
+
+                if (multigun)
+                {
+                    ini.WriteValue(" Global ", "InputAnalogGunX2", "\"" + mouse2 + "_XAXIS\"");
+                    ini.WriteValue(" Global ", "InputAnalogGunY2", "\"" + mouse2 + "_YAXIS\"");
+                    ini.WriteValue(" Global ", "InputAnalogTriggerLeft2", "\"" + mouse2 + "_LEFT_BUTTON\"");
+                    ini.WriteValue(" Global ", "InputAnalogTriggerRight2", "\"" + mouse2 + "_RIGHT_BUTTON\"");
+                }
+                else
+                {
+                    ini.WriteValue(" Global ", "InputAnalogGunX2", "\"NONE\"");
+                    ini.WriteValue(" Global ", "InputAnalogGunY2", "\"NONE\"");
+                    ini.WriteValue(" Global ", "InputAnalogTriggerLeft2", "\"NONE\"");
+                    ini.WriteValue(" Global ", "InputAnalogTriggerRight2", "\"NONE\"");
+                }
 
                 //Ski Champ controls
                 ini.WriteValue(" Global ", "InputSkiLeft", "\"NONE\"");
@@ -268,9 +407,18 @@ namespace emulatorLauncher
                 ini.WriteValue(" Global ", "InputMagicalLeverUp2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputMagicalLeverDown2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputMagicalLever1", "\"JOY" + j1index + "_YAXIS\"");
-                ini.WriteValue(" Global ", "InputMagicalLever2", "\"JOY" + j2index + "_YAXIS\"");
                 ini.WriteValue(" Global ", "InputMagicalPedal1", n1 == "nintendo" ? "\"JOY" + j1index + "_BUTTON2\"" : "\"JOY" + j1index + "_BUTTON1\"");
-                ini.WriteValue(" Global ", "InputMagicalPedal2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON2\"" : "\"JOY" + j2index + "_BUTTON1\"");
+
+                if (multiplayer)
+                {
+                    ini.WriteValue(" Global ", "InputMagicalLever2", "\"JOY" + j2index + "_YAXIS\"");
+                    ini.WriteValue(" Global ", "InputMagicalPedal2", n2 == "nintendo" ? "\"JOY" + j2index + "_BUTTON2\"" : "\"JOY" + j2index + "_BUTTON1\"");
+                }
+                else
+                {
+                    ini.Remove(" Global ", "InputMagicalLever2");
+                    ini.Remove(" Global ", "InputMagicalPedal2");
+                }
 
                 //Sega Bass Fishing / Get Bass controls
                 ini.WriteValue(" Global ", "InputFishingRodLeft", "\"NONE\"");
@@ -293,8 +441,11 @@ namespace emulatorLauncher
                 //deadzones - set 5 as default deadzone, good compromise to avoid joystick drift
                 ini.WriteValue(" Global ", "InputJoy" + j1index + "XDeadZone", "5");
                 ini.WriteValue(" Global ", "InputJoy" + j1index + "YDeadZone", "5");
-                ini.WriteValue(" Global ", "InputJoy" + j2index + "XDeadZone", "5");
-                ini.WriteValue(" Global ", "InputJoy" + j2index + "YDeadZone", "5");
+                if (multiplayer)
+                {
+                    ini.WriteValue(" Global ", "InputJoy" + j2index + "XDeadZone", "5");
+                    ini.WriteValue(" Global ", "InputJoy" + j2index + "YDeadZone", "5");
+                }
 
                 //other stuff
                 ini.WriteValue(" Global ", "DirectInputConstForceLeftMax", "100");
@@ -307,37 +458,73 @@ namespace emulatorLauncher
             //xinput case - this is used when player 1 controller is a xinput controller
             else
             {
-                ini.WriteValue(" Global ", "InputSystem", "xinput");
+                if (multigun)
+                    ini.WriteValue(" Global ", "InputSystem", "rawinput");
+                else
+                    ini.WriteValue(" Global ", "InputSystem", "xinput");
 
                 //common - L3 and R3 will be used to navigate service menu
                 ini.WriteValue(" Global ", "InputStart1", "\"KEY_1,JOY" + j1index + "_BUTTON8\"");
-                ini.WriteValue(" Global ", "InputStart2", "\"KEY_2,JOY" + j2index + "_BUTTON8\"");
                 ini.WriteValue(" Global ", "InputCoin1", "\"KEY_3,JOY" + j1index + "_BUTTON7\"");
-                ini.WriteValue(" Global ", "InputCoin2", "\"KEY_4,JOY" + j2index + "_BUTTON7\"");
-                ini.WriteValue(" Global ", "InputServiceA", "\"KEY_5,JOY" + j1index + "_BUTTON9\"");
-                ini.WriteValue(" Global ", "InputServiceB", "\"KEY_7,JOY" + j2index + "_BUTTON9\"");
-                ini.WriteValue(" Global ", "InputTestA", "\"KEY_6,JOY" + j1index + "_BUTTON10\"");
-                ini.WriteValue(" Global ", "InputTestB", "\"KEY_8,JOY" + j2index + "_BUTTON10\"");
+                ini.WriteValue(" Global ", "InputServiceA", enableServiceMenu ? "\"KEY_5,JOY" + j1index + "_BUTTON9\"" : "\"KEY_5\"");
+                ini.WriteValue(" Global ", "InputTestA", enableServiceMenu ? "\"KEY_6,JOY" + j1index + "_BUTTON10\"" : "\"KEY_6\"");
+
+                if (multiplayer)
+                {
+                    ini.WriteValue(" Global ", "InputStart2", "\"KEY_2,JOY" + j2index + "_BUTTON8\"");
+                    ini.WriteValue(" Global ", "InputCoin2", "\"KEY_4,JOY" + j2index + "_BUTTON7\"");
+                    ini.WriteValue(" Global ", "InputServiceB", enableServiceMenu ? "\"KEY_7,JOY" + j2index + "_BUTTON9\"" : "\"KEY_7\"");
+                    ini.WriteValue(" Global ", "InputTestB", enableServiceMenu ? "\"KEY_8,JOY" + j2index + "_BUTTON10\"" : "\"KEY_8\"");
+                }
+                else
+                {
+                    ini.Remove(" Global ", "InputStart2");
+                    ini.Remove(" Global ", "InputCoin2");
+                    ini.Remove(" Global ", "InputServiceB");
+                    ini.Remove(" Global ", "InputTestB");
+                }
 
                 //4-way digital joysticks
                 ini.WriteValue(" Global ", "InputJoyUp", "\"JOY" + j1index + "_YAXIS_NEG,JOY" + j1index + "_POV1_UP\"");
                 ini.WriteValue(" Global ", "InputJoyDown", "\"JOY" + j1index + "_YAXIS_POS,JOY" + j1index + "_POV1_DOWN\"");
                 ini.WriteValue(" Global ", "InputJoyLeft", "\"JOY" + j1index + "_XAXIS_NEG,JOY" + j1index + "_POV1_LEFT\"");
                 ini.WriteValue(" Global ", "InputJoyRight", "\"JOY" + j1index + "_XAXIS_POS,JOY" + j1index + "_POV1_RIGHT\"");
-                ini.WriteValue(" Global ", "InputJoyUp2", "\"JOY" + j2index + "_YAXIS_NEG,JOY" + j2index + "_POV1_UP\"");
-                ini.WriteValue(" Global ", "InputJoyDown2", "\"JOY" + j2index + "_YAXIS_POS,JOY" + j2index + "_POV1_DOWN\"");
-                ini.WriteValue(" Global ", "InputJoyLeft2", "\"JOY" + j2index + "_XAXIS_NEG,JOY" + j2index + "_POV1_LEFT\"");
-                ini.WriteValue(" Global ", "InputJoyRight2", "\"JOY" + j2index + "_XAXIS_POS,JOY" + j2index + "_POV1_RIGHT\"");
+                
+                if (multiplayer)
+                {
+                    ini.WriteValue(" Global ", "InputJoyUp2", "\"JOY" + j2index + "_YAXIS_NEG,JOY" + j2index + "_POV1_UP\"");
+                    ini.WriteValue(" Global ", "InputJoyDown2", "\"JOY" + j2index + "_YAXIS_POS,JOY" + j2index + "_POV1_DOWN\"");
+                    ini.WriteValue(" Global ", "InputJoyLeft2", "\"JOY" + j2index + "_XAXIS_NEG,JOY" + j2index + "_POV1_LEFT\"");
+                    ini.WriteValue(" Global ", "InputJoyRight2", "\"JOY" + j2index + "_XAXIS_POS,JOY" + j2index + "_POV1_RIGHT\"");
+                }
+                else
+                {
+                    ini.Remove(" Global ", "InputJoyUp2");
+                    ini.Remove(" Global ", "InputJoyDown2");
+                    ini.Remove(" Global ", "InputJoyLeft2");
+                    ini.Remove(" Global ", "InputJoyRight2");
+                }
 
                 //Fighting game buttons
                 ini.WriteValue(" Global ", "InputPunch", "\"JOY" + j1index + "_BUTTON3\"");
                 ini.WriteValue(" Global ", "InputKick", "\"JOY" + j1index + "_BUTTON4\"");
                 ini.WriteValue(" Global ", "InputGuard", "\"JOY" + j1index + "_BUTTON1\"");
                 ini.WriteValue(" Global ", "InputEscape", "\"JOY" + j1index + "_BUTTON2\"");
-                ini.WriteValue(" Global ", "InputPunch2", "\"JOY" + j2index + "_BUTTON3\"");
-                ini.WriteValue(" Global ", "InputKick2", "\"JOY" + j2index + "_BUTTON4\"");
-                ini.WriteValue(" Global ", "InputGuard2", "\"JOY" + j2index + "_BUTTON1\"");
-                ini.WriteValue(" Global ", "InputEscape2", "\"JOY" + j2index + "_BUTTON2\"");
+
+                if (multiplayer)
+                {
+                    ini.WriteValue(" Global ", "InputPunch2", "\"JOY" + j2index + "_BUTTON3\"");
+                    ini.WriteValue(" Global ", "InputKick2", "\"JOY" + j2index + "_BUTTON4\"");
+                    ini.WriteValue(" Global ", "InputGuard2", "\"JOY" + j2index + "_BUTTON1\"");
+                    ini.WriteValue(" Global ", "InputEscape2", "\"JOY" + j2index + "_BUTTON2\"");
+                }
+                else
+                {
+                    ini.Remove(" Global ", "InputPunch2");
+                    ini.Remove(" Global ", "InputKick2");
+                    ini.Remove(" Global ", "InputGuard2");
+                    ini.Remove(" Global ", "InputEscape2");
+                }
 
                 //Spikeout buttons
                 ini.WriteValue(" Global ", "InputShift", "\"JOY" + j1index + "_BUTTON2,JOY" + j1index + "_BUTTON6\"");
@@ -349,9 +536,19 @@ namespace emulatorLauncher
                 ini.WriteValue(" Global ", "InputShortPass", "\"JOY" + j1index + "_BUTTON3\"");
                 ini.WriteValue(" Global ", "InputLongPass", "\"JOY" + j1index + "_BUTTON1\"");
                 ini.WriteValue(" Global ", "InputShoot", "\"JOY" + j1index + "_BUTTON2\"");
-                ini.WriteValue(" Global ", "InputShortPass2", "\"JOY" + j2index + "_BUTTON3\"");
-                ini.WriteValue(" Global ", "InputLongPass2", "\"JOY" + j2index + "_BUTTON1\"");
-                ini.WriteValue(" Global ", "InputShoot2", "\"JOY" + j2index + "_BUTTON2\"");
+
+                if (multiplayer)
+                {
+                    ini.WriteValue(" Global ", "InputShortPass2", "\"JOY" + j2index + "_BUTTON3\"");
+                    ini.WriteValue(" Global ", "InputLongPass2", "\"JOY" + j2index + "_BUTTON1\"");
+                    ini.WriteValue(" Global ", "InputShoot2", "\"JOY" + j2index + "_BUTTON2\"");
+                }
+                else
+                {
+                    ini.Remove(" Global ", "InputShortPass2");
+                    ini.Remove(" Global ", "InputLongPass2");
+                    ini.Remove(" Global ", "InputShoot2");
+                }
 
                 //Steering wheel
                 ini.WriteValue(" Global ", "InputSteeringLeft", "\"NONE\"");
@@ -420,10 +617,10 @@ namespace emulatorLauncher
                 ini.WriteValue(" Global ", "InputAnalogJoyRight", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogJoyUp", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogJoyDown", "\"NONE\"");
-                ini.WriteValue(" Global ", "InputAnalogJoyX", "\"MOUSE_XAXIS_INV,JOY" + j1index + "_XAXIS_INV\"");
-                ini.WriteValue(" Global ", "InputAnalogJoyY", "\"MOUSE_YAXIS,JOY" + j1index + "_YAXIS_INV\"");
-                ini.WriteValue(" Global ", "InputAnalogJoyTrigger", "\"MOUSE_LEFT_BUTTON,JOY" + j1index + "_RZAXIS_POS,JOY" + j1index + "_BUTTON3\"");
-                ini.WriteValue(" Global ", "InputAnalogJoyEvent", "\"MOUSE_RIGHT_BUTTON,JOY" + j1index + "_BUTTON1\"");
+                ini.WriteValue(" Global ", "InputAnalogJoyX", "\"" + mouse1 + "_XAXIS_INV,JOY" + j1index + "_XAXIS_INV\"");
+                ini.WriteValue(" Global ", "InputAnalogJoyY", "\"" + mouse1 + "_YAXIS,JOY" + j1index + "_YAXIS_INV\"");
+                ini.WriteValue(" Global ", "InputAnalogJoyTrigger", "\"" + mouse1 + "_LEFT_BUTTON,JOY" + j1index + "_RZAXIS_POS,JOY" + j1index + "_BUTTON3\"");
+                ini.WriteValue(" Global ", "InputAnalogJoyEvent", "\"" + mouse1 + "_RIGHT_BUTTON,JOY" + j1index + "_BUTTON1\"");
                 ini.WriteValue(" Global ", "InputAnalogJoyTrigger2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogJoyEvent2", "\"NONE\"");
 
@@ -432,19 +629,31 @@ namespace emulatorLauncher
                 ini.WriteValue(" Global ", "InputGunRight", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputGunUp", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputGunDown", "\"NONE\"");
-                ini.WriteValue(" Global ", "InputGunX", "\"MOUSE1_XAXIS\"");
-                ini.WriteValue(" Global ", "InputGunY", "\"MOUSE1_YAXIS\"");
-                ini.WriteValue(" Global ", "InputTrigger", "\"MOUSE1_LEFT_BUTTON\"");
-                ini.WriteValue(" Global ", "InputOffscreen", "\"MOUSE1_RIGHT_BUTTON\"");
+                ini.WriteValue(" Global ", "InputGunX", "\"" + mouse1 + "_XAXIS\"");
+                ini.WriteValue(" Global ", "InputGunY", "\"" + mouse1 + "_YAXIS\"");
+                ini.WriteValue(" Global ", "InputTrigger", "\"" + mouse1 + "_LEFT_BUTTON\"");
+                ini.WriteValue(" Global ", "InputOffscreen", "\"" + mouse1 + "_RIGHT_BUTTON\"");
                 ini.WriteValue(" Global ", "InputAutoTrigger", "1");
                 ini.WriteValue(" Global ", "InputGunLeft2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputGunRight2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputGunUp2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputGunDown2", "\"NONE\"");
-                ini.WriteValue(" Global ", "InputGunX2", "\"MOUSE2_XAXIS\"");
-                ini.WriteValue(" Global ", "InputGunY2", "\"MOUSE2_YAXIS\"");
-                ini.WriteValue(" Global ", "InputTrigger2", "\"MOUSE2_LEFT_BUTTON\"");
-                ini.WriteValue(" Global ", "InputOffscreen2", "\"MOUSE2_RIGHT_BUTTON\"");
+
+                if (multigun)
+                {
+                    ini.WriteValue(" Global ", "InputGunX2", "\"" + mouse2 + "_XAXIS\"");
+                    ini.WriteValue(" Global ", "InputGunY2", "\"" + mouse2 + "_YAXIS\"");
+                    ini.WriteValue(" Global ", "InputTrigger2", "\"" + mouse2 + "_LEFT_BUTTON\"");
+                    ini.WriteValue(" Global ", "InputOffscreen2", "\"" + mouse2 + "_RIGHT_BUTTON\"");
+                }
+                else
+                {
+                    ini.WriteValue(" Global ", "InputGunX2", "\"NONE\"");
+                    ini.WriteValue(" Global ", "InputGunY2", "\"NONE\"");
+                    ini.WriteValue(" Global ", "InputTrigger2", "\"NONE\"");
+                    ini.WriteValue(" Global ", "InputOffscreen2", "\"NONE\"");
+                }
+
                 ini.WriteValue(" Global ", "InputAutoTrigger2", "1");
 
                 //Analog guns (Ocean Hunter, LA Machineguns)
@@ -452,18 +661,30 @@ namespace emulatorLauncher
                 ini.WriteValue(" Global ", "InputAnalogGunRight", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogGunUp", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogGunDown", "\"NONE\"");
-                ini.WriteValue(" Global ", "InputAnalogGunX", "\"MOUSE1_XAXIS\"");
-                ini.WriteValue(" Global ", "InputAnalogGunY", "\"MOUSE1_YAXIS\"");
-                ini.WriteValue(" Global ", "InputAnalogTriggerLeft", "\"MOUSE1_LEFT_BUTTON\"");
-                ini.WriteValue(" Global ", "InputAnalogTriggerRight", "\"MOUSE1_RIGHT_BUTTON\"");
+                ini.WriteValue(" Global ", "InputAnalogGunX", "\"" + mouse1 + "_XAXIS\"");
+                ini.WriteValue(" Global ", "InputAnalogGunY", "\"" + mouse1 + "_YAXIS\"");
+                ini.WriteValue(" Global ", "InputAnalogTriggerLeft", "\"" + mouse1 + "_LEFT_BUTTON\"");
+                ini.WriteValue(" Global ", "InputAnalogTriggerRight", "\"" + mouse1 + "_RIGHT_BUTTON\"");
                 ini.WriteValue(" Global ", "InputAnalogGunLeft2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogGunRight2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogGunUp2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputAnalogGunDown2", "\"NONE\"");
-                ini.WriteValue(" Global ", "InputAnalogGunX2", "\"MOUSE2_XAXIS\"");
-                ini.WriteValue(" Global ", "InputAnalogGunY2", "\"MOUSE2_YAXIS\"");
-                ini.WriteValue(" Global ", "InputAnalogTriggerLeft2", "\"MOUSE2_LEFT_BUTTON\"");
-                ini.WriteValue(" Global ", "InputAnalogTriggerRight2", "\"MOUSE2_RIGHT_BUTTON\"");
+                
+                if (multigun)
+                {
+                    ini.WriteValue(" Global ", "InputAnalogGunX2", "\"" + mouse2 + "_XAXIS\"");
+                    ini.WriteValue(" Global ", "InputAnalogGunY2", "\"" + mouse2 + "_YAXIS\"");
+                    ini.WriteValue(" Global ", "InputAnalogTriggerLeft2", "\"" + mouse2 + "_LEFT_BUTTON\"");
+                    ini.WriteValue(" Global ", "InputAnalogTriggerRight2", "\"" + mouse2 + "_RIGHT_BUTTON\"");
+                }
+                else
+                {
+                    ini.WriteValue(" Global ", "InputAnalogGunX2", "\"NONE\"");
+                    ini.WriteValue(" Global ", "InputAnalogGunY2", "\"NONE\"");
+                    ini.WriteValue(" Global ", "InputAnalogTriggerLeft2", "\"NONE\"");
+                    ini.WriteValue(" Global ", "InputAnalogTriggerRight2", "\"NONE\"");
+                }
+
 
                 //Ski Champ controls
                 ini.WriteValue(" Global ", "InputSkiLeft", "\"NONE\"");
@@ -484,9 +705,18 @@ namespace emulatorLauncher
                 ini.WriteValue(" Global ", "InputMagicalLeverUp2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputMagicalLeverDown2", "\"NONE\"");
                 ini.WriteValue(" Global ", "InputMagicalLever1", "\"JOY" + j1index + "_YAXIS\"");
-                ini.WriteValue(" Global ", "InputMagicalLever2", "\"JOY" + j2index + "_YAXIS\"");
                 ini.WriteValue(" Global ", "InputMagicalPedal1", "\"JOY" + j1index + "_BUTTON1\"");
-                ini.WriteValue(" Global ", "InputMagicalPedal2", "\"JOY" + j2index + "_BUTTON1\"");
+
+                if (multiplayer)
+                {
+                    ini.WriteValue(" Global ", "InputMagicalLever2", "\"JOY" + j2index + "_YAXIS\"");
+                    ini.WriteValue(" Global ", "InputMagicalPedal2", "\"JOY" + j2index + "_BUTTON1\"");
+                }
+                else
+                {
+                    ini.Remove(" Global ", "InputMagicalLever2");
+                    ini.Remove(" Global ", "InputMagicalPedal2");
+                }
 
                 //Sega Bass Fishing / Get Bass controls
                 ini.WriteValue(" Global ", "InputFishingRodLeft", "\"NONE\"");
@@ -509,8 +739,11 @@ namespace emulatorLauncher
                 //deadzones
                 ini.WriteValue(" Global ", "InputJoy" + j1index + "XDeadZone", "5");
                 ini.WriteValue(" Global ", "InputJoy" + j1index + "YDeadZone", "5");
-                ini.WriteValue(" Global ", "InputJoy" + j2index + "XDeadZone", "5");
-                ini.WriteValue(" Global ", "InputJoy" + j2index + "YDeadZone", "5");
+                if (multiplayer)
+                {
+                    ini.WriteValue(" Global ", "InputJoy" + j2index + "XDeadZone", "5");
+                    ini.WriteValue(" Global ", "InputJoy" + j2index + "YDeadZone", "5");
+                }
 
                 //other stuff
                 ini.WriteValue(" Global ", "XInputConstForceThreshold", "20");
@@ -526,7 +759,40 @@ namespace emulatorLauncher
         // no need to diferentiate qwerty and azerty (on azerty keyboard A is recognized as Q)
         private void WriteKeyboardMapping(IniFile ini, Controller c1)
         {
-            ini.WriteValue(" Global ", "InputSystem", "dinput");
+            int gunCount = RawLightgun.GetUsableLightGunCount();
+            var guns = RawLightgun.GetRawLightguns();
+
+            bool multigun = SystemConfig.isOptSet("multigun") && SystemConfig.getOptBoolean("multigun");
+            string mouseIndex1 = "1";
+            string mouseIndex2 = "2";
+
+            if (gunCount > 0 && guns.Length > 0)
+            {
+                mouseIndex1 = (guns[0].Index + 1).ToString();
+                if (gunCount > 1 && guns.Length > 1)
+                    mouseIndex2 = (guns[1].Index + 1).ToString();
+            }
+
+            if (SystemConfig.isOptSet("supermodel_gun1") && !string.IsNullOrEmpty(SystemConfig["supermodel_gun1"]))
+                mouseIndex1 = SystemConfig["supermodel_gun1"];
+            if (SystemConfig.isOptSet("supermodel_gun2") && !string.IsNullOrEmpty(SystemConfig["supermodel_gun2"]))
+                mouseIndex2 = SystemConfig["supermodel_gun2"];
+
+            if (multigun)
+                ini.WriteValue(" Global ", "InputSystem", "rawinput");
+            else
+                ini.WriteValue(" Global ", "InputSystem", "dinput");
+
+            string mouse1 = "MOUSE" + mouseIndex1;
+            string mouse2 = "MOUSE" + mouseIndex2;
+
+            if (!multigun)
+            {
+                mouse1 = mouse2 = "MOUSE";
+                ini.WriteValue(" Global ", "Crosshairs", "1");
+            }
+            else
+                ini.WriteValue(" Global ", "Crosshairs", "3");
 
             //common
             ini.WriteValue(" Global ", "InputStart1", "\"KEY_1\"");
@@ -651,38 +917,60 @@ namespace emulatorLauncher
             ini.WriteValue(" Global ", "InputGunRight", "\"KEY_RIGHT\"");
             ini.WriteValue(" Global ", "InputGunUp", "\"KEY_UP\"");
             ini.WriteValue(" Global ", "InputGunDown", "\"KEY_DOWN\"");
-            ini.WriteValue(" Global ", "InputGunX", "\"MOUSE_XAXIS\"");
-            ini.WriteValue(" Global ", "InputGunY", "\"MOUSE_YAXIS\"");
-            ini.WriteValue(" Global ", "InputTrigger", "\"KEY_A,MOUSE_LEFT_BUTTON\"");
-            ini.WriteValue(" Global ", "InputOffscreen", "\"KEY_S,MOUSE_RIGHT_BUTTON\"");
-            ini.WriteValue(" Global ", "InputAutoTrigger", "0");
+            ini.WriteValue(" Global ", "InputGunX", "\"" + mouse1 + "_XAXIS\"");
+            ini.WriteValue(" Global ", "InputGunY", "\"" + mouse1 + "_YAXIS\"");
+            ini.WriteValue(" Global ", "InputTrigger", "\"KEY_A," + mouse1 + "_LEFT_BUTTON\"");
+            ini.WriteValue(" Global ", "InputOffscreen", "\"KEY_S," + mouse1 + "_RIGHT_BUTTON\"");
+            ini.WriteValue(" Global ", "InputAutoTrigger", "1");
             ini.WriteValue(" Global ", "InputGunLeft2", "\"NONE\"");
             ini.WriteValue(" Global ", "InputGunRight2", "\"NONE\"");
             ini.WriteValue(" Global ", "InputGunUp2", "\"NONE\"");
             ini.WriteValue(" Global ", "InputGunDown2", "\"NONE\"");
-            ini.WriteValue(" Global ", "InputGunX2", "\"NONE\"");
-            ini.WriteValue(" Global ", "InputGunY2", "\"NONE\"");
-            ini.WriteValue(" Global ", "InputTrigger2", "\"NONE\"");
-            ini.WriteValue(" Global ", "InputOffscreen2", "\"NONE\"");
-            ini.WriteValue(" Global ", "InputAutoTrigger2", "0");
+
+            if (multigun)
+            {
+                ini.WriteValue(" Global ", "InputGunX2", "\"" + mouse2 + "_XAXIS\"");
+                ini.WriteValue(" Global ", "InputGunY2", "\"" + mouse2 + "_YAXIS\"");
+                ini.WriteValue(" Global ", "InputTrigger2", "\"" + mouse2 + "_LEFT_BUTTON\"");
+                ini.WriteValue(" Global ", "InputOffscreen2", "\"" + mouse2 + "_RIGHT_BUTTON\"");
+            }
+            else
+            {
+                ini.WriteValue(" Global ", "InputGunX2", "\"NONE\"");
+                ini.WriteValue(" Global ", "InputGunY2", "\"NONE\"");
+                ini.WriteValue(" Global ", "InputTrigger2", "\"NONE\"");
+                ini.WriteValue(" Global ", "InputOffscreen2", "\"NONE\"");
+            }
+            ini.WriteValue(" Global ", "InputAutoTrigger2", "1");
 
             //Analog guns (Ocean Hunter, LA Machineguns)
             ini.WriteValue(" Global ", "InputAnalogGunLeft", "\"KEY_LEFT\"");
             ini.WriteValue(" Global ", "InputAnalogGunRight", "\"KEY_RIGHT\"");
             ini.WriteValue(" Global ", "InputAnalogGunUp", "\"KEY_UP\"");
             ini.WriteValue(" Global ", "InputAnalogGunDown", "\"KEY_DOWN\"");
-            ini.WriteValue(" Global ", "InputAnalogGunX", "\"MOUSE_XAXIS\"");
-            ini.WriteValue(" Global ", "InputAnalogGunY", "\"MOUSE_YAXIS\"");
-            ini.WriteValue(" Global ", "InputAnalogTriggerLeft", "\"KEY_A,MOUSE_LEFT_BUTTON\"");
-            ini.WriteValue(" Global ", "InputAnalogTriggerRight", "\"KEY_S,MOUSE_RIGHT_BUTTON\"");
+            ini.WriteValue(" Global ", "InputAnalogGunX", "\"" + mouse1 + "_XAXIS\"");
+            ini.WriteValue(" Global ", "InputAnalogGunY", "\"" + mouse1 + "_YAXIS\"");
+            ini.WriteValue(" Global ", "InputAnalogTriggerLeft", "\"KEY_A," + mouse1 + "_LEFT_BUTTON\"");
+            ini.WriteValue(" Global ", "InputAnalogTriggerRight", "\"KEY_S," + mouse1 + "_RIGHT_BUTTON\"");
             ini.WriteValue(" Global ", "InputAnalogGunLeft2", "\"NONE\"");
             ini.WriteValue(" Global ", "InputAnalogGunRight2", "\"NONE\"");
             ini.WriteValue(" Global ", "InputAnalogGunUp2", "\"NONE\"");
             ini.WriteValue(" Global ", "InputAnalogGunDown2", "\"NONE\"");
-            ini.WriteValue(" Global ", "InputAnalogGunX2", "\"NONE\"");
-            ini.WriteValue(" Global ", "InputAnalogGunY2", "\"NONE\"");
-            ini.WriteValue(" Global ", "InputAnalogTriggerLeft2", "\"NONE\"");
-            ini.WriteValue(" Global ", "InputAnalogTriggerRight2", "\"NONE\"");
+
+            if (multigun)
+            {
+                ini.WriteValue(" Global ", "InputAnalogGunX2", "\"" + mouse2 + "_XAXIS\"");
+                ini.WriteValue(" Global ", "InputAnalogGunY2", "\"" + mouse2 + "_YAXIS\"");
+                ini.WriteValue(" Global ", "InputAnalogTriggerLeft2", "\"" + mouse2 + "_LEFT_BUTTON\"");
+                ini.WriteValue(" Global ", "InputAnalogTriggerRight2", "\"" + mouse2 + "_RIGHT_BUTTON\"");
+            }
+            else
+            {
+                ini.WriteValue(" Global ", "InputAnalogGunX2", "\"NONE\"");
+                ini.WriteValue(" Global ", "InputAnalogGunY2", "\"NONE\"");
+                ini.WriteValue(" Global ", "InputAnalogTriggerLeft2", "\"NONE\"");
+                ini.WriteValue(" Global ", "InputAnalogTriggerRight2", "\"NONE\"");
+            }
 
             //Ski Champ controls
             ini.WriteValue(" Global ", "InputSkiLeft", "\"KEY_LEFT\"");

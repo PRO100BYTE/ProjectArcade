@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
-using emulatorLauncher.Tools;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class Vita3kGenerator : Generator
     {
@@ -19,6 +20,11 @@ namespace emulatorLauncher
             string exe = Path.Combine(path, "vita3k.exe");
             if (!File.Exists(exe))
                 return null;
+
+            // Check if firmware is intalled
+            string firmware = Path.Combine(path, "vs0", "vsh", "initialsetup");
+            if (!Directory.Exists(firmware))
+                throw new ApplicationException("PSVita firmware is not installed in Vita3K emulator, launch the emulator and install the firware.");
 
             //Check extension of rom
             /*
@@ -42,10 +48,14 @@ namespace emulatorLauncher
             //Define command-line arguments
             List<string> commandArray = new List<string>();
 
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
             //-w, -f is used to avoid vita3k regenerating the config file as it is very fussy with it !
             //-c to specify the configfile to use
             //-r for game rom/ID
-            commandArray.Add("-F");
+            if (fullscreen)
+                commandArray.Add("-F");
+
             commandArray.Add("-w");
             commandArray.Add("-f");
             
@@ -102,6 +112,7 @@ namespace emulatorLauncher
             Dictionary<string, string> availableLanguages = new Dictionary<string, string>()
             {
                 { "jp", "0" },
+                { "ja", "0" },
                 { "en", "1" },
                 { "fr", "2" },
                 { "es", "3" },
@@ -112,7 +123,6 @@ namespace emulatorLauncher
                 { "ru", "8" },
                 { "ko", "9" },
                 { "zh", "10" },
-                { "tw", "11" },
                 { "pl", "16" }
             };
 
@@ -134,6 +144,9 @@ namespace emulatorLauncher
         //Configure config.yml file
         private void SetupConfiguration(string path)
         {
+            if (SystemConfig.getOptBoolean("disableautoconfig"))
+                return;
+
             var yml = YmlFile.Load(Path.Combine(path, "config.yml"));
             
             //First tackle the GUI stuff
@@ -141,20 +154,21 @@ namespace emulatorLauncher
             yml["user-auto-connect"] = "true";
             yml["show-welcome"] = "false";
 
+            // Discord
+            if (SystemConfig.isOptSet("discord") && SystemConfig.getOptBoolean("discord"))
+                yml["discord-rich-presence"] = "true";
+            else
+                yml["discord-rich-presence"] = "false";
+
             //System language
             BindFeature(yml, "sys-lang", "psvita_language", GetDefaultvitaLanguage());
 
             //Then the emulator options
             BindFeature(yml, "backend-renderer", "backend-renderer", "Vulkan");
             BindFeature(yml, "resolution-multiplier", "resolution-multiplier", "1");
-            
-            //Automatically disable surface sync when upscaling (as per standard emulator beahviour)
-            if (SystemConfig.isOptSet("resolution-multiplier") && SystemConfig["resolution-multiplier"] != "1")
-                yml["disable-surface-sync"] = "true";
-            else
-                yml["disable-surface-sync"] = "false";
-            BindFeature(yml, "enable-fxaa", "enable-fxaa", "false");
-            BindFeature(yml, "v-sync", "v-sync", "false");
+            BindFeature(yml, "disable-surface-sync", "disable_surfacesync", "false");
+            BindFeature(yml, "screen-filter", "vita_screenfilter", "Bilinear");
+            BindFeature(yml, "v-sync", "vsync", "false");
             BindFeature(yml, "anisotropic-filtering", "anisotropic-filtering", "1");
             BindFeature(yml, "cpu-opt", "cpu-opt", "true");
             BindFeature(yml, "shader-cache", "shader-cache", "true");

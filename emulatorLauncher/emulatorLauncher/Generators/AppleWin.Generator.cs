@@ -6,8 +6,9 @@ using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using EmulatorLauncher.Common;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class AppleWinGenerator : Generator
     {
@@ -27,6 +28,8 @@ namespace emulatorLauncher
             if (!File.Exists(exe))
                 return null;
 
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
             var versionInfo = FileVersionInfo.GetVersionInfo(exe);
             
             var version = versionInfo.ProductVersion;
@@ -34,7 +37,8 @@ namespace emulatorLauncher
                 WriteApple2Option("Version", version.Replace(",", ".").Replace(" ", ""));
 
             var commandArray = new List<string>();
-            commandArray.Add("-f");
+            if (fullscreen)
+                commandArray.Add("-f");
             commandArray.Add("-no-printscreen-dlg");
             commandArray.Add("-alt-enter=toggle-full-screen");
 
@@ -54,7 +58,7 @@ namespace emulatorLauncher
             var bezels = BezelFiles.GetBezelFiles(system, rom, resolution);
 
             // Check if it's retrobat version
-            if (!string.IsNullOrEmpty(versionInfo.FileDescription) && versionInfo.FileDescription.Contains("ProjectArcade"))
+            if (!string.IsNullOrEmpty(versionInfo.FileDescription) && versionInfo.FileDescription.Contains("Retrobat"))
             {
                 // Disable internal effects ( scanlines )
                 WriteApple2Option("Video Style", "0");
@@ -74,13 +78,51 @@ namespace emulatorLauncher
                 _resolution = resolution;
             }
 
+            // Treatment of multi-discs games
+            List<string> disks = new List<string>();
+            if (Path.GetExtension(rom).ToLower() == ".m3u")
+            {
+                string dskPath = Path.GetDirectoryName(rom);
+
+                foreach (var line in File.ReadAllLines(rom))
+                {
+                    string dsk = Path.Combine(dskPath, line);
+                    if (File.Exists(dsk))
+                        disks.Add(dsk);
+                    else
+                        throw new ApplicationException("File '" + Path.Combine(dskPath, line) + "' does not exist");
+                }
+
+                if (disks.Count == 0)
+                    throw new ApplicationException("m3u file does not contain any game file.");
+
+                else if (disks.Count == 1)
+                {
+                    commandArray.Add("-d1");
+                    commandArray.Add("\"" + disks[0] + "\"");
+                }
+
+                else
+                {
+                    commandArray.Add("-d1");
+                    commandArray.Add("\"" + disks[0] + "\"");
+                    commandArray.Add("-d2");
+                    commandArray.Add("\"" + disks[1] + "\"");
+                }
+            }
+            else
+            {
+                commandArray.Add("-d1");
+                commandArray.Add("\"" + rom + "\"");
+            }
+
             string args = string.Join(" ", commandArray);
 
             return new ProcessStartInfo()
             {
                 FileName = exe,
                 WorkingDirectory = path,
-                Arguments = args + " -d1 \"" + rom + "\"",
+                Arguments = args,
             };
         }
 

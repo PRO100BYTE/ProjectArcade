@@ -6,12 +6,14 @@ using System.IO;
 using System.Net;
 using System.ComponentModel;
 using System.Diagnostics;
-using emulatorLauncher.Tools;
 using System.Xml.Serialization;
 using System.Runtime.InteropServices;
 using System.Xml.Linq;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
+using EmulatorLauncher.Common.Compression;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     public class Installer
     {
@@ -22,13 +24,13 @@ namespace emulatorLauncher
 
             { new Installer("arcadeflashweb") },           
             { new Installer("libretro", "retroarch" ) }, { new Installer("angle", "retroarch" ) }, // "libretro_cores.7z" ???
-            { new Installer("duckstation", new string[] { "duckstation"}, new string[] { "duckstation-nogui-x64-ReleaseLTCG.exe", "duckstation-nogui-x64-Release.exe", "duckstation-nogui.exe" }) },
+            { new Installer("duckstation", new string[] { "duckstation"}, new string[] { "duckstation-qt-x64-ReleaseLTCG.exe" }) },
             { new Installer("kega-fusion", "kega-fusion", "Fusion.exe") }, 
             { new Installer("mesen") }, 
             { new Installer("model3", "supermodel") }, 
             { new Installer("supermodel") }, 
             { new Installer("rpcs3") }, { new Installer("ps3", "rpcs3") }, 
-            { new Installer("pcsx2", new string[] { "pcsx2" }, new string[] { "pcsx2-qtx64.exe", "pcsx2x64.exe" }) },
+            { new Installer("pcsx2", new string[] { "pcsx2" }, new string[] { "pcsx2-qt.exe", "pcsx2-qtx64.exe", "pcsx2x64.exe" }) },
             { new Installer("pcsx2-16", "pcsx2-16", "pcsx2.exe") },
             { new Installer("fpinball", "fpinball", "Future Pinball.exe") }, { new Installer("bam", "fpinball", "Future Pinball.exe") }, 
             { new Installer("cemu") }, { new Installer("wiiu", "cemu") },
@@ -37,23 +39,25 @@ namespace emulatorLauncher
             { new Installer("cxbx", new string[] { "cxbx-reloaded", "cxbx-r" }, "cxbx.exe") }, 
             { new Installer("chihiro", new string[] { "cxbx-reloaded", "cxbx-r" }, "cxbx.exe") }, 
             { new Installer("xbox", new string[] { "cxbx-reloaded", "cxbx-r" }, "cxbx.exe") },             
-            { new Installer("citra") },            
+            { new Installer("citra", "citra", "citra-qt.exe") },
+            { new Installer("citra-canary", "citra-canary", "citra-qt.exe") },
             { new Installer("daphne") },
             { new Installer("demul") }, 
             { new Installer("demul-old", "demul-old", "demul.exe") }, 
-            { new Installer("dolphin", new string[] { "dolphin-emu", "dolphin" }, "dolphin.exe") }, 
-            { new Installer("triforce", "dolphin-triforce", "dolphinWX.exe") },  
+            { new Installer("dolphin", new string[] { "dolphin-emu", "dolphin" }, "dolphin.exe") },
+            { new Installer("flycast", "flycast", "flycast.exe") },
+            { new Installer("simple64", "simple64", "simple64-gui.exe") },
+            { new Installer("mupen64", "mupen64", "RMG.exe") },
+            { new Installer("triforce", new string[] { "dolphin-triforce"}, new string[] { "dolphinWX.exe", "dolphin.exe" }) },
             { new Installer("dosbox") },
             { new Installer("hypseus", "hypseus", "hypseus.exe") },
-            { new Installer("love") },
-            { new Installer("ludo") },
+            { new Installer("love") }, 
             { new Installer("m2emulator", "m2emulator", "emulator_multicpu.exe") },
             { new Installer("mednafen", "mednafen") },        
             { new Installer("mgba", "mgba") }, 
             { new Installer("openbor") }, 
             { new Installer("scummvm") },             
-            { new Installer("oricutron") },
-            { new Installer("openmsx") },
+            { new Installer("oricutron") },             
             { new Installer("ppsspp", "ppsspp", "PPSSPPWindows64.exe") }, 
             { new Installer("project64", "project64") }, 
             { new Installer("raine") },             
@@ -73,7 +77,28 @@ namespace emulatorLauncher
             { new Installer("xenia", "xenia", "xenia.exe") },
             { new Installer("xenia-canary", "xenia-canary", "xenia_canary.exe" ) },
             { new Installer("bigpemu", "bigpemu", "BigPEmu.exe") },
-            { new Installer("phoenix", "phoenix", "PhoenixEmuProject.exe") }
+            { new Installer("phoenix", "phoenix", "PhoenixEmuProject.exe") },
+            { new Installer("openmsx", "openmsx", "openmsx.exe") },
+            { new Installer("ssf", "ssf", "SSF.exe") },
+            { new Installer("melonds", "melonds", "melonDS.exe") },
+            { new Installer("hbmame", "hbmame", "hbmameui.exe") },
+            { new Installer("zinc", "zinc", "ZiNc.exe") },
+            { new Installer("eduke32", "eduke32", "eduke32.exe") },
+            { new Installer("play", "play", "Play.exe") },
+            { new Installer("bizhawk", "bizhawk", "EmuHawk.exe") },
+            { new Installer("ares", "ares", "ares.exe") },
+            { new Installer("ruffle", "ruffle", "ruffle.exe") },
+            { new Installer("zesarux", "zesarux", "zesarux.exe") },
+            { new Installer("jynx", "jynx", "Jynx-Windows-64bit.exe") },
+            { new Installer("hatari", "hatari", "hatari.exe") },
+            { new Installer("xm6pro", "xm6pro", "XM6.exe") },
+            { new Installer("stella", "stella", "Stella.exe") },
+            { new Installer("theforceengine", "theforceengine", "TheForceEngine.exe") }
+        };
+
+        static List<string>noVersionExe = new List<string>()
+        {
+            "rmg", "play", "eduke32", "mesen"
         };
 
         #region Properties
@@ -83,26 +108,33 @@ namespace emulatorLauncher
 
         public string DefaultFolderName { get { return Folders[0]; } }
         public string ServerVersion { get; private set; }
+        public string ServerFileName { get; set; }
 
         public string PackageUrl
         {
             get
             {
+                if (!string.IsNullOrEmpty(ServerFileName))
+                    return GetUpdateUrl(ServerFileName);
+
                 return GetUpdateUrl(DefaultFolderName + ".7z");
             }
         }
 
         public static string GetUpdateUrl(string fileName)
         {
-            string installerUrl = "https://dl.projectarcade.ru/";
+            string installerUrl = RegistryKeyEx.GetRegistryValue(
+                RegistryKeyEx.CurrentUser,
+                @"SOFTWARE\RetroBat",
+                "InstallRootUrl") as string;
 
             if (string.IsNullOrEmpty(installerUrl))
                 return string.Empty;
 
             if (installerUrl.EndsWith("/"))
-                installerUrl = installerUrl + "/store/emulators/" + fileName;
+                installerUrl = installerUrl + UpdatesType + "/emulators/" + fileName;
             else
-                installerUrl = installerUrl + "/" + "/store/emulators/" + fileName;
+                installerUrl = installerUrl + "/" + UpdatesType + "/emulators/" + fileName;
 
             return installerUrl;
         }
@@ -191,13 +223,14 @@ namespace emulatorLauncher
             try
             {
                 string exe = GetInstalledExecutable();
+                string shortExe = Path.GetFileNameWithoutExtension(exe).ToLower();
                 if (string.IsNullOrEmpty(exe))
                     return null;
 
                 var versionInfo = FileVersionInfo.GetVersionInfo(exe);
 
                 string version = versionInfo.FileMajorPart + "." + versionInfo.FileMinorPart + "." + versionInfo.FileBuildPart + "." + versionInfo.FilePrivatePart;
-                if (version != "0.0.0.0")
+                if (version != "0.0.0.0" && !noVersionExe.Contains(shortExe))
                     return version;
 
                 // Retroarch specific
@@ -232,6 +265,15 @@ namespace emulatorLauncher
                 {
                     var output = ProcessExtensions.RunWithOutput(exe, "--help");
                     output = StringExtensions.FormatVersionString(output.ExtractString("GSplus v", " "));
+
+                    Version ver = new Version();
+                    if (Version.TryParse(output, out ver))
+                        return ver.ToString();
+                }
+                else if (Path.GetFileNameWithoutExtension(exe).ToLower() == "rmg")
+                {
+                    var output = ProcessExtensions.RunWithOutput(exe, "-v");
+                    output = StringExtensions.FormatVersionString(output.ExtractString("Rosalie's Mupen GUI v", "\r"));
 
                     Version ver = new Version();
                     if (Version.TryParse(output, out ver))
@@ -366,11 +408,11 @@ namespace emulatorLauncher
                 var settings = XDocument.Parse(xml);
                 if (settings == null)
                     return false;
-                
-                string serverVersion = settings
+
+                var serverVersion = settings
                     .Descendants()
                     .Where(d => d.Name == "system" && d.Attribute("name") != null && d.Attribute("version") != null && d.Attribute("name").Value == DefaultFolderName)
-                    .Select(d => d.Attribute("version").Value)
+                    .Select(d => new { Version = d.Attribute("version").Value, Path = d.Attribute("file") == null ? null : d.Attribute("file").Value })
                     .FirstOrDefault();
 
                 if (serverVersion == null)
@@ -378,10 +420,11 @@ namespace emulatorLauncher
 
                 Version local = new Version();
                 Version server = new Version();
-                if (Version.TryParse(GetInstalledVersion(), out local) && Version.TryParse(serverVersion, out server))
+                if (Version.TryParse(GetInstalledVersion(), out local) && Version.TryParse(serverVersion.Version, out server))
                 {
                     if (local < server)
                     {
+                        ServerFileName = serverVersion.Path;
                         ServerVersion = server.ToString();
                         return true;
                     }

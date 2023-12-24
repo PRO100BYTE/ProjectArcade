@@ -8,13 +8,15 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Threading;
 using TeknoParrotUi.Common;
-using emulatorLauncher.Tools;
-using emulatorLauncher.PadToKeyboard;
+using EmulatorLauncher.PadToKeyboard;
 using System.Management;
 using System.Text.RegularExpressions;
-using VPinballLauncher;
+using EmulatorLauncher.VPinballLauncher;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
+using EmulatorLauncher.Common.EmulationStation;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     partial class TeknoParrotGenerator : Generator
     {        
@@ -210,7 +212,9 @@ namespace emulatorLauncher
             }
 
             var windowed = userProfile.ConfigValues.FirstOrDefault(c => c.FieldName == "Windowed");
-            if (windowed != null)
+            if (windowed != null && SystemConfig.isOptSet("tp_nofs") && SystemConfig.getOptBoolean("tp_nofs"))
+                windowed.FieldValue = "1";
+            else if (windowed != null)
                 windowed.FieldValue = "0";
 
             var hideCursor = userProfile.ConfigValues.FirstOrDefault(c => c.FieldName == "HideCursor");
@@ -230,6 +234,21 @@ namespace emulatorLauncher
                 resolutionHeight.FieldValue = resY.ToString();
             }
 
+            // Option to disable RequiresAdmin tag
+            var requiresadmin = profile.RequiresAdmin;
+            
+            if (SystemConfig.isOptSet("requires_admin") && SystemConfig.getOptBoolean("requires_admin"))
+                userProfile.RequiresAdmin = false;
+            else
+                userProfile.RequiresAdmin = requiresadmin;
+
+            // APM3ID - for online gaming
+            var apm3id = userProfile.ConfigValues.FirstOrDefault(c => c.FieldName == "APM3ID");
+            if (apm3id != null && SystemConfig.isOptSet("apm3id") && !string.IsNullOrEmpty(SystemConfig["apm3id"]))
+                apm3id.FieldValue = SystemConfig["apm3id"].ToUpperInvariant();
+            else if (apm3id != null)
+                apm3id.FieldValue = string.Empty;
+
             ConfigureControllers(userProfile);
 
             JoystickHelper.SerializeGameProfile(userProfile, userProfilePath);
@@ -239,12 +258,18 @@ namespace emulatorLauncher
             _exename = Path.GetFileNameWithoutExtension(userProfile.GamePath);
             _gameProfile = userProfile;
 
+            List<string> commandArray = new List<string>();
+            commandArray.Add("--profile=" + profileName);
+            if (!SystemConfig.isOptSet("tp_minimize") || SystemConfig.getOptBoolean("tp_minimize"))
+                commandArray.Add("--startMinimized");
+            string args = string.Join(" ", commandArray);
+
             return new ProcessStartInfo()
             {
                 FileName = exe,
                 Verb = userProfile.RequiresAdmin ? "runas" : null,
                 WorkingDirectory = path,
-                Arguments = "--profile=" + profileName // + " --startMinimized",
+                Arguments = args,
             };
         }
 
@@ -260,10 +285,26 @@ namespace emulatorLauncher
             if (!data.SilentMode || data.ConfirmExit)
             {
                 data.SilentMode = true;
-                data.ConfirmExit = false;
-
-                File.WriteAllText(parrotData, data.ToXml());
+                data.ConfirmExit = false; 
             }
+
+            if (Program.SystemConfig.isOptSet("tp_stooz") && !string.IsNullOrEmpty(Program.SystemConfig["tp_stooz"]))
+            {
+                data.UseSto0ZDrivingHack = true;
+                data.StoozPercent = Program.SystemConfig["tp_stooz"].ToInteger();
+            }
+            else
+            {
+                data.UseSto0ZDrivingHack = false;
+                data.StoozPercent = 0;
+            }
+            
+            if (Program.SystemConfig.isOptSet("discord") && Program.SystemConfig.getOptBoolean("discord"))
+                data.UseDiscordRPC = true;
+            else
+                data.UseDiscordRPC = false;
+
+            File.WriteAllText(parrotData, data.ToXml());
         }
 
         private static void ExtractUserProfiles(string path)
@@ -345,6 +386,20 @@ namespace emulatorLauncher
                 var profile = JoystickHelper.DeSerializeGameProfile(file, false);
                 if (profile == null)
                     continue;
+
+                if (string.IsNullOrEmpty(profile.GameName))
+                {
+                    try
+                    {
+                        string json = Path.Combine(path, "Metadata", Path.GetFileNameWithoutExtension(file) + ".json");
+                        if (File.Exists(json))
+                        {
+                            var js = DynamicJson.Load(json);
+                            profile.GameName = js["game_name"];
+                        }
+                    }
+                    catch { }
+                }
 
                 if (gameName.Equals(profile.GameName, StringComparison.InvariantCultureIgnoreCase))
                     return profile;

@@ -6,21 +6,19 @@ using System.IO;
 using System.Diagnostics;
 using Microsoft.Win32;
 using System.Windows.Forms;
-using emulatorLauncher.Tools;
 using System.Threading;
-using VPinballLauncher;
+using EmulatorLauncher.VPinballLauncher;
+using EmulatorLauncher.Common.EmulationStation;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class FpinballGenerator : Generator
     {
+        private ScreenShotsWatcher _sswatch;
         private LoadingForm _splash;
-
-        public FpinballGenerator()                
-        {
-            SetupControllers();
-        }
-
+        
         public static int JoystickValue(InputKey key, Controller c)
         {
             var a = c.GetDirectInputMapping(key);
@@ -38,76 +36,77 @@ namespace emulatorLauncher
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
 
-            var controller = Controllers.FirstOrDefault(c => c.PlayerIndex == 1 && c.Config != null && c.Config.Type != "keyboard");
-            if (controller != null)
+            if (Controllers != null)
             {
-                var directInput = controller.DirectInput;
-                if (directInput != null)
+                var controller = Controllers.FirstOrDefault(c => c.PlayerIndex == 1 && c.Config != null && c.Config.Type != "keyboard");
+                if (controller != null)
                 {
-                    string fpinballName = directInput.Name.Length > 47 ? directInput.Name.Substring(0, 47) : directInput.Name;
-
-                    RegistryKey regKeyc = Registry.CurrentUser.OpenSubKey(@"Software", true);
-                    if (regKeyc != null)
-                        regKeyc = regKeyc.CreateSubKey("Future Pinball").CreateSubKey("GamePlayer").CreateSubKey("JoyPads");
-
-                    if (regKeyc != null)
+                    var directInput = controller.DirectInput;
+                    if (directInput != null)
                     {
-                        foreach (var name in regKeyc.GetValueNames())
-                            regKeyc.DeleteValue(name);
+                        string fpinballName = directInput.Name.Length > 47 ? directInput.Name.Substring(0, 47) : directInput.Name;
 
-                        regKeyc = regKeyc.CreateSubKey(fpinballName);
+                        RegistryKey regKeyc = Registry.CurrentUser.OpenSubKey(@"Software", true);
+                        if (regKeyc != null)
+                            regKeyc = regKeyc.CreateSubKey("Future Pinball").CreateSubKey("GamePlayer").CreateSubKey("JoyPads");
+
                         if (regKeyc != null)
                         {
-                            regKeyc.SetValue("JoypadSupport", 1);
-                            
-                            regKeyc.SetValue("JoypadDigitalPlunger", JoystickValue(InputKey.a, controller));
-                            regKeyc.SetValue("JoypadToggleHud", JoystickValue(InputKey.y, controller));
-                            regKeyc.SetValue("JoypadNextCamera", JoystickValue(InputKey.b, controller));
-                            regKeyc.SetValue("JoypadExit", JoystickValue(InputKey.x, controller));
-                            regKeyc.SetValue("JoypadLeftFlipper", JoystickValue(InputKey.pageup, controller));
-                            regKeyc.SetValue("JoypadRightFlipper", JoystickValue(InputKey.pagedown, controller));
+                            foreach (var name in regKeyc.GetValueNames())
+                                regKeyc.DeleteValue(name);
 
-                            regKeyc.SetValue("JoypadStartGame", JoystickValue(InputKey.start, controller));
-                            regKeyc.SetValue("JoypadInsertCoin", JoystickValue(InputKey.select, controller));
+                            regKeyc = regKeyc.CreateSubKey(fpinballName);
+                            if (regKeyc != null)
+                            {
+                                regKeyc.SetValue("JoypadSupport", 1);
 
-                            regKeyc.SetValue("JoypadPause", JoystickValue(InputKey.r3, controller));
-                            regKeyc.SetValue("JoypadBackbox", JoystickValue(InputKey.l3, controller));
+                                regKeyc.SetValue("JoypadDigitalPlunger", JoystickValue(InputKey.a, controller));
+                                regKeyc.SetValue("JoypadToggleHud", JoystickValue(InputKey.y, controller));
+                                regKeyc.SetValue("JoypadNextCamera", JoystickValue(InputKey.b, controller));
+                                regKeyc.SetValue("JoypadExit", JoystickValue(InputKey.x, controller));
+                                regKeyc.SetValue("JoypadLeftFlipper", JoystickValue(InputKey.pageup, controller));
+                                regKeyc.SetValue("JoypadRightFlipper", JoystickValue(InputKey.pagedown, controller));
 
-                            regKeyc.SetValue("JoypadSpecial1", -1);
-                            regKeyc.SetValue("JoypadSpecial2", -1);
-                            regKeyc.SetValue("JoypadInsertCoin2", -1);
-                            regKeyc.SetValue("JoypadInsertCoin3", -1);
-                            regKeyc.SetValue("JoypadLeft2ndFlipper", -1);
-                            regKeyc.SetValue("JoypadRight2ndFlipper", -1);
-                            regKeyc.SetValue("JoypadTest", -1);
-                            regKeyc.SetValue("JoypadVolumeUp", -1);
-                            regKeyc.SetValue("JoypadVolumeDown", -1);
-                            regKeyc.SetValue("JoypadMusicUp", -1);
-                            regKeyc.SetValue("JoypadMusicDown", -1);
-                            regKeyc.SetValue("JoypadService", -1);
-                            regKeyc.SetValue("JoypadPinballRoller", -1);
-                            regKeyc.SetValue("JoypadPlungerAxis", -1);
-                            regKeyc.SetValue("JoypadNudgeAxisX", -1);
-                            regKeyc.SetValue("JoypadNudgeAxisY", -1);
-                            regKeyc.SetValue("JoypadPinballRollerAxisX", -1);
-                            regKeyc.SetValue("JoypadPinballRollerAxisY", -1);
-                          
+                                regKeyc.SetValue("JoypadStartGame", JoystickValue(InputKey.start, controller));
+                                regKeyc.SetValue("JoypadInsertCoin", JoystickValue(InputKey.select, controller));
 
-                            regKeyc.Close();
+                                regKeyc.SetValue("JoypadPause", JoystickValue(InputKey.r3, controller));
+                                regKeyc.SetValue("JoypadBackbox", JoystickValue(InputKey.l3, controller));
+
+                                regKeyc.SetValue("JoypadSpecial1", -1);
+                                regKeyc.SetValue("JoypadSpecial2", -1);
+                                regKeyc.SetValue("JoypadInsertCoin2", -1);
+                                regKeyc.SetValue("JoypadInsertCoin3", -1);
+                                regKeyc.SetValue("JoypadLeft2ndFlipper", -1);
+                                regKeyc.SetValue("JoypadRight2ndFlipper", -1);
+                                regKeyc.SetValue("JoypadTest", -1);
+                                regKeyc.SetValue("JoypadVolumeUp", -1);
+                                regKeyc.SetValue("JoypadVolumeDown", -1);
+                                regKeyc.SetValue("JoypadMusicUp", -1);
+                                regKeyc.SetValue("JoypadMusicDown", -1);
+                                regKeyc.SetValue("JoypadService", -1);
+                                regKeyc.SetValue("JoypadPinballRoller", -1);
+                                regKeyc.SetValue("JoypadPlungerAxis", -1);
+                                regKeyc.SetValue("JoypadNudgeAxisX", -1);
+                                regKeyc.SetValue("JoypadNudgeAxisY", -1);
+                                regKeyc.SetValue("JoypadPinballRollerAxisX", -1);
+                                regKeyc.SetValue("JoypadPinballRollerAxisY", -1);
+
+
+                                regKeyc.Close();
+                            }
                         }
                     }
                 }
             }
         }
 
-
         string _bam;
         string _rom;
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
-        {            
+        {
             string path = AppConfig.GetFullPath("fpinball");
-            
             string exe = Path.Combine(path, "Future Pinball.exe");
             if (!File.Exists(exe))
             {
@@ -136,7 +135,9 @@ namespace emulatorLauncher
 
             ScreenResolution.SetHighDpiAware(exe);
 
+            SetupBamConfig();
             SetupOptions(resolution);
+            SetupControllers();
 
             var ret = new ProcessStartInfo()
             {
@@ -166,6 +167,34 @@ namespace emulatorLauncher
                 ret.Verb = "runas";
 
             return ret;
+        }
+
+        private void SetupBamConfig()
+        {
+            if (_bam == null || !File.Exists(_bam))
+                return;
+
+            string screenShotPath = AppConfig.GetFullPath("screenshots");
+            if (string.IsNullOrEmpty(screenShotPath))
+                return;
+
+            string folder = Path.GetDirectoryName(_bam);
+            string path = Path.Combine(Path.GetDirectoryName(_bam), "bam.cfg");
+            if (!File.Exists(path))
+                return;
+
+            string relativeSSPath = "..\\" + FileTools.GetRelativePath(folder, screenShotPath);
+
+            var lines = File.ReadAllLines(path).ToList();
+            lines.RemoveWhere(l => l != null && l.StartsWith("SnapShotPath"));
+            lines.RemoveWhere(l => l != null && l.StartsWith("SnapShotBackboxPath"));
+
+            lines.Add("SnapShotPath = " + relativeSSPath);
+            lines.Add("SnapShotBackboxPath = " + relativeSSPath);
+
+            File.WriteAllLines(path, lines.ToArray());
+
+            _sswatch = new ScreenShotsWatcher(screenShotPath, SystemConfig["system"], SystemConfig["rom"]);
         }
 
         public override int RunAndWait(ProcessStartInfo path)
@@ -211,35 +240,30 @@ namespace emulatorLauncher
                 _splash = null;
             }
 
-            PerformBamCapture();
-            base.Cleanup();
-        }
-
-        private void PerformBamCapture()
-        {
-            if (_bam == null || !File.Exists(_bam))
-                return;
-
-            string bamPng = Path.Combine(Path.GetDirectoryName(_bam), Path.ChangeExtension(Path.GetFileName(_rom), ".png"));
-            if (File.Exists(bamPng))
+            if (_sswatch != null)
             {
-                ScreenCapture.AddImageToGameList(_rom, bamPng, false);
-
-                try { File.Delete(bamPng); }
-                catch { }
+                _sswatch.Dispose();
+                _sswatch = null;
             }
+            
+            base.Cleanup();
         }
 
         private void SetupOptions(ScreenResolution resolution)
         {
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
             RegistryKey regKeyc = Registry.CurrentUser.OpenSubKey(@"Software", true);
             if (regKeyc != null)
                 regKeyc = regKeyc.CreateSubKey("Future Pinball").CreateSubKey("GamePlayer");
 
             if (regKeyc != null)
             {
-                regKeyc.SetValue("FullScreen", 1); 
-                 
+                if (fullscreen)
+                    regKeyc.SetValue("FullScreen", 1);
+                else
+                    regKeyc.SetValue("FullScreen", 0);
+
                 if (SystemConfig.isOptSet("arcademode") && SystemConfig["arcademode"] == "1")
                 {
                     if (Screen.PrimaryScreen.Bounds.Height > Screen.PrimaryScreen.Bounds.Width)
@@ -254,7 +278,7 @@ namespace emulatorLauncher
                     regKeyc.SetValue("RotateDegrees", 0);
                     regKeyc.SetValue("ArcadeMode", 0);
                 }
-                
+
 
                 if (SystemConfig.isOptSet("ratio"))
                 {
@@ -265,6 +289,11 @@ namespace emulatorLauncher
                 }
                 else
                     regKeyc.SetValue("AspectRatio", 169);
+
+                if (SystemConfig.isOptSet("fp_vsync") && SystemConfig["fp_vsync"] == "0")
+                    regKeyc.SetValue("VerticalSync", 0);
+                else
+                    regKeyc.SetValue("VerticalSync", 1);
 
                 if (resolution != null)
                 {
@@ -278,6 +307,11 @@ namespace emulatorLauncher
                     regKeyc.SetValue("Width", Screen.PrimaryScreen.Bounds.Width);
                     regKeyc.SetValue("BitsPerPixel", Screen.PrimaryScreen.BitsPerPixel);
                 }
+
+                if (SystemConfig.isOptSet("MonitorIndex"))
+                    regKeyc.SetValue("PlayfieldMonitorID", "\\\\.\\DISPLAY" + SystemConfig["MonitorIndex"]);
+                else
+                    regKeyc.SetValue("PlayfieldMonitorID", "\\\\.\\DISPLAY1");
 
                 if (regKeyc.GetValue("DefaultCamera") == null)
                     regKeyc.SetValue("DefaultCamera", 0);
@@ -342,6 +376,27 @@ namespace emulatorLauncher
                     regKeyc.SetValue("WireGuideSides", 0x14);
                     regKeyc.SetValue("HighQualityTextures", 1);
                 }
+
+                if (SystemConfig.isOptSet("fp_hide_gameroom") && SystemConfig.getOptBoolean("fp_hide_gameroom"))
+                    regKeyc.SetValue("RenderGameRoom", 0);
+
+                if (SystemConfig.isOptSet("fp_hide_ornaments") && SystemConfig.getOptBoolean("fp_hide_ornaments"))
+                    regKeyc.SetValue("RenderOrnaments", 0);
+
+                if (SystemConfig.isOptSet("fp_texture_filter"))
+                    regKeyc.SetValue("TextureFilter", SystemConfig["fp_texture_filter"]);
+                else
+                    regKeyc.SetValue("TextureFilter", "0");
+
+                if (SystemConfig.isOptSet("fp_anisotropic"))
+                    regKeyc.SetValue("AnisotropicFiltering", SystemConfig["fp_anisotropic"]);
+                else
+                    regKeyc.SetValue("AnisotropicFiltering", "1");
+
+                if (SystemConfig.isOptSet("fp_antialiasing"))
+                    regKeyc.SetValue("AntiAliasing", SystemConfig["fp_antialiasing"]);
+                else
+                    regKeyc.SetValue("AntiAliasing", "2");
 
                 regKeyc.Close();
             }

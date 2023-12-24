@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
-using emulatorLauncher.Tools;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class XeniaGenerator : Generator
     {
@@ -41,12 +42,23 @@ namespace emulatorLauncher
                     rom = Path.Combine(romdir, rom.Substring(1));
                 }
 
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
             SetupConfiguration(path);
+
+            var commandArray = new List<string>();
+
+            if (fullscreen)
+                commandArray.Add("--fullscreen");
+
+            commandArray.Add("\"" + rom + "\"");
+
+            string args = string.Join(" ", commandArray);
 
             return new ProcessStartInfo()
             {
                 FileName = exe,
-                Arguments = "--fullscreen \"" + rom + "\"",
+                Arguments = args,
                 WorkingDirectory = path,
             };
         }
@@ -55,7 +67,21 @@ namespace emulatorLauncher
         {
             var availableLanguages = new Dictionary<string, string>()
             {
-                {"en", "1" }, { "jp", "2" }, { "de", "3" }, { "fr", "4" }, { "es", "5" }, { "it", "6" }, { "ko", "7" }, { "zh", "8" }, { "pt", "9" }, { "pl", "11" }, { "ru", "12" }, { "nl", "16" }
+                { "en", "1" },
+                { "jp", "2" },
+                { "ja", "2" },
+                { "de", "3" },
+                { "fr", "4" },
+                { "es", "5" },
+                { "it", "6" },
+                { "ko", "7" },
+                { "zh", "8" },
+                { "pt", "9" },
+                { "pl", "11" },
+                { "ru", "12" },
+                { "sv", "13" },
+                { "tr", "14" },
+                { "nl", "16" }
             };
 
             // Special case for Taiwanese which is zh_TW
@@ -76,6 +102,9 @@ namespace emulatorLauncher
         //Setup toml configuration file (using AppendValue because config file is very sensitive to values that do not exist and both emulators are still under heavy development)
         private void SetupConfiguration(string path)
         {
+            if (SystemConfig.getOptBoolean("disableautoconfig"))
+                return;
+
             try
             {
                 using (IniFile ini = new IniFile(Path.Combine(path, _canary ? "xenia-canary.config.toml" : "xenia.config.toml"), IniOptions.KeepEmptyLines | IniOptions.UseSpaces))
@@ -93,6 +122,12 @@ namespace emulatorLauncher
                     else if (Features.IsSupported("license_mask"))
                         ini.AppendValue("Content", "license_mask", "0");
 
+                    //General section
+                    if (SystemConfig.isOptSet("discord") && SystemConfig.getOptBoolean("discord"))
+                        ini.AppendValue("General", "discord", "true");
+                    else
+                        ini.AppendValue("General", "discord", "false");
+
                     //D3D12 section
                     if (SystemConfig.isOptSet("d3d12_clear_memory_page_state") && !string.IsNullOrEmpty(SystemConfig["d3d12_clear_memory_page_state"]))
                         ini.AppendValue("D3D12", "d3d12_clear_memory_page_state", SystemConfig["d3d12_clear_memory_page_state"]);
@@ -103,6 +138,11 @@ namespace emulatorLauncher
                         ini.AppendValue("D3D12", "d3d12_allow_variable_refresh_rate_and_tearing", SystemConfig["d3d12_allow_variable_refresh_rate_and_tearing"]);
                     else if (Features.IsSupported("d3d12_allow_variable_refresh_rate_and_tearing"))
                         ini.AppendValue("D3D12", "d3d12_allow_variable_refresh_rate_and_tearing", "true");
+
+                    if (SystemConfig.isOptSet("d3d12_readback_resolve") && !string.IsNullOrEmpty(SystemConfig["d3d12_readback_resolve"]))
+                        ini.AppendValue("D3D12", "d3d12_readback_resolve", SystemConfig["d3d12_readback_resolve"]);
+                    else if (Features.IsSupported("d3d12_readback_resolve"))
+                        ini.AppendValue("D3D12", "d3d12_readback_resolve", "false");
 
                     //Display section
                     string fxaa = "\"" + SystemConfig["postprocess_antialiasing"] + "\"";
@@ -149,6 +189,11 @@ namespace emulatorLauncher
                     else if (Features.IsSupported("vsync"))
                         ini.AppendValue("GPU", "vsync", "true");
 
+                    if (SystemConfig.isOptSet("query_occlusion_fake_sample_count") && !string.IsNullOrEmpty(SystemConfig["query_occlusion_fake_sample_count"]))
+                        ini.AppendValue("GPU", "query_occlusion_fake_sample_count", SystemConfig["query_occlusion_fake_sample_count"]);
+                    else if (Features.IsSupported("query_occlusion_fake_sample_count"))
+                        ini.AppendValue("GPU", "query_occlusion_fake_sample_count", "1000");
+
                     // Memory section
                     if (SystemConfig.isOptSet("scribble_heap") && !string.IsNullOrEmpty(SystemConfig["scribble_heap"]))
                         ini.AppendValue("Memory", "scribble_heap", SystemConfig["scribble_heap"]);
@@ -161,6 +206,10 @@ namespace emulatorLauncher
                         ini.AppendValue("Memory", "protect_zero", "true");
 
                     // Storage section
+                    string contentPath = Path.Combine(AppConfig.GetFullPath("saves"), "xbox360", "xenia");
+                    if (Directory.Exists(contentPath))
+                        ini.AppendValue("Storage", "content_root", "\"" + contentPath.Replace("\\", "/") + "\"");
+
                     if (SystemConfig.isOptSet("mount_cache") && !string.IsNullOrEmpty(SystemConfig["mount_cache"]))
                         ini.AppendValue("Storage", "mount_cache", SystemConfig["mount_cache"]);
                     else if (Features.IsSupported("mount_cache"))

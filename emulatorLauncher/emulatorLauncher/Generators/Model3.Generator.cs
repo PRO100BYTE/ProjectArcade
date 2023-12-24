@@ -5,8 +5,10 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     partial class Model3Generator : Generator
     {
@@ -21,73 +23,78 @@ namespace emulatorLauncher
             if (!File.Exists(exe))
                 return null;
 
-            List<string> args = new List<string>();
-
             bool isWideScreen = false;
+
+            List<string> commandArray = new List<string>();
 
             if (resolution != null)
             {
                 isWideScreen = ((float)resolution.Width / (float)resolution.Height) > 1.75f;
-                args.Add("-res=" + resolution.Width + "," + resolution.Height);
+                commandArray.Add("-res=" + resolution.Width + "," + resolution.Height);
             }
             else
             {
                 isWideScreen = ((float)Screen.PrimaryScreen.Bounds.Width / (float)Screen.PrimaryScreen.Bounds.Height) >= 1.75f;
-                args.Add("-res=" + Screen.PrimaryScreen.Bounds.Width + "," + Screen.PrimaryScreen.Bounds.Height);
+                commandArray.Add("-res=" + Screen.PrimaryScreen.Bounds.Width + "," + Screen.PrimaryScreen.Bounds.Height);
             }
 
             _resolution = resolution;
 
             bool wideScreen = SystemConfig["widescreen"] == "1" || SystemConfig["widescreen"] == "2" || (!SystemConfig.isOptSet("widescreen") && isWideScreen);
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
             if (wideScreen)
             {
                 SystemConfig["forceNoBezel"] = "1";
 
                 ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution);
 
-                args.Add("-fullscreen");
+                if (fullscreen)
+                    commandArray.Add("-fullscreen");
 
                 if (SystemConfig["widescreen"] == "2")
-                    args.Add("-stretch");
+                    commandArray.Add("-stretch");
                 else
-                    args.Add("-wide-screen");
+                    commandArray.Add("-wide-screen");
             }
             else
             {
                 if (ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution))
-                    args.Add("-fullscreen");
+                    commandArray.Add("-fullscreen");
                 else
                 {
                     _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
-                    if (_bezelFileInfo == null)
-                        args.Add("-fullscreen");
+                    if (_bezelFileInfo == null && fullscreen)
+                        commandArray.Add("-fullscreen");
                 }
             }
 
             // quad rendering
             if (SystemConfig.isOptSet("quadRendering") && SystemConfig.getOptBoolean("quadRendering"))
-                args.Add("-quad-rendering");
+                commandArray.Add("-quad-rendering");
 
             // crosshairs
             if (SystemConfig.isOptSet("crosshairs"))
-                args.Add("-crosshairs=" + SystemConfig["crosshairs"]);
+                commandArray.Add("-crosshairs=" + SystemConfig["crosshairs"]);
             
             // force feedback
             if (SystemConfig.isOptSet("forceFeedback") && SystemConfig.getOptBoolean("forceFeedback"))
-                args.Add("-force-feedback");
+                commandArray.Add("-force-feedback");
 
             //Write config in supermodel.ini
-            SetupConfiguration(path, wideScreen);
+            SetupConfiguration(path, wideScreen, fullscreen);
 
             if (SystemConfig["VSync"] != "false")
-                args.Add("-vsync");
+                commandArray.Add("-vsync");
 
-            args.Add("\""+rom+"\"");
+            commandArray.Add("\"" + rom + "\"");
+
+            string args = string.Join(" ", commandArray);
 
             return new ProcessStartInfo()
             {
                 FileName = exe,
-                Arguments = string.Join(" ", args),
+                Arguments = args,
                 WorkingDirectory = path,                
             };            
         }
@@ -136,7 +143,7 @@ namespace emulatorLauncher
             }
             return -1;
         }
-        private void SetupConfiguration(string path, bool wideScreen)
+        private void SetupConfiguration(string path, bool wideScreen, bool fullscreen)
         {
             try
             {
@@ -146,7 +153,11 @@ namespace emulatorLauncher
                     using (IniFile ini = new IniFile(iniPath, IniOptions.UseSpaces))
                     {
                         //Fullscreen and widescreen values (should we keep these as commandline take precedent ?
-                        ini.WriteValue(" Global ", "FullScreen", _bezelFileInfo == null ? "1" : "0");
+                        if (fullscreen)
+                            ini.WriteValue(" Global ", "FullScreen", "1");
+                        else
+                            ini.WriteValue(" Global ", "FullScreen", "0");
+
                         ini.WriteValue(" Global ", "WideScreen", wideScreen ? "1" : "0");
                         
                         //throttle - default on

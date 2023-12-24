@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using EmulatorLauncher.Common;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class AmigaForeverGenerator : Generator
     {
@@ -14,6 +15,11 @@ namespace emulatorLauncher
             string path = AppConfig.GetFullPath("amigaforever");
 
             string exe = Path.Combine(path, "AmigaForever.exe");
+            if (!File.Exists(exe))
+            {
+                path = Path.Combine(Environment.ExpandEnvironmentVariables("%ProgramFiles(x86)%"), "Cloanto", "Amiga Forever");
+                exe = Path.Combine(path, "AmigaForever.exe");
+            }
             if (!File.Exists(exe))
                 return null;
 

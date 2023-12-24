@@ -2,19 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using emulatorLauncher.libRetro;
 using System.IO;
 using System.Diagnostics;
-using emulatorLauncher.Tools;
 using System.Text.RegularExpressions;
 using System.Management;
 using System.Globalization;
-using emulatorLauncher.PadToKeyboard;
 using System.Runtime.InteropServices;
 using System.Net;
 using System.ComponentModel;
 using Microsoft.Win32;
 using System.Text;
+using System.Security.Principal;
+using System.Xml.Linq;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
+using EmulatorLauncher.Common.EmulationStation;
+using EmulatorLauncher.Common.Joysticks;
+using EmulatorLauncher.Common.Compression;
+using EmulatorLauncher.PadToKeyboard;
+using EmulatorLauncher.Libretro;
 
 // XBox
 // -p1index 0 -p1guid 030000005e040000ea02000000007801 -p1name "XBox One S Controller" -p1nbbuttons 11 -p1nbhats 1 -p1nbaxes 6 -system pcengine -emulator libretro -core mednafen_supergrafx -rom "H:\[Emulz]\roms\pcengine\1941 Counter Attack.pce"
@@ -30,20 +36,20 @@ using System.Text;
 
 /// -p1index 0 -p1guid 03000000b50700000399000000000000 -p1name "2 axis 12 bouton boÃ®tier de commande" -p1nbbuttons 12 -p1nbhats 0 -p1nbaxes 2  -system atari2600 -emulator libretro -core stella -rom "H:\[Emulz]\roms\atari2600\Asteroids (USA).7z"
 /// 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     static class Program
     {
         static Dictionary<string, Func<Generator>> generators = new Dictionary<string, Func<Generator>>
         {
-			{ "3dsen", () => new Nes3dGenerator() },
+            { "3dsen", () => new Nes3dGenerator() },
             { "retrobat", () => new RetrobatLauncherGenerator() },
             { "libretro", () => new LibRetroGenerator() }, { "angle", () => new LibRetroGenerator() },
-			{ "amigaforever", () => new AmigaForeverGenerator() },
-			{ "duckstation", () => new DuckstationGenerator() },
-			{ "kega-fusion", () => new KegaFusionGenerator() },
-			{ "mesen", () => new MesenGenerator() },
-			{ "mgba", () => new mGBAGenerator() },			
+            { "amigaforever", () => new AmigaForeverGenerator() },
+            { "duckstation", () => new DuckstationGenerator() },
+            { "kega-fusion", () => new KegaFusionGenerator() },
+            { "mesen", () => new MesenGenerator() },
+            { "mgba", () => new mGBAGenerator() },
             { "model2", () => new Model2Generator() }, { "m2emulator", () => new Model2Generator() },
             { "model3", () => new Model3Generator() }, { "supermodel", () => new Model3Generator() },
             { "openbor", () => new OpenBorGenerator() },
@@ -54,8 +60,9 @@ namespace emulatorLauncher
             { "vpinball", () => new VPinballGenerator() },
             { "dosbox", () => new DosBoxGenerator() },
             { "ppsspp", () => new PpssppGenerator() },
-			{ "project64", () => new Project64Generator() },
+            { "project64", () => new Project64Generator() },
             { "dolphin", () => new DolphinGenerator() }, { "triforce", () => new DolphinGenerator() },
+            { "mupen64", () => new Mupen64Generator() },
             { "cemu", () => new CemuGenerator() },  { "wiiu", () => new CemuGenerator() },  
             { "winuae", () => new UaeGenerator() },
             { "applewin", () => new AppleWinGenerator() }, { "apple2", () => new AppleWinGenerator() },
@@ -63,25 +70,26 @@ namespace emulatorLauncher
             { "simcoupe", () => new SimCoupeGenerator() },               
             { "cxbx", () => new CxbxGenerator() }, { "chihiro", () => new CxbxGenerator() }, { "xbox", () => new CxbxGenerator() },               
             { "redream", () => new RedreamGenerator() },                  
-            { "mugen", () => new ExeLauncherGenerator() }, { "windows", () => new ExeLauncherGenerator() }, 
+            { "mugen", () => new ExeLauncherGenerator() }, { "windows", () => new ExeLauncherGenerator() },
             { "demul", () => new DemulGenerator() }, { "demul-old", () => new DemulGenerator() }, 
             { "mednafen", () => new MednafenGenerator() },
             { "daphne", () => new DaphneGenerator() },
-            { "hypseus", () => new HypseusGenerator() },            
-			{ "raine", () => new RaineGenerator() },
-			{ "snes9x", () => new Snes9xGenerator() },
-			{ "citra", () => new CitraGenerator() },
-			{ "pico8", () => new Pico8Generator() },
+            { "hypseus", () => new HypseusGenerator() },
+            { "raine", () => new RaineGenerator() },
+            { "snes9x", () => new Snes9xGenerator() },
+            { "citra", () => new CitraGenerator() },
+            { "citra-canary", () => new CitraGenerator() },
+            { "pico8", () => new Pico8Generator() },
             { "xenia", () => new XeniaGenerator() }, { "xenia-canary", () => new XeniaGenerator() },
-            { "mame64", () => new Mame64Generator() },
+            { "mame64", () => new Mame64Generator() }, { "hbmame", () => new Mame64Generator() },
             { "oricutron", () => new OricutronGenerator() },
             { "switch", () => new YuzuGenerator() }, { "yuzu", () => new YuzuGenerator() }, { "yuzu-early-access", () => new YuzuGenerator() },
             { "ryujinx", () => new RyujinxGenerator() },
             { "teknoparrot", () => new TeknoParrotGenerator() },    
             { "easyrpg", () => new EasyRpgGenerator() },                
             { "tsugaru", () => new TsugaruGenerator() },
-			{ "love", () => new LoveGenerator() },
-			{ "xemu", () => new XEmuGenerator() },
+            { "love", () => new LoveGenerator() },
+            { "xemu", () => new XEmuGenerator() },
             { "scummvm", () => new ScummVmGenerator() },            
             { "arcadeflashweb", () => new ArcadeFlashWebGenerator() },			
             { "solarus", () => new SolarusGenerator() },
@@ -89,8 +97,27 @@ namespace emulatorLauncher
             { "n-gage", () => new Eka2l1Generator() },
             { "nosgba", () => new NosGbaGenerator() }, { "no$gba", () => new NosGbaGenerator() },
             { "pinballfx3", () => new PinballFX3Generator() },
+            { "pinballfx", () => new PinballFXGenerator() },
+            { "zaccariapinball", () => new ZaccariaPinballGenerator() },
             { "bigpemu", () => new BigPEmuGenerator() },
-            { "phoenix", () => new PhoenixGenerator() }
+            { "phoenix", () => new PhoenixGenerator() },
+            { "openmsx", () => new OpenMSXGenerator() },
+            { "ssf", () => new SSFGenerator() },
+            { "zinc", () => new ZincGenerator() },
+            { "melonds", () => new MelonDSGenerator() },
+            { "flycast", () => new FlycastGenerator() },
+            { "eduke32", () => new EDukeGenerator() },
+            { "simple64", () => new Simple64Generator() },
+            { "play", () => new PlayGenerator() },
+            { "bizhawk", () => new BizhawkGenerator() },
+            { "ares", () => new AresGenerator() },
+            { "ruffle", () => new RuffleGenerator() },
+            { "zesarux", () => new ZEsarUXGenerator() },
+            { "jynx", () => new JynxGenerator() },
+            { "hatari", () => new HatariGenerator() },
+            { "xm6pro", () => new Xm6proGenerator() },
+            { "stella", () => new StellaGenerator() },
+            { "theforceengine", () => new ForceEngineGenerator() },
         };
 
         public static ConfigFile AppConfig { get; private set; }
@@ -99,6 +126,53 @@ namespace emulatorLauncher
         public static List<Controller> Controllers { get; private set; }
         public static EsFeatures Features { get; private set; }
         public static Game CurrentGame { get; private set; }
+
+        private static EsSystems _esSystems;
+
+        public static EsSystems EsSystems
+        {
+            get
+            {
+                if (_esSystems == null)
+                    _esSystems = EsSystems.Load(Path.Combine(Program.LocalPath, ".emulationstation", "es_systems.cfg"));
+
+                return _esSystems;
+            }
+        }
+
+        private static EsSaveStates _esSaveStates;
+
+        public static EsSaveStates EsSaveStates
+        {
+            get
+            {
+                if (_esSaveStates == null)
+                    _esSaveStates = EsSaveStates.Load(Path.Combine(Program.LocalPath, ".emulationstation", "es_savestates.cfg"));
+
+                return _esSaveStates;
+            }
+        }
+
+        private static GunGames _gunGames;
+
+        public static GunGames GunGames
+        {
+            get
+            {
+                if (_gunGames == null)
+                    _gunGames = GunGames.Load(Path.Combine(Program.AppConfig.GetFullPath("resources"), "gungames.xml"));
+
+                return _gunGames;
+            }
+        }
+
+        public static bool HasEsSaveStates
+        {
+            get
+            {
+                return File.Exists(Path.Combine(Program.LocalPath, ".emulationstation", "es_savestates.cfg"));
+            }
+        }
 
         public static bool EnableHotKeyStart
         {
@@ -111,6 +185,36 @@ namespace emulatorLauncher
         [DllImport("user32.dll")]
         public static extern bool SetProcessDPIAware();
 
+        static void ShowSplashVideo()
+        {
+            var loadingScreens = AppConfig.GetFullPath("loadingscreens");
+            if (string.IsNullOrEmpty(loadingScreens))
+                return;
+
+            var system = SystemConfig["system"];
+            if (string.IsNullOrEmpty(system))
+                return;
+
+            var rom = Path.GetFileNameWithoutExtension(SystemConfig["rom"]??"");
+
+            var paths = new string[] 
+            {
+                "!screens!\\!system!\\!romname!.mp4",
+                "!screens!\\!system!\\!system!.mp4",
+                "!screens!\\!system!.mp4",
+                "!screens!\\default.mp4"
+            };
+
+            var videoPath = paths
+                .Select(path => path.Replace("!screens!", loadingScreens).Replace("!system!", system).Replace("!romname!", rom))
+                .FirstOrDefault(path => File.Exists(path));
+
+            if (string.IsNullOrEmpty(videoPath))
+                return;
+
+           SplashVideo.Start(videoPath, 5000);           
+        }
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -121,6 +225,14 @@ namespace emulatorLauncher
 
             if (args.Length == 0)
                 return;
+
+            // Used by XInputDevice.GetDevices
+            if (args.Length == 2 && args[0] == "-queryxinputinfo")
+            {
+                var all = XInputDevice.GetDevices(true);
+                File.WriteAllText(args[1], string.Join("\r\n", all.Where(d => d.Connected).Select(d => "<xinput index=\"" + d.DeviceIndex + "\" path=\"" + d.Path + "\"/>").ToArray()));
+                return;
+            }
 
             AppDomain.CurrentDomain.UnhandledException += OnCurrentDomainUnhandledException;
 
@@ -143,9 +255,40 @@ namespace emulatorLauncher
 
             if (!SystemConfig.isOptSet("use_guns") && args.Any(a => a == "-lightgun"))
                 SystemConfig["use_guns"] = "true";
-
-            LoadControllerConfiguration(args);
+            
             ImportShaderOverrides();
+            
+            if (args.Any(a => "-resetusbcontrollers".Equals(a, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                bool elevated = WindowsIdentity.GetCurrent().Owner.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid);
+                if (!elevated)
+                {
+                    MessageBox.Show("Process is not elevated");
+                }
+                else
+                {
+                    var dd = HidGameDevice.GetUsbGameDevices();
+                    if (dd.Length > 1)
+                    {
+                        try
+                        {
+                            foreach (var dev in dd)
+                                dev.Enable(false);
+
+                            System.Threading.Thread.Sleep(200);
+
+                            foreach (var dev in dd.OrderBy(dev => dev.PNPDeviceID))
+                                dev.Enable(true);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+                    }
+                }
+
+                return;
+            }
 
             if (args.Any(a => "-extract".Equals(a, StringComparison.InvariantCultureIgnoreCase)))
             {
@@ -262,10 +405,25 @@ namespace emulatorLauncher
             {
                 CurrentGame = new Game()
                 {
-                    path = SystemConfig.GetFullPath("rom"),
+                    Path = SystemConfig.GetFullPath("rom"),
                     Name = Path.GetFileNameWithoutExtension(SystemConfig["rom"]),
                     Tag = "missing"
                 };
+            }
+
+            Generator generator = generators.Where(g => g.Key == SystemConfig["emulator"]).Select(g => g.Value()).FirstOrDefault();
+            if (generator == null && !string.IsNullOrEmpty(SystemConfig["emulator"]) && SystemConfig["emulator"].StartsWith("lr-"))
+                generator = new LibRetroGenerator();
+            if (generator == null)
+                generator = generators.Where(g => g.Key == SystemConfig["system"]).Select(g => g.Value()).FirstOrDefault();
+
+            LoadControllerConfiguration(args);
+
+            if (generator != null)
+            {
+                ShowSplashVideo();
+                //System.Threading.Thread.Sleep(5000);
+                //return;
             }
 
             // Check if installed. Download & Install it if necessary.
@@ -281,12 +439,6 @@ namespace emulatorLauncher
                 }
             }
             
-            Generator generator = generators.Where(g => g.Key == SystemConfig["emulator"]).Select(g => g.Value()).FirstOrDefault();
-            if (generator == null && !string.IsNullOrEmpty(SystemConfig["emulator"]) && SystemConfig["emulator"].StartsWith("lr-"))
-                generator = new LibRetroGenerator();
-            if (generator == null)
-                generator = generators.Where(g => g.Key == SystemConfig["system"]).Select(g => g.Value()).FirstOrDefault();
-
             if (generator != null)
             {
                 SimpleLogger.Instance.Info("[Generator] Using " + generator.GetType().Name);
@@ -611,18 +763,6 @@ namespace emulatorLauncher
                     }
 
                     Controllers.RemoveAll(c => c.Config == null);
-
-#if DEBUG
-                    /*
-                    foreach (var c in Controllers)
-                    {
-                        var dinput = c.DirectInput;
-                        var xinput = c.XInput;
-                        var winmm = c.WinmmJoystick;
-                        var sdl = c.SdlController;
-                    }
-                    */
-#endif
 
                     if (!Controllers.Any() || SystemConfig.getOptBoolean("use_guns") || Misc.HasWiimoteGun())
                     {

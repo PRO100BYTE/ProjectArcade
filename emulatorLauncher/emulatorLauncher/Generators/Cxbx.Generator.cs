@@ -5,11 +5,13 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
-using emulatorLauncher.Tools;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.Compression;
+using EmulatorLauncher.Common.FileFormats;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
-    class CxbxGenerator : Generator
+    partial class CxbxGenerator : Generator
     {
         #region XboxIsoVfs management
         private string _dokanDriveLetter;
@@ -24,18 +26,18 @@ namespace emulatorLauncher
                 throw new ApplicationException("xbox-iso-vfs is required and is not installed");
 
             // Check dokan is installed
-            string dokan = Environment.GetEnvironmentVariable("DokanLibrary1");
+            string dokan = Environment.GetEnvironmentVariable("DokanLibrary2");
             if (!Directory.Exists(dokan))
             {
                 MountFile.ShowDownloadDokanPage();
-                throw new ApplicationException("Dokan 1.4.0.1000 is required and is not installed");
+                throw new ApplicationException("Dokan 2 is required and is not installed");
             }
 
-            dokan = Path.Combine(dokan, "dokan1.dll");
+            dokan = Path.Combine(dokan, "dokan2.dll");
             if (!File.Exists(dokan))
             {
                 MountFile.ShowDownloadDokanPage();
-                throw new ApplicationException("Dokan 1.4.0.1000 is required and is not installed");
+                throw new ApplicationException("Dokan 2 is required and is not installed");
             }
 
             var drive = FileTools.FindFreeDriveLetter();
@@ -112,6 +114,7 @@ namespace emulatorLauncher
             rom = MountIso(rom);
 
             _resolution = resolution;
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
             if (_isUsingCxBxLoader)
                 _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
@@ -140,14 +143,12 @@ namespace emulatorLauncher
 
                 //Fulscreen Management
                 if (_isUsingCxBxLoader)
-                {
                     ini.WriteValue("video", "FullScreen", "false");
-                }
                 else
                 {
                     string videoResolution = res.Width + " x " + res.Height + " 32bit x8r8g8b8 (" + (res.DisplayFrequency <= 0 ? 60 : res.DisplayFrequency).ToString() + " hz)";
                     ini.WriteValue("video", "VideoResolution", videoResolution);
-                    ini.WriteValue("video", "FullScreen", "true");
+                    ini.WriteValue("video", "FullScreen", fullscreen ? "true" : "false");
                 }
 
                 //Vsync
@@ -163,34 +164,28 @@ namespace emulatorLauncher
                     ini.WriteValue("video", "MaintainAspect", "true");
 
                 //Internal resolution
-                if (Features.IsSupported("internalresolution") && SystemConfig.isOptSet("internalresolution") && !string.IsNullOrEmpty(SystemConfig["internalresolution"]))
-                    ini.WriteValue("video", "RenderResolution", SystemConfig["internalresolution"]);
-                else
-                    ini.WriteValue("video", "RenderResolution", "3");
+                BindIniFeature(ini, "video", "RenderResolution", "internalresolution", "3");
 
                 //XBE signature
-                if (SystemConfig.isOptSet("xbeSignature") && SystemConfig.getOptBoolean("xbeSignature"))
-                    ini.WriteValue("gui", "IgnoreInvalidXbeSig", "true");
-                else if (Features.IsSupported("xbeSignature"))
-                    ini.WriteValue("gui", "IgnoreInvalidXbeSig", "false");
+                BindBoolIniFeature(ini, "gui", "IgnoreInvalidXbeSig", "xbeSignature", "true", "false");
 
                 //hacks
-                if (SystemConfig.isOptSet("disablePixelShaders") && SystemConfig.getOptBoolean("disablePixelShaders"))
-                    ini.WriteValue("hack", "DisablePixelShaders", "true");
-                else if (Features.IsSupported("disablePixelShaders"))
-                    ini.WriteValue("hack", "DisablePixelShaders", "false");
+                BindBoolIniFeature(ini, "hack", "DisablePixelShaders", "disablePixelShaders", "true", "false");
+                BindBoolIniFeature(ini, "hack", "UseAllCores", "useallcores", "true", "false");
+                BindBoolIniFeature(ini, "hack", "SkipRdtscPatching", "rdtscPatching", "true", "false");
 
-                if (SystemConfig.isOptSet("useallcores") && SystemConfig.getOptBoolean("useallcores"))
-                    ini.WriteValue("hack", "UseAllCores", "true");
-                else if (Features.IsSupported("useallcores"))
-                    ini.WriteValue("hack", "UseAllCores", "false");
-
-                if (SystemConfig.isOptSet("rdtscPatching") && SystemConfig.getOptBoolean("rdtscPatching"))
-                    ini.WriteValue("hack", "SkipRdtscPatching", "true");
-                else if (Features.IsSupported("rdtscPatching"))
-                    ini.WriteValue("hack", "SkipRdtscPatching", "false");
-
+                ConfigureControllers(ini);
             }
+
+            if (system == "xbox")
+            {
+                string eeprom = Path.Combine(AppConfig.GetFullPath("cxbx-reloaded"), "EEPROM.bin");
+                if (!File.Exists(eeprom))
+                    File.WriteAllBytes(eeprom, Properties.Resources.eeprom);
+
+                WriteXboxEEPROM(eeprom);
+            }
+            
 
             if (_isUsingCxBxLoader)
             {
@@ -210,7 +205,102 @@ namespace emulatorLauncher
                 Arguments = "\"" + rom + "\"",
             };
         }
-        
+
+        /// <summary>
+        /// Get XBOX language to write to eeprom, value from features or default language of ES.
+        /// </summary>
+        private int getXboxLangFromEnvironment()
+        {
+            var availableLanguages = new Dictionary<string, int>()
+            {
+                { "en", 1 },
+                { "jp", 2 },
+                { "ja", 2 },
+                { "de", 3 },
+                { "fr", 4 },
+                { "es", 5 },
+                { "it", 6 },
+                { "ko", 7 },
+                { "zh", 8 },
+                { "pt", 9 }
+            };
+
+            var lang = GetCurrentLanguage();
+            if (!string.IsNullOrEmpty(lang))
+            {
+                int ret;
+                if (availableLanguages.TryGetValue(lang, out ret))
+                    return ret;
+            }
+
+            return 1;
+        }
+
+        /// <summary>
+        /// Write data to XboX eeprom (language).
+        /// </summary>
+        /// <param name="path"></param>
+        private void WriteXboxEEPROM(string path)
+        {
+            if (!File.Exists(path))
+                return;
+
+            int langId = 1;
+
+            if (SystemConfig.isOptSet("xbox_language") && !string.IsNullOrEmpty(SystemConfig["xbox_language"]))
+                langId = SystemConfig["xbox_language"].ToInteger();
+            else
+                langId = getXboxLangFromEnvironment();
+
+            // Read eeprom file
+            byte[] bytes = File.ReadAllBytes(path);
+
+            var toSet = new byte[] { (byte)langId };
+            for (int i = 0; i < toSet.Length; i++)
+                bytes[144] = toSet[i];
+
+            uint UserSectionChecksum = ~ChecksumCalculate(bytes, 0x64, 0x5C);
+
+            byte[] userchecksum = BitConverter.GetBytes(UserSectionChecksum);
+            for (int i = 0; i < userchecksum.Length; i++)
+                bytes[96 + i] = userchecksum[i];
+
+            File.WriteAllBytes(path, bytes);
+        }
+
+        /// <summary>
+        /// Calculates the EEPROM data checksum of specified offset and size.
+        /// Original code by Ernegien (https://github.com/Ernegien/XboxEepromEditor)
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="offset"></param>
+        /// <param name="size"></param>
+        private static uint ChecksumCalculate(byte[] data, int offset, int size)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+
+            if (size % sizeof(uint) > 0)
+                throw new ArgumentException("Size must be a multiple of four.", "size");
+
+            if (offset + size > data.Length)
+                throw new ArgumentOutOfRangeException();
+
+            // high and low parts of the internal checksum
+            uint high = 0, low = 0;
+
+            for (int i = 0; i < size / sizeof(uint); i++)
+            {
+                uint val = BitConverter.ToUInt32(data, offset + i * sizeof(uint));
+                ulong sum = ((ulong)high << 32) | low;
+
+                high = (uint)((sum + val) >> 32);
+                low += val;
+            }
+
+            return high + low;
+        }
+
         public override int RunAndWait(ProcessStartInfo path)
         {
             if (!_isUsingCxBxLoader)

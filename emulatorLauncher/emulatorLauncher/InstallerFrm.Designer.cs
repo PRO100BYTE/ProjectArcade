@@ -1,4 +1,4 @@
-﻿namespace emulatorLauncher
+﻿namespace EmulatorLauncher
 {
     partial class InstallerFrm
     {
@@ -60,8 +60,8 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49.26109F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 1.477833F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49.26109F));
-            this.tableLayoutPanel1.Controls.Add(this.button2, 2, 0);
             this.tableLayoutPanel1.Controls.Add(this.button1, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.button2, 2, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 202);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -132,10 +132,10 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Image = global::emulatorLauncher.Properties.Resources.retrobat;
+            this.pictureBox1.Image = global::EmulatorLauncher.Properties.Resources.retrobat;
             this.pictureBox1.Location = new System.Drawing.Point(14, 13);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(215, 89);
+            this.pictureBox1.Size = new System.Drawing.Size(204, 70);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 5;
             this.pictureBox1.TabStop = false;

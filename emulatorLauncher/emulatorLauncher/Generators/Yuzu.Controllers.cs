@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
-using emulatorLauncher.Tools;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
+using EmulatorLauncher.Common.EmulationStation;
+using EmulatorLauncher.Common.Joysticks;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     partial class YuzuGenerator : Generator
     {        
@@ -42,6 +45,21 @@ namespace emulatorLauncher
 
             UpdateSdlControllersWithHints(ini);
 
+            // Cleanup control part first
+            for (int i=0; i<10; i++)
+            {
+                var controlLines = ini.EnumerateKeys("Controls").Where(k => k.StartsWith("player_" + i)).ToList();
+
+                if (controlLines.Count >0 && controlLines != null)
+                {
+                    foreach (var line in controlLines)
+                        ini.Remove("Controls", line);
+                }
+            }
+
+            // Hotkeys
+            WriteShortcuts(ini);
+
             foreach (var controller in this.Controllers.OrderBy(i => i.PlayerIndex))
                 ConfigureInput(controller, ini);
         }
@@ -66,7 +84,7 @@ namespace emulatorLauncher
             if (cfg == null)
                 return;
 
-            var guid = controller.GetSdlGuid(_sdlVersion);
+            var guid = controller.GetSdlGuid(SdlVersion.SDL2_0_X, true);
 
             // Yuzu deactivates RAWINPUT with SDL_SetHint(SDL_HINT_JOYSTICK_RAWINPUT, 0) when enable_raw_input is set to false (default value) 
             // Convert Guid to XInput
@@ -82,13 +100,13 @@ namespace emulatorLauncher
                     .GroupBy(c => c.Guid.ToLowerInvariant())
                     .Where(c => c.Key == controller.Guid.ToLowerInvariant())
                     .SelectMany(c => c)
-                    .OrderBy(c => SdlGameController.GetControllerIndex(c))
+                    .OrderBy(c => c.GetSdlControllerIndex())
                     .ToList()
                     .IndexOf(controller);
 
             string player = "player_" + (controller.PlayerIndex - 1) + "_";
 
-            // player_0_type=1 Pro controller
+            // player_0_type=0 Pro controller
             // player_0_type=1 Dual joycon
             // player_0_type=2 Left joycon
             // player_0_type=3 Right joycon
@@ -103,12 +121,14 @@ namespace emulatorLauncher
                 string id = SystemConfig[playerType];
                 if (!string.IsNullOrEmpty(id))
                     playerTypeId = id.ToInteger();
-            }            
+            }
+
+            bool handheld = playerTypeId == 4;
 
             ini.WriteValue("Controls", player + "type" + "\\default",  playerTypeId == 0 ? "true" : "false");
             ini.WriteValue("Controls", player + "type", playerTypeId.ToString());
             ini.WriteValue("Controls", player + "connected" + "\\default", "false");
-            ini.WriteValue("Controls", player + "connected", "true");
+            ini.WriteValue("Controls", player + "connected", handheld ? "false" : "true");
 
             //Vibration settings
             ini.WriteValue("Controls", player + "vibration_enabled" + "\\default", "true");
@@ -117,6 +137,8 @@ namespace emulatorLauncher
             ini.WriteValue("Controls", player + "right_vibration_device" + "\\default", "true");
             ini.WriteValue("Controls", "enable_accurate_vibrations" + "\\default", "false");
             ini.WriteValue("Controls", "enable_accurate_vibrations", "true");
+            ini.Remove("Controls", player + "left_vibration_device");
+            ini.Remove("Controls", player + "right_vibration_device");
 
             //vibration strength for XInput = 70
             if (controller.IsXInputDevice)
@@ -150,7 +172,7 @@ namespace emulatorLauncher
             if (!controller.IsXInputDevice)
             {
                 ini.WriteValue("Controls", player + "motionleft" + "\\default", "false");
-                ini.WriteValue("Controls", player + "motionleft", "\"" + "engine:sdl,motion:0,port:" + index + ", guid:" + yuzuGuid + "\"");
+                ini.WriteValue("Controls", player + "motionleft", "\"" + "engine:sdl,motion:0,port:" + index + ",guid:" + yuzuGuid + "\"");
                 ini.WriteValue("Controls", player + "motionright" + "\\default", "false");
                 ini.WriteValue("Controls", player + "motionright", "\"" + "engine:sdl,motion:0,port:" + index + ",guid:" + yuzuGuid + "\"");
             }
@@ -186,6 +208,13 @@ namespace emulatorLauncher
             }
 
             bool revertButtons = Features.IsSupported("yuzu_gamepadbuttons") && SystemConfig.isOptSet("yuzu_gamepadbuttons") && SystemConfig.getOptBoolean("yuzu_gamepadbuttons");
+            if (controller.VendorID == USB_VENDOR.NINTENDO)
+            {
+                if (revertButtons)
+                    revertButtons = false;
+                else
+                    revertButtons = true;
+            }
 
             foreach (var map in Mapping)
             {
@@ -212,6 +241,14 @@ namespace emulatorLauncher
             ini.WriteValue("Controls", player + "button_sl", "[empty]");
             ini.WriteValue("Controls", player + "button_sr" + "\\default", "false");
             ini.WriteValue("Controls", player + "button_sr", "[empty]");
+            ini.WriteValue("Controls", player + "button_slleft" + "\\default", "false");
+            ini.WriteValue("Controls", player + "button_slleft", "[empty]");
+            ini.WriteValue("Controls", player + "button_srleft" + "\\default", "false");
+            ini.WriteValue("Controls", player + "button_srleft", "[empty]");
+            ini.WriteValue("Controls", player + "button_slright" + "\\default", "false");
+            ini.WriteValue("Controls", player + "button_slright", "[empty]");
+            ini.WriteValue("Controls", player + "button_srright" + "\\default", "false");
+            ini.WriteValue("Controls", player + "button_srright", "[empty]");
             ini.WriteValue("Controls", player + "button_home" + "\\default", "false");
             ini.WriteValue("Controls", player + "button_home", "[empty]");
             ini.WriteValue("Controls", player + "button_screenshot" + "\\default", "false");
@@ -292,12 +329,31 @@ namespace emulatorLauncher
             if (keyboard == null)
                 return;
 
+            // player_0_type=1 Pro controller
+            // player_0_type=1 Dual joycon
+            // player_0_type=2 Left joycon
+            // player_0_type=3 Right joycon
+            // player_0_type=4 Handheld
+            // player_0_type=5 Gamecube controller
+
+            int playerTypeId = 0;
+
             string player = "player_" + (controller.PlayerIndex - 1) + "_";
 
-            ini.WriteValue("Controls", player + "type" + "\\default", "true");
-            ini.WriteValue("Controls", player + "type", "0");
-            ini.WriteValue("Controls", player + "connected" + "\\default", "true");
-            ini.WriteValue("Controls", player + "connected", "true");
+            string playerType = player + "type";
+            if (Program.Features.IsSupported(playerType) && Program.SystemConfig.isOptSet(playerType))
+            {
+                string id = Program.SystemConfig[playerType];
+                if (!string.IsNullOrEmpty(id))
+                    playerTypeId = id.ToInteger();
+            }
+
+            bool handheld = playerTypeId == 4;
+
+            ini.WriteValue("Controls", player + "type" + "\\default", playerTypeId == 0 ? "true" : "false");
+            ini.WriteValue("Controls", player + "type", playerTypeId.ToString());
+            ini.WriteValue("Controls", player + "connected" + "\\default", "false");
+            ini.WriteValue("Controls", player + "connected", handheld ? "false" : "true");
             ini.WriteValue("Controls", player + "vibration_enabled" + "\\default", "true");
             ini.WriteValue("Controls", player + "vibration_enabled", "true");
             ini.WriteValue("Controls", player + "left_vibration_device" + "\\default", "true");
@@ -342,6 +398,14 @@ namespace emulatorLauncher
             ini.WriteValue("Controls", player + "button_sl", "\"" + "engine:keyboard,code:81,toggle:0" + "\"");
             ini.WriteValue("Controls", player + "button_sr\\default", "true");
             ini.WriteValue("Controls", player + "button_sr", "\"" + "engine:keyboard,code:69,toggle:0" + "\"");
+            ini.WriteValue("Controls", player + "button_slleft\\default", "true");
+            ini.WriteValue("Controls", player + "button_slleft", "\"" + "engine:keyboard,code:81,toggle:0" + "\"");
+            ini.WriteValue("Controls", player + "button_srleft\\default", "true");
+            ini.WriteValue("Controls", player + "button_srleft", "\"" + "engine:keyboard,code:69,toggle:0" + "\"");
+            ini.WriteValue("Controls", player + "button_slright\\default", "true");
+            ini.WriteValue("Controls", player + "button_slright", "\"" + "engine:keyboard,code:81,toggle:0" + "\"");
+            ini.WriteValue("Controls", player + "button_srright\\default", "true");
+            ini.WriteValue("Controls", player + "button_srright", "\"" + "engine:keyboard,code:69,toggle:0" + "\"");
             ini.WriteValue("Controls", player + "button_home\\default", "true");
             ini.WriteValue("Controls", player + "button_home", "\"" + "engine:keyboard,code:0,toggle:0" + "\"");
             ini.WriteValue("Controls", player + "button_screenshot\\default", "true");
@@ -356,7 +420,18 @@ namespace emulatorLauncher
             ini.WriteValue("Controls", player + "motionright", "\"" + "engine:keyboard,code:56,toggle:0" + "\"");
         }
 
-        static Dictionary<string, string> DefKeys = new Dictionary<string, string>()
+        private static void WriteShortcuts(IniFile ini)
+        {
+            // exit yuzu with SELECT+START
+            ini.WriteValue("UI", "Shortcuts\\Main%20Window\\Exit%20yuzu\\Controller_KeySeq\\default", "false");
+            ini.WriteValue("UI", "Shortcuts\\Main%20Window\\Exit%20yuzu\\Controller_KeySeq", "Minus+Plus");
+
+            // Pause with SELECT+EAST
+            ini.WriteValue("UI", "Shortcuts\\Main%20Window\\Continue\\Pause%20Emulation\\Controller_KeySeq\\default", "false");
+            ini.WriteValue("UI", "Shortcuts\\Main%20Window\\Continue\\Pause%20Emulation\\Controller_KeySeq", "Minus+A");
+        }
+
+            static Dictionary<string, string> DefKeys = new Dictionary<string, string>()
         {
             { "button_a", "engine:keyboard,code:67,toggle:0" },
             { "button_b","engine:keyboard,code:88,toggle:0" },

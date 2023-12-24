@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace emulatorLauncher.Properties {
+namespace EmulatorLauncher.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace emulatorLauncher.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("emulatorLauncher.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("EmulatorLauncher.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -131,8 +131,8 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ядро {0} не установлено.
-        ///Установить сейчас ?.
+        ///   Ищет локализованную строку, похожую на The core &apos;{0}&apos; is not installed.
+        ///Install now ?.
         /// </summary>
         internal static string CoreNotInstalled {
             get {
@@ -141,7 +141,7 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Загружается {0}.
+        ///   Ищет локализованную строку, похожую на Downloading {0}.
         /// </summary>
         internal static string Downloading {
             get {
@@ -160,8 +160,8 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Эмулятор {0} не установлен.
-        ///Установить сейчас ?.
+        ///   Ищет локализованную строку, похожую на The emulator &apos;{0}&apos; is not installed.
+        ///Install now ?.
         /// </summary>
         internal static string EmulatorNotInstalled {
             get {
@@ -170,7 +170,7 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Возникла ошибка :
+        ///   Ищет локализованную строку, похожую на An error occured :
         ///{0}.
         /// </summary>
         internal static string ErrorOccured {
@@ -180,7 +180,7 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Внимание : Future Pinball требует включенного режима разработчика в настройках Windows.
+        ///   Ищет локализованную строку, похожую на Warning : Future Pinball requires developper mode enabled in Windows settings.
         /// </summary>
         internal static string FPinballDeveloperMode {
             get {
@@ -199,7 +199,7 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Установка.....
+        ///   Ищет локализованную строку, похожую на Installing.....
         /// </summary>
         internal static string Installing {
             get {
@@ -208,7 +208,7 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вы хотите сохранить игру в несжатом виде для дальнейшего использования ?.
+        ///   Ищет локализованную строку, похожую на Do you want to keep the uncompressed game for further use ?.
         /// </summary>
         internal static string KeepUncompressedFile {
             get {
@@ -217,7 +217,17 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Проверка обновлений....
+        ///   Поиск локализованного ресурса типа System.Byte[].
+        /// </summary>
+        internal static byte[] libretrocoreguns {
+            get {
+                object obj = ResourceManager.GetObject("libretrocoreguns", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Looking for updates....
         /// </summary>
         internal static string LookingForUpdates {
             get {
@@ -265,7 +275,7 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Нет.
+        ///   Ищет локализованную строку, похожую на No.
         /// </summary>
         internal static string No {
             get {
@@ -274,7 +284,7 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на ОК.
+        ///   Ищет локализованную строку, похожую на Ok.
         /// </summary>
         internal static string Ok {
             get {
@@ -365,7 +375,27 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Распаковка {0}.
+        ///   Поиск локализованного ресурса типа System.Byte[].
+        /// </summary>
+        internal static byte[] SQLite_Interop_x64_gz {
+            get {
+                object obj = ResourceManager.GetObject("SQLite_Interop_x64_gz", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Byte[].
+        /// </summary>
+        internal static byte[] SQLite_Interop_x86_gz {
+            get {
+                object obj = ResourceManager.GetObject("SQLite_Interop_x86_gz", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Decompressing {0}.
         /// </summary>
         internal static string UnCompressing {
             get {
@@ -374,10 +404,10 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Доступно обновление для {0} :
-        ///Новая версия : {1}
-        ///Установленная версия : {2}
-        ///Установить сейчас ?.
+        ///   Ищет локализованную строку, похожую на An update is available for {0} :
+        ///Update version : {1}
+        ///Installed version : {2}
+        ///Install now ?.
         /// </summary>
         internal static string UpdateAvailable {
             get {
@@ -386,7 +416,7 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Обновление {0}.
+        ///   Ищет локализованную строку, похожую на Updating {0}.
         /// </summary>
         internal static string Updating {
             get {
@@ -405,7 +435,7 @@ namespace emulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Да.
+        ///   Ищет локализованную строку, похожую на Yes.
         /// </summary>
         internal static string Yes {
             get {

@@ -1,12 +1,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
-using emulatorLauncher.Tools;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     partial class RyujinxGenerator : Generator
     {
+        public RyujinxGenerator()
+        {
+            DependsOnDesktopResolution = true;
+        }
+
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
             string path = AppConfig.GetFullPath("ryujinx");
@@ -22,6 +28,7 @@ namespace emulatorLauncher
                 FileName = exe,
                 WorkingDirectory = path,
                 Arguments = "\"" + rom + "\"",
+                WindowStyle = ProcessWindowStyle.Minimized,
             };
         }
 
@@ -30,6 +37,7 @@ namespace emulatorLauncher
             Dictionary<string, string> availableLanguages = new Dictionary<string, string>()
             {
                 { "jp", "Japanese" },
+                { "ja", "Japanese" },
                 { "en", "AmericanEnglish" },
                 { "fr", "French" },
                 { "de", "German" },
@@ -43,9 +51,13 @@ namespace emulatorLauncher
                 { "tw", "Taiwanese" }
             };
 
-            // Special case for Taiwanese which is zh_TW
+            // Special case for some variances
             if (SystemConfig["Language"] == "zh_TW")
                 return "Taiwanese";
+            else if (SystemConfig["Language"] == "pt_BR")
+                return "BrazilianPortuguese";
+            else if (SystemConfig["Language"] == "en_GB")
+                return "BritishEnglish";
 
             string lang = GetCurrentLanguage();
             if (!string.IsNullOrEmpty(lang))
@@ -60,13 +72,18 @@ namespace emulatorLauncher
         //Manage Config.json file settings
         private void SetupConfiguration(string path)
         {
+            if (SystemConfig.isOptSet("disableautoconfig") && SystemConfig.getOptBoolean("disableautoconfig"))
+                return;
+
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
             var json = DynamicJson.Load(Path.Combine(path, "portable", "Config.json"));
 
             //Perform conroller configuration
             CreateControllerConfiguration(json);
 
             //Set fullscreen
-            json["start_fullscreen"] = "true";
+            json["start_fullscreen"] = fullscreen ? "true" : "false";
 
             //General Settings
             json["check_updates_on_start"] = "false";
@@ -74,10 +91,14 @@ namespace emulatorLauncher
             json["show_console"] = "false";
 
             //Input
-            json["docked_mode"] = "true";
+            BindBoolFeature(json, "docked_mode", "ryujinx_undock", "false", "true");
+            json["hide_cursor_on_idle"] = "true";
+
+            // Discord
+            BindBoolFeature(json, "enable_discord_integration", "discord", "true", "false");
 
             //System
-            json["system_language"] = GetDefaultswitchLanguage();
+            BindFeature(json, "system_language", "switch_language", GetDefaultswitchLanguage());
             BindFeature(json, "enable_vsync", "vsync", "true");
             BindFeature(json, "enable_ptc", "enable_ptc", "true");
             BindFeature(json, "enable_fs_integrity_checks", "enable_fs_integrity_checks", "true");

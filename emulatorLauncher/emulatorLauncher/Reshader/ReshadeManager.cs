@@ -5,17 +5,18 @@ using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using System.Diagnostics;
-using emulatorLauncher.Tools;
 using System.IO.Compression;
 using System.ComponentModel;
 using System.Reflection;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class ReshadeManager
     {
         // Update this version number, if shipped reshader version changes.
-        private static Version ShippedVersion = new Version(4, 5, 4, 115);
+        private static Version ShippedVersion = new Version(5, 9, 2, 2);
 
         private const string ReshadeFolder = "reshade-shaders";
 
@@ -45,10 +46,12 @@ namespace emulatorLauncher
                 reShadeIni.WriteValue("GENERAL", "TextureSearchPaths", @".\" + ReshadeFolder  +@"\Textures");
                 reShadeIni.WriteValue("GENERAL", "PresetFiles", @".\" + ReshadeFolder + @"\ReShadePreset.ini");
                 reShadeIni.WriteValue("GENERAL", "PresetPath", @".\" + ReshadeFolder + @"\ReShadePreset.ini");
+                reShadeIni.WriteValue("GENERAL", "ShowPresetTransitionMessage", "0");
 
                 if (!string.IsNullOrEmpty(Program.AppConfig["screenshots"]))
                 {
                     reShadeIni.WriteValue("GENERAL", "ScreenshotPath", Program.AppConfig.GetFullPath("screenshots"));
+                    reShadeIni.WriteValue("SCREENSHOT", "SavePath", Program.AppConfig.GetFullPath("screenshots"));
                     reShadeIni.WriteValue("SCREENSHOTS", "SavePath", Program.AppConfig.GetFullPath("screenshots"));
                 }
 
@@ -56,10 +59,10 @@ namespace emulatorLauncher
                 Directory.CreateDirectory(effectSearchPaths);
 
                 if (!File.Exists(Path.Combine(effectSearchPaths, "ReShade.fxh")))
-                    File.WriteAllBytes(Path.Combine(effectSearchPaths, "ReShade.fxh"), Properties.Resources.ReShade);
+                    File.WriteAllBytes(Path.Combine(effectSearchPaths, "ReShade.fxh"), EmulatorLauncher.Properties.Resources.ReShade);
 
                 if (!File.Exists(Path.Combine(effectSearchPaths, "ReShadeUI.fxh")))
-                    File.WriteAllBytes(Path.Combine(effectSearchPaths, "ReShadeUI.fxh"), Properties.Resources.ReShadeUI);
+                    File.WriteAllBytes(Path.Combine(effectSearchPaths, "ReShadeUI.fxh"), EmulatorLauncher.Properties.Resources.ReShadeUI);
                 
                 using (var reShadePreset = new IniFile(Path.Combine(path, ReshadeFolder, "ReShadePreset.ini")))
                 {                 
@@ -113,7 +116,7 @@ namespace emulatorLauncher
                         var bezelEffect = reShadePreset.GetOrCreateSection("Bezel.fx");
 
                         BezelInfo infos = bezel.BezelInfos;
-                        if (infos != null && infos.IsValid())
+                        if (infos != null && infos.IsValid() && !infos.IsEstimated)
                         {
                             displayW = ((float)infos.width.Value - (float)infos.right.Value - (float)infos.left.Value) / (float)infos.width.Value;
                             displayH = ((float)infos.height.Value - (float)infos.bottom.Value - (float)infos.top.Value) / (float)infos.height.Value;
@@ -222,9 +225,9 @@ namespace emulatorLauncher
                 UninstallReshader(type, path);
 
                 if (platform == ReshadePlatform.x86)
-                    GZipBytesToFile(Properties.Resources.reshader_x86_gz, Path.Combine(path, dllName));
+                    FileTools.ExtractGZipBytes(Properties.Resources.reshader_x86_gz, Path.Combine(path, dllName));
                 else
-                    GZipBytesToFile(Properties.Resources.reshader_x64_gz, Path.Combine(path, dllName));
+                    FileTools.ExtractGZipBytes(Properties.Resources.reshader_x64_gz, Path.Combine(path, dllName));
             }
 
             if (!File.Exists(Path.Combine(path, "ReShade.ini")))
@@ -286,30 +289,6 @@ namespace emulatorLauncher
             }            
 
             return knownTechniques;
-        }
-
-        static bool GZipBytesToFile(byte[] bytes, string fileName)
-        {
-            try
-            {
-                using (var reader = new MemoryStream(bytes))
-                {
-                    using (var decompressedStream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-                    {
-                        using (GZipStream decompressionStream = new GZipStream(reader, CompressionMode.Decompress))
-                        {
-                            decompressionStream.CopyTo(decompressedStream);
-                            return true;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                SimpleLogger.Instance.Error("[ReadGZipStream] Failed " + ex.Message, ex);
-            }
-
-            return false;
         }
 
         static string GetEnumDescription(Enum value)

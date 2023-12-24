@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
-using emulatorLauncher.Tools;
 using System.Xml.Linq;
 using System.Xml;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.Joysticks;
+using EmulatorLauncher.Common.FileFormats;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     partial class CemuGenerator : Generator
     {
@@ -16,6 +18,8 @@ namespace emulatorLauncher
         {
             DependsOnDesktopResolution = true;
         }
+
+        private SdlVersion _sdlVersion = SdlVersion.SDL2_0_X;
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
@@ -39,18 +43,41 @@ namespace emulatorLauncher
                     rom = Path.Combine(path, rom.Substring(1));
             }
 
+            // Extract SDL2 version info
+            try
+            {
+                string sdl2 = Path.Combine(path, "SDL2.dll");
+                if (FileVersionInfo.GetVersionInfo(exe).ProductMajorPart <= 1 && File.Exists(sdl2))
+                    _sdlVersion = SdlJoystickGuidManager.GetSdlVersion(sdl2);
+                else
+                    _sdlVersion = SdlJoystickGuidManager.GetSdlVersionFromStaticBinary(exe);
+            }
+            catch { }
+
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
             //settings
-            SetupConfiguration(path, rom);
+            SetupConfiguration(path, rom, fullscreen);
 
             //controller configuration
             CreateControllerConfiguration(path);
 
             string romdir = Path.GetDirectoryName(rom);
 
+            var commandArray = new List<string>();
+
+            if (fullscreen)
+                commandArray.Add("-f");
+
+            commandArray.Add("-g");
+            commandArray.Add("\"" + rom +"\"");
+
+            string args = string.Join(" ", commandArray);
+
             return new ProcessStartInfo()
             {
                 FileName = exe,
-                Arguments = "-f -g \"" + rom + "\"",
+                Arguments = args,
                 WorkingDirectory = path,
             };
         }
@@ -75,7 +102,8 @@ namespace emulatorLauncher
         {
             Dictionary<string, string> availableLanguages = new Dictionary<string, string>() 
             { 
-                { "jp", "0" }, 
+                { "jp", "0" },
+                { "ja", "0" },
                 { "en", "1" },                 
                 { "fr", "2" }, 
                 { "de", "3" }, 
@@ -86,7 +114,6 @@ namespace emulatorLauncher
                 { "nl", "8" }, 
                 { "pt", "9" }, 
                 { "ru", "10" },
-                { "tw", "11" }
             };
 
             // Special case for Taiwanese which is zh_TW
@@ -103,22 +130,31 @@ namespace emulatorLauncher
 
             return "1";
         }
+
         /// <summary>
         /// Configure emulator features (settings.xml)
         /// </summary>
         /// <param name="path"></param>
-        private void SetupConfiguration(string path, string rom)
+        private void SetupConfiguration(string path, string rom, bool fullscreen = true)
         {
             string settingsFile = Path.Combine(path, "settings.xml");
 
             var xdoc = File.Exists(settingsFile) ? XElement.Load(settingsFile) : new XElement("content");
 
+            if (SystemConfig.isOptSet("discord") && SystemConfig.getOptBoolean("discord"))
+                xdoc.SetElementValue("use_discord_presence", "true");
+            else
+                xdoc.SetElementValue("use_discord_presence", "false");
+
             xdoc.SetElementValue("check_update", "false");
             BindFeature(xdoc, "console_language", "wiiu_language", GetDefaultWiiULanguage());
 
+            if (!fullscreen)
+                xdoc.SetElementValue("fullscreen", "false");
+
             // Graphic part of settings file
-            var graphic = xdoc.GetOrCreateElement("Graphic");            
-            BindFeature(graphic, "VSync", "vsync", "true"); // VSYNC (true or false)
+            var graphic = xdoc.GetOrCreateElement("Graphic");
+            BindFeature(graphic, "VSync", "VSync", "1"); // VSYNC (true or false)
             BindFeature(graphic, "api", "video_renderer", "1"); // Graphic driver (0 for OpenGL / 1 for Vulkan)
             BindFeature(graphic, "AsyncCompile", "async_texture", SystemConfig["video_renderer"] != "0" ? "true" : "false"); // Async shader compilation (only if vulkan - true or false)
             BindFeature(graphic, "GX2DrawdoneSync", "accurate_sync", "true"); // Full sync at GX2DrawDone (only if opengl - true or false)
@@ -168,11 +204,13 @@ namespace emulatorLauncher
                 {
                     notification.SetElementValue("ControllerProfiles", "true");
                     notification.SetElementValue("ShaderCompiling", "true");
+                    notification.SetElementValue("ControllerBattery", "true");
                 }
                 else
                 {
                     notification.SetElementValue("ControllerProfiles", "false");
                     notification.SetElementValue("ShaderCompiling", "false");
+                    notification.SetElementValue("ControllerBattery", "false");
                 }
             }
 

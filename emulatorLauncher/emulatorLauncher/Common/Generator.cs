@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
-using emulatorLauncher.PadToKeyboard;
-using emulatorLauncher.Tools;
 using System.IO;
 using System.Drawing;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.Compression;
+using EmulatorLauncher.Common.FileFormats;
+using EmulatorLauncher.Common.EmulationStation;
+using EmulatorLauncher.PadToKeyboard;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     abstract class Generator
     {
@@ -58,6 +61,9 @@ namespace emulatorLauncher
                     // Decompression for mounting is generally faster in temp path as it's generally a SSD Drive...
                     extractionPath = Path.Combine(Path.GetTempPath(), ".uncompressed", Path.GetFileName(fileName));
                 }
+                else
+                    extractionPath = Path.Combine(extractionPath, Path.GetFileName(fileName));
+
 
                 if (string.IsNullOrEmpty(extractionPath))
                     return fileName;
@@ -137,15 +143,29 @@ namespace emulatorLauncher
 
                     try { Directory.Delete(extractionPath, true); }
                     catch(Exception ex) { SimpleLogger.Instance.Error("Can't delete " + extractionPath + " : " + ex.Message); }
+                    
+                    try 
+                    {
+                        string parent = Path.GetDirectoryName(extractionPath);
+                        if (Directory.Exists(parent))
+                        {
+                            SimpleLogger.Instance.Info("[Generator] Directory.Delete(" + parent + ", false)");
+                            Directory.Delete(parent);
+                        }
+                    }
+                    catch (Exception ex) 
+                    { 
+                        SimpleLogger.Instance.Error("Can't delete " + extractionPath + " : " + ex.Message); 
+                    }
 
-                    SimpleLogger.Instance.Info("[Generator] Directory.Delete(" + Path.GetDirectoryName(extractionPath) + ", false)");
-
-                    try { Directory.Delete(Path.GetDirectoryName(extractionPath)); }
-                    catch (Exception ex) { SimpleLogger.Instance.Error("Can't delete " + extractionPath + " : " + ex.Message); }
-
-                    SimpleLogger.Instance.Info("[Generator] Directory.Delete(" + uncompressedFolderPath + ", false)");
-
-                    try { Directory.Delete(uncompressedFolderPath); }
+                    try
+                    {
+                        if (Directory.Exists(uncompressedFolderPath))
+                        {
+                            SimpleLogger.Instance.Info("[Generator] Directory.Delete(" + uncompressedFolderPath + ", false)");
+                            Directory.Delete(uncompressedFolderPath);
+                        }
+                    }
                     catch { }                
                 }
             }
@@ -174,7 +194,7 @@ namespace emulatorLauncher
                 {
                     using (var frm = new InstallerFrm())
                     {
-                        frm.SetLabel(Properties.Resources.KeepUncompressedFile);
+                        frm.SetLabel(EmulatorLauncher.Properties.Resources.KeepUncompressedFile);
                         if (frm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                         {
                             try { Directory.Delete(_unzip.UncompressedPath, true); }
@@ -384,6 +404,12 @@ namespace emulatorLauncher
             return null;
         }
 
+        public static bool IsEmulationStationWindowed()
+        {
+            Rectangle bounds;
+            return IsEmulationStationWindowed(out bounds);
+        }
+
         public static bool IsEmulationStationWindowed(out Rectangle bounds, bool updateSize = false)
         {
             bool isWindowed = false;
@@ -456,16 +482,57 @@ namespace emulatorLauncher
             return s;
         }
 
+        // xml bindfeatures
         protected void BindFeature(System.Xml.Linq.XElement cfg, string settingName, string featureName, string defaultValue, bool force = false)
         {
            if (force || Features.IsSupported(featureName))
                 cfg.SetElementValue(settingName, SystemConfig.GetValueOrDefault(featureName, defaultValue));
         }
 
+        protected void BindBoolFeature(System.Xml.Linq.XElement cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            { 
+                if (SystemConfig.isOptSet(featureName) && SystemConfig.getOptBoolean(featureName))
+                    cfg.SetElementValue(settingName, trueValue);
+                else
+                    cfg.SetElementValue(settingName, falseValue);
+            }
+        }
+
+        // yml and bml bindfeatures
         protected void BindFeature(YmlContainer cfg, string settingName, string featureName, string defaultValue, bool force = false)
         {
             if (force || Features.IsSupported(featureName))
                 cfg[settingName] = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+        }
+
+        protected void BindFeature(BmlContainer cfg, string settingName, string featureName, string defaultValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+                cfg[settingName] = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+        }
+
+        protected void BindBoolFeature(YmlContainer cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && SystemConfig.getOptBoolean(featureName))
+                    cfg[settingName] = trueValue;
+                else
+                    cfg[settingName] = falseValue;
+            }   
+        }
+
+        protected void BindBoolFeature(BmlContainer cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && SystemConfig.getOptBoolean(featureName))
+                    cfg[settingName] = trueValue;
+                else
+                    cfg[settingName] = falseValue;
+            }
         }
 
         protected void BindFeature(IniSection cfg, string settingName, string featureName, string defaultValue, bool force = false)
@@ -474,12 +541,38 @@ namespace emulatorLauncher
                 cfg[settingName] = SystemConfig.GetValueOrDefault(featureName, defaultValue);
         }
 
+        // Qtini bindfeatures
+        protected void BindQtIniFeature(IniFile ini, string section, string settingName, string featureName, string defaultValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                bool isCustomValue = SystemConfig.isOptSet(featureName) && !string.IsNullOrEmpty(SystemConfig[featureName]);
+                string value = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+
+                ini.WriteValue(section, settingName + "\\default", isCustomValue ? "false" : "true");                
+                ini.WriteValue(section, settingName, value);                
+            }
+        }
+
+        // json bindfeatures
         protected void BindFeature(DynamicJson cfg, string settingName, string featureName, string defaultValue, bool force = false)
         {
             if (force || Features.IsSupported(featureName))
                 cfg[settingName] = SystemConfig.GetValueOrDefault(featureName, defaultValue);
         }
 
+        protected void BindBoolFeature(DynamicJson cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && SystemConfig.getOptBoolean(featureName))
+                    cfg[settingName] = trueValue;
+                else
+                    cfg[settingName] = falseValue;
+            } 
+        }
+
+        // cfg bindfeatures
         protected void BindBoolFeature(ConfigFile cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
         {
             if (force || Features.IsSupported(featureName))
@@ -497,6 +590,36 @@ namespace emulatorLauncher
                 cfg[settingName] = SystemConfig.GetValueOrDefault(featureName, defaultValue);
         }
 
+        // ini bindfeatures
+        protected void BindIniFeature(IniFile ini, string section, string settingName, string featureName, string defaultValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (force || Features.IsSupported(featureName))
+                    ini.WriteValue(section, settingName, SystemConfig.GetValueOrDefault(featureName, defaultValue));
+            }
+        }
+
+        protected void BindBoolIniFeature(IniFile ini, string section, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && SystemConfig.getOptBoolean(featureName))
+                    ini.WriteValue(section, settingName, trueValue);
+                else
+                    ini.WriteValue(section, settingName, falseValue);
+            }
+        }
+
+        protected void SetIniPath(IniFile ini, string section, string settingName, string pathName)
+        {
+            if (!Directory.Exists(pathName))
+                try { Directory.CreateDirectory(pathName); }
+                catch { }
+
+            if (!string.IsNullOrEmpty(pathName))
+                ini.WriteValue(section, settingName, pathName);
+        }
     }
 
     enum ExitCodes : int

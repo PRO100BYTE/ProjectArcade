@@ -5,11 +5,13 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using emulatorLauncher.PadToKeyboard;
 using System.Windows.Forms;
 using System.Threading;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
+using EmulatorLauncher.PadToKeyboard;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class DemulGenerator : Generator
     {
@@ -32,44 +34,18 @@ namespace emulatorLauncher
             if (!File.Exists(exe))
                 return null;
 
-            string demulCore = "dc";
-
-            if (emulator == "demul-hikaru" || core == "hikaru")
-                demulCore = "hikaru";
-            else if (emulator == "demul-gaelco" || core == "gaelco")
-                demulCore = "gaelco";
-            else if (emulator == "demul-atomiswave" || core == "atomiswave")
-                demulCore = "awave";
-            else if (emulator == "demul-naomi" || emulator == "demul-naomi2" || core == "naomi")
-                demulCore = "naomi";
-            else
-            {
-                switch (system)
-                {
-                    case "hikaru":
-                    case "gaelco":
-                    case "naomi":
-                        demulCore = system;
-                        break;
-                    case "naomi2":
-                        demulCore = "naomi"; 
-                        break;
-                    case "atomiswave":
-                        demulCore = "awave"; 
-                        break;
-                }
-            }
+            string demulCore = GetDemulCore(emulator, core, system);
 
             // Allow fake decorations if ratio is set to 4/3, otherwise disable bezels
-            if (SystemConfig.isOptSet("ratio") && SystemConfig["ratio"] != "1")
+            if (SystemConfig.isOptSet("demul_ratio") && SystemConfig["demul_ratio"] != "1")
                 SystemConfig["bezel"] = "none";
 
             var bezels = BezelFiles.GetBezelFiles(system, rom, resolution);
             _isUsingReshader = ReshadeManager.Setup(ReshadeBezelType.dxgi, ReshadePlatform.x86, system, rom, path, resolution, bezels != null);
             if (_isUsingReshader)
             {
-                if (bezels != null) 
-                    SystemConfig["ratio"] = "0"; // Force stretch mode if bezel is used
+                if (bezels != null)
+                    SystemConfig["demul_ratio"] = "0"; // Force stretch mode if bezel is used
             }
             else 
             {
@@ -96,72 +72,6 @@ namespace emulatorLauncher
                 WorkingDirectory = path,
                 Arguments = "-run=" + demulCore + " -rom=\"" + Path.GetFileNameWithoutExtension(rom).ToLower() + "\"",
             };            
-        }
-
-        public override int RunAndWait(ProcessStartInfo path)
-        {
-            FakeBezelFrm bezel = null;
-
-            if (_bezelFileInfo != null)
-                bezel = _bezelFileInfo.ShowFakeBezel(_resolution);
-
-            path.WindowStyle = ProcessWindowStyle.Maximized;
-            var process = Process.Start(path);
-
-            while (process != null)
-            {
-                if (process.WaitForExit(50))
-                {
-                    process = null;
-                    break;
-                }
-
-                var hWnd = User32.FindHwnd(process.Id);
-                if (hWnd == IntPtr.Zero)
-                    continue;
-                
-                var name = User32.GetWindowText(hWnd);
-                if (name != null && name.StartsWith("gpu"))
-                {
-                    var style = User32.GetWindowStyle(hWnd);
-                    if (style.HasFlag(WS.CAPTION))
-                    {
-                        if (_isUsingReshader)
-                            SendKeys.SendWait("%~");
-                        else
-                        {
-                            int resX = (_resolution == null ? Screen.PrimaryScreen.Bounds.Width : _resolution.Width);
-                            int resY = (_resolution == null ? Screen.PrimaryScreen.Bounds.Height : _resolution.Height);
-                            style &= ~WS.CAPTION;
-                            style &= ~WS.BORDER;
-                            style &= ~WS.DLGFRAME;
-                            style &= ~WS.SYSMENU;
-
-                            User32.SetWindowStyle(hWnd, style);
-                            User32.SetMenu(hWnd, IntPtr.Zero);
-                            User32.SetWindowPos(hWnd, IntPtr.Zero, 0, 0, resX, resY, SWP.NOZORDER | SWP.FRAMECHANGED);
-                        }                        
-                    }
-
-                    break;
-                }
-            }
-
-            if (process != null)
-            {
-                process.WaitForExit();
-
-                if (bezel != null)
-                    bezel.Dispose();
-
-                try { return process.ExitCode; }
-                catch { }
-            }
-            
-            if (bezel != null)
-                bezel.Dispose();
-
-            return -1;
         }
 
         private void SetupGeneralConfig(string path, string rom, string system, string core, string demulCore)
@@ -234,9 +144,9 @@ namespace emulatorLauncher
                     else if (Features.IsSupported("cpumode"))
                         ini.WriteValue("main", "cpumode", "1");
 
-                    if (SystemConfig.isOptSet("videomode") && !string.IsNullOrEmpty(SystemConfig["videomode"]))
-                        ini.WriteValue("main", "videomode", SystemConfig["videomode"]);
-                    else if (Features.IsSupported("videomode"))
+                    if (SystemConfig.isOptSet("demul_videomode") && !string.IsNullOrEmpty(SystemConfig["demul_videomode"]))
+                        ini.WriteValue("main", "videomode", SystemConfig["demul_videomode"]);
+                    else if (Features.IsSupported("demul_videomode"))
                         ini.WriteValue("main", "videomode", "1024");
 
                     if (SystemConfig.isOptSet("dc_region") && !string.IsNullOrEmpty(SystemConfig["dc_region"]))
@@ -258,7 +168,7 @@ namespace emulatorLauncher
         private string _videoDriverName = "gpuDX11";
 
         private void SetupDx11Config(string path, string rom, string system, ScreenResolution resolution)
-        {                                
+        {
             string iniFile = Path.Combine(path, _videoDriverName + ".ini");
 
             try
@@ -273,23 +183,110 @@ namespace emulatorLauncher
                     ini.WriteValue("resolution", "Width", resolution.Width.ToString());
                     ini.WriteValue("resolution", "Height", resolution.Height.ToString());
 
-                    if (SystemConfig.isOptSet("internal_resolution") && !string.IsNullOrEmpty(SystemConfig["internal_resolution"]))
-                        ini.WriteValue("main", "scaling", SystemConfig["internal_resolution"]);
-                    else if (Features.IsSupported("internal_resolution"))
-                        ini.WriteValue("main", "scaling", "1");
-
-                    if (SystemConfig.isOptSet("ratio") && !string.IsNullOrEmpty(SystemConfig["ratio"]))
-                        ini.WriteValue("main", "aspect", SystemConfig["ratio"]);
-                    else if (Features.IsSupported("ratio"))
-                        ini.WriteValue("main", "aspect", "1");
+                    BindIniFeature(ini, "main", "scaling", "internal_resolution", "1");
+                    BindIniFeature(ini, "main", "aspect", "demul_ratio", "1");
 
                     if (SystemConfig.isOptSet("smooth"))
                         ini.WriteValue("main", "bilinearfb", SystemConfig.getOptBoolean("smooth") ? "true" : "false");
-                    else if (Features.IsSupported("ratio"))
+                    else if (Features.IsSupported("smooth"))
                         ini.WriteValue("main", "bilinearfb", "true");
                 }
             }
             catch { }
+        }
+
+        private string GetDemulCore(string emulator, string core, string system)
+        {
+            if (emulator == "demul-hikaru" || core == "hikaru")
+                return "hikaru";
+            else if (emulator == "demul-gaelco" || core == "gaelco")
+                return "gaelco";
+            else if (emulator == "demul-atomiswave" || core == "atomiswave")
+                return "awave";
+            else if (emulator == "demul-naomi" || emulator == "demul-naomi2" || core == "naomi")
+                return "naomi";
+            else
+            {
+                switch (system)
+                {
+                    case "hikaru":
+                    case "gaelco":
+                    case "naomi":
+                        return system;
+                    case "naomi2":
+                        return "naomi";
+                    case "atomiswave":
+                        return "awave";
+                }
+            }
+            
+            return "dc";
+        }
+
+        public override int RunAndWait(ProcessStartInfo path)
+        {
+            FakeBezelFrm bezel = null;
+
+            if (_bezelFileInfo != null)
+                bezel = _bezelFileInfo.ShowFakeBezel(_resolution);
+
+            path.WindowStyle = ProcessWindowStyle.Maximized;
+            var process = Process.Start(path);
+
+            while (process != null)
+            {
+                if (process.WaitForExit(50))
+                {
+                    process = null;
+                    break;
+                }
+
+                var hWnd = User32.FindHwnd(process.Id);
+                if (hWnd == IntPtr.Zero)
+                    continue;
+
+                var name = User32.GetWindowText(hWnd);
+                if (name != null && name.StartsWith("gpu"))
+                {
+                    var style = User32.GetWindowStyle(hWnd);
+                    if (style.HasFlag(WS.CAPTION))
+                    {
+                        if (_isUsingReshader)
+                            SendKeys.SendWait("%~");
+                        else
+                        {
+                            int resX = (_resolution == null ? Screen.PrimaryScreen.Bounds.Width : _resolution.Width);
+                            int resY = (_resolution == null ? Screen.PrimaryScreen.Bounds.Height : _resolution.Height);
+                            style &= ~WS.CAPTION;
+                            style &= ~WS.BORDER;
+                            style &= ~WS.DLGFRAME;
+                            style &= ~WS.SYSMENU;
+
+                            User32.SetWindowStyle(hWnd, style);
+                            User32.SetMenu(hWnd, IntPtr.Zero);
+                            User32.SetWindowPos(hWnd, IntPtr.Zero, 0, 0, resX, resY, SWP.NOZORDER | SWP.FRAMECHANGED);
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            if (process != null)
+            {
+                process.WaitForExit();
+
+                if (bezel != null)
+                    bezel.Dispose();
+
+                try { return process.ExitCode; }
+                catch { }
+            }
+
+            if (bezel != null)
+                bezel.Dispose();
+
+            return -1;
         }
     }
 }

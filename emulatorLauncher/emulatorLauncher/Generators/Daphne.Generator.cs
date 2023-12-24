@@ -5,9 +5,10 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
-using emulatorLauncher.Tools;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.Lightguns;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class HypseusGenerator : DaphneGenerator
     {
@@ -28,9 +29,6 @@ namespace emulatorLauncher
 
             if (_executableName == "daphne")
             {
-                //if (!SystemConfig.isOptSet("smooth"))
-                //    commandArray.Add("-nolinear_scale");
-
                 if (SystemConfig["ratio"] == "16/9")
                     commandArray.Add("-ignore_aspect_ratio");
 
@@ -47,10 +45,7 @@ namespace emulatorLauncher
                     commandArray.Add("-ignore_aspect_ratio");
                 else
                     commandArray.Add("-force_aspect_ratio");
-/*
-                if (SystemConfig.isOptSet("hypseus_scanlines") && SystemConfig["hypseus_scanlines"] == "scanlines")
-                    commandArray.Add("-scanlines");
-
+                /*
                 if (SystemConfig.isOptSet("hypseus_renderer") && SystemConfig["hypseus_renderer"] == "vulkan")
                 {
                     commandArray.Remove("-opengl");
@@ -81,10 +76,7 @@ namespace emulatorLauncher
                         return ret;
                 }                
             }
-            catch
-            {
-                
-            }
+            catch { }
 
             return null;
         }
@@ -199,13 +191,17 @@ namespace emulatorLauncher
                 commandArray.Add("2");
             }
 
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
             commandArray.Add("-x");
             commandArray.Add((resolution == null ? Screen.PrimaryScreen.Bounds.Width : resolution.Width).ToString());
 
             commandArray.Add("-y");
             commandArray.Add((resolution == null ? Screen.PrimaryScreen.Bounds.Height : resolution.Height).ToString());
 
-            commandArray.Add("-fullscreen");
+            if (fullscreen)
+                commandArray.Add("-fullscreen");
+
             commandArray.Add("-opengl");            
             commandArray.Add("-fastboot");
             

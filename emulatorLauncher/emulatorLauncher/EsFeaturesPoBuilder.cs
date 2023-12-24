@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using emulatorLauncher.Tools;
 using System.IO;
 using System.Windows.Forms;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.EmulationStation;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class EsFeaturesPoBuilder
     {
@@ -83,7 +84,7 @@ namespace emulatorLauncher
 
                 file.Save();
             }
-            MessageBox.Show("Локализации обновлены:\r\n" + root, null, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Translations updated :\r\n" + root, null, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private static List<string> GetEsFeaturesStrings()

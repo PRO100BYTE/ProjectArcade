@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
-using emulatorLauncher.Tools;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
+using EmulatorLauncher.Common.EmulationStation;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     partial class OpenBorGenerator : Generator
     {
@@ -112,8 +114,15 @@ namespace emulatorLauncher
             if (!File.Exists(ini) && !_isCustomRetrobatOpenBor)
                 return false;
 
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
             var conf = ConfigFile.FromFile(ini);
-            conf["fullscreen"] = "1";
+            
+            if (fullscreen)
+                conf["fullscreen"] = "1";
+            else
+                conf["fullscreen"] = "0";
+
             conf["vsync"] = SystemConfig["VSync"] != "false" ? "1" : "0";
             conf["usegl"] = "1";
             conf["stretch"] = SystemConfig.isOptSet("ratio") && SystemConfig["ratio"] == "1" ? "1" : "0";

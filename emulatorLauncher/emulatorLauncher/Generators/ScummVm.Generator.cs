@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
-using emulatorLauncher.PadToKeyboard;
-using emulatorLauncher.Tools;
-using VPinballLauncher;
 using System.Windows.Forms;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.FileFormats;
+using EmulatorLauncher.Common.EmulationStation;
+using EmulatorLauncher.PadToKeyboard;
+using EmulatorLauncher.VPinballLauncher;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class ScummVmGenerator : Generator
     {
@@ -39,64 +41,15 @@ namespace emulatorLauncher
             
             _resolution = resolution;
 
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
             string iniPath = Path.ChangeExtension(exe, ".ini");
 
-            using (IniFile ini = new IniFile(iniPath))
-            {
-                ini.WriteValue("scummvm", "gfx_mode", "opengl");
-                ini.WriteValue("scummvm", "confirm_exit", "false");
-                ini.WriteValue("scummvm", "gui_return_to_launcher_at_exit", "false");
-                ini.WriteValue("scummvm", "window_maximized", "false");
-
-                if (_bezelFileInfo != null)
-                    ini.WriteValue("scummvm", "fullscreen", "false");
-                else
-                    ini.WriteValue("scummvm", "fullscreen", "true");
-
-                if (Features.IsSupported("ratio") && SystemConfig.isOptSet("ratio") && SystemConfig["ratio"] == "stretch")
-                {
-                    ini.WriteValue("scummvm", "aspect_ratio", "false");                        
-                    _bezelFileInfo = null;
-                }
-                else
-                    ini.WriteValue("scummvm", "aspect_ratio", "true");
-
-                if (SystemConfig.isOptSet("VSync") && !SystemConfig.getOptBoolean("VSync"))
-                    ini.WriteValue("scummvm", "vsync", "false");
-                else
-                    ini.WriteValue("scummvm", "vsync", "true");
-
-                if (Features.IsSupported("scaler"))
-                {
-                    if (SystemConfig.isOptSet("scaler"))
-                        ini.WriteValue("scummvm", "scaler", SystemConfig["scaler"]);
-                    else
-                        ini.Remove("scummvm", "scaler");
-                }
-
-                if (Features.IsSupported("smooth"))
-                {
-                    if (SystemConfig.isOptSet("smooth") && SystemConfig.getOptBoolean("smooth"))
-                        ini.WriteValue("scummvm", "filtering", "true");
-                    else
-                        ini.WriteValue("scummvm", "filtering", "false");
-                }
-
-                ini.WriteValue("scummvm", "updates_check", "0");
-
-                if (!string.IsNullOrEmpty(AppConfig["saves"]) && Directory.Exists(AppConfig["saves"]))
-                {
-                    string savePath = Path.Combine(AppConfig.GetFullPath("saves"), system);
-                    if (!Directory.Exists(savePath)) try { Directory.CreateDirectory(savePath); }
-                        catch { }
-
-                    ini.WriteValue("scummvm", "savepath", savePath);
-                }
-            }
+            SetupConfiguration(iniPath, system, fullscreen);
 
             List<string> commandArray = new List<string>();
 
-            if (_bezelFileInfo == null)
+            if (_bezelFileInfo == null && fullscreen)
                 commandArray.Add("--fullscreen");
 
             commandArray.Add("--no-console");
@@ -121,6 +74,178 @@ namespace emulatorLauncher
                 WorkingDirectory = path,
                 Arguments = args
             };
+        }
+
+        private void SetupConfiguration(string iniPath, string system, bool fullscreen = true)
+        {
+            using (IniFile ini = new IniFile(iniPath))
+            {
+                if (Features.IsSupported("gfx_mode") && SystemConfig.isOptSet("gfx_mode"))
+                    ini.WriteValue("scummvm", "gfx_mode", SystemConfig["gfx_mode"]);
+                else
+                    ini.WriteValue("scummvm", "gfx_mode", "opengl");
+
+                if (Features.IsSupported("render_mode") && SystemConfig.isOptSet("render_mode"))
+                    ini.WriteValue("scummvm", "render_mode", SystemConfig["render_mode"]);
+                else
+                    ini.Remove("scummvm", "render_mode");
+
+                ini.WriteValue("scummvm", "confirm_exit", "false");
+                ini.WriteValue("scummvm", "gui_return_to_launcher_at_exit", "false");
+                ini.WriteValue("scummvm", "window_maximized", "false");
+
+                // Discord
+                if (SystemConfig.isOptSet("discord") && SystemConfig.getOptBoolean("discord"))
+                    ini.WriteValue("scummvm", "discord_rpc", "true");
+                else
+                    ini.WriteValue("scummvm", "discord_rpc", "false");
+
+                if (_bezelFileInfo != null || !fullscreen)
+                    ini.WriteValue("scummvm", "fullscreen", "false");
+                else
+                    ini.WriteValue("scummvm", "fullscreen", "true");
+
+                if (Features.IsSupported("ratio") && SystemConfig.getOptBoolean("ratio"))
+                    ini.WriteValue("scummvm", "aspect_ratio", "false");
+                else
+                    ini.WriteValue("scummvm", "aspect_ratio", "true");
+
+                if (SystemConfig.isOptSet("vsync") && !SystemConfig.getOptBoolean("vsync"))
+                    ini.WriteValue("scummvm", "vsync", "false");
+                else
+                    ini.WriteValue("scummvm", "vsync", "true");
+
+                if (Features.IsSupported("scaler"))
+                {
+                    switch (SystemConfig["scaler"])
+                    {
+                        case "normal1":
+                            ini.WriteValue("scummvm", "scale_factor", "1");
+                            ini.WriteValue("scummvm", "scaler", "normal");
+                            break;
+                        case "normal2":
+                            ini.WriteValue("scummvm", "scale_factor", "2");
+                            ini.WriteValue("scummvm", "scaler", "normal");
+                            break;
+                        case "normal3":
+                            ini.WriteValue("scummvm", "scale_factor", "3");
+                            ini.WriteValue("scummvm", "scaler", "normal");
+                            break;
+                        case "normal4":
+                            ini.WriteValue("scummvm", "scale_factor", "4");
+                            ini.WriteValue("scummvm", "scaler", "normal");
+                            break;
+                        case "normal5":
+                            ini.WriteValue("scummvm", "scale_factor", "5");
+                            ini.WriteValue("scummvm", "scaler", "normal");
+                            break;
+                        case "hq2":
+                            ini.WriteValue("scummvm", "scale_factor", "2");
+                            ini.WriteValue("scummvm", "scaler", "hq");
+                            break;
+                        case "hq3":
+                            ini.WriteValue("scummvm", "scale_factor", "3");
+                            ini.WriteValue("scummvm", "scaler", "hq");
+                            break;
+                        case "edge2":
+                            ini.WriteValue("scummvm", "scale_factor", "2");
+                            ini.WriteValue("scummvm", "scaler", "edge");
+                            break;
+                        case "edge3":
+                            ini.WriteValue("scummvm", "scale_factor", "3");
+                            ini.WriteValue("scummvm", "scaler", "edge");
+                            break;
+                        case "advmame2":
+                            ini.WriteValue("scummvm", "scale_factor", "2");
+                            ini.WriteValue("scummvm", "scaler", "advmame");
+                            break;
+                        case "advmame3":
+                            ini.WriteValue("scummvm", "scale_factor", "3");
+                            ini.WriteValue("scummvm", "scaler", "advmame");
+                            break;
+                        case "advmame4":
+                            ini.WriteValue("scummvm", "scale_factor", "4");
+                            ini.WriteValue("scummvm", "scaler", "advmame");
+                            break;
+                        case "sai2":
+                            ini.WriteValue("scummvm", "scale_factor", "2");
+                            ini.WriteValue("scummvm", "scaler", "sai");
+                            break;
+                        case "supersai2":
+                            ini.WriteValue("scummvm", "scale_factor", "2");
+                            ini.WriteValue("scummvm", "scaler", "supersai");
+                            break;
+                        case "supereagle2":
+                            ini.WriteValue("scummvm", "scale_factor", "2");
+                            ini.WriteValue("scummvm", "scaler", "supereagle");
+                            break;
+                        case "pm2":
+                            ini.WriteValue("scummvm", "scale_factor", "2");
+                            ini.WriteValue("scummvm", "scaler", "pm");
+                            break;
+                        case "dotmatrix2":
+                            ini.WriteValue("scummvm", "scale_factor", "2");
+                            ini.WriteValue("scummvm", "scaler", "dotmatrix");
+                            break;
+                        case "tv2":
+                            ini.WriteValue("scummvm", "scale_factor", "2");
+                            ini.WriteValue("scummvm", "scaler", "tv");
+                            break;
+                        default:
+                            ini.Remove("scummvm", "scale_factor");
+                            ini.Remove("scummvm", "scaler");
+                            break;
+                    }
+                }
+
+                if (Features.IsSupported("smooth"))
+                {
+                    if (SystemConfig.isOptSet("smooth") && SystemConfig.getOptBoolean("smooth"))
+                        ini.WriteValue("scummvm", "filtering", "true");
+                    else
+                        ini.WriteValue("scummvm", "filtering", "false");
+                }
+
+                if (Features.IsSupported("subtitles") && SystemConfig.getOptBoolean("subtitles"))
+                    ini.WriteValue("scummvm", "subtitles", "true");
+                else
+                    ini.WriteValue("scummvm", "subtitles", "false");
+
+                if (Features.IsSupported("antialiasing") && SystemConfig.isOptSet("antialiasing"))
+                    ini.WriteValue("scummvm", "antialiasing", SystemConfig["antialiasing"]);
+                else
+                    ini.Remove("scummvm", "antialiasing");
+
+                ini.WriteValue("scummvm", "updates_check", "0");
+
+                if (!string.IsNullOrEmpty(AppConfig["saves"]) && Directory.Exists(AppConfig["saves"]))
+                {
+                    string savePath = Path.Combine(AppConfig.GetFullPath("saves"), system);
+                    if (!Directory.Exists(savePath)) try { Directory.CreateDirectory(savePath); }
+                        catch { }
+
+                    ini.WriteValue("scummvm", "savepath", savePath);
+                }
+
+                // Write themepath and extrapath (same location as libretro scummvm core)
+                string biosPath = AppConfig.GetFullPath("bios");
+                string themePath = Path.Combine(biosPath, "scummvm", "theme");
+                string extraPath = Path.Combine(biosPath, "scummvm", "extra");
+
+                if (Directory.Exists(themePath))
+                {
+                    ini.WriteValue("scummvm", "themepath", themePath);
+                }
+                if (Directory.Exists(extraPath))
+                {
+                    ini.WriteValue("scummvm", "extrapath", extraPath);
+                }
+
+                if (Features.IsSupported("unsupported_games") && SystemConfig.getOptBoolean("unsupported_games"))
+                    ini.WriteValue("scummvm", "enable_unsupported_game_warning", "false");
+                else
+                    ini.Remove("scummvm", "enable_unsupported_game_warning");
+            }
         }
 
         public override int RunAndWait(ProcessStartInfo path)

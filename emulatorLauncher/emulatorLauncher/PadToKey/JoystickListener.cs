@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using emulatorLauncher.Tools;
 using System.Threading;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.IO;
 using System.Management;
+using EmulatorLauncher.Common.EmulationStation;
+using EmulatorLauncher.Common;
 
-namespace emulatorLauncher.PadToKeyboard
+namespace EmulatorLauncher.PadToKeyboard
 {
     class JoystickListener : IDisposable
     {
@@ -260,6 +261,10 @@ namespace emulatorLauncher.PadToKeyboard
                             case SDL.SDL_EventType.SDL_JOYDEVICEADDED:
                                 joysticks.AddJoystick(evt.jdevice.which);
                                 break;
+
+                            //case SDL.SDL_EventType.SDL_JOYBATTERYUPDATED:
+                            default:
+                                continue;
                         }
 
                         foreach (var joy in joysticks)

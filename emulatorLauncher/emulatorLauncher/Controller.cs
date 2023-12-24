@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using emulatorLauncher.Tools;
+using EmulatorLauncher.Common.Joysticks;
+using EmulatorLauncher.Common.EmulationStation;
+using EmulatorLauncher.Common;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class Controller
     {
@@ -24,12 +26,12 @@ namespace emulatorLauncher
         
         public bool IsKeyboard { get { return "Keyboard".Equals(Name, StringComparison.InvariantCultureIgnoreCase); } }
 
-        public SdlJoystickGuid GetSdlGuid(SdlVersion version = SdlVersion.SDL2_0_X)
+        public SdlJoystickGuid GetSdlGuid(SdlVersion version = SdlVersion.SDL2_0_X, bool noRemoveDriver = false)
         {
             if (version == SdlVersion.Unknown)
                 return Guid;
 
-            return Guid.ConvertSdlGuid(Name??"", version);            
+            return Guid.ConvertSdlGuid(Name??"", version, noRemoveDriver);            
         }
 
         private HashSet<string> _compatibleSdlGuids;
@@ -124,7 +126,6 @@ namespace emulatorLauncher
 
         #region XInput
         private XInputDevice _xInputDevice;
-        private bool _xInputDeviceKnown;
 
         public bool IsXInputDevice
         {
@@ -137,27 +138,40 @@ namespace emulatorLauncher
             }
         }
 
+        private static bool _xInputDevicesKnown;
+
+        private static void EnsureXInputControllers()
+        {
+            if (_xInputDevicesKnown)
+                return;
+
+            _xInputDevicesKnown = true;
+
+            var devices = XInputDevice.GetDevices();
+            var xInputControllers = Program.Controllers.Where(c => c.Name != "Keyboard" && c.Config != null && XInputDevice.IsXInputDevice(c.Config.DeviceGUID)).ToArray();
+            
+            foreach (var c in xInputControllers)
+            {
+                var inst = devices.FirstOrDefault(dev => dev.Path == c.DevicePath || dev.ParentPath == c.DevicePath);
+                if (inst != null)
+                    c._xInputDevice = inst;
+            }
+
+            foreach (var c in xInputControllers.Where(dev => dev._xInputDevice == null).OrderBy(c => c.SdlController != null ? c.SdlController.Index : c.PlayerIndex))
+            {
+                int idx = 0;
+                while (xInputControllers.Any(dev => dev._xInputDevice != null && dev._xInputDevice.DeviceIndex == idx))
+                    idx++;
+
+                c._xInputDevice = new XInputDevice(idx);
+            }
+        }
+
         public XInputDevice XInput
         {
             get
-            {
-                if (_xInputDeviceKnown == false)
-                {
-                    _xInputDeviceKnown = true;
-
-
-                    if (Name == "Keyboard" || !IsXInputDevice)
-                        return null;
-
-                    var xinputindex = Program.Controllers
-                        .OrderBy(c => c.DeviceIndex)
-                        .Where(c => c == this || c.IsXInputDevice)
-                        .ToList()
-                        .IndexOf(this);
-
-                    _xInputDevice = new XInputDevice(xinputindex);
-                }
-
+            {                    
+                EnsureXInputControllers();
                 return _xInputDevice;
             }
         }
@@ -459,5 +473,12 @@ namespace emulatorLauncher
 
             return key;
         }
+
+        public static int GetSdlControllerIndex(this Controller ctrl)
+        {
+            var sdlDev = SdlGameController.GetGameControllerByPath(ctrl.DevicePath);
+            return sdlDev != null ? sdlDev.Index : ctrl.DeviceIndex;
+        }
+
     }
 }

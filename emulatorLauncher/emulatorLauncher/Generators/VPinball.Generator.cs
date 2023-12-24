@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
-using VPinballLauncher;
+using EmulatorLauncher.VPinballLauncher;
 using System.Xml;
 using System.Drawing;
-using emulatorLauncher.Tools;
 using Microsoft.Win32;
 using System.Windows.Forms;
+using EmulatorLauncher.Common;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class VPinballGenerator : Generator
     {
@@ -97,8 +97,10 @@ namespace emulatorLauncher
             {
                 var px = Process.Start(path);
 
-                using (new KeyboardManager(() => KillProcess(px, _rom)))
+                using (var kb = new KeyboardManager(() => KillProcess(px)))
                 {
+                    kb.RegisterKeyboardAction(() => SaveScreenshot(), (vkCode, scanCode) => vkCode == 44 && scanCode == 55);
+
                     while (!px.HasExited)
                     {
                         if (px.WaitForExit(10))
@@ -147,13 +149,31 @@ namespace emulatorLauncher
             base.Cleanup();
         }
 
-        private static void KillProcess(Process px, string rom)
+        private static void SaveScreenshot()
         {
-            try
+            if (!ScreenCapture.AddScreenCaptureToGameList(Program.SystemConfig["system"], Program.SystemConfig["rom"]))
             {
-                ScreenCapture.AddScreenCaptureToGameList(rom);
-                px.Kill();
+                string path = Program.AppConfig.GetFullPath("screenshots");
+                if (!Directory.Exists(path))
+                    return;
+
+                int index = 0;
+                string fn;
+
+                do
+                {
+                    fn = Path.Combine(path, Path.GetFileNameWithoutExtension(Program.SystemConfig["rom"]) + (index == 0 ? "" : "_" + index.ToString()) + ".jpg");
+                    index++;
+                } 
+                while (File.Exists(fn));
+
+                ScreenCapture.CaptureScreen(fn);
             }
+        }
+
+        private static void KillProcess(Process px)
+        {
+            try { px.Kill(); }
             catch { }
         }
 
@@ -264,39 +284,66 @@ namespace emulatorLauncher
             catch { }
         }
 
-        private static void EnsureBackglassServerRegistered(string path)
+        private static string ReadRegistryValue(RegistryKeyEx key, string path, string value)
+        {
+            var regKeyc = key.OpenSubKey(path, RegistryViewEx.Registry32);
+            if (regKeyc != null)
+            {
+                object pth = regKeyc.GetValue(value);
+                    if (pth != null)
+                        return pth.ToString();
+
+                regKeyc.Close();
+            }
+
+            return null;
+        }
+
+        private static bool ShouldRegisterBackglassServer(string path)
         {
             try
             {
-                RegistryKey regKeyc = Registry.ClassesRoot.OpenSubKey(@"Record\{080561AA-C3D7-3933-AF39-15A780324DB1}", false);
-                if (regKeyc != null)
-                {
-                    var sk = regKeyc.OpenSubKey(@"1.0.0.0");
-                    if (sk != null)
-                    {
-                        object pth = sk.GetValue("CodeBase");
-                        if (pth != null)
-                        {
-                            try
-                            {
-                                string localPath = new Uri(pth.ToString()).LocalPath;
-                                if (File.Exists(localPath))
-                                {
-                                    regKeyc.Close();
-                                    return;
-                                }
-                            }
-                            catch { }
-                        }
-                    }
-                    regKeyc.Close();
-                }
+                var clsid = ReadRegistryValue(RegistryKeyEx.ClassesRoot, @"B2S.B2SPlayer\CLSID", null);
+                if (string.IsNullOrEmpty(clsid))
+                    return true;
 
+                var codeBase = ReadRegistryValue(RegistryKeyEx.ClassesRoot, @"CLSID\" + clsid + @"\InprocServer32", "CodeBase");
+                if (string.IsNullOrEmpty(codeBase))
+                    return true;
+                
+                string localPath = new Uri(codeBase).LocalPath;
+                if (!File.Exists(localPath))
+                    return true;
+
+                // Path has changed ?
+                if (!localPath.Equals(path, StringComparison.InvariantCultureIgnoreCase))
+                    return true;
+
+                // Version changed ?
+                var assembly = ReadRegistryValue(RegistryKeyEx.ClassesRoot, @"CLSID\" + clsid + @"\InprocServer32", "Assembly");
+                var assemblyName = System.Reflection.AssemblyName.GetAssemblyName(localPath).FullName;
+
+                return assembly != assemblyName;
+            }
+            catch
+            {
+                return true;
+            }
+        }
+
+        private static void EnsureBackglassServerRegistered(string path)
+        {
+            string dllPath = Path.Combine(path, "BackglassServer", "B2SBackglassServer.dll");
+            if (!ShouldRegisterBackglassServer(dllPath))
+                return;
+
+            try
+            {            
                 Process px = new Process();
                 px.EnableRaisingEvents = true;
                 px.StartInfo.Verb = "RunAs";
                 px.StartInfo.FileName = Path.Combine(GetRegAsmPath(), "regasm.exe");
-                px.StartInfo.Arguments = "\"" + Path.Combine(path, "BackglassServer", "B2SBackglassServer.dll") + "\" /codebase";
+                px.StartInfo.Arguments = "\"" + dllPath + "\" /codebase";
                 px.StartInfo.UseShellExecute = true;
                 px.StartInfo.CreateNoWindow = true;
                 px.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
@@ -305,7 +352,6 @@ namespace emulatorLauncher
             }
             catch { }
         }
-
 
         private static string GetRegAsmPath()
         {
@@ -345,34 +391,43 @@ namespace emulatorLauncher
             return str2;
         }
 
-        private static void EnsureVPinMameRegistered(string path)
+        private static bool ShouldRegisterVPinMame(string path)
         {
             try
             {
-                RegistryKey regKeyc = Registry.ClassesRoot.OpenSubKey(@"TypeLib\{57270B76-C846-4B1E-88D4-53C8337A0623}", false);
-                if (regKeyc != null)
-                {
-                    var sk = regKeyc.OpenSubKey(@"1.0\0\win32");
-                    if (sk != null)
-                    {
-                        object pth = sk.GetValue(null);
-                        if (pth != null)
-                        {
-                            if (File.Exists(pth.ToString()))
-                            {
-                                regKeyc.Close();
-                                return;
-                            }
-                        }
-                    }
-                    regKeyc.Close();
-                }
+                var dllPath = ReadRegistryValue(RegistryKeyEx.ClassesRoot, @"TypeLib\{57270B76-C846-4B1E-88D4-53C8337A0623}\1.0\0\win32", null);
+                if (string.IsNullOrEmpty(dllPath))
+                    return true;
 
+                string localPath = new Uri(dllPath).LocalPath;
+                if (!File.Exists(localPath))
+                    return true;
+
+                // Path has changed ?
+                if (!localPath.Equals(path, StringComparison.InvariantCultureIgnoreCase))
+                    return true;
+
+                return false;
+            }
+            catch
+            {
+                return true;
+            }
+        }
+
+        private static void EnsureVPinMameRegistered(string path)
+        {
+            string dllPath = Path.Combine(path, "VPinMame", "VPinMAME.dll");
+            if (!ShouldRegisterVPinMame(dllPath))
+                return;
+
+            try
+            {
                 Process px = new Process();
                 px.EnableRaisingEvents = true;
                 px.StartInfo.Verb = "RunAs";
                 px.StartInfo.FileName = Path.Combine(FileTools.GetSystemDirectory(), "regsvr32.exe");
-                px.StartInfo.Arguments = "/s \"" + Path.Combine(path, "VPinMame", "VPinMAME.dll") + "\"";
+                px.StartInfo.Arguments = "/s \"" + dllPath + "\"";
                 px.StartInfo.UseShellExecute = true;
                 px.StartInfo.CreateNoWindow = true;
                 px.Start();
@@ -425,6 +480,16 @@ namespace emulatorLauncher
                 SetOption(regKeyc, "FullScreen", resolution == null ? 0 : 1);
                 SetOption(regKeyc, "AdaptiveVSync", SystemConfig["VSync"] != "false" ? 1 : 0);
                 SetOption(regKeyc, "BGSet", SystemConfig["arcademode"] == "1" ? 1 : 0);
+                SetOption(regKeyc, "LRAxis", SystemConfig["nouse_joyaxis"] == "1" ? 0 : 1);
+                SetOption(regKeyc, "UDAxis", SystemConfig["nouse_joyaxis"] == "1" ? 0 : 2);
+                SetOption(regKeyc, "PlungerAxis", SystemConfig["nouse_joyaxis"] == "1" ? 0 : 3);
+
+                int deadzone = 15;
+
+                if (SystemConfig.isOptSet("joy_deadzone") && !string.IsNullOrEmpty(SystemConfig["joy_deadzone"]))
+                    deadzone = SystemConfig["joy_deadzone"].ToInteger();
+                
+                SetOption(regKeyc, "DeadZone", deadzone);
 
                 regKeyc.Close();
             }

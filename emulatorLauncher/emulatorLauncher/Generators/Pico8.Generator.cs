@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using EmulatorLauncher.Common;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
     class Pico8Generator : Generator
     {
@@ -16,11 +17,18 @@ namespace emulatorLauncher
             string exe = Path.Combine(path, "pico8.exe");
             if (!File.Exists(exe))
                 return null;
-				
-			List<string> commandArray = new List<string>();
+
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
+            List<string> commandArray = new List<string>();
             
             commandArray.Add("-run");
-            commandArray.Add("-windowed 0");
+
+            if (fullscreen)
+                commandArray.Add("-windowed 0");
+            else
+                commandArray.Add("-windowed 1");
+
             commandArray.Add("-home " + '\u0022' + path + '\u0022');
             commandArray.Add("-root_path " + '\u0022' + Path.GetDirectoryName(rom) + '\u0022');
 			commandArray.Add("-desktop " + '\u0022' + AppConfig.GetFullPath("screenshots") + "\\pico8" + '\u0022');

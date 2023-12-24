@@ -5,76 +5,25 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
+using EmulatorLauncher.Common.FileFormats;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.Lightguns;
 
-namespace emulatorLauncher
+namespace EmulatorLauncher
 {
-    class Model2Generator : Generator
+    partial class Model2Generator : Generator
     {
-        static Dictionary<string, string> parentRoms = new Dictionary<string, string>() 
-        { 
-            // Daytona USA
-            { "dayton93", "daytona" },
-            { "daytonas", "daytona" },
-            { "daytonase", "daytona" },
-            { "daytonat", "daytona" },
-            { "daytonata", "daytona" },
-            { "daytonagtx", "daytona" },
-            { "daytonam", "daytona" },
-            // Dead Or Alive
-            { "doaa", "doa" },
-            // Dynamite Cop
-            { "dynmcopb", "dynamcop" },
-            { "dynmcopc", "dynamcop" },
-            // Dynamite Deka 
-            { "dyndeka2", "dynamcop" },
-            { "dyndek2b", "dynamcop" },
-            // Indianapolis 500
-            { "indy500d", "indy500" },
-            { "indy500to", "indy500" },
-            // Last Bronx
-            { "lastbrnxj", "lastbrnx" },
-            { "lastbrnxu", "lastbrnx" },
-            // Pilot Kids
-            { "pltkidsa", "pltkids" },            
-            // Over Rev
-            { "overrevb", "overrev" }, 
-            // Sega Rally Championship
-            { "srallycb", "srallyc" },
-            { "srallyp", "srallyc" },
-            // Sega Touring Car Championship
-            { "stcca", "stcc" },
-            { "stccb", "stcc" },
-            // Top Skater
-            { "topskatrj", "topskatr" },
-            { "topskatru", "topskatr" },
-            // Sonic The Fighters
-            { "sfight", "schamp" },            
-            // Virtua Cop
-            { "vcopa", "vcop" },            
-            // Virtua Fighter 2
-            { "vf2o", "vf2" },
-            { "vf2a", "vf2" },
-            { "vf2b", "vf2" },
-            // Virtua Striker
-            { "vstrikro", "vstriker" },
-            // Virtual On Cybertroopers
-            { "vonj", "von" },
-            // Zero Gunner
-            { "zerogunaj", "zerogun" },
-            { "zerogunj", "zerogun" },
-            { "zeroguna", "zerogun" },
-        };
-
+        
         private BezelFiles _bezelFileInfo;
         private ScreenResolution _resolution;
+        private bool _dinput;
+        private string _destFile;
+        private string _destParent;
 
         public Model2Generator()
         {
             DependsOnDesktopResolution = false;
         }
-
-        private string _destFile;
-        private string _destParent;
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
@@ -103,7 +52,7 @@ namespace emulatorLauncher
             if (!File.Exists(_destFile))
             {
                 File.Copy(rom, _destFile);
-                
+
                 try { new FileInfo(_destFile).Attributes &= ~FileAttributes.ReadOnly; }
                 catch { }
             }
@@ -122,33 +71,39 @@ namespace emulatorLauncher
                     catch { }
                 }
             }
-            
+
             _resolution = resolution;
 
-            if (!ReshadeManager.Setup(ReshadeBezelType.d3d9, ReshadePlatform.x86, system, rom, path,  resolution))
+            if (!ReshadeManager.Setup(ReshadeBezelType.d3d9, ReshadePlatform.x86, system, rom, path, resolution))
                 _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
-
-            SetupConfig(path, resolution);
             
+            _dinput = false;
+            if (SystemConfig.isOptSet("m2_joystick_driver") && SystemConfig["m2_joystick_driver"] == "dinput")
+                _dinput = true;
+            
+            SetupConfig(path, resolution, rom);
+
             string arg = Path.GetFileNameWithoutExtension(_destFile);
 
             return new ProcessStartInfo()
             {
                 FileName = exe,
                 Arguments = arg,
-                WorkingDirectory = path,                
-            };            
+                WorkingDirectory = path,
+            };
         }
 
-        private void SetupConfig(string path, ScreenResolution resolution)
+        private void SetupConfig(string path, ScreenResolution resolution, string rom)
         {
             string iniFile = Path.Combine(path, "Emulator.ini");
 
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
             try
             {
-                using (var ini = new IniFile(iniFile, IniOptions.UseSpaces))
+                using (var ini = new IniFile(iniFile))
                 {
-                    if (_bezelFileInfo == null)
+                    if (_bezelFileInfo == null && fullscreen)
                     {
                         ini.WriteValue("Renderer", "FullMode", "4");
                         ini.WriteValue("Renderer", "AutoFull", "1");
@@ -163,11 +118,106 @@ namespace emulatorLauncher
 
                     ini.WriteValue("Renderer", "FullScreenWidth", (resolution == null ? Screen.PrimaryScreen.Bounds.Width : resolution.Width).ToString());
                     ini.WriteValue("Renderer", "FullScreenHeight", (resolution == null ? Screen.PrimaryScreen.Bounds.Height : resolution.Height).ToString());
-                    ini.WriteValue("Renderer", "ForceSync", SystemConfig["VSync"] != "false" ? "1" : "0");                              
+                    ini.WriteValue("Renderer", "ForceSync", SystemConfig["VSync"] != "false" ? "1" : "0");
+
+                    BindBoolIniFeature(ini, "Renderer", "Bilinear", "bilinear_filtering", "0", "1");
+                    BindBoolIniFeature(ini, "Renderer", "Trilinear", "trilinear_filtering", "1", "0");
+                    BindBoolIniFeature(ini, "Renderer", "ForceManaged", "m2_ForceManaged", "1", "0");
+                    BindBoolIniFeature(ini, "Renderer", "AutoMip", "m2_AutoMip", "1", "0");
+                    BindBoolIniFeature(ini, "Renderer", "FSAA", "m2_fsaa", "1", "0");
+
+                    // Input Drivers
+                    if (SystemConfig.isOptSet("m2_joystick_driver") && SystemConfig["m2_joystick_driver"] == "dinput")
+                        ini.WriteValue("Input", "XInput", "0");
+                    else
+                        ini.WriteValue("Input", "XInput", "1");
+
+                    BindBoolIniFeature(ini, "Input", "EnableFF", "m2_force_feedback", "1", "0");
+                    BindBoolIniFeature(ini, "Input", "HoldGears", "m2_HoldGears", "1", "0");
+                    BindBoolIniFeature(ini, "Input", "UseRawInput", "m2_rawinput", "0", "1");
+
+                    // Gun indexes
+                    string mouse1Index = "0";
+                    string mouse2Index = "1";
+                    int gunCount = RawLightgun.GetUsableLightGunCount();
+                    var guns = RawLightgun.GetRawLightguns();
+
+                    if (gunCount > 0 && guns.Length > 0)
+                    {
+                        mouse1Index = guns[0].Index.ToString();
+                        if (gunCount > 1 && guns.Length > 1)
+                            mouse2Index = guns[1].Index.ToString();
+                    }
+
+                    if (SystemConfig.isOptSet("m2_rawinput_p1") && !string.IsNullOrEmpty(SystemConfig["m2_rawinput_p1"]))
+                        mouse1Index = SystemConfig["m2_rawinput_p1"];
+                    if (SystemConfig.isOptSet("m2_rawinput_p2") && !string.IsNullOrEmpty(SystemConfig["m2_rawinput_p2"]))
+                        mouse2Index = SystemConfig["m2_rawinput_p2"];
+                    
+                    ini.WriteValue("Input", "RawDevP1", mouse1Index);
+                    ini.WriteValue("Input", "RawDevP2", mouse2Index);
+
+                    BindIniFeature(ini, "Input", "FE_CENTERING_Deadband", "m2_deadzone", "1000");
+
+                    ConfigureInput(path, ini, rom);
                 }
             }
-
             catch { }
+        }
+
+        private void ConfigureInput(string path, IniFile ini, string rom)
+        {
+            if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
+                return;
+
+            else if (Program.SystemConfig.isOptSet("m2_joystick_autoconfig") && Program.SystemConfig["m2_joystick_autoconfig"] == "template")
+            {
+                string inputCFGpath = Path.Combine(path, "CFG");
+                if (!Directory.Exists(inputCFGpath)) try { Directory.CreateDirectory(inputCFGpath); }
+                    catch { }
+
+                string game = Path.GetFileNameWithoutExtension(rom).ToLowerInvariant();
+                string parentGame = game;
+                if (parentRoms.ContainsKey(game))
+                    parentGame = parentRoms[game];
+
+                string sourceInputCfgFile = Path.Combine(path, "templatescfg", "xinput", parentGame + ".input");
+                if (_dinput)
+                    sourceInputCfgFile = Path.Combine(path, "templatescfg", "dinput", parentGame + ".input");
+
+                string targetInputCfgFile = Path.Combine(inputCFGpath, game + ".input");
+
+                if (File.Exists(targetInputCfgFile))
+                    File.Delete(targetInputCfgFile);
+
+                if (File.Exists(sourceInputCfgFile))
+                    File.Copy(sourceInputCfgFile, targetInputCfgFile);
+            }
+            else
+            {
+                string inputCFGpath = Path.Combine(path, "CFG");
+                if (!Directory.Exists(inputCFGpath)) try { Directory.CreateDirectory(inputCFGpath); }
+                    catch { }
+
+                string inputFilename = Path.GetFileNameWithoutExtension(rom);
+                string inputFile = Path.Combine(inputCFGpath, inputFilename + ".input");
+
+                string parentRom = parentRoms.ContainsKey(inputFilename) ? parentRoms[inputFilename] : inputFilename;
+                int hexLength = 107;
+                if (byteLength.ContainsKey(parentRom))
+                    hexLength = byteLength[parentRom];
+
+                byte[] bytes;
+
+                if (File.Exists(inputFile))
+                    bytes = File.ReadAllBytes(inputFile);
+                else
+                    bytes = new byte[hexLength];
+
+                ConfigureControllers(bytes, ini, parentRom, hexLength);
+
+                File.WriteAllBytes(inputFile, bytes);
+            }
         }
 
         public override void Cleanup()
@@ -208,7 +258,7 @@ namespace emulatorLauncher
                                 User32.SetWindowStyle(hWnd, style & ~WS.CAPTION);
                                 User32.SetWindowPos(hWnd, IntPtr.Zero, 0, 0, resX, resY, SWP.NOZORDER | SWP.FRAMECHANGED);
                                 User32.SetMenu(hWnd, IntPtr.Zero);
-                                
+
                                 if (_bezelFileInfo != null && bezel == null)
                                     bezel = _bezelFileInfo.ShowFakeBezel(_resolution);
                             }
@@ -229,5 +279,95 @@ namespace emulatorLauncher
 
             return -1;
         }
+
+        static Dictionary<string, string> parentRoms = new Dictionary<string, string>()
+        { 
+            // Daytona USA
+            { "dayton93", "daytona" },
+            { "daytonam", "daytona" },
+            { "daytonas", "daytona" },
+            { "daytonase", "daytona" },
+            { "daytonat", "daytona" },
+            { "daytonata", "daytona" },
+            { "daytonagtx", "daytona" },
+            // Dead Or Alive
+            { "doaa", "doa" },
+            // Dynamite Cop
+            { "dynmcopb", "dynamcop" },
+            { "dynmcopc", "dynamcop" },
+            { "dyndeka2", "dynamcop" },
+            { "dyndek2b", "dynamcop" },
+            // Indianapolis 500
+            { "indy500d", "indy500" },
+            { "indy500to", "indy500" },
+            // Last Bronx
+            { "lastbrnxj", "lastbrnx" },
+            { "lastbrnxu", "lastbrnx" },
+            // Pilot Kids
+            { "pltkidsa", "pltkids" },            
+            // Over Rev
+            { "overrevb", "overrev" }, 
+            // Sega Rally Championship
+            { "srallycb", "srallyc" },
+            { "srallyp", "srallyc" },
+            // Sega Touring Car Championship
+            { "stcca", "stcc" },
+            { "stccb", "stcc" },
+            // Top Skater
+            { "topskatrj", "topskatr" },
+            { "topskatru", "topskatr" },
+            // Sonic The Fighters
+            { "sfight", "schamp" },            
+            // Virtua Cop
+            { "vcopa", "vcop" },            
+            // Virtua Fighter 2
+            { "vf2o", "vf2" },
+            { "vf2a", "vf2" },
+            { "vf2b", "vf2" },
+            // Virtua Striker
+            { "vstrikro", "vstriker" },
+            // Virtual On Cybertroopers
+            { "vonj", "von" },
+            // Zero Gunner
+            { "zerogunaj", "zerogun" },
+            { "zerogunj", "zerogun" },
+            { "zeroguna", "zerogun" },
+        };
+
+        static Dictionary<string, int> byteLength = new Dictionary<string, int>()
+        {
+            { "bel", 108 },
+            { "daytona", 104 },
+            { "desert", 100 },
+            { "doa", 108 },
+            { "dynabb97", 116 },
+            { "dynamcop", 108 },
+            { "fvipers", 108 },
+            { "gunblade", 108 },
+            { "hotd", 108 },
+            { "indy500", 80 },
+            { "lastbrnx", 108 },
+            { "manxtt", 76 },
+            { "manxttc", 76 },
+            { "motoraid", 76 },
+            { "overrev", 80 },
+            { "pltkids", 108 },
+            { "rchase2", 108 },
+            { "schamp", 108 },
+            { "segawski", 68 },
+            { "sgt24h", 80 },
+            { "skisuprg", 76 },
+            { "skytargt", 76 },
+            { "srallyc", 92 },
+            { "stcc", 80 },
+            { "topskatr", 76 },
+            { "vcop", 108 },
+            { "vcop2", 108 },
+            { "vf2", 108 },
+            { "von", 84 },
+            { "vstriker", 108 },
+            { "waverunr", 72 },
+            { "zerogun", 108 }
+        };
     }
 }

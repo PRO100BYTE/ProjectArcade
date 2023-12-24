@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using emulatorLauncher.Tools;
+using EmulatorLauncher.Common.EmulationStation;
+using EmulatorLauncher.Common;
+using EmulatorLauncher.Common.Joysticks;
 
-namespace emulatorLauncher.PadToKeyboard
+namespace EmulatorLauncher.PadToKeyboard
 {
     class Joystick
     {
@@ -27,7 +29,10 @@ namespace emulatorLauncher.PadToKeyboard
         public void Close()
         {
             if (SdlJoystick != IntPtr.Zero)
+            {
+                SimpleLogger.Instance.Info("[PadToKey] RemoveJoystick " + Controller == null ? Id.ToString() : Controller.ToString());
                 SDL.SDL_JoystickClose(SdlJoystick);
+            }
 
             SdlJoystick = IntPtr.Zero;
         }
@@ -100,7 +105,7 @@ namespace emulatorLauncher.PadToKeyboard
             var js = _joysticks.FirstOrDefault(j => j.Id == which);
             if (js != null)
             {
-                SDL.SDL_JoystickClose(js.SdlJoystick);
+                js.Close();
                 _joysticks.Remove(js);
             }
         }
