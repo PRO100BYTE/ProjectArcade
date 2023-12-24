@@ -105,7 +105,7 @@ for %%i in %modules_list% do (
 	(set/A found_%%i=0)
 	(set/A found_total=!found_total!+1)
 	(set package_name=%%i)
-	(set modules_path=!root_path!\system\modules\rb_updater)
+	(set modules_path=!root_path!\system\tools)
 	
 	if exist "!modules_path!\!package_name!.exe" ((set/A found_%%i=!found_%%i!+1))
 	
@@ -132,6 +132,11 @@ set task=set_install
 
 set "tmp_infos_file=!root_path!\emulationstation\rb_infos.tmp"
 if not "%tmp_infos_file%" == "" if exist "%tmp_infos_file%" del/Q "%tmp_infos_file%" >nul
+
+:: ---- PING TEST ----
+
+ping www.retrobat.ovh >nul
+if %ERRORLEVEL% NEQ 0 (exit 1)
 
 :: ---- CALL SHARED VARIABLES SCRIPT ----
 
@@ -168,7 +173,7 @@ if exist "%tmp_infos_file%" (
 if not "%version_remote%"=="%version_local%" (
 
 	if exist "!root_path!\emulationstation\es-update.cmd" del/Q "!root_path!\emulationstation\es-update.cmd" >nul
-	"!root_path!\system\modules\rb_updater\wget" --no-check-certificate wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 3 -P "%emulationstation_path%" %installroot_url%/repo/%arch%/%branch%/%version_local%/es-update.cmd -q >nul
+	"!root_path!\system\tools\wget" --no-check-certificate wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 3 -P "%emulationstation_path%" %installroot_url%/repo/%arch%/%branch%/%version_local%/es-update.cmd -q >nul
 	echo %version_remote%
 	exit 0
 	

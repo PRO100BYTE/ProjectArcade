@@ -14,6 +14,7 @@ apple2
 apple2gs
 arcadia
 archimedes
+arduboy
 astrocade
 atari2600
 atari5200
@@ -23,6 +24,7 @@ atarist
 atom
 atomiswave
 bbcmicro
+boom3
 c128
 c20
 c64
@@ -41,9 +43,12 @@ cps2
 cps3
 crvision
 daphne
+dinothawr
 dos
 dreamcast
 easyrpg
+ecwolf
+eduke32
 fbneo
 fds
 flash
@@ -73,6 +78,7 @@ jaguar
 jaguarcd
 lcdgames
 love
+lowresnx
 lutro
 lynx
 mame
@@ -89,6 +95,7 @@ msxturbor
 mugen
 n64
 n64dd
+namco2x6
 naomi
 naomi2
 nds
@@ -100,6 +107,7 @@ ngp
 ngpc
 o2em
 openbor
+openlara
 oricatmos
 pc88
 pc98
@@ -108,6 +116,8 @@ pcenginecd
 pcfx
 pet
 pico8
+pinballfx
+pinballfx2
 pinballfx3
 pokemini
 ports
@@ -125,6 +135,7 @@ scummvm
 scv
 sega32x
 segacd
+segastv
 sg1000
 sgb
 snes
@@ -132,11 +143,13 @@ snes-msu
 solarus
 spectravideo
 sufami
+superbroswar
 supergrafx
 supervision
 supracan
 switch
 teknoparrot
+theforceengine
 thomson
 ti99
 tic80
@@ -144,8 +157,10 @@ triforce
 tutor
 tvgames
 tyrquake
+uzebox
 vectrex
 virtualboy
+vitaquake2
 vpinball
 vsmile
 wasm4
@@ -160,5 +175,6 @@ xbox
 xbox360
 xegs
 zaccariapinball
+zinc
 zx81
 zxspectrum
