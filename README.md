@@ -43,6 +43,7 @@ ProjectArcade can also run in Portable Mode. This means you can play games from 
 - [pajarorrojo](https://github.com/pajarorrojo) - For PlayStation-X theme and support
 - [mluizvitor](https://github.com/mluizvitor) - For Elementerial theme
 - [NoCopyrightSounds](https://ncs.io) - For an excellent copyright-free music library
+- [Antony Meehan](https://music.yandex.ru/artist/8597156) - For providing wonderful tracks for use in ProjectArcade
 
 ## Also, special thanks to the 🦇 [RetroBat Team](https://github.com/RetroBat-Official) for their work:
 - [Adrien Chalard "Kayl"](https://github.com/kaylh) - creator of the RetroBat project, developer
