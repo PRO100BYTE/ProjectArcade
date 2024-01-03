@@ -46,7 +46,6 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 		<image.avatar ifSubset="system-avatar:monkeyisland">monkeyisland.png</image.avatar>
 		<image.avatar ifSubset="system-avatar:nanaki">nanaki.png</image.avatar>
 		<image.avatar ifSubset="system-avatar:outrun">outrun.png</image.avatar>
-		<image.avatar ifSubset="system-avatar:projectarcade">projectarcade.png</image.avatar>
 		<image.avatar ifSubset="system-avatar:pacman-blinky">pacman-blinky.png</image.avatar>
 		<image.avatar ifSubset="system-avatar:pacman-clyde">pacman-clyde.png</image.avatar>
 		<image.avatar ifSubset="system-avatar:pacman-inky">pacman-inky.png</image.avatar>
@@ -56,6 +55,7 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 		<image.avatar ifSubset="system-avatar:peace">peace.png</image.avatar>
 		<image.avatar ifSubset="system-avatar:pikachu">pikachu.png</image.avatar>
 		<image.avatar ifSubset="system-avatar:pole-position">pole-position.png</image.avatar>
+		<image.avatar ifSubset="system-avatar:projectarcade">projectarcade.png</image.avatar>
 		<image.avatar ifSubset="system-avatar:ps-logo">playstation-logo.png</image.avatar>
 		<image.avatar ifSubset="system-avatar:astrobot">astrobot.png</image.avatar>
 		<image.avatar ifSubset="system-avatar:q-bert">q-bert.png</image.avatar>

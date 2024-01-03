@@ -93,7 +93,8 @@ namespace EmulatorLauncher
             { new Installer("hatari", "hatari", "hatari.exe") },
             { new Installer("xm6pro", "xm6pro", "XM6.exe") },
             { new Installer("stella", "stella", "Stella.exe") },
-            { new Installer("theforceengine", "theforceengine", "TheForceEngine.exe") }
+            { new Installer("theforceengine", "theforceengine", "TheForceEngine.exe") },
+            { new Installer("kronos", "kronos", "kronos.exe") }
         };
 
         static List<string>noVersionExe = new List<string>()
@@ -129,9 +130,9 @@ namespace EmulatorLauncher
                 return string.Empty;
 
             if (installerUrl.EndsWith("/"))
-                installerUrl = installerUrl + "/store/emulators/" + fileName;
+                installerUrl = installerUrl + "store/emulators/" + fileName;
             else
-                installerUrl = installerUrl + "/" + "/store/emulators/" + fileName;
+                installerUrl = installerUrl + "/" + "store/emulators/" + fileName;
 
             return installerUrl;
         }

@@ -11,7 +11,7 @@ namespace RetrobatUpdater
     {
         public static string GetInstallUrl(string relativePath)
         {
-            string installerUrl = RegistryKeyEx.GetRegistryValue(RegistryKeyEx.CurrentUser, @"SOFTWARE\RetroBat", "InstallRootUrl") as string;
+            string installerUrl = "https://dl.projectarcade.ru/";
             if (string.IsNullOrEmpty(installerUrl))
                 return null;
 
