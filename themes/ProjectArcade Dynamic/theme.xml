@@ -1,7 +1,9 @@
 <!-- Theme by pajarorrojo
 https://github.com/pajarorrojo/es-theme-PlayStation-X 
 -->
-<theme defaultTransition="instant">
+<theme defaultView="classic" defaultTransition="instant">
+
+
 
 
 	<formatVersion>7</formatVersion>
@@ -23,32 +25,15 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 	<include lang="zh">./_theme_lang/${lang}.xml</include>
 
 
-
-
-
 	<!--PERSONALIZACION-->
 	<include>./custom-username.xml</include>
 	<include>./_theme_options/usernames.xml</include>
 	<include>./_theme_options/avatars.xml</include>
 
-<view name="splash">		
-
-
-	<text name="welcome" extra="true">
-		<origin>0 0</origin>
-		<pos>0 0.2</pos>
-		<size>1 0.05</size>
-		<size ifSubset="aspect-ratio:4-3|5-4">0.5 0.3</size>
-		<origin ifSubset="aspect-ratio:4-3|5-4">0.5 0</origin>
-		<pos ifSubset="aspect-ratio:4-3|5-4">0.5 0</pos>
-		<size tinyScreen="true">0.5 0.3</size>
-		<origin tinyScreen="true">0.5 0</origin>
-		<pos tinyScreen="true">0.5 0</pos>
-	</text>
-
-</view>
 
 	<!--THEME OPTIONS-->
+
+
 
 	<!--RELACION DE ASPECTO (auto deteccion)-->
 	<subset name="aspect-ratio" displayName="${theme.aspect-ratio}">
@@ -64,7 +49,7 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 	</subset>
 
 
-	<!--RELACION DE ASPECTO NO DETECTADA EN BATO 35 O SUPERIOR (mostramos todas las opciones) Y EL RESTO -->
+	<!--RELACION DE ASPECTO NO DETECTADA (mostramos todas las opciones) -->
 	<subset name="aspect-ratio" displayName="${theme.aspect-ratio}">
 		<include name="16-9" displayName="16:9 widescreen" />
 		<include name="4-3" displayName="4:3 standard" />
@@ -75,19 +60,19 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 	</subset>
 
 
-
 	<!--FRONTEND-->
 	<subset name="frontend" displayName="${theme.frontend}">
 		<include ifNotArch="windows" name="batocera" displayName="batocera" />
 		<include name="no-frontend" displayName="${none}" tinyScreen="true" />
 		<include name="retrobat" displayName="retrobat" />
-		<include name="projectarcade" displayName="projectarcade" />
-		<include ifArch="windows" name="projectarcade" displayName="projectarcade" />
+		<include name="projectarcade" displayName="ProjectArcade" />
+		<include ifArch="windows" name="batocera" displayName="batocera" />
 		<include name="batocera" displayName="batocera" />
 		<include name="batocera-plus" displayName="batocera plus" />
 		<include name="emuelec" displayName="emuelec" />
 		<include name="no-frontend" displayName="${none}" tinyScreen="false" />
 	</subset>
+
 
 	<!--JUEGO DE COLORES-->
 	<subset name="colorset" displayName="${theme.colorset}">
@@ -112,6 +97,7 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 
 	<!--AVATARES-->
 	<subset name="system-avatar" displayName="${theme.Avatar}">
+		<include name="batocera" displayName="Batocera" />
 		<include name="custom" displayName="${custom}" />
 		<include name="castlevania" displayName="Alucard (Castlevania)" />
 		<include name="arale" displayName="Arale Norimaki" />
@@ -162,6 +148,7 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 		<include name="peace" displayName="Peace" />
 		<include name="pikachu" displayName="Pikachu" />
 		<include name="pole-position" displayName="Pole Position" />
+		<include name="projectarcade" displayName="ProjectArcade" />
 		<include name="ps-logo" displayName="PlayStation Logo" />
 		<include name="astrobot" displayName="PSN Astro Bot" />
 		<include name="retroship" displayName="PSN Retro Ship" />
@@ -170,7 +157,7 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 		<include name="recalbox" displayName="Recalbox" />
 		<include name="retroachievements" displayName="Retroachievements Default" />
 		<include name="retrobat" displayName="Retrobat" />
-		<include name="projectarcade" displayName="projectarcade" />
+		<include name="retropie" displayName="Retropie" />
 		<include name="robocop" displayName="Robocop" />
 		<include name="rollingthunder" displayName="Rolling Thunder" />
 		<include name="shenmue" displayName="Ryo Hazuki (Shenmue)" />
@@ -190,6 +177,7 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 		<include name="playstation-x" displayName="Playstation-X" />
 		<!--<include name="aspect-ratio-test" displayName="check aspect ratio" />-->
 		<!--<include name="arch-test" displayName="arch-test" />-->
+	    <!--<include name="system-test" displayName="system-test" />-->
 		<include if="{global.cheevos} == true" name="cheevos" displayName="Retroachievements ID: ${cheevos.username}" />
 		<include if="{global.netplay} == true" name="netplay" displayName="Netplay ID: ${global.netplay.username}" />
 		<include name="custom" displayName="${custom}: ${custom.nick}" />
@@ -209,9 +197,9 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 		<include name="megaman" displayName="Mega-Man" />
 		<include name="nathandrake" displayName="Nathan Drake" />
 		<include name="pajarorrojo" displayName="pajarorrojo" />
+		<include name="projectarcade" displayName="ProjectArcade" />
 		<include name="recalbox" displayName="Recalbox" />
 		<include name="retroarch" displayName="RetroArch" />
-		<include name="ProjectArcade" displayName="ProjectArcade" />
 		<include name="retrobat" displayName="Retrobat" />
 		<include name="samus" displayName="Samus Aran" />
 		<include name="sephirot" displayName="Sephirot" />
@@ -222,13 +210,15 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 
 	<!--SETS DE ICONOS-->
 	<subset name="iconset" displayName="${iconset}">
-		<include name="psx" displayName="1-PSX">./_theme_options/iconsets/psx.xml</include>
-		<include name="psx-light" displayName="2-PSX LIGHT">./_theme_options/iconsets/psx-light.xml</include>
-		<include name="psx-color" displayName="3-PSX COLOR">./_theme_options/iconsets/psx-color.xml</include>
-		<include name="psx-color-2" displayName="4-PSX COLOR 2">./_theme_options/iconsets/psx-color-2.xml</include>
-		<include name="xbox" displayName="5-XBOX">./_theme_options/iconsets/xbox.xml</include>
-		<include name="snes" displayName="6-SNES">./_theme_options/iconsets/snes.xml</include>
-		<include name="arcade" displayName="7-ARCADE">./_theme_options/iconsets/arcade.xml</include>
+		<include name="psx" displayName="PSX">./_theme_options/iconsets/psx.xml</include>
+		<include name="psx-light" displayName="PSX LIGHT">./_theme_options/iconsets/psx-light.xml</include>
+		<include name="psx-color" displayName="PSX COLOR">./_theme_options/iconsets/psx-color.xml</include>
+		<include name="psx-color-2" displayName="PSX COLOR 2">./_theme_options/iconsets/psx-color-2.xml</include>
+		<include name="xbox" displayName="XBOX - STEAM - PC">./_theme_options/iconsets/xbox.xml</include>
+		<include name="xbox-color" displayName="XBOX - STEAM - PC COLOR">./_theme_options/iconsets/xbox-color.xml</include>
+		<include name="snes" displayName="SNES">./_theme_options/iconsets/snes.xml</include>
+		<include name="position" displayName="POSITION">./_theme_options/iconsets/posicion.xml</include>
+		<include name="arcade" displayName="ARCADE">./_theme_options/iconsets/arcade.xml</include>
 	</subset>
 
 
@@ -269,6 +259,15 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 	</subset>
 
 
+	<!--SONIDOS DE NAVEGACION-->
+	<subset name="nav-sound" displayName="${theme.nav-sounds}">
+		<include name="default" displayName="${default}">./_theme_options/sound-effects/default.xml</include>
+		<include name="ff" displayName="Final Fantasy" >./_theme_options/sound-effects/ff.xml</include>
+		<include name="sd" displayName="Steam Deck" >./_theme_options/sound-effects/sd.xml</include>
+
+	</subset>
+
+
 	<!--DESCRIPCIONES-->
 	<subset name="system-description" displayName="${theme.system-description}">
 		<include name="NO" displayName="${no}" tinyScreen="true" />
@@ -276,18 +275,14 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 		<include name="NO" displayName="${no}" tinyScreen="false" />
 	</subset>
 
-	<!--CONSOLA Y LOGO VISTA SISTEMAS-->
-	<subset name="system-console" displayName="${theme.systemConsole}">
-		<include name="NO" displayName="${no}" tinyScreen="true" />
-		<include name="YES" displayName="${yes}">./_theme_options/show-logo-consoles-front.xml</include>
-		<include name="NO" displayName="${no}" tinyScreen="false" />
-	</subset>
 
 	<!--ANIMACIONES DE VISTA SISTEMAS-->
 	<subset name="anim-system" displayName="${theme.animatedSystem}">
-		<include displayName="${yes}">./_theme_options/animated-systems.xml</include>
+		<include name="YES" displayName="${yes}">./_theme_options/animated-systems.xml</include>
 		<include name="NO" displayName="${no}" />
 	</subset>
+
+	
 
 	<!--MOSTRAR AYUDA HOTKEYS-->
 
@@ -305,82 +300,65 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 		<include tinyScreen="false" name="never" displayName="${never}" />
 	</subset>
 
+	<!--TIPO DE PANTALLA DE CARGA DE JUEGOS-->
 
-
-
-
-
-
-	<!--OPCIONES GAMELISTS-->
-
-	<!--OPCIONES DE VISTA DETALLADA-->
-	<subset name="detailed-origin" displayName="${theme.detailedorigin}" appliesTo="detailed,">
-		<include name="image" displayName="image" />
-		<include name="thumbnail" displayName="thumbnail" />
-		<include name="titleshot" displayName="titleshot" />
-		<include name="marquee" displayName="marquee" />
-		<include name="boxart" displayName="boxart" />
-		<include name="fanart" displayName="fanart" ifSubset="background-list:default"/>
-		<!-- <include name="boxback" displayName="boxback"/> -->
-		<include name="cartridge" displayName="cartridge" />
-	</subset>
-
-	<!--OPCIONES DE VISTA CUADRICULA-->
-	<subset name="grid-main-origin" displayName="${theme.gridMainorigin}" appliesTo="grid">
-		<include name="image" displayName="image" />
-		<include name="thumbnail" displayName="thumbnail" />
-		<include name="titleshot" displayName="titleshot" />
-		<include name="marquee" displayName="marquee" />
-		<include name="boxart" displayName="boxart" />
-		<include name="fanart" displayName="fanart" ifSubset="background-list:default" />
-		<!-- <include name="boxback" displayName="boxback"/> -->
-		<include name="cartridge" displayName="cartridge" />
-	</subset>
-
-	<subset name="grid-origin" displayName="${theme.gridorigin}" appliesTo="grid">
-		<include name="titleshot" displayName="titleshot" />
-		<include name="marquee" displayName="marquee" />
-		<include name="boxart" displayName="boxart" />
-		<include name="fanart" displayName="fanart"  />
-		<!-- <include name="boxback" displayName="boxback"/> no funciona en grilla-->
-		<include name="cartridge" displayName="cartridge" />
-		<include name="image" displayName="image" />
-		<include name="thumbnail" displayName="thumbnail" />
-	</subset>
-
-	<!--OPCIONES DE VISTA CARRUSEL-->
-	<subset name="carousel-main-origin" displayName="${theme.carouselMainOrigin}" appliesTo="carousel">
-		<include name="image" displayName="image" />
-		<include name="thumbnail" displayName="thumbnail" />
-		<include name="titleshot" displayName="titleshot" />
-		<include name="marquee" displayName="marquee" />
-		<include name="boxart" displayName="boxart" />
-		<include name="fanart" displayName="fanart" ifSubset="background-list:default" />
-		<!-- <include name="boxback" displayName="boxback"/> -->
-		<include name="cartridge" displayName="cartridge" />
-	</subset>
-
-	<subset name="carousel-origin" displayName="${theme.carouselOrigin}" appliesTo="carousel">
-		<include name="thumbnail" displayName="thumbnail" />
-		<include name="titleshot" displayName="titleshot" />
-		<include name="marquee" displayName="marquee" />
-		<include name="boxart" displayName="boxart" />
-		<include name="fanart" displayName="fanart" />
-		<!-- <include name="boxback" displayName="boxback"/> no funciona en grilla-->
-		<include name="cartridge" displayName="cartridge" />
-		<include name="image" displayName="image" />
-	</subset>
-
-	<!-- IMAGEN DE FONDO EN LA LISTA DE JUEGOS -->
-
-	<subset name="background-list" displayName="${theme.gamelistBackground}" appliesTo="detailed, grid, carousel">
+	<subset ifArch="windows,x86,x86_64" name="gamesplash-type" displayName="${theme.gamesplash-type}">
 		<include name="default" displayName="${default}" />
+		<include name="image-full-size" displayName="${image-full-size}" />
+	</subset>
+
+
+
+
+
+
+
+<!--OPCIONES GAMELISTS-->
+
+	<!-- MOSTRAR /  OCULTAR DESCRIPCIONES DE JUEGOS -->
+
+	<subset name="game-description" displayName="${theme.gameDescription}" appliesTo="detailed, grid, classic, carousel, full-grid">
+		<include tinyScreen="true" name="no" displayName="${no}" />
+		<include name="si" displayName="${yes}" />
+		<include name="no" displayName="${no}" />
+	</subset>
+
+	<!--BARRA DE INFO JUEGOS-->
+	<subset name="info-bar" displayName="${gameBar}" appliesTo="detailed, grid, classic, carousel, full-grid">
+		<include name="YES" displayName="${yes}" />
+		<include name="NO" displayName="${no}" />
+	</subset>
+
+	<!--OPCIONES DE IMAGENES-->
+	<subset name="main-origin" displayName="${theme.mainImage}" appliesTo="detailed, grid, classic, carousel, full-grid">
+		<include name="default" displayName="${default}" />
+		<include name="image" displayName="image" />
+		<include name="thumbnail" displayName="thumbnail" />
+		<include name="marquee" displayName="marquee" />
 		<include name="fanart" displayName="fanart" />
+		<include name="titleshot" displayName="titleshot" />
+		<include name="boxart" displayName="boxart" />
+		<include name="cartridge" displayName="cartridge" />
+		<include name="boxback" displayName="boxback" />
+		<include name="none" displayName="${none}" />
+	</subset>
+
+
+	<subset name="grid-origin" displayName="${theme.gridImage}" appliesTo="grid, classic, carousel, full-grid">
+		<include name="default" displayName="${default}" />
+		<include name="image" displayName="image" />
+		<include name="thumbnail" displayName="thumbnail" />
+		<include name="marquee" displayName="marquee" />
+		<include name="fanart" displayName="fanart" />
+		<include name="titleshot" displayName="titleshot" />
+		<include name="boxart" displayName="boxart" />
+		<include name="cartridge" displayName="cartridge" />
 	</subset>
 
 	<!--OPCIONES DE SNAPVIDEO-->
-	<subset name="game-video" displayName="${theme.gridvideo}" appliesTo="detailed, grid, carousel">
+	<subset name="game-video" displayName="${theme.gridvideo}" appliesTo="detailed, grid, classic, carousel, full-grid">
 		<include tinyScreen="true" name="oversize" displayName="${theme.oversizeVideoOption}" />
+		<include name="default" displayName="${default}" />
 		<include name="window" displayName="${theme.windowVideoOption}" />
 		<include name="background" displayName="${theme.backgroundVideoOption}" />
 		<include tinyScreen="false" name="oversize" displayName="${theme.oversizeVideoOption}" />
@@ -389,13 +367,13 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 	</subset>
 
 	<!--AUDIO VIDEOSNAP ON/OFF-->
-	<subset name="videosnap-audio" displayName="${theme.videoSnapAudio}" appliesTo="detailed, grid, carousel" ifSubset="game-video:window|background|oversize">
+	<subset name="videosnap-audio" displayName="${theme.videoSnapAudio}" appliesTo="detailed, grid, classic, carousel, full-grid" ifSubset="game-video:window|background|oversize|default">
 		<include name="enabled" displayName="${yes}" />
 		<include name="disabled" displayName="${no}" />
 	</subset>
 
 	<!--OPCIONES DE RETARDO DE VIDEO-->
-	<subset name="video-gamelist-delay" displayName="${theme.videoGamelistDelay}" appliesTo="detailed, grid, carousel" ifSubset="game-video:window|background|inside|oversize">
+	<subset name="video-gamelist-delay" displayName="${theme.videoGamelistDelay}" appliesTo="detailed, grid, classic, carousel, full-grid" ifSubset="game-video:window|background|inside|oversize|default">
 		<include name="1sec" displayName="1s" />
 		<include name="2sec" displayName="2s" />
 		<include name="3sec" displayName="3s" />
@@ -403,26 +381,39 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 		<include name="05sec" displayName="0.5s" />
 	</subset>
 
-	<!--BARRA DE INFO JUEGOS-->
-	<subset name="info-bar" displayName="${gameBar}" appliesTo="detailed,grid,carousel">
-		<include name="YES" displayName="${yes}">./_theme_options/info-bar.xml</include>
-		<include name="NO" displayName="${no}" />
+	<!-- IMAGEN DE FONDO EN LA LISTA DE JUEGOS -->
+
+	<subset name="background-list" displayName="${theme.gamelistBackground}" appliesTo="detailed, grid, classic, carousel, full-grid">
+		<include name="fanart" displayName="fanart" />
+		<include name="sistema" displayName="system" />
 	</subset>
 
+	<!--FONDO ANIMADO-->
+	<subset name="animated-backg" displayName="${theme.animated-background}" appliesTo="detailed, grid, classic, carousel, full-grid">
+		<include ifArch="rpi4,windows,x86,x86_64,odroidc4,odroidxu4" name="YES" displayName="${yes}">./_theme_options/animated-background.xml</include>
+		<include name="NO" displayName="${no}" />
+		<include ifNotArch="rpi4,windows,x86,x86_64,odroidc4,odroidxu4" name="YES" displayName="${yes}">./_theme_options/animated-background.xml</include>
+	</subset>
 
 	<!--ANIMACION DE LISTAS-->
-	<subset name="anim-list" displayName="${theme.animatedList}" appliesTo="detailed, grid, carousel">
+	<subset name="anim-list" displayName="${theme.animatedList}" appliesTo="detailed, grid, classic, carousel, full-grid">
 		<include ifArch="rpi4,windows,x86,x86_64,odroidc4,odroidxu4" name="YES" displayName="${yes}">./_theme_options/animated-list.xml</include>
 		<include name="NO" displayName="${no}" />
 		<include ifNotArch="rpi4,windows,x86,x86_64,odroidc4,odroidxu4" name="YES" displayName="${yes}">./_theme_options/animated-list.xml</include>
 	</subset>
 
-	<!--FONDO ANIMADO-->
-	<subset name="animated-backg" displayName="${theme.animated-background}" appliesTo="detailed, grid, carousel">
-		<include ifArch="rpi4,windows,x86,x86_64,odroidc4,odroidxu4" name="YES" displayName="${yes}">./_theme_options/animated-background.xml</include>
-		<include name="NO" displayName="${no}" />
-		<include ifNotArch="rpi4,windows,x86,x86_64,odroidc4,odroidxu4" name="YES" displayName="${yes}">./_theme_options/animated-background.xml</include>
+	<!--ESTILO DE LISTA EN LAS COLECCIONES
+
+	<subset name="collections-layout" displayName="Layout en colecciones">
+		<include name="default" displayName="${default}" />
+		<include name="detailed" displayName="${detailed}" />
+		<include name="grid" displayName="${grid}" />
+		<include name="classic" displayName="${classiclViewName}" />
+		<include name="full-grid" displayName="${fullGridlViewName}" />
+		<include name="carousel" displayName="${carouselViewName}" />
 	</subset>
+	-->
+	
 
 
 	<view name="screen">
@@ -432,11 +423,12 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 			<pos>0.96 0.961</pos>
 			<size>0.027</size>
 			<color>666666</color>
+			<planemodeIcon>./_theme_inc/menu_icons/Planemode.png</planemodeIcon>
 
 		</batteryIndicator>
 	</view>
 
-	<view name="system, basic, detailed, grid">
+	<view name="system, detailed, grid">
 
 
 		<text name="region" extra="true" tinyScreen="false">
@@ -479,7 +471,6 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 			<fontSize>0.028</fontSize>
 			<fontSize tinyScreen="true">0.038</fontSize>
 			<fontSize ifSubset="aspect-ratio:4-3" tinyScreen="true">0.034</fontSize>
-
 			<color>${menuFontcolor}</color>
 			<separatorColor>${menuSeparatorColor}</separatorColor>
 			<selectorColor>${menuSelectorColor}</selectorColor>
@@ -534,6 +525,7 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 			<iconFastShutdown>./_theme_inc/menu_icons/Fastshutdown.png</iconFastShutdown>
 			<iconRetroachievements>./_theme_inc/menu_icons/Contest.png</iconRetroachievements>
 			<iconManual>./_theme_inc/menu_icons/Manual.png</iconManual>
+			<iconPlanemode>./_theme_inc/menu_icons/Planemode.png</iconPlanemode>
 		</menuIcons>
 
 
@@ -562,7 +554,7 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 		</helpsystem>
 	</view>
 
-	<view name="basic,detailed,grid">
+	<view name="detailed,grid">
 		<helpsystem name="help">
 			<textColor>${helpFontColor}</textColor>
 			<iconColor>${helpIconColor}</iconColor>
@@ -571,37 +563,40 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 			<fontPath tinyScreen="true">./_theme_inc/fonts/SST Bold.ttf</fontPath>
 			<fontSize>0.026</fontSize>
 			<fontSize ifSubset="aspect-ratio:4-3|5-4">0.03</fontSize>
-
 			<fontSize ifSubset="aspect-ratio:4-3|5-4" tinyScreen="true">0.026</fontSize>
 			<glowColor>00000035</glowColor>
 			<glowSize ifArch="rpi4,windows,x86,x86_64,odroidc4,odroidxu4">1</glowSize>
 			<glowOffset ifArch="rpi4,windows,x86,x86_64,odroidc4,odroidxu4">3 2</glowOffset>
 		</helpsystem>
+
+		
+
+		
 	</view>
 
 
 
 
-	<include>./_theme_inc/infos/${system.theme}.xml</include>
 	<include>./_theme_views/detailed.xml</include>
 	<include>./_theme_views/grid.xml</include>
+	<include>./_theme_views/classic.xml</include>
+	<include>./_theme_views/full-grid.xml</include>
 	<include>./_theme_views/carousel.xml</include>
 	<include>./_theme_views/front.xml</include>
 	<include>./_theme_views/top-info.xml</include>
 	<include>./_theme_options/videosnap-controls.xml</include>
 	<include>./_theme_options/image-sources.xml</include>
 	<include>./_theme_views/grid-layouts/${system.theme}.xml</include>
+	<include>./_theme_views/test-media.xml</include>
 	<!--<include if="{system.name} == 'library' || {system.name} == 'screenshots' || {system.name} == 'imageviewer' || {system.name} == 'odcommander'">./_theme_options/force-gridview.xml</include>-->
-	<include tinyScreen="true">./_theme_options/force-gridview.xml</include>
-
-
+	<!--<include tinyScreen="true">./_theme_options/force-gridview.xml</include>-->
 
 	<!-- COLORES MAESTROS -->
 
 	<variables>
 		<psx-theme-yellow>F3C300</psx-theme-yellow>
 		<psx-theme-red>DF0024</psx-theme-red>
-		<psx-theme-green>00ff00</psx-theme-green>
+		<psx-theme-green>00FF00</psx-theme-green>
 		<psx-theme-blue1>3CAEFB</psx-theme-blue1>
 		<psx-theme-blue2>0070d1</psx-theme-blue2>
 		<psx-theme-blue3>2E6DB4</psx-theme-blue3>

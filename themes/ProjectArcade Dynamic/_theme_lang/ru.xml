@@ -3,12 +3,13 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
 -->
 <theme>
   <formatVersion>7</formatVersion>
+  
   <variables lang="ru">
     <theme.welcome>Добро пожаловать в</theme.welcome>
     <theme.start>Запуск</theme.start>
     <theme.mostplayed>Часто запускаемые:</theme.mostplayed>
     <theme.items>Элементы:</theme.items>
-    <theme.collections>Коллекции:</theme.collections>
+    <theme.collections>Коллекции</theme.collections>
     <GamesNumber>игр</GamesNumber>
     <GamesFavs>избранных</GamesFavs>
     <NumberPlayed>недавних</NumberPlayed>
@@ -32,7 +33,7 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
     <iconset>набор иконок</iconset>
     <theme.frontend>Выберите свой любимый фронтенд</theme.frontend>
     <gameBar>Показать информацию об игре</gameBar>
-    <CarouselImageSize>Размер изображения в карусели</CarouselImageSize>
+    <CarouselImageSize>Размер карусели систем</CarouselImageSize>
     <theme.videoBackground>Показать видео на экране системы</theme.videoBackground>
     <theme.system-description>Показать описания системы</theme.system-description>
     <theme.animated-background>Анимированный фон (волны)</theme.animated-background>
@@ -45,12 +46,12 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
     <ifnospot>Если нет системного видео</ifnospot>
     <theme.Avatar>Выберите свой аватар</theme.Avatar>
     <theme.username>Выберите свой никнейм</theme.username>
-    <custom>настроенный</custom>
+    <custom>персонализированный</custom>
     <theme.videoGamelistDelay>Задержка видео в списке игр</theme.videoGamelistDelay>
     <VideoOff>Не отображать видео</VideoOff>
     <theme.systemConsole>Показывать логотип и консоли в системном виде</theme.systemConsole>
     <randomGame>Случайная игра</randomGame>
-    <theme.colorset>Набор цветов темы</theme.colorset>
+    <theme.colorset>Основной цвет темы</theme.colorset>
     <theme.secondaryColorset>Дополнительный цвет</theme.secondaryColorset>
     <theme.gridvideo>Отображать видеоигры</theme.gridvideo>
     <theme.videoSnapAudio>Включить звук в видеоиграх</theme.videoSnapAudio>
@@ -58,7 +59,7 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
     <theme.animatedSystem>Анимированные переходы в системном виде</theme.animatedSystem>
     <theme.aspect-ratio>Выберите тип экрана</theme.aspect-ratio>
     <theme.oversizeVideoOption>Увеличенное видео</theme.oversizeVideoOption>
-    <theme.bato35compatilble>Совместимо только с Batocers 35 или выше</theme.bato35compatilble>
+    <theme.bato35compatilble>Совместимо только с Batocera 35 или выше</theme.bato35compatilble>
     <theme.netplay-required>Пожалуйста, включите сетевую игру, чтобы показать свое имя пользователя или выберите другой ник в настройках темы</theme.netplay-required>
     <theme.ra-required>Пожалуйста, включите Retroachievements, чтобы показать свое имя пользователя или выберите другой ник в настройках темы</theme.ra-required>
     <theme.hotkey>Показать помощь по горячим клавишам на экране приветствия</theme.hotkey>
@@ -76,5 +77,14 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
     <randomFanart>Случайный фанарт</randomFanart>
     <theme.gamelistBackground>Фоновое изображение в списке игр</theme.gamelistBackground>
     <theme.forced>Принудительно</theme.forced>
+    <theme.gameDescription>Показать описания игр</theme.gameDescription>
+    <carouselViewName>Горизонтальный карусель</carouselViewName>
+    <classiclViewName>Классическая карусель</classiclViewName>
+    <theme.mainImage>Главное изображение</theme.mainImage>
+    <theme.gridImage>Изображение сетки</theme.gridImage>
+    <fullGridlViewName>Полная сетка</fullGridlViewName>
+    <theme.gamesplash-type>Экран загрузки игры</theme.gamesplash-type>
+    <image-full-size>Изображение на весь экран</image-full-size>
+    <theme.nav-sounds>Звуки навигации</theme.nav-sounds>
   </variables>
 </theme>

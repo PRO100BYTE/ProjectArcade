@@ -6,14 +6,15 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
    <view name="system">
       <image name="logo">
          <path>./_theme_inc/images/caratulas/default.png</path>
-         <path ifSubset="colorset:black">./_theme_inc/images/caratulas/default-b.png</path>
+         <path ifSubset="colorset:black">./_theme_inc/images/caratulas/default.png</path>
          <path>./_theme_inc/images/caratulas/${system.theme}.jpg</path>
          <path>./_theme_inc/images/caratulas/${system.theme}.png</path>
-         <path ifSubset="colorset:black">./_theme_inc/images/caratulas/${system.theme}-b.png</path>
+         <path ifSubset="colorset:black">./_theme_inc/images/caratulas/${system.theme}.png</path>
          <tile>false</tile>
          <linearSmooth>true</linearSmooth>
          <zIndex>0</zIndex>
       </image>
+
 
       <image name="logo" extra="true" region="us">
          <path>./_theme_inc/images/caratulas/us/${system.theme}.jpg</path>
@@ -26,16 +27,23 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
       </image>
 
       <carousel name="systemcarousel">
+           <!--<type>horizontal_wheel</type>
+         <logoRotation>0.039</logoRotation>
+         <logoRotationOrigin>0 1500</logoRotationOrigin>-->
+         <type>horizontal</type>
          <systemInfoDelay>5</systemInfoDelay>
          <color>00000000</color>
          <logoAlignment>top</logoAlignment>
-         <scrollSound>./../_theme_inc/sound-effects/scroll-2.wav</scrollSound>
          <zIndex>80</zIndex>
-         <defaultTransition>instant</defaultTransition>
+         <defaultTransition ifSubset="anim-system:NO">instant</defaultTransition>
+         <defaultTransition ifSubset="anim-system:YES">fade & slide</defaultTransition>
          <transitionSpeed>500</transitionSpeed>
          <minLogoOpacity ifSubset="video-system:background-option">0.4</minLogoOpacity>
          <minLogoOpacity ifSubset="video-system:NO|small-screen">0.7</minLogoOpacity>
       </carousel>
+
+
+
 
       <image name="marco-activo" extra="static">
          <path>./../_theme_inc/images/marco-activo-iso.png</path>
@@ -108,7 +116,7 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
       </image>
 
       <image name="overlay" extra="static">
-         <path>./_theme_inc/images/overlay.png</path>
+         <path>./_theme_inc/images/overlay-systemview.png</path>
          <zIndex>42</zIndex>
       </image>
 
@@ -142,7 +150,7 @@ https://github.com/pajarorrojo/es-theme-PlayStation-X
          <linearSmooth>true</linearSmooth>
          <zIndex>98</zIndex>
       </image>
-
+      
    </view>
 
 </theme>
