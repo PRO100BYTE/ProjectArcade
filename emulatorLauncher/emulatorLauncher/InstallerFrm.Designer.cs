@@ -132,10 +132,10 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Image = global::EmulatorLauncher.Properties.Resources.retrobat;
+            this.pictureBox1.Image = global::EmulatorLauncher.Properties.Resources.projectarcade;
             this.pictureBox1.Location = new System.Drawing.Point(14, 13);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(204, 70);
+            this.pictureBox1.Size = new System.Drawing.Size(204, 85);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 5;
             this.pictureBox1.TabStop = false;

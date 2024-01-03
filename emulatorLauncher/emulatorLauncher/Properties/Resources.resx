@@ -145,6 +145,9 @@
   <data name="retrobat" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\retrobat.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="projectarcade" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\projectarcade.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Downloading" xml:space="preserve">
     <value>Downloading {0}</value>
   </data>

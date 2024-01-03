@@ -10,8 +10,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("PRO100BYTE Team")]
 [assembly: AssemblyProduct("emulatorLauncher")]
-[assembly: AssemblyCopyright("Copyright © PRO100BYTE Team  2022-2023")]
-[assembly: AssemblyTrademark("ProjectArcade emulatorLauncher")]
+[assembly: AssemblyCopyright("Copyright © PRO100BYTE Team 2023-2024")]
+[assembly: AssemblyTrademark("ProjectArcade by PRO100BYTE Team")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

@@ -16,7 +16,7 @@
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>projectarcade.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -257,6 +257,10 @@
       <DependentUpon>Zinc.Generator.cs</DependentUpon>
     </Compile>
     <Compile Include="Generators\SSF.Generator.cs" />
+    <Compile Include="Generators\Kronos.Generator.cs" />
+    <Compile Include="Generators\Kronos.Controllers.cs">
+      <DependentUpon>Kronos.Generator.cs</DependentUpon>
+    </Compile>
     <Compile Include="MameVersionDetector.cs" />
     <Compile Include="PadToKey\EvMapyKeysFile.cs" />
     <Compile Include="PadToKey\JoyInputState.cs" />
@@ -419,6 +423,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <Content Include="projectarcade.ico" />
+    <Content Include="Resources\projectarcade.png" />
     <None Include="Resources\blacklisted-words.txt" />
     <None Include="Resources\retrobat.png" />
     <None Include="Reshader\Bezel.fx" />
