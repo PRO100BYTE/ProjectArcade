@@ -2,7 +2,7 @@
 
 <h1 align="left">
   <br>
-  <a href="https://projectarcade.ru/"><img src="https://raw.githubusercontent.com/PRO100BYTE/ProjectArcade/master/resources/images/projectarcade-github.png" alt="ProjectArcade" width="500"></a>
+  <a href="https://projectarcade.ru/"><img src="https://raw.githubusercontent.com/PRO100BYTE/ProjectArcade/main/resources/images/projectarcade-github.png" alt="ProjectArcade" width="500"></a>
 </h1>
 
 **ProjectArcade 1.0**
