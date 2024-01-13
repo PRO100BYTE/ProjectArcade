@@ -13,7 +13,7 @@ ProjectArcade License Agreement
 ProjectArcade is a software for 64-bit versions of Windows designed for retro-gaming and running various emulators of gaming systems.
 
 Copyright (c) 2017-2019 Adrien Chalard "Kayl"
-Copyright (c) 2020-2023 RetroBat Team
+Copyright (c) 2020-2024 RetroBat Team
 Copyright (c) 2022-2023 #TheDayG0ne
 Copyright (c) 2023-2024 PRO100BYTE Team
 
@@ -40,7 +40,7 @@ RetroBat Launcher (MFA) - https://github.com/RetroBat-Official/retrobat-mfa-laun
 ProjectArcade — это программное обеспечение для 64-битных версий Windows, предназначенное для ретро-игр и запуска различных эмуляторов игровых систем.
 
 Copyright (c) 2017-2019 Adrien Chalard "Kayl"
-Copyright (c) 2020-2023 RetroBat Team
+Copyright (c) 2020-2024 RetroBat Team
 Copyright (c) 2022-2023 #TheDayG0ne
 Copyright (c) 2023-2024 PRO100BYTE Team
 
