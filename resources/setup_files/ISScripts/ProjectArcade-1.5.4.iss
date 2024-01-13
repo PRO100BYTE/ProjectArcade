@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ProjectArcade"
-#define MyAppVersion "1.5.4"
+#define MyAppVersion "1.5.4 "
 #define MyAppPublisher "#TheDayG0ne"
 #define MyAppURL "https://projectarcade.ru"
 #define MyPublisherURL "https://thedayg0ne.ru"
