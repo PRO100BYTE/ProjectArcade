@@ -80,7 +80,6 @@ function InitializeSetup: Boolean;
 begin
   // comment out functions to disable installing them
   Dependency_AddDotNet35;
-  Dependency_AddDotNet48;
 
 #ifdef Dependency_Path_NetCoreCheck
   Dependency_ForceX86 := True;
