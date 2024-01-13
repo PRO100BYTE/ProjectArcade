@@ -63,14 +63,16 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "P:\Software\ProjectArcade\ProjectArcade-builds\1.6.0-beta1\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion;
 Source: "P:\Software\ProjectArcade\ProjectArcade-builds\1.6.0-beta1\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs;
 Source: "P:\Software\ProjectArcade\ProjectArcade-builds\1.6.0-beta1\projectarcade.ini"; DestDir: "{app}"; Flags: ignoreversion;
-Source: "P:\Software\ProjectArcade\ProjectArcade-builds\1.6.0-beta1\emulationstation\about.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; Attribs: readonly;
-Source: "P:\Software\ProjectArcade\ProjectArcade-builds\1.6.0-beta1\emulationstation\version.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; Attribs: readonly; 
+Source: "P:\Software\ProjectArcade\ProjectArcade-builds\1.6.0-beta1\emulationstation\about.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; 
+; Attribs: readonly;
+Source: "P:\Software\ProjectArcade\ProjectArcade-builds\1.6.0-beta1\emulationstation\version.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion
+; Attribs: readonly; 
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Comment: "Launch ProjectArcade"; IconFilename: "{app}\projectarcade.ico"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Comment: "Launch ProjectArcade"; IconFilename: "{app}\projectarcade.ico"; Tasks: desktopicon
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Comment: "Launch ProjectArcade"; IconFilename: "{app}\projectarcade.exe"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Comment: "Launch ProjectArcade"; IconFilename: "{app}\projectarcade.exe"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
