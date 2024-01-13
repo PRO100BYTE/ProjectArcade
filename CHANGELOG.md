@@ -2,7 +2,7 @@
 
 <h1 align="left">
   <br>
-  <a href="https://projects.thedayg0ne.ru/"><img src="https://raw.githubusercontent.com/TheDayG0ne/ProjectArcade/master/resources/images/projectarcade-github.png" alt="ProjectArcade" width="500"></a>
+  <a href="https://projectarcade.ru/"><img src="https://raw.githubusercontent.com/PRO100BYTE/ProjectArcade/master/resources/images/projectarcade-github.png" alt="ProjectArcade" width="500"></a>
 </h1>
 
 **ProjectArcade 1.0**
@@ -61,3 +61,9 @@
 - New emulators: OpenMSX, Flycast
 - Updated Russian localization in EmulationStation
 - Reduced the size of the shell in the installed form
+
+**ProjectArcade 1.6.0-beta1**
+- Minor bug fixes
+- Added the ability to launch games via OpenMSX and Flycast emulators
+- Support for new emulators: SF, mylands, HBMAME, ZiNc
+- When starting the game, it is now possible to display the screensaver (.mp4)
