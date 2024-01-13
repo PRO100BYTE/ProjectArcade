@@ -1,9 +1,17 @@
-ProjectArcade license
+    ____               _           __  ___                        __   
+   / __ \_________    (_)__  _____/ /_/   |  ______________ _____/ /__ 
+  / /_/ / ___/ __ \  / / _ \/ ___/ __/ /| | / ___/ ___/ __ `/ __  / _ \
+ / ____/ /  / /_/ / / /  __/ /__/ /_/ ___ |/ /  / /__/ /_/ / /_/ /  __/
+/_/   /_/   \____/_/ /\___/\___/\__/_/  |_/_/   \___/\__,_/\__,_/\___/ 
+                /___/                                                  
+
+--- For English speaking users ---
+ProjectArcade License Agreement
 
 ProjectArcade is a software for 64-bit versions of Windows designed for retro-gaming and running various emulators of gaming systems.
 
 Copyright (c) 2017-2019 Adrien Chalard "Kayl"
-Copyright (c) 2020-2024 RetroBat Team
+Copyright (c) 2020-2023 RetroBat Team
 Copyright (c) 2022-2023 #TheDayG0ne
 Copyright (c) 2023-2024 PRO100BYTE Team
 
@@ -20,6 +28,33 @@ See https://creativecommons.org/licenses/by-nc-sa/4.0.
 A small easter egg for the guys from the RetroBat team: you are the best :)
 
 Links to used projects:
+EmulationStation - https://github.com/RetroBat-Official/emulationstation
+emulatorLauncher - https://github.com/RetroBat-Official/emulatorlauncher
+RetroBat Launcher (MFA) - https://github.com/RetroBat-Official/retrobat-mfa-launcher
+
+--- Для русскоговорящих пользователей ---
+Лицензионное соглашение ProjectArcade
+
+ProjectArcade — это программное обеспечение для 64-битных версий Windows, предназначенное для ретро-игр и запуска различных эмуляторов игровых систем.
+
+Copyright (c) 2017-2019 Adrien Chalard "Kayl"
+Copyright (c) 2020-2023 RetroBat Team
+Copyright (c) 2022-2023 #TheDayG0ne
+Copyright (c) 2023-2024 PRO100BYTE Team
+
+ProjectArcade — это бесплатный проект с открытым исходным кодом, основанный на проектах EmulationStation с открытым исходным кодом, emulatorLauncher и RetroBat. Софт разрабатывался энтузиастами для некоммерческого использования, а именно для веселого времяпрепровождения. Весь код, написанный #TheDayG0ne, Adrien Chalard "Kayl", RetroBat Team и PRO100BYTE Team, если он не лицензирован в соответствии с лицензией исходного проекта, распространяется под лицензией LGPL v3.
+
+Запрещается продавать ProjectArcade или RetroBat на предустановленной машине или на любых устройствах хранения.
+ProjectArcade включает в себя программное обеспечение, которое нельзя ассоциировать с какой-либо коммерческой деятельностью.
+Распространение ProjectArcade или RetroBat с дополнительным проприетарным контентом, защищенным авторским правом, является незаконным, строго запрещено и настоятельно не рекомендуется RetroBat Team и PRO100BYTE Team.
+В противном случае вы можете начать новый проект из источников RetroBat или ProjectArcade, если будете соблюдать те же условия.
+
+Наконец, лицензия, которая касается всех проектов RetroBat и ProjectArcade как произведения, в частности письменного или графического контента, транслируемого на различных носителях, обусловлена условиями лицензии CC BY-NC-SA 4.0.
+См. https://creativecommons.org/licenses/by-nc-sa/4.0.
+
+Небольшая пасхалка для ребят из команды RetroBat: вы лучшие :)
+
+Ссылки на использованные проекты:
 EmulationStation - https://github.com/RetroBat-Official/emulationstation
 emulatorLauncher - https://github.com/RetroBat-Official/emulatorlauncher
 RetroBat Launcher (MFA) - https://github.com/RetroBat-Official/retrobat-mfa-launcher
