@@ -2,7 +2,6 @@
 
 [fork]: https://docs.github.com/en/get-started/quickstart/fork-a-repo
 [pr]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request
-[style]: https://standardjs.com/
 [code-of-conduct]: CODE_OF_CONDUCT.md
 
 Hi there! We're happy that you'd like to contribute to the ProjectArcade. Your help is essential for keeping it great.
