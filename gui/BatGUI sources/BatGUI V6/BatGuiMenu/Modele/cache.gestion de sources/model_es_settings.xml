@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<config>
+	<bool name="FavoritesFirst" value="true" />
+	<bool name="PublicWebAccess" value="true" />
+	<bool name="ScrapeManual" value="true" />
+	<bool name="ScrapeVideos" value="true" />
+	<bool name="ShowManualIcon" value="true" />
+	<bool name="ShowSaveStates" value="true" />
+	<bool name="audio.bgmusic" value="false" />
+	<bool name="global.netplay" value="true" />
+	<bool name="kodi.enabled" value="true" />
+	<int name="recent.sort" value="7" />
+	<string name="CollectionSystemsAuto" value="all,arcade,favorites,lightgun,recent,vertical" />
+	<string name="Language" value="fr_FR" />
+	<string name="LastSystem" value="gb" />
+	<string name="ScrapperImageSrc" value="sstitle" />
+	<string name="ScreenSaverBehavior" value="random video" />
+	<string name="ScreenSaverGameInfo" value="start &amp; end" />
+	<string name="ShowFlags" value="auto" />
+	<string name="ThemeSet" value="es-theme-carbon" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].CRTSuperRes" value="false" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].CRTSwitch" value="false" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].DrawStats" value="fps_only" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].GPUIndex" value="0" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].GameFocus" value="0" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].MonitorIndex" value="1" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].OnScreenMsg" value="false" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].RotateScreen" value="0" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].SnesControllerP1" value="1" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].SnesControllerP2" value="1" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].audio_driver" value="xaudio" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].audio_mixer_volume" value="1.000000" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].audio_resampler" value="sinc" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].audio_resampler_quality" value="1" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].audio_volume" value="1.000000" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].autosave" value="1" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].bezel" value="ambiance_broadcast" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].bsnes_aspect_ratio" value="8:7" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].bsnes_blur_emulation" value="OFF" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].bsnes_cpu_fastmath" value="OFF" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].bsnes_hotfixes" value="OFF" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].bsnes_mode7_perspective" value="ON" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].bsnes_mode7_scale" value="1x" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].bsnes_mode7_supersample" value="OFF" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].bsnes_ppu_show_overscan" value="OFF" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].bsnes_run_ahead_frames" value="OFF" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].buttonsInvert" value="0" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].disableautocontrollers" value="1" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].input_driver" value="sdl2" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].integerscale" value="1" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].ratio" value="4/3" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].rewind" value="1" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].runahead" value="0" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].secondinstance" value="1" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].shaderset" value="crt-new-pixie" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].smooth" value="1" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].use_guns" value="0" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].video_black_frame_insertion" value="0" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].video_driver" value="gl" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].video_frame_delay_auto" value="1" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].video_hard_sync" value="false" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].video_swap_interval" value="1" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].video_vsync" value="true" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].videomode" value="640x480x32x75" />
+	<string name="gb[&quot;Mega Man 2 (E) [!].gb&quot;].vrr_runloop_enable" value="false" />
+	<string name="megadrive.core" value="picodrive" />
+	<string name="megadrive.disableautocontrollers" value="1" />
+	<string name="megadrive.emulator" value="libretro" />
+	<string name="updates.type" value="stable" />
+</config>
