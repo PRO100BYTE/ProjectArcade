@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<gameList>
+	<provider>
+		<System>Super Nintendo</System>
+		<software>Skraper</software>
+		<database>ScreenScraper.fr</database>
+		<web>http://www.screenscraper.fr</web>
+	</provider>
+	<game id="2169" source="ScreenScraper.fr">
+		<path>./Donkey Kong Country 2 - Diddy's Kong Quest (Europe) (En,Fr) (Rev 1).zip</path>
+		<arcadesystemname>CPSx</arcadesystemname>
+		<name>Donkey Kong Country 2 : Diddy's Kong Quest</name>
+		<desc>Donkey Kong Country 2 : Diddy's Kong Quest sur Super Nintendo est un jeu d'action/plates-formes bondissant. Guidez Diddy ou Dixie Kong à travers huit mondes d'action délirants sur l'Ile Crocodile. Mais attention aux Kremlings ! Découvrez des secrets, apprenez de nouvelles techniques, rencontrez d'autres membres du clan Kong et contrôlez de nouveaux amis animaux, comme Squitter l'araignée ou Rattly le serpent à sonnette.</desc>
+		<rating>0.95</rating>
+		<releasedate>19951114T000000</releasedate>
+		<lastplayed>19951114T000000</lastplayed>
+		<developer>Rareware</developer>
+		<publisher>Nintendo</publisher>
+		<genreid>257</genreid>
+		<genre>Plateforme-Plateforme / Run Jump</genre>
+		<players>1-2</players>
+		<hash>2EA6B7E8</hash>
+		<image>./media/box2dfront/Donkey Kong Country 2 - Diddy's Kong Quest (Europe) (En,Fr) (Rev 1).png</image>
+		<cover>./media/box2dfront/Donkey Kong Country 2 - Diddy's Kong Quest (Europe) (En,Fr) (Rev 1).png</cover>
+		<marquee>./media/box2dfront/Donkey Kong Country 2 - Diddy's Kong Quest (Europe) (En,Fr) (Rev 1).png</marquee>
+		<thumbnail>./media/box2dfront/Donkey Kong Country 2 - Diddy's Kong Quest (Europe) (En,Fr) (Rev 1).png</thumbnail>
+		<manual>./media/box2dfront/Donkey Kong Country 2 - Diddy's Kong Quest (Europe) (En,Fr) (Rev 1).pdf</manual>
+		<video>./media/box2dfront/Donkey Kong Country 2 - Diddy's Kong Quest (Europe) (En,Fr) (Rev 1).pdf</video>
+		<fanart>./media/box2dfront/Donkey Kong Country 2 - Diddy's Kong Quest (Europe) (En,Fr) (Rev 1).pdf</fanart>
+		<boxback>./media/box2dfront/Donkey Kong Country 2 - Diddy's Kong Quest (Europe) (En,Fr) (Rev 1).pdf</boxback>
+		<gametime>1258</gametime>
+		<playcount>62</playcount>
+		<md5>257</md5>
+		<lang>FR</lang>
+		<kidgame>True</kidgame>
+		<hidden>True</hidden>
+		<favorite>True</favorite>
+		<family>True</family>
+		<crc32>2145684789</crc32>
+		<region>EU</region>
+		<titleshot>Test</titleshot>
+		<magazine>Super Power</magazine>
+		<map>Carte du jeu</map>
+		<bezel>DonkeyKong</bezel>
+		<cheevosHash>DonkeyKong</cheevosHash>
+		<scrap>DonkeyKong</scrap>
+		<emulator>libretro</emulator>
+		<core>bsnes</core>
+	</game>
+</gameList>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
