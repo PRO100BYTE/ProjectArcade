@@ -7,7 +7,7 @@ ArcadeGUI is a graphical user interface (GUI) for managing ProjectArcade, which 
 - Changing the SDL library on the fly
 - Create M3U and more
 
-The ArcadeGUI project is based on the BatGui source code (https://github.com/xReppa/rb_gui)
+The ArcadeGUI project is based on the BatGui V6 source code (https://github.com/xReppa/BatGui6)
 
 The ArcadeGUI source code is available on GitHub: https://github.com/PRO100BYTE/ArcadeGUI
 
