@@ -1,0 +1,89 @@
+﻿<!-- Theme by pajarorrojo
+https://github.com/pajarorrojo/es-theme-PlayStation-X 
+-->
+<theme>
+  <formatVersion>7</formatVersion>
+
+  <variables lang="fr">
+    <theme.welcome>Bienvenue sur</theme.welcome>
+    <theme.start>Démarrer</theme.start>
+    <theme.mostplayed>Le plus joué :</theme.mostplayed>
+    <theme.items>Nombre d'élements :</theme.items>
+    <theme.collections>collections</theme.collections>
+    <GamesNumber>Jeux</GamesNumber>
+    <GamesFavs>Favoris</GamesFavs>
+    <NumberPlayed>Joués</NumberPlayed>
+    <big>Grand</big>
+    <medium>Moyen</medium>
+    <small>Petit</small>
+    <blue>Bleu</blue>
+    <black>Noir</black>
+    <red>Rouge</red>
+    <yellow>Jaune</yellow>
+    <green>Vert</green>
+    <purple>Violet</purple>
+    <orange>Orange</orange>
+    <pink>Rose</pink>
+    <default>Défaut</default>
+    <yes>Oui</yes>
+    <no>Non</no>
+    <none>Aucune</none>
+    <never>Jamais</never>
+    <always>Toujours</always>
+    <iconset>Set d'icones</iconset>
+    <theme.frontend>Sélectionnez votre frontend préféré</theme.frontend>
+    <gameBar>Informations des Jeux</gameBar>
+    <CarouselImageSize>Taille du carrousel des systèmes</CarouselImageSize>
+    <theme.videoBackground>Videos Systèmes</theme.videoBackground>
+    <theme.system-description>Afficher les descriptions Systèmes ?</theme.system-description>
+    <theme.animated-background>Fond animé (vagues) ?</theme.animated-background>
+    <theme.backgroundVideoOption>En vidéo de fond</theme.backgroundVideoOption>
+    <theme.windowVideoOption>Vitre</theme.windowVideoOption>
+    <theme.insideVideoOption>À l'intérieur du cadre</theme.insideVideoOption>
+    <theme.smallScreenOption>En petit écran</theme.smallScreenOption>
+    <theme.videoaudio>Activer l'audio pour les vidéos système</theme.videoaudio>
+    <theme.videoRandom>Activer Videosnap aléatoire</theme.videoRandom>
+    <ifnospot>S'il n'y a pas de vidéo système</ifnospot>
+    <theme.Avatar>Choisissez votre Avatar</theme.Avatar>
+    <theme.username>Choisissez un Pseudo</theme.username>
+    <custom>Personnalisé</custom>
+    <theme.videoGamelistDelay>Délai Lancement Vidéo</theme.videoGamelistDelay>
+    <VideoOff>Video Off</VideoOff>
+    <theme.systemConsole>Afficher logo et consoles dans systemview ?</theme.systemConsole>
+    <randomGame>Jeu aléatoire</randomGame>
+    <theme.colorset>Jeux de couleurs</theme.colorset>
+    <theme.gridvideo>Vue vidéosnap</theme.gridvideo>
+    <theme.videoSnapAudio>Activer l'audio pour les vidéosnap</theme.videoSnapAudio>
+    <theme.animatedList>Transition de la liste de jeux animée</theme.animatedList>
+    <theme.animatedSystem>Transition de la liste de système animée</theme.animatedSystem>
+    <theme.aspect-ratio>Sélectionnez type d'écran</theme.aspect-ratio>
+    <theme.oversizeVideoOption>Vidéo surdimensionnée</theme.oversizeVideoOption>
+    <theme.bato35compatilble>Uniquement compatible avec batocera 35 ou supérieur</theme.bato35compatilble>
+    <theme.netplay-required>Veuillez activer le netplay pour afficher votre nom d'utilisateur ou sélectionner un autre nick dans les options de thème</theme.netplay-required>
+    <theme.ra-required>Veuillez activer les retroachievements pour afficher votre nom d'utilisateur ou sélectionner un autre nick dans les options de thème</theme.ra-required>
+    <theme.hotkey>Afficher une aide au hotkey sur l'écran de bienvenue</theme.hotkey>
+		<theme.hotkey-x86>Montrer une aide rapide hotkey</theme.hotkey-x86>
+		<theme.hotkey.gamesplash>Uniquement sur l'écran de chargement du jeu</theme.hotkey.gamesplash>
+		<theme.hotkey.splash>Uniquement sur l'écran de bienvenue</theme.hotkey.splash>
+		<theme.hotkey.both>Sur les deux écrans</theme.hotkey.both>
+    <theme.detected>détecté</theme.detected>
+    <theme.detailedorigin>Image en vue détaillée</theme.detailedorigin>
+    <theme.gridMainorigin>Image principale en vue en grille</theme.gridMainorigin>
+    <theme.gridorigin>Images de la grille</theme.gridorigin>
+    <theme.carouselMainOrigin>Image principale en vue en carrousel</theme.carouselMainOrigin>
+    <theme.carouselOrigin>Images du carrousel</theme.carouselOrigin>
+    <theme.systemBackground>Image de fond dans la vue des systèmes</theme.systemBackground>
+    <randomFanart> Fanart Aléatoire </randomFanart>
+    <theme.gamelistBackground>Image de fond dans la liste de jeux</theme.gamelistBackground>
+    <theme.forced>forcé</theme.forced>
+    <theme.gameDescription>Afficher les descriptions des jeux</theme.gameDescription>
+    <carouselViewName>Carrousel horizontal</carouselViewName>
+    <classiclViewName>Carrousel classique</classiclViewName>
+    <theme.mainImage>Image principale</theme.mainImage>
+    <theme.gridImage>Image de grille</theme.gridImage>
+    <fullGridlViewName>Grille complète</fullGridlViewName>
+    <theme.gamesplash-type>Écran de chargement du jeu</theme.gamesplash-type>
+    <image-full-size>Image en plein écran</image-full-size>
+    <theme.nav-sounds>Sons de navigation</theme.nav-sounds>
+  </variables>
+</theme>
