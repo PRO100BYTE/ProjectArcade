@@ -1,0 +1,26 @@
+<theme>
+  <formatVersion>7</formatVersion>
+
+  <view name="splash">
+    <splash name="splash">
+      <backgroundColor>000000</backgroundColor>
+    </splash>
+
+    <image name="background">
+      <!-- Leave default for better OS/device portability -->
+    </image>
+    <image name="progressbar">
+      <color>1c1c1c</color>
+      <roundCorners>0.015</roundCorners>
+    </image>
+    <image name="progressbar:active">
+      <color>00FF00</color>
+    </image>
+    <text name="label">
+      <alignment>center</alignment>
+      <fontPath>./assets/fonts/Inter/Inter-Regular.otf</fontPath>
+      <fontSize>0.03125</fontSize>
+      <color>ffffff</color>
+    </text>
+  </view>
+</theme>
