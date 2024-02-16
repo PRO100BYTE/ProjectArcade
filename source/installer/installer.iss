@@ -44,7 +44,7 @@ Compression=lzma
 DefaultDirName=C:\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-DisableReadyPage=True
+DisableWelcomePage=no
 InfoBeforeFile=".\readme.txt"
 LicenseFile=.\..\license.txt
 MinVersion=0,6.1sp1
@@ -53,7 +53,7 @@ OutputDir={#SourceDir}
 OutputManifestFile={#MyAppName}-v{#MyAppVersion}-setup_Manifest.txt
 PrivilegesRequired=lowest
 SetupIconFile=".\resources\launcher.ico"
-ShowLanguageDialog=auto
+ShowLanguageDialog=yes
 SolidCompression=yes
 Uninstallable=no
 VersionInfoCopyright={#MyAppPublisher}
@@ -61,6 +61,7 @@ VersionInfoVersion=1.0.0.0
 WizardImageFile=".\resources\retrobat_wizard.bmp"
 WizardImageStretch=yes
 WizardSmallImageFile=".\resources\WizardSmall.bmp"
+WizardStyle=modern
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -112,6 +113,7 @@ Root: "HKCU64"; Subkey: "Software\RetroBat"; ValueType: string; ValueName: "Inst
 Root: "HKCU32"; Subkey: "Software\RetroBat"; ValueType: string; ValueName: "InstallRootUrl"; ValueData: "{#InstallRootUrl}"; Flags: createvalueifdoesntexist; MinVersion: 0,6.2; Check: not IsWin64
 
 [Code]
+
 function InitializeSetup: Boolean;
 begin
   Dependency_AddDirectX;
@@ -121,6 +123,5 @@ begin
   Dependency_ForceX86 := False;
   Dependency_AddVC2010;
   Dependency_AddVC2015To2022;
-
   Result := True;
 end;

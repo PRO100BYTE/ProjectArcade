@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <gameList>
 	<game>
 		<path>./applewin.menu</path>
@@ -238,6 +238,23 @@
 		<lang>en</lang>
 		<region>wr</region>
 	</game>
+	<!--<game>
+		<path>./kronos.menu</path>
+		<name>Kronos (Saturn)</name>
+		<desc>Run Kronos (Saturn).</desc>
+		<image>./media/kronos-logo.png</image>
+		<marquee>./media/kronos-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>François Caron</developer>
+		<publisher />
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>-->
 	<game>
 		<path>./m2emulator.menu</path>
 		<name>M2Emulator (Model 2)</name>
@@ -246,6 +263,21 @@
 		<marquee>./media/m2emulator-logo.png</marquee>
 		<developer>Nebula Team</developer>
 		<publisher>Nebula Team</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./magicengine.menu</path>
+		<name>Magic Engine (PC Engine)</name>
+		<desc>Run Magic Engine (PC Engine).</desc>
+		<image>./media/magicengine-logo.png</image>
+		<marquee>./media/magicengine-logo.png</marquee>
+		<developer>David / Cédric Michel</developer>
+		<publisher />
 		<genre>Emulator</genre>
 		<playcount />
 		<lastplayed />
@@ -293,6 +325,23 @@
 		<releasedate />
 		<developer>mGBA Team</developer>
 		<publisher>mGBA Team</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./openmsx.menu</path>
+		<name>OpenMSX (MSX)</name>
+		<desc>Run OpenMSX (MSX).</desc>
+		<image>./media/openmsx-logo.png</image>
+		<marquee>./media/openmsx-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>openMSX Team</developer>
+		<publisher>openMSX Team</publisher>
 		<genre>Emulator</genre>
 		<playcount />
 		<lastplayed />
@@ -526,7 +575,7 @@
 		<name>DOSBox Pure Libretro (MS-DOS)</name>
 		<desc>Run DOSBox Pure Libretro.</desc>
 		<image>./media/dosbox_pure_libretro-logo.png</image>
-		<marquee>./media/dosbox_pure-logo.png</marquee>
+		<marquee>./media/dosbox_pure_libretro-logo.png</marquee>
 		<rating>0</rating>
 		<releasedate />
 		<developer>DOSBox Pure Team</developer>
@@ -659,8 +708,8 @@
 	</game>
     <game>
 		<path>./phoenix.menu</path>
-		<name>Phoenix (3DO & jaguar emulator)</name>
-		<desc>Run Phoenix  (3DO & jaguar Emulator).</desc>
+		<name>Phoenix (3DO &amp; jaguar emulator)</name>
+		<desc>Run Phoenix  (3DO &amp; jaguar Emulator).</desc>
 		<image>./media/phoenix.png</image>
 		<marquee>./media/phoenix.png</marquee>
 		<rating>0</rating>
