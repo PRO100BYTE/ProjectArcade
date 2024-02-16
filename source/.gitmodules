@@ -4,3 +4,7 @@
 [submodule "system/decorations"]
 	path = system/decorations
 	url = https://github.com/RetroBat-Official/retrobat-bezels
+[submodule "launcher"]
+	path = launcher
+	url = https://github.com/RetroBat-Official/retrobat-mfa-launcher
+

@@ -1,7 +1,8 @@
 \system\resources\emulationstation\notice.pdf|\emulationstation\.emulationstation\notice.pdf
 \system\resources\emulationstation\progress.png|\emulationstation\resources\progress.png
 \system\resources\emulationstation\splash.xml|\emulationstation\resources\splash.xml
-\system\resources\retrobat_logo.svg|\emulationstation\resources\splash_retrobat.svg
+\system\resources\retrobat_logo.png|\emulationstation\resources\splash_retrobat.png
+\system\resources\retrobat_logo_old.svg|\emulationstation\resources\splash_retrobat.svg
 \system\templates\ares\settings.bml|\emulators\ares\settings.bml
 \system\templates\bigpemu\userdata\BigPEmuConfig.bigpcfg|\emulators\bigpemu\userdata\BigPEmuConfig.bigpcfg
 \system\templates\bizhawk\config.ini|\emulators\bizhawk\config.ini
@@ -30,6 +31,7 @@
 \system\templates\emulationstation\es_padtokey.cfg|\emulationstation\.emulationstation\es_padtokey.cfg
 \system\templates\emulationstation\es_settings.cfg|\emulationstation\.emulationstation\es_settings.cfg
 \system\templates\flycast\emu.cfg|\emulators\flycast\emu.cfg
+\system\templates\gzdoom\gzdoom_portable.ini|\emulators\gzdoom\gzdoom_portable.ini
 \system\templates\hatari\hatari.cfg|\emulators\hatari\hatari.cfg
 \system\templates\hbmame\ctrlr\ds4_ds5.cfg|\saves\hbmame\ctrlr\ds4_ds5.cfg
 \system\templates\hbmame\ctrlr\switch_pro.cfg|\saves\hbmame\ctrlr\switch_pro.cfg
@@ -52,9 +54,6 @@
 \system\templates\m2emulator\xinput.zip|\emulators\m2emulator\templatescfg\xinput
 \system\templates\mame\fmtownsux.ini|\emulators\mame\ini\fmtownsux.ini
 \system\templates\mame\blank.fmtowns|\saves\mame\fmtowns\blank.fmtowns
-\system\templates\mame\ctrlr\ds4_ds5.cfg|\saves\mame\ctrlr\ds4_ds5.cfg
-\system\templates\mame\ctrlr\switch_pro.cfg|\saves\mame\ctrlr\switch_pro.cfg
-\system\templates\mame\ctrlr\xinput.cfg|\saves\mame\ctrlr\xinput.cfg
 \system\templates\melonds\melonDS.ini|\emulators\melonds\melonDS.ini
 \system\templates\mesen\settings.json|\emulators\mesen\settings.json
 \system\templates\mgba\config.ini|\emulators\mgba\config.ini
@@ -76,6 +75,7 @@
 \system\templates\pcsx2\portable.ini|\emulators\pcsx2\portable.ini
 \system\templates\phoenix\phoenix.config.xml|\emulators\phoenix\phoenix.config.xml
 \system\templates\play\config.xml|\emulators\play\Play Data Files\config.xml
+\system\templates\play\inputprofiles\Retrobat.xml|\emulators\play\Play Data Files\inputprofiles\Retrobat.xml
 \system\templates\ppsspp\ppsspp.ini|\emulators\ppsspp\memstick\PSP\SYSTEM\ppsspp.ini
 \system\templates\project64\Project64.cfg|\emulators\project64\Config\Project64.cfg
 \system\templates\raine\raine32_sdl.cfg|\emulators\raine\config\raine32_sdl.cfg
