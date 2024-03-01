@@ -32,9 +32,9 @@ ProjectArcade can also run in Portable Mode. This means you can play games from 
 
 ## 🎮 Supported Platforms
 
-![Supported Platforms](https://raw.githubusercontent.com/TheDayG0ne/ProjectArcade/master/resources/images/pasystems.png)
+![Supported Platforms](https://raw.githubusercontent.com/PRO100BYTE/ProjectArcade/main/resources/images/pasystems.png)
 
-**ProjectArcade or RetroBat will never provide copyrighted/commercial ROMs or BIOS files.**
+**ProjectArcade and RetroBat will never provide copyrighted/commercial ROMs or BIOS files.**
 
 ## 💟 Special Thanks
 
