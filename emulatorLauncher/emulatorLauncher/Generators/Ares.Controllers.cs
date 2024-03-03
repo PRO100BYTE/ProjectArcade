@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Diagnostics;
 using System.Linq;
-using System.Drawing.Design;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.EmulationStation;
 
@@ -45,17 +42,17 @@ namespace EmulatorLauncher
                 return;
 
             if (controller.IsKeyboard)
-                ConfigureKeyboard(bml, controller.Config);
+                ConfigureKeyboard(bml, controller.Config, controller.PlayerIndex);
             else
                 ConfigureJoystick(bml, controller, controller.PlayerIndex);
         }
 
-        private void ConfigureKeyboard(BmlFile bml, InputConfig keyboard)
+        private void ConfigureKeyboard(BmlFile bml, InputConfig keyboard, int playerindex)
         {
             if (keyboard == null)
                 return;
 
-            var vpad = bml.GetOrCreateContainer("VirtualPad1");
+            var vpad = bml.GetOrCreateContainer("VirtualPad" + playerindex);
 
             vpad["Pad.Up"] = GetKeyName(InputKey.up, keyboard);
             vpad["Pad.Down"] = GetKeyName(InputKey.down, keyboard);

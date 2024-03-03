@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
-using System.Windows.Media.Media3D;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
 
@@ -88,6 +87,8 @@ namespace EmulatorLauncher
                         ini.WriteValue("Screen Setup", "ScreenHeight", res.Height.ToString());
                         ini.WriteValue("Screen Setup", "ScreenWidth", res.Width.ToString());
                     }
+
+                    ini.WriteValue("Controls", "UseJoystick", "1");
                 }
             }
             catch { }

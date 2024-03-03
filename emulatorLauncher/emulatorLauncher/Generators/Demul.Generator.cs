@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using System.Threading;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
-using EmulatorLauncher.PadToKeyboard;
 
 namespace EmulatorLauncher
 {
-    class DemulGenerator : Generator
+    partial class DemulGenerator : Generator
     {
         private bool _oldVersion = false;
         private bool _isUsingReshader = false;
         private BezelFiles _bezelFileInfo;
         private ScreenResolution _resolution;
+
+        public DemulGenerator()
+        {
+            DependsOnDesktopResolution = true;
+        }
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
@@ -89,7 +89,7 @@ namespace EmulatorLauncher
                     // Rom paths
                     var biosPath = AppConfig.GetFullPath("bios");
                     var romsPath = AppConfig.GetFullPath("roms");
-                    
+
                     var romsPaths = new List<string>();
                     romsPaths.Add(Path.Combine(biosPath, "dc"));
                     romsPaths.Add(biosPath);
@@ -102,7 +102,7 @@ namespace EmulatorLauncher
                             romsPaths.Add(sysPath);
                     }
 
-                    for(int i = 0 ; i < romsPaths.Count ; i++)
+                    for (int i = 0; i < romsPaths.Count; i++)
                         ini.WriteValue("files", "roms" + i, romsPaths[i]);
 
                     ini.WriteValue("files", "romsPathsCount", romsPaths.Count.ToString());
@@ -160,6 +160,16 @@ namespace EmulatorLauncher
                         ini.WriteValue("main", "broadcast", "1");
 
                     ini.WriteValue("main", "timehack", SystemConfig["timehack"] != "false" ? "true" : "false");
+                    ini.WriteValue("main", "VMUscreendisable", "true");
+                    ini.WriteValue("main", "PausedIfFocusLost", "true");
+
+                    SetupControllers(path, ini, system);
+
+                    if (SystemConfig.isOptSet("use_guns") && SystemConfig.getOptBoolean("use_guns"))
+                    {
+                        ini.WriteValue("PORTA", "device", "-2147483648");
+                        ini.WriteValue("PORTB", "device", "-2147483648");
+                    }
                 }
             }
             catch { }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
 using System.Diagnostics;
 using EmulatorLauncher.Common;
@@ -11,6 +10,11 @@ namespace EmulatorLauncher
 {
     partial class Rpcs3Generator : Generator
     {
+        public Rpcs3Generator()
+        {
+            DependsOnDesktopResolution = true;
+        }
+
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
             string path = AppConfig.GetFullPath(emulator);
@@ -42,20 +46,23 @@ namespace EmulatorLauncher
                     rom = Path.Combine(path, rom.Substring(1));
             }
 
-            List<string> commandArray = new List<string>();
-            commandArray.Add("\"" + rom + "\"");
+            // Fullscreen
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
-            if (SystemConfig.isOptSet("gui") && !SystemConfig.getOptBoolean("gui"))
+            var commandArray = new List<string>();
+            commandArray.Add("\"" + rom + "\"");
+            
+            if (fullscreen)
+            {
                 commandArray.Add("--no-gui");
+                commandArray.Add("--fullscreen");
+            }
 
             string args = string.Join(" ", commandArray);
             
             // If game was uncompressed, say we are going to launch, so the deletion will not be silent
             ValidateUncompressedGame();
-
-            // Fullscreen
-            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
-
+            
             // Configuration
             if (!SystemConfig.getOptBoolean("disableautoconfig"))
             {
@@ -91,9 +98,28 @@ namespace EmulatorLauncher
             {
                 FileName = exe,
                 WorkingDirectory = path,
-                Arguments = args,                
-                WindowStyle = ProcessWindowStyle.Minimized
+                Arguments = args,
+                WindowStyle = args.Contains("--fullscreen") ? ProcessWindowStyle.Maximized : ProcessWindowStyle.Minimized
             };
+        }
+
+        public override int RunAndWait(System.Diagnostics.ProcessStartInfo path)
+        {
+            foreach (var px in Process.GetProcessesByName("rpcs3"))
+            {
+                try { px.Kill(); }
+                catch { }
+            }
+
+            var process = Process.Start(path);
+            process.WaitForExit();
+
+            // In some cases, the process seems to be launched again by the main one
+            process = Process.GetProcessesByName("rpcs3").FirstOrDefault();
+            if (process != null)
+                process.WaitForExit();
+
+            return 0;
         }
 
         /// <summary>
@@ -310,30 +336,7 @@ namespace EmulatorLauncher
             yml.Save();
         }
 
-        /// <summary>
-        /// Setup config.yml file
-        /// </summary>
-        /// <param name="path"></param>
-        private void SetupGuns(YmlFile yml, YmlContainer vulkan)
-        {
-            if (!Program.SystemConfig.getOptBoolean("rpcs3_guns"))
-                return;
-
-            // set borderless window mode for guns
-            vulkan["Exclusive Fullscreen Mode"] = "Disable";
-
-            //
-            var io = yml.GetOrCreateContainer("Input/Output");
-            io["Keyboard"] = "\"Null\"";
-            io["Mouse"] = "\"Null\"";
-            io["Camera"] = "Fake";
-            io["Camera type"] = "PS Eye";
-            io["Move"] = "Mouse";
-
-            BindBoolFeature(io, "Show move cursor", "rpcs3_mouse_cursor", "true", "false");
-        }
-
-            private string GetDefaultPS3Language()
+        private string GetDefaultPS3Language()
         {
             Dictionary<string, string> availableLanguages = new Dictionary<string, string>()
             {

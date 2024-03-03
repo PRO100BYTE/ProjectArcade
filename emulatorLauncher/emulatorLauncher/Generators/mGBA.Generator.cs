@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using EmulatorLauncher.Common;
@@ -74,6 +71,8 @@ namespace EmulatorLauncher
             {
                 if (!fullscreen)
                     ini.WriteValue("ports.qt", "fullscreen", "0");
+
+                ini.WriteValue("ports.qt", "updateAutoCheck", "0");
 
                 // Write Paths
                 string savestatePath = Path.Combine(AppConfig.GetFullPath("saves"), system, "mgba", "sstates");

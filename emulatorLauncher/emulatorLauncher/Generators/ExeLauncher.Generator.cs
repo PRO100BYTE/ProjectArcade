@@ -3,14 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Diagnostics;
-using Microsoft.Win32;
-using System.Runtime.Serialization;
 using System.Threading;
-using System.Data.SQLite;
-using System.IO.Compression;
-using System.Net;
-using System.Windows.Documents;
-using System.Security.Cryptography;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.Common.FileFormats;
@@ -20,6 +13,11 @@ namespace EmulatorLauncher
 {
     partial class ExeLauncherGenerator : Generator
     {
+        public ExeLauncherGenerator()
+        {
+            DependsOnDesktopResolution = true;
+        }
+
         private string _systemName;
         private string _exename;
         private bool _isGameExePath;
@@ -185,6 +183,8 @@ namespace EmulatorLauncher
             else
                 _exename = Path.GetFileNameWithoutExtension(rom);
 
+            SimpleLogger.Instance.Info("[INFO] Executable name : " + _exename);
+
             // If game was uncompressed, say we are going to launch, so the deletion will not be silent
             ValidateUncompressedGame();
 
@@ -238,22 +238,29 @@ namespace EmulatorLauncher
             if (_isGameExePath)
             {
                 Process process = Process.Start(path);
-
+                SimpleLogger.Instance.Info("Process started : " + _exename);
+                
+                Thread.Sleep(8000);
+                
                 int i = 1;
                 Process[] gamelist = Process.GetProcessesByName(_exename);
 
                 while (i <= 3 && gamelist.Length == 0)
                 {
                     gamelist = Process.GetProcessesByName(_exename);
-                    Thread.Sleep(8000);
+                    Thread.Sleep(10000);
                     i++;
                 }
 
                 if (gamelist.Length == 0)
+                {
+                    SimpleLogger.Instance.Info("Process : " + _exename + " not running");
                     return 0;
+                }
 
                 else
                 {
+                    SimpleLogger.Instance.Info("Process : " + _exename + " found, waiting to exit");
                     Process game = gamelist.OrderBy(p => p.StartTime).FirstOrDefault();
                     game.WaitForExit();
                 }

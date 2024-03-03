@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
@@ -13,7 +12,7 @@ namespace EmulatorLauncher
 {
     partial class Model2Generator : Generator
     {
-        
+
         private BezelFiles _bezelFileInfo;
         private ScreenResolution _resolution;
         private bool _dinput;
@@ -76,12 +75,13 @@ namespace EmulatorLauncher
 
             if (!ReshadeManager.Setup(ReshadeBezelType.d3d9, ReshadePlatform.x86, system, rom, path, resolution))
                 _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
-            
+
             _dinput = false;
             if (SystemConfig.isOptSet("m2_joystick_driver") && SystemConfig["m2_joystick_driver"] == "dinput")
                 _dinput = true;
-            
+
             SetupConfig(path, resolution, rom);
+            SetupLUAScript(path, resolution, rom);
 
             string arg = Path.GetFileNameWithoutExtension(_destFile);
 
@@ -103,18 +103,17 @@ namespace EmulatorLauncher
             {
                 using (var ini = new IniFile(iniFile))
                 {
-                    if (_bezelFileInfo == null && fullscreen)
-                    {
-                        ini.WriteValue("Renderer", "FullMode", "4");
+                    ini.WriteValue("Renderer", "FullMode", "4");
+
+                    if (fullscreen)
                         ini.WriteValue("Renderer", "AutoFull", "1");
-                        ini.WriteValue("Renderer", "WideScreenWindow", "0");
-                    }
                     else
-                    {
-                        ini.WriteValue("Renderer", "FullMode", "4");
                         ini.WriteValue("Renderer", "AutoFull", "0");
+
+                    if (SystemConfig["bezel"] == null || SystemConfig["bezel"] == "none")
                         ini.WriteValue("Renderer", "WideScreenWindow", "1");
-                    }
+                    else
+                        ini.WriteValue("Renderer", "WideScreenWindow", "0");
 
                     ini.WriteValue("Renderer", "FullScreenWidth", (resolution == null ? Screen.PrimaryScreen.Bounds.Width : resolution.Width).ToString());
                     ini.WriteValue("Renderer", "FullScreenHeight", (resolution == null ? Screen.PrimaryScreen.Bounds.Height : resolution.Height).ToString());
@@ -125,6 +124,7 @@ namespace EmulatorLauncher
                     BindBoolIniFeature(ini, "Renderer", "ForceManaged", "m2_ForceManaged", "1", "0");
                     BindBoolIniFeature(ini, "Renderer", "AutoMip", "m2_AutoMip", "1", "0");
                     BindBoolIniFeature(ini, "Renderer", "FSAA", "m2_fsaa", "1", "0");
+                    BindBoolIniFeature(ini, "Renderer", "DrawCross", "m2_crosshair", "1", "0");
 
                     // Input Drivers
                     if (SystemConfig.isOptSet("m2_joystick_driver") && SystemConfig["m2_joystick_driver"] == "dinput")
@@ -153,7 +153,7 @@ namespace EmulatorLauncher
                         mouse1Index = SystemConfig["m2_rawinput_p1"];
                     if (SystemConfig.isOptSet("m2_rawinput_p2") && !string.IsNullOrEmpty(SystemConfig["m2_rawinput_p2"]))
                         mouse2Index = SystemConfig["m2_rawinput_p2"];
-                    
+
                     ini.WriteValue("Input", "RawDevP1", mouse1Index);
                     ini.WriteValue("Input", "RawDevP2", mouse2Index);
 
@@ -209,6 +209,8 @@ namespace EmulatorLauncher
 
                 byte[] bytes;
 
+                SimpleLogger.Instance.Info("Configuring input file " + inputFile);
+
                 if (File.Exists(inputFile))
                     bytes = File.ReadAllBytes(inputFile);
                 else
@@ -216,6 +218,7 @@ namespace EmulatorLauncher
 
                 ConfigureControllers(bytes, ini, parentRom, hexLength);
 
+                SimpleLogger.Instance.Info("Saving input file " + inputFile);
                 File.WriteAllBytes(inputFile, bytes);
             }
         }
@@ -369,5 +372,37 @@ namespace EmulatorLauncher
             { "waverunr", 72 },
             { "zerogun", 108 }
         };
+
+        private void SetupLUAScript(string path, ScreenResolution resolution, string rom)
+        {
+            string luaFile = Path.Combine(path, "scripts", Path.GetFileNameWithoutExtension(rom) + ".lua");
+
+            if (File.Exists(luaFile))
+            {
+                try
+                {
+                    var lines = File.ReadAllLines(luaFile);
+
+                    for (var i = 0; i < lines.Length; i++)
+                    {
+                        var line = lines[i];
+
+                        if (lines[i].Contains("wide=false") || lines[i].Contains("wide=true"))
+                        {
+                            if (SystemConfig.getOptBoolean("m2_widescreen"))
+                                lines[i] = line.Replace("wide=false", "wide=true");
+                            else
+                                lines[i] = line.Replace("wide=true", "wide=false");
+
+                            break;
+                        }
+                            
+                    }
+
+                    File.WriteAllLines(luaFile, lines);
+                }
+                catch { }
+            }
+        }
     }
 }

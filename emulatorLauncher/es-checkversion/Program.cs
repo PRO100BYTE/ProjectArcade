@@ -20,7 +20,7 @@ namespace es_checkversion
 
                 string localVersion = RetrobatVersion.GetLocalVersion();
                 if (string.IsNullOrEmpty(localVersion))
-                    throw new ApplicationException("ProjectArcade is not properly installed");
+                    throw new ApplicationException("Retrobat is not properly installed");
 
                 string remoteVersion = RetrobatVersion.GetRemoteVersion(branch);
                 if (string.IsNullOrEmpty(remoteVersion))

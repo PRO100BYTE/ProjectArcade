@@ -442,7 +442,7 @@
       },
       {
         "md5": "0ec5ae5b5a5c4959fa8b43fcf8687f7c",
-        "file": "../emulators/flycast/data/awbios.zip"
+        "file": "emulators/flycast/data/awbios.zip"
       }
     ]
   },
@@ -652,15 +652,15 @@
       },
       {
         "md5": "e10c53c2f8b90bab96ead2d368858623",
-        "file": "../emulators/flycast/data/dc_boot.bin"
+        "file": "emulators/flycast/data/dc_boot.bin"
       },
       {
         "md5": "0a93f7940c455905bea6e392dfde92a4",
-        "file": "../emulators/flycast/data/dc_flash.bin"
+        "file": "emulators/flycast/data/dc_flash.bin"
       },
       {
         "md5": "",
-        "file": "../emulators/flycast/data/dc.zip"
+        "file": "emulators/flycast/data/dc.zip"
       }
     ]
   },
@@ -930,27 +930,27 @@
       },
       {
         "md5": "",
-        "file": "../emulators/jynx/lynx48-1.rom"
+        "file": "emulators/jynx/lynx48-1.rom"
       },
       {
         "md5": "",
-        "file": "../emulators/jynx/lynx48-2.rom"
+        "file": "emulators/jynx/lynx48-2.rom"
       },
       {
         "md5": "",
-        "file": "../emulators/jynx/lynx96-1.rom"
+        "file": "emulators/jynx/lynx96-1.rom"
       },
       {
         "md5": "",
-        "file": "../emulators/jynx/lynx96-2.rom"
+        "file": "emulators/jynx/lynx96-2.rom"
       },
       {
         "md5": "",
-        "file": "../emulators/jynx/lynx96-3.rom"
+        "file": "emulators/jynx/lynx96-3.rom"
       },
       {
         "md5": "",
-        "file": "../emulators/jynx/lynx96-3-scorpion.rom"
+        "file": "emulators/jynx/lynx96-3-scorpion.rom"
       },
       {
         "md5": "",
@@ -1196,7 +1196,7 @@
       },
       {
         "md5": "eb4099aeb42ef089cfe94f8fe95e51f6",
-        "file": "../emulators/flycast/data/naomi.zip"
+        "file": "emulators/flycast/data/naomi.zip"
       }
     ]
   },
@@ -1210,7 +1210,7 @@
       },
       {
         "md5": "",
-        "file": "../emulators/flycast/data/naomi2.zip"
+        "file": "emulators/flycast/data/naomi2.zip"
       }
     ]
   },
@@ -1315,6 +1315,16 @@
       {
         "md5": "",
         "file": "bios/neocd/uni-bioscd.rom"
+      }
+    ]
+  },
+
+  "ngage": {
+    "name": "Nokia N-gage",
+    "biosFiles": [
+      {
+        "md5": "64a95a4a884cf4cc15a566b856603193",
+        "file": "bios/eka2l1/data/roms/NEM-4/SYM.ROM"
       }
     ]
   },
@@ -1469,32 +1479,8 @@
     "name": "PS2",
     "biosFiles": [
       {
-        "md5": "28922c703cc7d2cf856f177f2985b3a9",
-        "file": "bios/SCPH30004R.bin"
-      },
-      {
-        "md5": "3faf7c064a4984f53e2ef5e80ed543bc",
-        "file": "bios/SCPH30004R.MEC"
-      },
-      {
-        "md5": "d5ce2c7d119f563ce04bc04dbc3a323e",
-        "file": "bios/scph39001.bin"
-      },
-      {
-        "md5": "3faf7c064a4984f53e2ef5e80ed543bc",
-        "file": "bios/scph39001.MEC"
-      },
-      {
-        "md5": "9a9e8ed7668e6adfc8f7766c08ab9cd0",
-        "file": "bios/EROM.BIN"
-      },
-      {
-        "md5": "44552702b05697a14ccbe2ca22ee7139",
-        "file": "bios/rom1.bin"
-      },
-      {
-        "md5": "b406d05922dac2eaf3c2e68157b1b468",
-        "file": "bios/ROM2.BIN"
+        "md5": "21038400dc633070a78ad53090c53017",
+        "file": "bios/pcsx2/bios/ps2-0230a-20080220.bin"
       }
     ]
   },
@@ -1503,24 +1489,8 @@
     "name": "PSX",
     "biosFiles": [
       {
-        "md5": "dc2b9bf8da62ec93e868cfd29f0d067d",
-        "file": "bios/scph1001.bin"
-      },
-      {
-        "md5": "8dd7d5296a650fac7319bce665a6a53c",
-        "file": "bios/scph5500.bin"
-      },
-      {
-        "md5": "490f666e1afb15b7362b406ed1cea246",
-        "file": "bios/scph5501.bin"
-      },
-      {
-        "md5": "32736f17079d0b2b7024407c39bd3050",
-        "file": "bios/scph5502.bin"
-      },
-      {
-        "md5": "1e68c231d0896b7eadcad1d7d8e76129",
-        "file": "bios/scph7001.bin"
+        "md5": " c53ca5908936d412331790f4426c6c33",
+        "file": "bios/psxonpsp660.bin"
       }
     ]
   },
@@ -1699,7 +1669,7 @@
     "name": "Super A Can",
     "biosFiles": [
       {
-        "md5": "3bd04a2e4edcc77fa0e62ff79a99b569",
+        "md5": "f6f0b2ccbbeb2e1d6e843acb145490f8",
         "file": "bios/supracan.zip"
       },
       {

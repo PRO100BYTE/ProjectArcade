@@ -3,6 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
+using EmulatorLauncher.Common.Joysticks;
 
 namespace EmulatorLauncher
 {
@@ -13,6 +14,9 @@ namespace EmulatorLauncher
             DependsOnDesktopResolution = true;
         }
 
+        private SdlVersion _sdlVersion = SdlVersion.SDL2_26;
+        private readonly string _currentESSdlVersion = "2.28.1.0";
+
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
             string path = AppConfig.GetFullPath("ryujinx");
@@ -20,6 +24,40 @@ namespace EmulatorLauncher
             string exe = Path.Combine(path, "Ryujinx.exe");
             if (!File.Exists(exe))
                 return null;
+
+            // Align Ryujinx sdl version with the one from ES to get proper Guid
+            string ESSdl2 = Path.Combine(AppConfig.GetFullPath("retrobat"), "emulationstation", "SDL2.dll");
+            string ESsdlVersion = _currentESSdlVersion;
+            if (File.Exists(ESSdl2))
+            {
+                var ESsdlVersionInfo = FileVersionInfo.GetVersionInfo(ESSdl2);
+                ESsdlVersion = ESsdlVersionInfo.FileMajorPart + "." + ESsdlVersionInfo.FileMinorPart + "." + ESsdlVersionInfo.FileBuildPart + "." + ESsdlVersionInfo.FilePrivatePart;
+            }
+
+            string ryujinxSdl2 = Path.Combine(path, "SDL2.dll");
+            string sdlVersionRyujinx = "";
+            if (File.Exists(ryujinxSdl2))
+            {
+                var sdlVersionInfoRyujinx = FileVersionInfo.GetVersionInfo(ryujinxSdl2);
+                sdlVersionRyujinx = sdlVersionInfoRyujinx.FileMajorPart + "." + sdlVersionInfoRyujinx.FileMinorPart + "." + sdlVersionInfoRyujinx.FileBuildPart + "." + sdlVersionInfoRyujinx.FilePrivatePart;
+            }
+
+            string sourceSDL = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "sdl2", "SDL2_" + ESsdlVersion + "_x64.dll");
+            if (!File.Exists(sourceSDL))
+            {
+                sourceSDL = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "sdl2", "SDL2_" + _currentESSdlVersion + "_x64.dll");
+                ESsdlVersion= _currentESSdlVersion;
+            }
+            
+            if (sdlVersionRyujinx != ESsdlVersion && File.Exists(sourceSDL))
+            {
+                if (File.Exists(ryujinxSdl2))
+                    File.Delete(ryujinxSdl2);
+
+                File.Copy(sourceSDL, ryujinxSdl2);
+            }
+            
+            _sdlVersion = SdlJoystickGuidManager.GetSdlVersion(ryujinxSdl2);
 
             SetupConfiguration(path);
 
@@ -79,11 +117,17 @@ namespace EmulatorLauncher
 
             var json = DynamicJson.Load(Path.Combine(path, "portable", "Config.json"));
 
-            //Perform conroller configuration
-            CreateControllerConfiguration(json);
-
             //Set fullscreen
             json["start_fullscreen"] = fullscreen ? "true" : "false";
+
+            // Folder
+            List<string> paths = new List<string>();
+            string romPath = Path.Combine(AppConfig.GetFullPath("roms"), "switch");
+            if (Directory.Exists(romPath))
+            {
+                paths.Add(romPath);
+                json.SetObject("game_dirs", paths);
+            }
 
             //General Settings
             json["check_updates_on_start"] = "false";
@@ -92,7 +136,7 @@ namespace EmulatorLauncher
 
             //Input
             BindBoolFeature(json, "docked_mode", "ryujinx_undock", "false", "true");
-            json["hide_cursor_on_idle"] = "true";
+            json["hide_cursor"] = "2";
 
             // Discord
             BindBoolFeature(json, "enable_discord_integration", "discord", "true", "false");
@@ -110,12 +154,17 @@ namespace EmulatorLauncher
 
             //Graphics Settings
             BindFeature(json, "backend_threading", "backend_threading", "Auto");
-            BindFeature(json, "graphics_backend", "backend", "Vulkan");
+            
             BindFeature(json, "enable_shader_cache", "enable_shader_cache", "true");
             BindFeature(json, "enable_texture_recompression", "enable_texture_recompression", "false");
             BindFeature(json, "res_scale", "res_scale", "1");
             BindFeature(json, "max_anisotropy", "max_anisotropy", "-1");
             BindFeature(json, "aspect_ratio", "aspect_ratio", "Fixed16x9");
+
+            //Perform conroller configuration
+            CreateControllerConfiguration(json);
+
+            BindFeature(json, "graphics_backend", "backend", "Vulkan");
 
             //save config file
             json.Save();

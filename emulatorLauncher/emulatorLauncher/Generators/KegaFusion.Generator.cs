@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using System.Threading;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
-using EmulatorLauncher.PadToKeyboard;
 
 namespace EmulatorLauncher
 {
-    class KegaFusionGenerator : Generator
+    partial class KegaFusionGenerator : Generator
     {
         public KegaFusionGenerator()
         {
@@ -28,7 +21,7 @@ namespace EmulatorLauncher
             if (!File.Exists(exe))
                 return null;
 
-            SetupConfiguration(path);
+            SetupConfiguration(path, system);
 
             List<string> commandArray = new List<string>();
 
@@ -76,12 +69,19 @@ namespace EmulatorLauncher
             };
         }
 
-        private void SetupConfiguration(string path)
+        private void SetupConfiguration(string path, string system)
         {
             string iniFile = Path.Combine(path, "Fusion.ini");
 
             using (var ini = IniFile.FromFile(iniFile))
             {
+                // PATHS
+                string screenshotpath = Path.Combine(AppConfig.GetFullPath("screenshots"), "kega-fusion");
+                if (!Directory.Exists(screenshotpath)) try { Directory.CreateDirectory(screenshotpath); }
+                    catch { }
+
+                ini.WriteValue("", "ScreenshotPath", screenshotpath);
+
                 // VIDEO
                 bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
@@ -123,6 +123,7 @@ namespace EmulatorLauncher
 
                 BindIniFeature(ini, "", "FPSEnabled", "kega_fps", "0");
 
+                ConfigureControllers(ini, system);
             }
         }
 

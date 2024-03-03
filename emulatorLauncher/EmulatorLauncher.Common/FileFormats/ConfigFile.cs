@@ -131,7 +131,7 @@ namespace EmulatorLauncher.Common.FileFormats
                     if (Directory.Exists(Path.GetFullPath(Path.Combine(LocalPath, "..", key))))
                         return Path.Combine(Path.GetFullPath(Path.Combine(LocalPath, "..", key)));
                 }
-                else if (key == "retrobat")
+                else if (key == "projectarcade")
                 {
                     if (Directory.Exists(Path.GetFullPath(Path.Combine(LocalPath))))
                         return Path.Combine(Path.GetFullPath(Path.Combine(LocalPath, "..")));
@@ -240,7 +240,8 @@ namespace EmulatorLauncher.Common.FileFormats
         {
             ConfigItem item;
             if (_data.TryGetValue(FormatKey(key), out item) && item != null)
-                return item.Value;
+                if (!string.IsNullOrEmpty(item.Value))
+                    return item.Value;
 
             return defaultValue;
         }

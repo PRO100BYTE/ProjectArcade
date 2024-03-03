@@ -11,7 +11,7 @@ namespace RetrobatUpdater
 {
     class Program
     {
-        static string UpdateRelativeUrl = "{0}/archives/projectarcade-{1}.zip";
+        static string UpdateRelativeUrl = "{0}/archives/retrobat-v{1}.zip";
 
         static int Main(string[] args)
         {
@@ -31,7 +31,7 @@ namespace RetrobatUpdater
                 string localVersion = RetrobatVersion.GetLocalVersion();
                 if (string.IsNullOrEmpty(localVersion))
                 {
-                    ConsoleOutput("ProjectArcade is not properly installed");
+                    ConsoleOutput("Retrobat is not properly installed");
                     return 1;
                 }
 

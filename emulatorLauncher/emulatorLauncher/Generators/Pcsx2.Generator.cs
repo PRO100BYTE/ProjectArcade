@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
-using System.Drawing;
-using System.Management;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common;
 
@@ -170,7 +167,7 @@ namespace EmulatorLauncher
 
                 commandArray.Add("--nogui");
 
-                if (SystemConfig.isOptSet("fullboot") && SystemConfig.getOptBoolean("fullboot"))
+                if (SystemConfig.isOptSet("fullboot") && SystemConfig.getOptBoolean("fullboot") && SystemConfig["pcsx2_forcebios"] != "ps3_ps2_emu_bios.bin")
                     commandArray.Add("--fullboot");
             }
 
@@ -694,9 +691,7 @@ namespace EmulatorLauncher
             if (SystemConfig.getOptBoolean("disableautoconfig"))
                 return;
 
-            var biosList = new string[] {
-                            "SCPH30004R.bin", "SCPH30004R.MEC", "scph39001.bin", "scph39001.MEC",
-                            "SCPH-39004_BIOS_V7_EUR_160.BIN", "SCPH-39001_BIOS_V7_USA_160.BIN", "SCPH-70000_BIOS_V12_JAP_200.BIN" };
+            var biosList = new string[] { "ps2-0230a-20080220.bin", "ps2-0230e-20080220.bin", "ps2-0250e-20100415.bin", "ps2-0230j-20080220.bin", "ps3_ps2_emu_bios.bin" };
 
             string conf = Path.Combine(_path, "inis", "PCSX2.ini");
 
@@ -705,6 +700,7 @@ namespace EmulatorLauncher
                 ini.WriteValue("UI", "HideMouseCursor", "true");
                 CreateControllerConfiguration(ini);
                 SetupGunQT(ini, path);
+                SetupWheelQT(ini, path);
 
                 // Disable auto-update
                 ini.WriteValue("AutoUpdater", "CheckAtStartup", "false");
@@ -743,35 +739,33 @@ namespace EmulatorLauncher
                 AddPathToRecursivePaths(Path.GetFullPath(Path.GetDirectoryName(rom)), ini);
 
                 // BIOS path
-                string biosPath = AppConfig.GetFullPath("bios");
-
-                if (biosList.Any(b => File.Exists(Path.Combine(biosPath, "pcsx2", "bios", b))))
-                    ini.WriteValue("Folders", "Bios", Path.Combine(biosPath, "pcsx2", "bios"));
-                else
-                    ini.WriteValue("Folders", "Bios", biosPath);
-
-                string biosPcsx2Path = Path.Combine(biosPath, "pcsx2");
-                if (!Directory.Exists(biosPcsx2Path))
-                    try { Directory.CreateDirectory(biosPcsx2Path); }
+                string biosPath = Path.Combine(AppConfig.GetFullPath("bios"), "pcsx2", "bios");
+                if (!Directory.Exists(biosPath))
+                    try { Directory.CreateDirectory(biosPath); }
                     catch { }
+                ini.WriteValue("Folders", "Bios", biosPath);
 
-                // Precise bios to use
-                string biosFile = biosList.FirstOrDefault(b => File.Exists(Path.Combine(biosPcsx2Path, "bios", b)));
-                if (string.IsNullOrEmpty(biosFile))
+                string biosFile = "ps2-0230a-20080220.bin";                     // Default bios
+
+                if (!File.Exists(Path.Combine(biosPath, biosFile)))             // if default does not exist, select first one that exists
                     biosFile = biosList.FirstOrDefault(b => File.Exists(Path.Combine(biosPath, b)));
-                else
-                    biosFile = "SCPH30004R.bin";
+
+                if (SystemConfig.isOptSet("pcsx2_forcebios") && !string.IsNullOrEmpty(SystemConfig["pcsx2_forcebios"]))                         // Precise bios to use through feature
+                    biosFile = SystemConfig["pcsx2_forcebios"];
+
+                if (string.IsNullOrEmpty(biosFile))
+                    throw new ApplicationException("No PS2 BIOS found.");
 
                 ini.WriteValue("Filenames", "BIOS", biosFile);
 
                 // Cheats Path
-                string cheatsPath = Path.Combine(AppConfig.GetFullPath("cheats"), "pcsx2", "cheats");
-                string cheatswsPath = Path.Combine(AppConfig.GetFullPath("cheats"), "pcsx2", "cheats_ws");
-                string cheatsniPath = Path.Combine(AppConfig.GetFullPath("cheats"), "pcsx2", "cheats_ni");
-                SetIniPath(ini, "Folders", "Cheats", cheatsPath);
-                SetIniPath(ini, "Folders", "CheatsWS", cheatswsPath);
-                SetIniPath(ini, "Folders", "CheatsNI", cheatsniPath);
-
+                var cheatsRootPath = AppConfig.GetFullPath("cheats");
+                cheatsRootPath = string.IsNullOrEmpty(cheatsRootPath) ? path : Path.Combine(cheatsRootPath, "pcsx2");
+                
+                SetIniPath(ini, "Folders", "Cheats", Path.Combine(cheatsRootPath, "cheats"));
+                SetIniPath(ini, "Folders", "CheatsWS", Path.Combine(cheatsRootPath, "cheats_ws"));
+                SetIniPath(ini, "Folders", "CheatsNI", Path.Combine(cheatsRootPath, "cheats_ni"));
+                
                 // Snapshots path
                 string screenShotsPath = Path.Combine(AppConfig.GetFullPath("screenshots"), "pcsx2");
                 SetIniPath(ini, "Folders", "Snapshots", screenShotsPath);

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Threading;
 using TeknoParrotUi.Common;
@@ -160,6 +159,11 @@ namespace EmulatorLauncher
         private string _exename;
         private GameProfile _gameProfile;
 
+        public TeknoParrotGenerator()
+        {
+            DependsOnDesktopResolution = true;
+        }
+
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
             string path = AppConfig.GetFullPath("TeknoParrot");
@@ -303,6 +307,8 @@ namespace EmulatorLauncher
                 data.UseDiscordRPC = true;
             else
                 data.UseDiscordRPC = false;
+
+            data.CheckForUpdates = false;
 
             File.WriteAllText(parrotData, data.ToXml());
         }

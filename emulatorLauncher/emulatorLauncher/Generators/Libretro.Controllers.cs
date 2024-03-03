@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Globalization;
-using System.IO;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.Common.FileFormats;
@@ -16,6 +14,7 @@ namespace EmulatorLauncher.Libretro
         private static HashSet<string> disabledAnalogModeSystems = new HashSet<string> { "n64", "dreamcast", "gamecube", "3ds" };
 
         static List<string> systemButtonInvert = new List<string>() { "snes", "snes-msu", "sattelaview", "sufami" };
+        static List<string> coreNoRemap = new List<string>() { "mednafen_snes" };
 
 
         public static bool WriteControllersConfig(ConfigFile retroconfig, string system, string core)
@@ -26,6 +25,9 @@ namespace EmulatorLauncher.Libretro
             if (Program.SystemConfig["input_driver"] == "xinput")
                 _inputDriver = "xinput";
 
+            if (Program.SystemConfig["input_driver"] == "dinput")
+                _inputDriver = "dinput";
+
             // no menu in non full uimode
             if (Program.SystemConfig.isOptSet("uimode") && Program.SystemConfig["uimode"] != "Full" && retroarchspecials.ContainsKey(InputKey.a))
                 retroarchspecials.Remove(InputKey.a);
@@ -33,7 +35,7 @@ namespace EmulatorLauncher.Libretro
             CleanControllerConfig(retroconfig);
 
             foreach (var controller in Program.Controllers)
-                WriteControllerConfig(retroconfig, controller, system);
+                WriteControllerConfig(retroconfig, controller, system, core);
 
             WriteHotKeyConfig(retroconfig);
 
@@ -176,7 +178,7 @@ namespace EmulatorLauncher.Libretro
             return "0";
         }
 
-        private static Dictionary<string, string> GenerateControllerConfig(ConfigFile retroconfig, Controller controller, string system)
+        private static Dictionary<string, string> GenerateControllerConfig(ConfigFile retroconfig, Controller controller, string system, string core)
         {
             Dictionary<InputKey, string> retroarchbtns = new Dictionary<InputKey, string>()
             {
@@ -201,57 +203,6 @@ namespace EmulatorLauncher.Libretro
                 retroarchbtns[InputKey.r3] = "l3";
             }
 
-            if (system == "atari800")
-            {
-                retroarchbtns[InputKey.b] = "b";
-                retroarchbtns[InputKey.a] = "a";
-            }
-            else if (system == "atari5200")
-            {
-                retroarchbtns = new Dictionary<InputKey, string>()
-                {
-                    { InputKey.b, "x" },
-                    { InputKey.a, "a" },
-                    { InputKey.x, "b" }, 
-                    { InputKey.y, "y" },
-                    { InputKey.start, "start"}, 
-                    { InputKey.pagedown, "select"} // select
-                };
-            }
-
-            if (system == "gamecube")
-            {
-                bool revertall = Program.Features.IsSupported("gamepadbuttons") && Program.SystemConfig.isOptSet("gamepadbuttons") && Program.SystemConfig["gamepadbuttons"] == "reverse_all";
-                bool revertAB = Program.Features.IsSupported("gamepadbuttons") && Program.SystemConfig.isOptSet("gamepadbuttons") && Program.SystemConfig["gamepadbuttons"] == "reverse_ab";
-
-                retroarchbtns = new Dictionary<InputKey, string>()
-                {
-                    { InputKey.b, "a" },
-                    { InputKey.a, "b" }, // A et B inversés par rapport à batocera
-                    { InputKey.x, "x" }, 
-                    { InputKey.y, "y" },
-                    { InputKey.l2, "l2"},
-                    { InputKey.r2, "r2"},
-                    { InputKey.l3, "l3"}, 
-                    { InputKey.r3, "r3"},
-                    { InputKey.start, "start"}, 
-                    { InputKey.pagedown, "r"} // select
-                };
-
-                if (revertall)
-                {
-                    retroarchbtns[InputKey.b] = "b";
-                    retroarchbtns[InputKey.a] = "a";
-                    retroarchbtns[InputKey.x] = "y";
-                    retroarchbtns[InputKey.y] = "x";
-                }
-                else if (revertAB)
-                {
-                    retroarchbtns[InputKey.b] = "b";
-                    retroarchbtns[InputKey.a] = "a";
-                }
-            }
-
             if (system == "n64")
             {
                 // some input adaptations for some cores...
@@ -264,7 +215,7 @@ namespace EmulatorLauncher.Libretro
             }
 
             // Reverse buttons clockwise option for super nintendo libretro cores
-            if (systemButtonInvert.Contains(system) && Program.Features.IsSupported("buttonsInvert") && Program.SystemConfig.getOptBoolean("buttonsInvert"))
+            if (systemButtonInvert.Contains(system) && Program.Features.IsSupported("buttonsInvert") && Program.SystemConfig.getOptBoolean("buttonsInvert") && coreNoRemap.Contains(core))
             {
                 retroarchbtns[InputKey.a] = "a";
                 retroarchbtns[InputKey.b] = "b";
@@ -363,9 +314,9 @@ namespace EmulatorLauncher.Libretro
                              .ToArray();
         }
 
-        private static void WriteControllerConfig(ConfigFile retroconfig, Controller controller, string system)
+        private static void WriteControllerConfig(ConfigFile retroconfig, Controller controller, string system, string core)
         {
-            var generatedConfig = GenerateControllerConfig(retroconfig, controller, system);
+            var generatedConfig = GenerateControllerConfig(retroconfig, controller, system, core);
             foreach (var key in generatedConfig)
                 retroconfig[key.Key] = key.Value;
 
