@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
 using System.Diagnostics;
-using System.Windows.Forms;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.Lightguns;
+using System.Windows.Forms;
 
 namespace EmulatorLauncher
 {
-    class HypseusGenerator : DaphneGenerator
+    partial class HypseusGenerator : DaphneGenerator
     {
-        public HypseusGenerator() { _executableName = "hypseus"; }
+        public HypseusGenerator() { _executableName = "hypseus"; DependsOnDesktopResolution = true; }
+
     }
 
-    class DaphneGenerator : Generator
+    partial class DaphneGenerator : Generator
     {
         public DaphneGenerator()
         {
@@ -45,14 +45,13 @@ namespace EmulatorLauncher
                     commandArray.Add("-ignore_aspect_ratio");
                 else
                     commandArray.Add("-force_aspect_ratio");
-                /*
+
                 if (SystemConfig.isOptSet("hypseus_renderer") && SystemConfig["hypseus_renderer"] == "vulkan")
                 {
                     commandArray.Remove("-opengl");
                     commandArray.Add("-vulkan");
-
                 }
-                */
+
                 return;
             }
         }
@@ -124,6 +123,9 @@ namespace EmulatorLauncher
                 return null;
             }
 
+            if (emulator == "hypseus")
+                CreateControllerConfiguration(emulatorPath);
+
             List<string> commandArray = new List<string>();
 
             // extension used .daphne and the file to start the game is in the folder .daphne with the extension .txt
@@ -175,23 +177,32 @@ namespace EmulatorLauncher
             }
             else
             {
-                 commandArray.AddRange(new string[]                       
-                   {                                
-                       romName, 
-                       "vldp", 
-                        "-framefile", frameFile, 
+                if (emulator == "daphne")
+                {
+                    commandArray.AddRange(new string[]
+                   {
+                       romName,
+                       "vldp",
+                        "-framefile", frameFile,
                         "-useoverlaysb", "2",
                         "-homedir", _daphneHomedir
                    });
+                }
+                else                 {
+                    commandArray.AddRange(new string[]
+                   {
+                       romName,
+                       "vldp",
+                        "-framefile", frameFile,
+                        "-homedir", _daphneHomedir
+                   });
+                }
             }
-
-            if (Features.IsSupported("overlay") && SystemConfig.getOptBoolean("overlay"))
-            {
-                commandArray.Add("-useoverlaysb");
-                commandArray.Add("2");
-            }
-
+            
             bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
+            if (fullscreen)
+                commandArray.Add("-fullscreen");
 
             commandArray.Add("-x");
             commandArray.Add((resolution == null ? Screen.PrimaryScreen.Bounds.Width : resolution.Width).ToString());
@@ -199,12 +210,12 @@ namespace EmulatorLauncher
             commandArray.Add("-y");
             commandArray.Add((resolution == null ? Screen.PrimaryScreen.Bounds.Height : resolution.Height).ToString());
 
-            if (fullscreen)
-                commandArray.Add("-fullscreen");
-
             commandArray.Add("-opengl");            
             commandArray.Add("-fastboot");
-            
+
+            if (SystemConfig.getOptBoolean("daphne_vsync") && emulator == "hypseus")
+                commandArray.Add("-novsync");
+
             UpdateCommandline(commandArray);       
             
             // The folder may have a file with the game name and .commands with extra arguments to run the game.
@@ -222,7 +233,7 @@ namespace EmulatorLauncher
                     }
 
                     if (s == romName || s == "singe" || s == "vdlp" || s == "-fullscreen" || 
-                        s == "-opengl" || s == "-fastboot" || s == "-retropath" || s == "-manymouse")
+                        s == "-opengl" || s == "-vulkan" || s == "-fastboot" || s == "-retropath" || s == "-manymouse")
                         continue;
 
                     if (s == "-x" || s == "-y" || s == "-framefile" || s == "-script" || s == "script" || s == "-useoverlaysb" || s == "-homedir" || s == "-datadir")
@@ -235,10 +246,48 @@ namespace EmulatorLauncher
                 }
             }
 
-            if (SystemConfig["ratio"] == "16/9")
-                SystemConfig["bezel"] = "none";
+            if (emulator == "daphne")
+            {
+                if (SystemConfig["ratio"] == "16/9")
+                    SystemConfig["bezel"] = "none";
 
-            ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadeManager.GetPlatformFromFile(exe), system, rom, emulatorPath, resolution);
+                ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadeManager.GetPlatformFromFile(exe), system, rom, emulatorPath, resolution);
+            }
+
+            else if (emulator == "hypseus")
+            {
+                BezelFiles bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+                if (bezelFileInfo != null)
+                {
+                    string bezelFile = bezelFileInfo.PngFile;
+                    string hypseusBezelFile = Path.Combine(AppConfig.GetFullPath("hypseus"), "bezels", "ProjectArcadeBezel.png");
+
+                    if (bezelFile != null && File.Exists(bezelFile))
+                    {
+                        if (File.Exists(hypseusBezelFile))
+                            File.Delete(hypseusBezelFile);
+
+                        File.Copy(bezelFile, hypseusBezelFile);
+
+                        string targetBezelFile = Path.GetFileName(hypseusBezelFile);
+
+                        commandArray.Add("-bezel");
+                        commandArray.Add("\"" + targetBezelFile + "\"");
+                    }
+                }
+
+                if (SystemConfig["bezel"] == "default_unglazed")
+                {
+                    string hypseusBezelFile = Path.Combine(AppConfig.GetFullPath("hypseus"), "bezels", romName + ".png");
+
+                    if (File.Exists(hypseusBezelFile))
+                    {
+                        string targetBezelFile = Path.GetFileName(hypseusBezelFile);
+                        commandArray.Add("-bezel");
+                        commandArray.Add("\"" + targetBezelFile + "\"");
+                    }
+                }
+            }
 
             string args = string.Join(" ", commandArray);
 

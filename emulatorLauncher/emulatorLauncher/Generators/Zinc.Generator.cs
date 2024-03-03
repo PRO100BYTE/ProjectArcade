@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
+using System.Linq;
 
 namespace EmulatorLauncher
 {
@@ -51,38 +51,35 @@ namespace EmulatorLauncher
             commandArray.Add(cfgFile);
 
             // Add controller config path command line
-            string controllerCfgFile = Path.Combine(path, "cfg", zincControllerCfgFiles[romNumber]);
-            string oldControllerCfgFile = Path.Combine(path, "controller.cfg");
+            string[] gameCtrlFiles = Directory.GetFiles(Path.Combine(path, "cfg"), "*.cfg");
+            string gameCtrlFile = gameCtrlFiles.FirstOrDefault(f => Path.GetFileName(f).StartsWith(romNumber.ToString()));
+            string ControllerCfgFile = Path.Combine(path, "controller.cfg");
 
-            if (zincControllerCfgFiles.ContainsKey(romNumber) && File.Exists(controllerCfgFile) && SystemConfig["zinc_controller_config"] != "none")
+            if (File.Exists(gameCtrlFile) && SystemConfig["zinc_controller_config"] != "none")
             {
-                if (SystemConfig.isOptSet("zinc_controller_config") && SystemConfig["zinc_controller_config"] == "autoconfig")
+                if (SystemConfig.isOptSet("zinc_controller_config") && SystemConfig["zinc_controller_config"] == "predefined")
                 {
-                    ConfigureControllers(oldControllerCfgFile, path);
-                    string controllerCfgCommand = "--use-controller-cfg-file=" + "\"" + oldControllerCfgFile + "\"";
-                    commandArray.Add("--controller=.\\controller.znc");
-                    commandArray.Add(controllerCfgCommand);
+                    if (File.Exists(ControllerCfgFile))
+                        File.Delete(ControllerCfgFile);
+                    if (File.Exists(gameCtrlFile))
+                        File.Copy(gameCtrlFile, ControllerCfgFile);
                 }
                 else
                 {
-                    controllerCfgFile = Path.Combine(path, "cfg", zincControllerCfgFiles[romNumber]);
-                    string controllerCfgCommand = "--use-controller-cfg-file=" + "\"" + controllerCfgFile + "\"";
-                    string outputFile = Path.Combine(path, "wberror.txt");
-                    using (var ini = IniFile.FromFile(controllerCfgFile, IniOptions.UseSpaces | IniOptions.KeepEmptyValues | IniOptions.KeepEmptyLines))
-                    {
-                        ini.WriteValue("General", "output", outputFile);
-                        ini.WriteValue("General", "NOERROR", "1");
-                        ini.Save();
-                    }
-
-                    if (File.Exists(oldControllerCfgFile))
-                        File.Delete(oldControllerCfgFile);
-                    if (File.Exists(controllerCfgFile))
-                        File.Copy(controllerCfgFile, oldControllerCfgFile);
-
-                    commandArray.Add("--controller=.\\controller.znc");
-                    commandArray.Add(controllerCfgCommand);
+                    ConfigureControllers(ControllerCfgFile, path);
                 }
+            }
+
+            commandArray.Add("--controller=.\\controller.znc");
+            string controllerCfgCommand = "--use-controller-cfg-file=" + "\"" + ControllerCfgFile + "\"";
+            commandArray.Add(controllerCfgCommand);
+
+            string outputFile = Path.Combine(path, "wberror.txt");
+            using (var ini = IniFile.FromFile(gameCtrlFile, IniOptions.UseSpaces | IniOptions.KeepEmptyValues | IniOptions.KeepEmptyLines))
+            {
+                ini.WriteValue("General", "output", outputFile);
+                ini.WriteValue("General", "NOERROR", "1");
+                ini.Save();
             }
 
             // Renderer choice
@@ -117,7 +114,7 @@ namespace EmulatorLauncher
             cfgFile.Save(cfg, false);
         }
 
-        private void SetupRendererCfg(string path, string rom, ScreenResolution resolution = null, bool fullscreen = true)
+        private void SetupRendererCfg(string path, string rom, ScreenResolution resolution = null, bool fullscreen = false)
         {
             // renderer.cfg file
             string cfg = Path.Combine(path, "renderer.cfg");
@@ -130,6 +127,7 @@ namespace EmulatorLauncher
             BindFeature(cfgFile, "ColorDepth", "zinc_colordepth", "32");
             BindFeature(cfgFile, "ScanLines", "zinc_scanlines", "0");
             BindFeature(cfgFile, "ShowFPS", "zinc_fps", "0");
+            BindFeature(cfgFile, "FrameSkipping", "zinc_frameskip", "0");
 
             cfgFile.Save(cfg, false);
         }

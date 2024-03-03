@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
-using System.Net;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml.Serialization;
-using System.Runtime.InteropServices;
 using System.Xml.Linq;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
@@ -94,7 +91,9 @@ namespace EmulatorLauncher
             { new Installer("xm6pro", "xm6pro", "XM6.exe") },
             { new Installer("stella", "stella", "Stella.exe") },
             { new Installer("theforceengine", "theforceengine", "TheForceEngine.exe") },
-            { new Installer("kronos", "kronos", "kronos.exe") }
+            { new Installer("kronos", "kronos", "kronos.exe") },
+            { new Installer("gzdoom", "gzdoom", "gzdoom.exe") },
+            { new Installer("eka2l1", "eka2l1", "eka2l1_qt.exe") }
         };
 
         static List<string>noVersionExe = new List<string>()

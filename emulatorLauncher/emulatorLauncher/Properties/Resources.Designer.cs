@@ -10,9 +10,8 @@
 
 namespace EmulatorLauncher.Properties {
     using System;
-    using System.Drawing;
-
-
+    
+    
     /// <summary>
     ///   Класс ресурса со строгой типизацией для поиска локализованных строк и т.д.
     /// </summary>
@@ -24,7 +23,7 @@ namespace EmulatorLauncher.Properties {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
-        internal static Image projectarcade;
+        
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
@@ -294,6 +293,16 @@ namespace EmulatorLauncher.Properties {
         }
         
         /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap projectarcade {
+            get {
+                object obj = ResourceManager.GetObject("projectarcade", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Поиск локализованного ресурса типа System.Byte[].
         /// </summary>
         internal static byte[] ReShade {
@@ -376,26 +385,6 @@ namespace EmulatorLauncher.Properties {
         }
         
         /// <summary>
-        ///   Поиск локализованного ресурса типа System.Byte[].
-        /// </summary>
-        internal static byte[] SQLite_Interop_x64_gz {
-            get {
-                object obj = ResourceManager.GetObject("SQLite_Interop_x64_gz", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Byte[].
-        /// </summary>
-        internal static byte[] SQLite_Interop_x86_gz {
-            get {
-                object obj = ResourceManager.GetObject("SQLite_Interop_x86_gz", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Decompressing {0}.
         /// </summary>
         internal static string UnCompressing {
@@ -422,6 +411,26 @@ namespace EmulatorLauncher.Properties {
         internal static string Updating {
             get {
                 return ResourceManager.GetString("Updating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Byte[].
+        /// </summary>
+        internal static byte[] wheelmapping {
+            get {
+                object obj = ResourceManager.GetObject("wheelmapping", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Byte[].
+        /// </summary>
+        internal static byte[] wheelsdlmapping {
+            get {
+                object obj = ResourceManager.GetObject("wheelsdlmapping", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         

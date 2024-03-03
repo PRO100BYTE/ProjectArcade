@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using EmulatorLauncher.Common;
@@ -240,7 +237,7 @@ namespace EmulatorLauncher
 
             var toSet = new byte[] { (byte)langId };
             for (int i = 0; i < toSet.Length; i++)
-                bytes[104] = toSet[i];
+                bytes[128] = toSet[i];
 
             File.WriteAllBytes(path, bytes);
         }

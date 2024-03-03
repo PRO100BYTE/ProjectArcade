@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
@@ -25,22 +24,30 @@ namespace EmulatorLauncher
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {            
             string path = AppConfig.GetFullPath("openbor");
+            string newPath;
+            string newExe;
 
             string exe = Path.Combine(path, "OpenBOR.exe");
             if (!File.Exists(exe))
                 return null;
 
-            string build = GetBuildToUse(rom);
+            string build = GetBuildToUse(rom, core);
             if (!string.IsNullOrEmpty(build))
             {
-                path = Path.Combine(path, build);
-                exe = Path.Combine(path, "OpenBOR.exe");
+                newPath = Path.Combine(path, build);
+                newExe = Path.Combine(newPath, "OpenBOR.exe");
+
+                if (Directory.Exists(newPath) && File.Exists(newExe))
+                {
+                    path = newPath;
+                    exe = newExe;
+                }
             }
 
             try
             {
                 var versionInfo = FileVersionInfo.GetVersionInfo(exe);
-                _isCustomRetrobatOpenBor = (versionInfo.FilePrivatePart == 5242); // 5242 stands for RB ( 'R' x52, 'B' x42 ) -> RetroBat !
+                _isCustomRetrobatOpenBor = (versionInfo.FilePrivatePart == 5242); // 5242 stands for RB ( 'R' x52, 'B' x42 ) -> ProjectArcade !
             }
             catch { }
 
@@ -58,12 +65,13 @@ namespace EmulatorLauncher
                 };
             }
 
-            // Old versions ?
+            /* Old versions ?
 
             if (build == "4432")
                 setupConfigBor4432Cfg(path);
             else 
                 setupConfigBorCfg(path);
+            */
 
             string pakDir = Path.Combine(path, "Paks");
             if (!Directory.Exists(pakDir))
@@ -93,9 +101,9 @@ namespace EmulatorLauncher
         private void SetupBezelAndShaders(string system, string rom, ScreenResolution resolution, string path)
         {
             var bezels = BezelFiles.GetBezelFiles(system, rom, resolution);
-            if (bezels != null && ((SystemConfig.isOptSet("ratio") && SystemConfig["ratio"] == "1") || BorPak.GetVideoMode(rom).IsWideScreen))
+            if (bezels != null && ((SystemConfig.isOptSet("ratio") && SystemConfig["ratio"] == "1")))
                 SystemConfig["forceNoBezel"] = "1";
-
+            
             ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x86, system, rom, path, resolution, false);
         }
 
@@ -111,7 +119,7 @@ namespace EmulatorLauncher
         private bool setupConfigIni(string path)
         {
             string ini = Path.Combine(path, "config.ini");
-            if (!File.Exists(ini) && !_isCustomRetrobatOpenBor)
+            if (!_isCustomRetrobatOpenBor)
                 return false;
 
             bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
@@ -161,9 +169,11 @@ namespace EmulatorLauncher
         #endregion
 
         #region Old Openbor versions with bor.cfg file format
-        private string GetBuildToUse(string rom)
+        private string GetBuildToUse(string rom, string core)
         {
-            /*
+            if (core != "openbor-specific-version")
+                return null;
+            
             string path = AppConfig.GetFullPath("openbor");
 
             int buildIndex = rom.LastIndexOf(']');
@@ -173,14 +183,8 @@ namespace EmulatorLauncher
                 if (buildNumber == 0)
                     return null;
 
-                if (buildNumber < 4000 && File.Exists(Path.Combine(path, "3318", "OpenBOR.exe")))
-                    return "3318";
-                else if (buildNumber < 6000 && File.Exists(Path.Combine(path, "4432", "OpenBOR.exe")))
-                    return "4432";
-                else if (buildNumber < 6340 && File.Exists(Path.Combine(path, "6330", "OpenBOR.exe")))
-                    return "6330";
+                return buildNumber.ToString();
             }
-            */
 
             return null;
         }

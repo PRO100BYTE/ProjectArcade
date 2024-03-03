@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using EmulatorLauncher.Common;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -48,6 +46,7 @@ namespace EmulatorLauncher
             catch { }
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         struct SAVE_STATE_HEADER
         {
             public UInt32 magic;

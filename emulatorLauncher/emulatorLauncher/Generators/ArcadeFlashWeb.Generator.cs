@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using EmulatorLauncher.Common;
+using System;
+using System.Windows.Forms;
+using System.Threading;
+using System.Windows.Interop;
 
 namespace EmulatorLauncher
 {
@@ -12,7 +13,7 @@ namespace EmulatorLauncher
     {
         public ArcadeFlashWebGenerator()
         {
-            DependsOnDesktopResolution = true;
+            DependsOnDesktopResolution = false;
         }
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
@@ -47,13 +48,47 @@ namespace EmulatorLauncher
 
             string args = string.Join(" ", commandArray);
 
-            return new ProcessStartInfo()
+            var ret = new ProcessStartInfo()
             {
                 FileName = exe,
                 WorkingDirectory = path,
                 Arguments = args,
             };
+
+            return ret;
         }
 
+        public override int RunAndWait(ProcessStartInfo path)
+        {
+            Process process = Process.Start(path);
+            Thread.Sleep(3000);
+
+            var hWnd = User32.FindHwnd(process.Id);
+            var focusApp = User32.GetForegroundWindow();
+
+            while (hWnd != focusApp)
+            {
+                var name = User32.GetWindowText(focusApp);
+                var name2 = User32.GetWindowText(hWnd);
+                if (process.WaitForExit(50))
+                {
+                    process = null;
+                    break;
+                }
+
+                User32.SetForegroundWindow(hWnd);
+                break;
+            }
+
+            if (process != null)
+            {
+                process.WaitForExit();
+
+                try { return process.ExitCode; }
+                catch { }
+            }
+
+            return 0;
+        }
     }
 }

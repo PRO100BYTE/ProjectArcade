@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
 using System.Globalization;
-using System.Security.Cryptography;
-using System.Drawing;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.Common.FileFormats;
@@ -36,7 +33,13 @@ namespace EmulatorLauncher
 
             if (system == "wii")
             {
-                if (Program.SystemConfig.isOptSet("emulatedwiimotes") && Program.SystemConfig.getOptBoolean("emulatedwiimotes"))
+                if (Program.SystemConfig.getOptBoolean("use_guns"))
+                {
+                    generateControllerConfig_wiilightgun(path, "WiimoteNew.ini", "Wiimote");
+                    return true;
+                }
+
+                else if (Program.SystemConfig.isOptSet("emulatedwiimotes") && Program.SystemConfig.getOptBoolean("emulatedwiimotes"))
                 {
                     generateControllerConfig_emulatedwiimotes(path, rom);
                     removeControllerConfig_gamecube(path, "Dolphin.ini"); // because pads will already be used as emulated wiimotes
@@ -480,6 +483,69 @@ namespace EmulatorLauncher
                 SetWiimoteHotkeys(hotkeyini);
         }
 
+        private static void generateControllerConfig_wiilightgun(string path, string filename, string anyDefKey)
+        {
+            string iniFile = Path.Combine(path, "User", "Config", filename);
+
+            using (IniFile ini = new IniFile(iniFile, IniOptions.UseSpaces))
+            {
+                for (int i = 1; i < 5; i++)
+                {
+                    ini.ClearSection(anyDefKey + i.ToString());
+                }
+                string wiimote = "Wiimote1";
+                
+                ini.WriteValue(wiimote, "Device", "DInput/0/Keyboard Mouse");
+                ini.WriteValue(wiimote, "Source", "1");
+                ini.WriteValue(wiimote, "Buttons/X", "Q");
+                ini.WriteValue(wiimote, "Buttons/B", "`Click 0`");
+                ini.WriteValue(wiimote, "Buttons/Y", "S");
+                ini.WriteValue(wiimote, "Buttons/A", "`Click 1`");
+                ini.WriteValue(wiimote, "Buttons/-", "BACK");
+                ini.WriteValue(wiimote, "Buttons/+", "RETURN");
+                ini.WriteValue(wiimote, "Main Stick/Up", "UP");
+                ini.WriteValue(wiimote, "Main Stick/Down", "DOWN");
+                ini.WriteValue(wiimote, "Main Stick/Left", "LEFT");
+                ini.WriteValue(wiimote, "Main Stick/Right", "RIGHT");
+                ini.WriteValue(wiimote, "Tilt/Modifier/Range", "50.");
+                ini.WriteValue(wiimote, "Nunchuk/Stick/Modifier/Range", "50.");
+                ini.WriteValue(wiimote, "Nunchuk/Tilt/Modifier/Range", "50.");
+                ini.WriteValue(wiimote, "uDraw/Stylus/Modifier/Range", "50.");
+                ini.WriteValue(wiimote, "Drawsome/Stylus/Modifier/Range", "50.");
+                ini.WriteValue(wiimote, "Buttons/1", "`Click 2`");
+                ini.WriteValue(wiimote, "Buttons/2", "`2`");
+                ini.WriteValue(wiimote, "D-Pad/Up", "UP");
+                ini.WriteValue(wiimote, "D-Pad/Down", "DOWN");
+                ini.WriteValue(wiimote, "D-Pad/Left", "LEFT");
+                ini.WriteValue(wiimote, "D-Pad/Right", "RIGHT");
+                ini.WriteValue(wiimote, "IR/Up", "`Cursor Y-`");
+                ini.WriteValue(wiimote, "IR/Down", "`Cursor Y+`");
+                ini.WriteValue(wiimote, "IR/Left", "`Cursor X-`");
+                ini.WriteValue(wiimote, "IR/Right", "`Cursor X+`");
+                ini.WriteValue(wiimote, "Shake/X", "`Click 2`");
+                ini.WriteValue(wiimote, "Shake/Y", "`Click 2`");
+                ini.WriteValue(wiimote, "Shake/Z", "`Click 2`");
+                ini.WriteValue(wiimote, "Extension", "Nunchuk");
+                ini.WriteValue(wiimote, "Nunchuk/Buttons/C", "LCONTROL");
+                ini.WriteValue(wiimote, "Nunchuk/Buttons/Z", "LSHIFT");
+                ini.WriteValue(wiimote, "Nunchuk/Stick/Up", "W");
+                ini.WriteValue(wiimote, "Nunchuk/Stick/Down", "S");
+                ini.WriteValue(wiimote, "Nunchuk/Stick/Left", "A");
+                ini.WriteValue(wiimote, "Nunchuk/Stick/Right", "D");
+                ini.WriteValue(wiimote, "Nunchuk/Stick/Calibration", "100.00 141.42 100.00 141.42 100.00 141.42 100.00 141.42");
+                ini.WriteValue(wiimote, "Nunchuk/Shake/X", "`Click 2`");
+                ini.WriteValue(wiimote, "Nunchuk/Shake/Y", "`Click 2`");
+                ini.WriteValue(wiimote, "Nunchuk/Shake/Z", "`Click 2`");
+
+                ini.Save();
+            }
+
+            // Reset hotkeys
+            string hotkeyini = Path.Combine(path, "User", "Config", "Hotkeys.ini");
+            if (File.Exists(hotkeyini))
+                ResetHotkeysToDefault(hotkeyini);
+        }
+
         private static string GetSDLMappingName(Controller pad, InputKey key)
         {
             var input = pad.GetSdlMapping(key);
@@ -531,6 +597,8 @@ namespace EmulatorLauncher
         {
             //string path = Program.AppConfig.GetFullPath("dolphin");
             string iniFile = Path.Combine(path, "User", "Config", filename);
+
+            SimpleLogger.Instance.Info("[INFO] Writing controller configuration in : " + iniFile);
 
             bool forceSDL = false;
             if (Program.SystemConfig.isOptSet("input_forceSDL") && Program.SystemConfig.getOptBoolean("input_forceSDL"))
@@ -1007,6 +1075,12 @@ namespace EmulatorLauncher
                             ini.Remove(gcpad, "Swing/Up");
                             ini.Remove(gcpad, "Swing/Left");
                         }
+
+                        // Hide wiimote cursor
+                        if (Program.SystemConfig.getOptBoolean("wii_hidecursor"))
+                            ini.WriteValue(gcpad, "IR/Auto-Hide", "True");
+                        else
+                            ini.WriteValue(gcpad, "IR/Auto-Hide", "False");
                     }
                 }
 
@@ -1077,10 +1151,10 @@ namespace EmulatorLauncher
 
                     ini.WriteValue("Hotkeys", "General/Exit", "`Button 4`&`Button 6`");
 
-                    var save = "@(" + (GetSDLMappingName(c1, InputKey.hotkey) ?? "") + "&" + (GetSDLMappingName(c1, InputKey.y) ?? "") + ")";
+                    var save = (GetSDLMappingName(c1, InputKey.hotkey) ?? "") + "&" + (GetSDLMappingName(c1, InputKey.y) ?? "");
                     ini.WriteValue("Hotkeys", "General/Take Screenshot", save); // Use Same value as SaveState....
                     ini.WriteValue("Hotkeys", "Save State/Save to Selected Slot", save);
-                    ini.WriteValue("Hotkeys", "Load State/Load from Selected Slot", "@(" + (GetSDLMappingName(c1, InputKey.hotkey) ?? "") + "&" + (GetSDLMappingName(c1, InputKey.x) ?? "") + ")");                    
+                    ini.WriteValue("Hotkeys", "Load State/Load from Selected Slot", (GetSDLMappingName(c1, InputKey.hotkey) ?? "") + "&" + (GetSDLMappingName(c1, InputKey.x) ?? ""));                    
 
                     // Save State/Save to Selected Slot = @(`Button 6`+`Button 2`)
 
@@ -1095,8 +1169,6 @@ namespace EmulatorLauncher
                     ini.WriteValue("Hotkeys", "General/Toggle Pause", "`F10`");
                     ini.WriteValue("Hotkeys", "General/Toggle Fullscreen", "@(Alt+RETURN)");
                     ini.WriteValue("Hotkeys", "General/Exit", "ESCAPE");
-                 //   ini.WriteValue("Hotkeys", "Load State/Load State Slot 1", "`F1`");
-                 //   ini.WriteValue("Hotkeys", "Save State/Save State Slot 1", "Alt&`F1");
                     ini.WriteValue("Hotkeys", "General/Take Screenshot", "`F9`");
                     ini.WriteValue("Hotkeys", "General/Eject Disc", "Alt&E");
                     ini.WriteValue("Hotkeys", "General/Change Disc", "Alt&S");

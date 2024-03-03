@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
 using System.Xml.Linq;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.Compression;
-using EmulatorLauncher.Common.EmulationStation;
 
 namespace EmulatorLauncher
 {
@@ -17,7 +15,7 @@ namespace EmulatorLauncher
 
         static MessSystem[] MessSystems = new MessSystem[]
             {
-                // IN RETROBAT
+                // In ProjectArcade
 
                 // ADAM
                 new MessSystem("adam"         ,"adam"     , new MessRomType[]
@@ -262,7 +260,7 @@ namespace EmulatorLauncher
                 new MessSystem("arcadia"      ,"arcadia"  ,"cart"  ),           // Arcadia 2001
                 new MessSystem("gmaster"      ,"gmaster"  ,"cart"  ),           // Game Master
 
-                // NOT IN RETROBAT
+                // NOT IN ProjectArcade
                 new MessSystem("x1"           ,"x1" , new MessRomType[] 
                         { 
                             new MessRomType("cart", new string[] { "bin", "rom" } ), 

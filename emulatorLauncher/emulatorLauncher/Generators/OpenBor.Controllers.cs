@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Globalization;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.EmulationStation;
@@ -132,7 +131,7 @@ namespace EmulatorLauncher
             int nbButtons = c.NbButtons;
             int nbAxes = c.NbAxes;
 
-            // With Custom Retrobat Build, Button & Axes count are hardcoded for easiest injection
+            // With Custom ProjectArcade Build, Button & Axes count are hardcoded for easiest injection
             if (_isCustomRetrobatOpenBor)
             {
                 nbButtons = 20;

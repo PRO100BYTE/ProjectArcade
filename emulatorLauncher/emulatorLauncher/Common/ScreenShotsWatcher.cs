@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 using EmulatorLauncher.Common.EmulationStation;
 
@@ -35,9 +32,9 @@ namespace EmulatorLauncher.Common
                 try
                 {
                     var bytes = File.ReadAllBytes(LastScreenshot);
-                    EmulationStationServices.AddImageToGameListIfMissing(_system, _rom, bytes, GetMimeType(LastScreenshot));
+                    bool assigned = EmulationStationServices.AddImageToGameListIfMissing(_system, _rom, bytes, GetMimeType(LastScreenshot));
 
-                    if (DeleteIfAssigned)
+                    if (DeleteIfAssigned && assigned)
                         FileTools.TryDeleteFile(LastScreenshot);
                 }
                 catch { }

@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Diagnostics;
-using System.Windows.Forms;
-using System.Drawing;
-using System.Management;
-using System.Diagnostics.Eventing.Reader;
 using EmulatorLauncher.Common.FileFormats;
 
 namespace EmulatorLauncher
@@ -365,6 +357,21 @@ namespace EmulatorLauncher
 
             BindFeature(mednafenValues, "ss.cart", "bizhawk_saturn_expansion", "auto");
             BindFeature(mednafenValues, "ss.smpc.autortc.lang", "bizhawk_saturn_language", "english");
+
+            var portDevices = saturnSync.GetOrCreateContainer("PortDevices");
+
+            for (int i = 0; i < 12; i++)
+            {
+                portDevices.Remove(i.ToString());
+            }
+
+            if (SystemConfig.isOptSet("use_guns") && SystemConfig.getOptBoolean("use_guns"))
+            {
+                string devicetype = "gun";
+                portDevices["0"] = "gun";
+
+                SetupLightGuns(json, devicetype, core, system);
+            }
         }
 
         private void ConfigureTurboNyma(DynamicJson json, DynamicJson coreSettings, DynamicJson coreSyncSettings, string core, string system)

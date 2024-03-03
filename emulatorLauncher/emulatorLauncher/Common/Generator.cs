@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Diagnostics;
 using System.IO;
 using System.Drawing;
@@ -42,7 +41,7 @@ namespace EmulatorLauncher
         private MountFile _mountFile;
         private GameUnzip _unzip;
 
-        protected string TryUnZipGameIfNeeded(string system, string fileName, bool silent = false)
+        protected string TryUnZipGameIfNeeded(string system, string fileName, bool silent = false, bool tryMount = true)
         {
             if (Path.GetExtension(fileName).ToLowerInvariant() == ".iso")
             {
@@ -52,7 +51,7 @@ namespace EmulatorLauncher
             }
 
             // Try mount file as a drive letter
-            if (Zip.IsCompressedFile(fileName))
+            if (Zip.IsCompressedFile(fileName) && tryMount)
             {
                 string extractionPath = GetUnCompressedFolderPath();
 

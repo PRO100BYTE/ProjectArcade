@@ -192,8 +192,13 @@ namespace EmulatorLauncher
             //Define tech (SDL or XInput)
             string tech = c.IsXInputDevice ? "XInput" : "SDL";
 
-            //Get SDL controller index
-            int index = c.DeviceIndex;
+            //Get controller index (index is equal to 0 and ++ for each repeated guid)
+            int index = 0;
+            List<Controller> same_pad = this.Controllers.Where(i => i.Config != null && i.Guid == c.Guid && !i.IsKeyboard).OrderBy(j => j.DeviceIndex).ToList();
+            if (same_pad.Count > 1)
+            {
+                index = same_pad.IndexOf(c);
+            }
             
             //Build input_config section
             var input_config = new DynamicJson();
@@ -310,7 +315,7 @@ namespace EmulatorLauncher
 
             //player identification part
             //get guid in system.guid format
-            string guid = c.GetSdlGuid(SdlVersion.SDL2_26, true);
+            string guid = c.GetSdlGuid(_sdlVersion, true);
             var newguid = SdlJoystickGuidManager.FromSdlGuidString(guid);
 
             input_config["version"] = "1";

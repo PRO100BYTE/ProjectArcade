@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using EmulatorLauncher.Common;
@@ -11,6 +8,11 @@ namespace EmulatorLauncher
 {
     class XeniaGenerator : Generator
     {
+        public XeniaGenerator()
+        {
+            DependsOnDesktopResolution = true;
+        }
+
         private bool _canary = false;
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)

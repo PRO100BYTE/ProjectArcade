@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using System.Data.SQLite;
 using EmulatorLauncher.Common;
-using EmulatorLauncher.Common.FileFormats;
 
 namespace EmulatorLauncher
 {
@@ -71,7 +69,7 @@ namespace EmulatorLauncher
 
             if (File.Exists(configdb))
             {
-                InstallSQLiteInteropDll();
+                SQLiteInteropManager.InstallSQLiteInteropDll();
 
                 using (var db = new SQLiteConnection("Data Source = " + configdb))
                 {
@@ -124,23 +122,6 @@ namespace EmulatorLauncher
                     db.Close();
                 }
             }
-        }
-
-        private static void InstallSQLiteInteropDll()
-        {
-            string dllName = Path.Combine(Path.GetDirectoryName(typeof(ConfigFile).Assembly.Location), "SQLite.Interop.dll");
-            int platform = IntPtr.Size;
-
-            if (File.Exists(dllName) && Kernel32.IsX64(dllName) == (IntPtr.Size == 8))
-                return;
-
-            if (File.Exists(dllName))
-            {
-                try { File.Delete(dllName); }
-                catch { }
-            }
-
-            FileTools.ExtractGZipBytes(IntPtr.Size == 8 ? Properties.Resources.SQLite_Interop_x64_gz : Properties.Resources.SQLite_Interop_x86_gz, dllName);
         }
 
         private static void SetStellaSetting(SQLiteConnection db, string setting, string feature, string defaultValue)

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.IO;
 using System.Management;
@@ -420,6 +418,14 @@ namespace EmulatorLauncher.PadToKeyboard
                 return;
             }
 
+            if (input.Action != null)
+            {
+                if (newState.HasNewInput(input.Name, oldState))
+                    input.Action();
+
+                return;
+            }
+
             if (input.Key != null && (input.Key.StartsWith("(") || input.Key.StartsWith("{")))
             {
                 if (newState.HasNewInput(input.Name, oldState))
@@ -444,6 +450,11 @@ namespace EmulatorLauncher.PadToKeyboard
                     {
                         SimpleLogger.Instance.Info("[SendKey] Kill " + process);
                         KillProcess(hWndProcess, process);
+                    }
+                    else if (input.Key == "(%{PRTSC})" && hWndProcess != IntPtr.Zero)
+                    {
+                        SimpleLogger.Instance.Info("[SendKey] Print Screen " + process);
+                        SendKeys.SendWait("{PRTSC}");
                     }
                     else if (input.Key == "(%{F4})" && process == "emulationstation")
                     {

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Drawing;
-using System.Threading;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
 
@@ -70,9 +68,11 @@ namespace EmulatorLauncher
 
             if (system == "wii")
             {
-                string sysconf = Path.Combine(path, "User", "Wii", "shared2", "sys", "SYSCONF");
+                string sysconf = Path.Combine(AppConfig.GetFullPath("saves"), "dolphin", "User", "Wii", "shared2", "sys", "SYSCONF");
                 if (File.Exists(sysconf))
                     writeWiiSysconfFile(sysconf);
+                else
+                    SimpleLogger.Instance.Info("[WARNING] Wii Nand file not found in : " + sysconf);
             }
             
             SetupGeneralConfig(path, system, emulator, core, rom);
@@ -221,7 +221,7 @@ namespace EmulatorLauncher
                     BindBoolIniFeature(ini, "Settings", "CacheHiresTextures", "CacheHiresTextures", "True", "False");
 
                     // Other settings
-                    ini.WriteValue("Hardware", "VSync", SystemConfig["VSync"] != "false" ? "True" : "False");
+                    BindIniFeature(ini, "Hardware", "VSync", "dolphin_vsync", "True");
                     BindBoolIniFeature(ini, "Settings", "ShowFPS", "DrawFramerate", "True", "False");
                     BindIniFeature(ini, "Settings", "InternalResolution", "internal_resolution", "0");
                     BindIniFeature(ini, "Enhancements", "ForceTextureFiltering", "ForceFiltering", "0");
@@ -237,6 +237,7 @@ namespace EmulatorLauncher
                     BindIniFeature(ini, "Enhancements", "MaxAnisotropy", "anisotropic_filtering", "0");
                     BindBoolIniFeature(ini, "Settings", "SSAA", "ssaa", "True", "False");
                     BindBoolIniFeature(ini, "Settings", "Crop", "dolphin_crop", "True", "False");
+                    BindBoolIniFeature(ini, "Enhancements", "HDROutput", "enable_hdr", "True", "False");
                 }
             }
             catch { }
@@ -283,6 +284,8 @@ namespace EmulatorLauncher
             if (!File.Exists(path))
                 return;
 
+            SimpleLogger.Instance.Info("[INFO] Writing to wii system nand in : " + path);
+
             int langId = 1;
             int barPos = 0;
 
@@ -307,6 +310,8 @@ namespace EmulatorLauncher
                     bytes[index + i] = toSet[i];
             }
 
+            SimpleLogger.Instance.Info("[INFO] Writing language " + langId.ToString() + " to wii system nand");
+
             // Search BT.BAR pattern and replace with target position
             byte[] barPositionPattern = new byte[] { 0x42, 0x54, 0x2E, 0x42, 0x41, 0x52 };
             int index2 = bytes.IndexOf(barPositionPattern);
@@ -316,6 +321,8 @@ namespace EmulatorLauncher
                 for (int i = 0; i < toSet.Length; i++)
                     bytes[index2 + i] = toSet[i];
             }
+
+            SimpleLogger.Instance.Info("[INFO] Writing sensor bar position " + barPos.ToString() + " to wii system nand");
 
             File.WriteAllBytes(path, bytes);
         }
@@ -431,10 +438,10 @@ namespace EmulatorLauncher
                     if (!_triforce)
                     {
                         string savesPath = AppConfig.GetFullPath("saves");
-                        string dolphinLoadPath = Path.Combine(savesPath, "gamecube", "User", "Load");
+                        string dolphinLoadPath = Path.Combine(savesPath, "dolphin", "User", "Load");
                         if (!Directory.Exists(dolphinLoadPath)) try { Directory.CreateDirectory(dolphinLoadPath); }
                             catch { }
-                        string dolphinResourcesPath = Path.Combine(savesPath, "gamecube", "User", "ResourcePacks");
+                        string dolphinResourcesPath = Path.Combine(savesPath, "dolphin", "User", "ResourcePacks");
                         if (!Directory.Exists(dolphinResourcesPath)) try { Directory.CreateDirectory(dolphinResourcesPath); }
                             catch { }
 
@@ -448,6 +455,27 @@ namespace EmulatorLauncher
                             _saveStatesWatcher = new DolphinSaveStatesMonitor(rom, Path.Combine(path, "User", "StateSaves"), localPath);
                             _saveStatesWatcher.PrepareEmulatorRepository();
                         }
+
+                        // Wii NAND path
+                        string wiiNandPath = Path.Combine(savesPath, "dolphin", "User", "Wii");
+                        if (!Directory.Exists(wiiNandPath)) try { Directory.CreateDirectory(wiiNandPath); }
+                            catch { }
+                        ini.WriteValue("General", "NANDRootPath", wiiNandPath);
+
+                        // Gamecube saves
+                        string gc_region = "EUR";
+                        if (SystemConfig.isOptSet("dolphin_gcregion") && !string.IsNullOrEmpty(SystemConfig["dolphin_gcregion"]))
+                            gc_region = SystemConfig["dolphin_gcregion"];
+
+                        ini.WriteValue("Core", "SlotA", SystemConfig["dolphin_slotA"] == "1" ? "1" : "8");
+
+                        string gcSavePath = Path.Combine(savesPath, "dolphin", "User", "GC", gc_region);
+                        if (!Directory.Exists(gcSavePath)) try { Directory.CreateDirectory(gcSavePath); }
+                            catch { }
+                        string sramFile = Path.Combine(savesPath, "dolphin", "User", "GC", "SRAM." + gc_region + ".raw");
+
+                        ini.WriteValue("Core", "GCIFolderAPath", gcSavePath);
+                        ini.WriteValue("Core", "MemcardAPath", sramFile);
                     }
 
                     // Add rom path to isopath

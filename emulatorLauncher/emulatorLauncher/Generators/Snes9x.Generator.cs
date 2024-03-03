@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 using System.Diagnostics;
-using System.Windows.Forms;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
 
 namespace EmulatorLauncher
 {
-	class Snes9xGenerator : Generator
+	partial class Snes9xGenerator : Generator
 	{
 		private BezelFiles _bezelFileInfo;
 		private ScreenResolution _resolution;
@@ -28,6 +25,7 @@ namespace EmulatorLauncher
 				return null;
 
 			//Applying bezels
+
 			if (!ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution))
 				_bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
 
@@ -70,12 +68,13 @@ namespace EmulatorLauncher
 			if (!File.Exists(conf))
 				return;
 
-            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+			bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
             using (var ini = IniFile.FromFile(conf, IniOptions.KeepEmptyLines))
 			{
+				string shaderPath;
 
-				// Inject path loop
+				// Inject path
 				Dictionary<string, string> userPath = new Dictionary<string, string>
 				{
 					{ "Dir:Roms", Path.Combine(AppConfig.GetFullPath("roms"), system) },
@@ -97,24 +96,27 @@ namespace EmulatorLauncher
 				}
 
 				// General settings
+
 				ini.WriteValue(@"Sound\Win", "SoundDriver", "4"); // Force XAudio
 				ini.WriteValue(@"Sound\Win", "BufferSize", "64");
 
-				ini.WriteValue(@"Display\Win", "OutputMethod", "2"); // Force OpenGL renderer to get bezel and shader to work
-				ini.WriteValue(@"Display\Win", "HideMenu", "TRUE"); // Hide menu at startup, ESC to toggle
-				ini.WriteValue(@"Display\Win", "FullscreenOnOpen", "FALSE");
+				//ini.WriteValue(@"Display\Win", "OutputMethod", "2"); // Force OpenGL renderer to get bezel and shader to work
+				BindBoolIniFeature(ini, @"Display\Win", "HideMenu", "snes9x_showmenu", "FALSE", "TRUE");    // Hide menu at startup, ESC to toggle
+                ini.WriteValue(@"Display\Win", "FullscreenOnOpen", "FALSE");
 				ini.WriteValue(@"Display\Win", "Fullscreen:Enabled", fullscreen ? "TRUE" : "FALSE");
 				ini.WriteValue(@"Display\Win", "Fullscreen:EmulateFullscreen", fullscreen ? "TRUE" : "FALSE");
 				ini.WriteValue(@"Display\Win", "Window:Maximized", "TRUE");
 				ini.WriteValue(@"Display\Win", "BlendHiRes", "TRUE");
 
 				// Bilinear filtering
+
 				if (SystemConfig.isOptSet("snes9x_bilinear") && SystemConfig.getOptBoolean("snes9x_bilinear"))
 					ini.WriteValue(@"Display\Win", "Stretch:BilinearFilter", "TRUE");
 				else
 					ini.WriteValue(@"Display\Win", "Stretch:BilinearFilter", "FALSE");
 
 				// Ratio
+
 				if (SystemConfig.isOptSet("snes9x_ratio") && !string.IsNullOrEmpty(SystemConfig["snes9x_ratio"]))
                 {
 
@@ -136,49 +138,97 @@ namespace EmulatorLauncher
 				}
 
 				// Integer scale
+
 				if (SystemConfig.isOptSet("snes9x_integer") && SystemConfig.getOptBoolean("snes9x_integer"))
 					ini.WriteValue(@"Display\Win", "Stretch:IntegerScaling", "TRUE");
 				else
 					ini.WriteValue(@"Display\Win", "Stretch:IntegerScaling", "FALSE");
 
 				// VSync
+
 				if (SystemConfig.isOptSet("snes9x_vsync") && !SystemConfig.getOptBoolean("snes9x_vsync"))
 					ini.WriteValue(@"Display\Win", "Vsync", "FALSE");
 				else
 					ini.WriteValue(@"Display\Win", "Vsync", "TRUE");
 
 				// NTSC filters
+
 				if (SystemConfig.isOptSet("snes9x_ntsc_filters") && !string.IsNullOrEmpty(SystemConfig["snes9x_ntsc_filters"]))
 					ini.WriteValue(@"Display\Win", "FilterType", SystemConfig["snes9x_ntsc_filters"]);
 				else
 					ini.WriteValue(@"Display\Win", "FilterType", "0");
 
+				// Video drivers
+
+				if (SystemConfig.isOptSet("snes9x_renderer") && !string.IsNullOrEmpty(SystemConfig["snes9x_renderer"]))
+                {
+					if (SystemConfig["snes9x_renderer"] == "opengl")
+						ini.WriteValue(@"Display\Win", "OutputMethod", "2");
+					else if (SystemConfig["snes9x_renderer"] == "vulkan")
+						ini.WriteValue(@"Display\Win", "OutputMethod", "3");				
+
+				}
+				else
+					ini.WriteValue(@"Display\Win", "OutputMethod", "2");
+
+
 				// Shaders
+
 				if (SystemConfig.isOptSet("snes9x_shader") && !string.IsNullOrEmpty(SystemConfig["snes9x_shader"]))
                 {
 					ini.WriteValue(@"Display\Win", "ShaderEnabled", "TRUE");
 					ini.WriteValue(@"Display\Win", "NTSCScanlines", "TRUE");
 
-					string shaderPath = Path.Combine(path, "shaders", "shaders_glsl", SystemConfig["snes9x_shader"]);
-					if (!File.Exists(shaderPath))
+					if (SystemConfig["snes9x_shader"].Contains(".glslp"))
+                    {
 						shaderPath = Path.Combine(AppConfig.GetFullPath("retroarch"), "shaders", "shaders_glsl", SystemConfig["snes9x_shader"]);
-					if (!File.Exists(shaderPath))
-						shaderPath = Path.Combine(AppConfig.GetFullPath("system"), "shaders", "shaders_glsl", SystemConfig["snes9x_shader"]);
-					if (File.Exists(shaderPath))
-						ini.WriteValue(@"Display\Win", "OpenGL:OGLShader", shaderPath);
+						ini.WriteValue(@"Display\Win", "OutputMethod", "2");
+
+						if (File.Exists(shaderPath))
+							ini.WriteValue(@"Display\Win", "OpenGL:OGLShader", shaderPath);
+						else
+							ini.WriteValue(@"Display\Win", "OpenGL:OGLShader", "");
+					}					
+					else if (SystemConfig["snes9x_shader"].Contains(".slangp"))
+                    {
+						shaderPath = Path.Combine(AppConfig.GetFullPath("retroarch"), "shaders", "shaders_slang", SystemConfig["snes9x_shader"]);
+						ini.WriteValue(@"Display\Win", "OutputMethod", "3");
+
+						if (File.Exists(shaderPath))
+							ini.WriteValue(@"Display\Win", "OpenGL:OGLShader", shaderPath);
+						else
+							ini.WriteValue(@"Display\Win", "OpenGL:OGLShader", "");
+					}						
 					else
-						ini.WriteValue(@"Display\Win", "OpenGL:OGLShader", "");                 
-                }
+                    {
+						if (SystemConfig["snes9x_renderer"] == "opengl")
+                        {
+							shaderPath = Path.Combine(AppConfig.GetFullPath("retroarch"), "shaders", "shaders_glsl", SystemConfig["snes9x_shader"] + ".glslp");
+
+							if (File.Exists(shaderPath))
+								ini.WriteValue(@"Display\Win", "OpenGL:OGLShader", shaderPath);
+							else
+								ini.WriteValue(@"Display\Win", "OpenGL:OGLShader", "");
+
+						}
+						else if (SystemConfig["snes9x_renderer"] == "vulkan")
+                        {
+							shaderPath = Path.Combine(AppConfig.GetFullPath("retroarch"), "shaders", "shaders_slang", SystemConfig["snes9x_shader"] + ".slangp");
+
+							if (File.Exists(shaderPath))
+								ini.WriteValue(@"Display\Win", "OpenGL:OGLShader", shaderPath);
+							else
+								ini.WriteValue(@"Display\Win", "OpenGL:OGLShader", "");
+						}	
+					}
+				}
                 else
                 {
 					ini.WriteValue(@"Display\Win", "ShaderEnabled", "FALSE");
 					ini.WriteValue(@"Display\Win", "NTSCScanlines", "FALSE");
-					ini.WriteValue(@"Display\Win", "OpenGL:OGLShader", "");
-				}            
-				
-			}
-
+				}
+				CreateControllerConfiguration(ini);
+            }
         }
-
     }
 }

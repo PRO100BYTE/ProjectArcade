@@ -6,7 +6,6 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Windows.Forms;
 using System.Reflection;
-using System.Diagnostics;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.Common;
@@ -75,7 +74,12 @@ namespace EmulatorLauncher.PadToKeyboard
         [XmlIgnore]
         public string ForceApplyToProcess { get; set; }
 
-        public static PadToKey AddOrUpdateKeyMapping(PadToKey mapping, string processName, InputKey inputKey, string key)
+        public static PadToKey AddOrUpdateKeyMapping(PadToKey mapping, string processName, InputKey inputKey, Action action = null)
+        {
+            return AddOrUpdateKeyMapping(mapping, processName, inputKey, null, action);
+        }
+
+        public static PadToKey AddOrUpdateKeyMapping(PadToKey mapping, string processName, InputKey inputKey, string key, Action action = null)
         {
             if (string.IsNullOrEmpty(processName))
                 return mapping;
@@ -110,6 +114,7 @@ namespace EmulatorLauncher.PadToKeyboard
 
             input.Type = PadToKeyType.Keyboard;
             input.Key = key;
+            input.Action = action;
 
             return mapping;
         }
@@ -276,5 +281,8 @@ namespace EmulatorLauncher.PadToKeyboard
 
             return sb.ToString().Trim();
         }
+
+        [XmlIgnore]
+        public Action Action { get; set; }
     }
 }

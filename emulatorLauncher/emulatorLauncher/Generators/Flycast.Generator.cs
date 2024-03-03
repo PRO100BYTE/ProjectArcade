@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
-using System.Windows.Forms;
-using System.Text.RegularExpressions;
-using System.Drawing;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
 
@@ -16,6 +10,7 @@ namespace EmulatorLauncher
     {
         private BezelFiles _bezelFileInfo;
         private ScreenResolution _resolution;
+        private bool _fullscreen;
 
         public FlycastGenerator()
         {
@@ -32,8 +27,12 @@ namespace EmulatorLauncher
             if (!File.Exists(exe))
                 return null;
 
+            _fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+            bool wide = SystemConfig.isOptSet("flycast_ratio") && SystemConfig["flycast_ratio"] != "normal";
+
             //Applying bezels
-            _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+            if (_fullscreen && !wide)
+                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
 
             _resolution = resolution;
 
@@ -88,8 +87,7 @@ namespace EmulatorLauncher
                 ini.WriteValue("config", "Dreamcast.ContentPath", dcRomsPath + ";" + naomiRomsPath + ";" + naomi2RomsPath + ";" + atomiwaveRomsPath);
 
                 // video
-                bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
-                if (fullscreen)
+                if (_fullscreen)
                     ini.WriteValue("window", "fullscreen", "yes");
                 else
                 {

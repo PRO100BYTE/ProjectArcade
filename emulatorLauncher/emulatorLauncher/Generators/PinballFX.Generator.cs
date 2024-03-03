@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Security.Permissions;
-using System.Windows.Forms;
 using System.Threading;
 using Microsoft.Win32;
 using EmulatorLauncher.Common;
-using EmulatorLauncher.PadToKeyboard;
 
 namespace EmulatorLauncher
 {
@@ -24,7 +19,7 @@ namespace EmulatorLauncher
         private string _exename;
         private string _corename;
 
-        private static List<string> pinballfxsystems = new List<string>() { "pinballfx", "pinballfx2", "pinballfx3" };
+        private static List<string> pinballfxsystems = new List<string>() { "pinballfx", "pinballfx2", "pinballfx3", "pinballm" };
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
@@ -42,6 +37,9 @@ namespace EmulatorLauncher
 
             if (system == "pinballfx3")
                 _exename = "Pinball FX3";
+
+            if (system == "pinballm")
+                _exename = "PinballM";
 
             if (core == "steam")
             {
@@ -64,6 +62,9 @@ namespace EmulatorLauncher
                 if (system == "pinballfx3")
                     commandArray.Add("442120");
 
+                if (system == "pinballm")
+                    commandArray.Add("2337640");
+
             }
 
             if (core == "hack" || core == "nonsteam")
@@ -73,7 +74,7 @@ namespace EmulatorLauncher
 
             }
 
-            if (system == "pinballfx")
+            if (system == "pinballfx" || system == "pinballm")
             {
                 if (!File.Exists(rom) || Path.GetExtension(rom).ToLower() != ".table")
                     return null;
@@ -85,16 +86,24 @@ namespace EmulatorLauncher
                 rom = lines[0];
                 int tableId = rom.ToInteger();
 
-                if (SystemConfig.isOptSet("pinballfx_gamemode") && !string.IsNullOrEmpty(SystemConfig["pinballfx_gamemode"]))
-                    commandArray.Add("-GameMode" + " " + SystemConfig["pinballfx_gamemode"]);
-
                 commandArray.Add("-Table" + " " + tableId);
 
+                switch (system)
+                {
+                    case "pinballfx":
+                        if (SystemConfig.isOptSet("pinballfx_gamemode") && !string.IsNullOrEmpty(SystemConfig["pinballfx_gamemode"]))
+                            commandArray.Add("-GameMode" + " " + SystemConfig["pinballfx_gamemode"]);
+                        break;
+                    case "pinballm":
+                        if (SystemConfig.isOptSet("pinballm_gamemode") && !string.IsNullOrEmpty(SystemConfig["pinballm_gamemode"]))
+                            commandArray.Add("-GameMode" + " " + SystemConfig["pinballm_gamemode"]);
+                        break;
+                }
             }
 
             else if (system == "pinballfx2")
             {
-                if (!File.Exists(rom) || Path.GetExtension(rom).ToLower() != ".table")
+                if (!File.Exists(rom))
                     return null;
 
                 if (core == "steam")
