@@ -85,7 +85,7 @@
 		<lang>en</lang>
 		<region>wr</region>
 	</game>
-	<game>
+	<!--<game>
 		<path>./citra.menu</path>
 		<name>Citra (3DS)</name>
 		<desc>Run Citra Emulator (Nintendo 3DS).</desc>
@@ -101,8 +101,8 @@
 		<gametime />
 		<lang>en</lang>
 		<region>wr</region>
-	</game>
-	<game>
+	</game>-->
+	<!--<game>
 		<path>./citra_canary.menu</path>
 		<name>Citra Canary(3DS)</name>
 		<desc>Run Citra Canary Emulator (Nintendo 3DS).</desc>
@@ -118,7 +118,7 @@
 		<gametime />
 		<lang>en</lang>
 		<region>wr</region>
-	</game>
+	</game>-->
 	<game>
 		<path>./demul-old.menu</path>
 		<name>Demul Old DX11 Plugin (Gaelco)</name>
@@ -910,7 +910,7 @@
 		<lang>en</lang>
 		<region>wr</region>
 	</game>
-	<game>
+	<!--<game>
 		<path>./yuzu.menu</path>
 		<name>Yuzu (Switch)</name>
 		<desc>Run Yuzu (Switch). This software is not provided by ProjectArcade. You can download it here: https://yuzu-emu.org/downloads/</desc>
@@ -926,8 +926,8 @@
 		<gametime />
 		<lang>en</lang>
 		<region>wr</region>
-	</game>
-	<game>
+	</game>-->
+	<!--<game>
 		<path>./yuzu-early-access.menu</path>
 		<name>Yuzu Early Access (Switch)</name>
 		<desc>Run Yuzu Early Access (Switch). This software is not provided by ProjectArcade.</desc>
@@ -943,7 +943,7 @@
 		<gametime />
 		<lang>en</lang>
 		<region>wr</region>
-	</game>
+	</game>-->
 	<!--<game>
 		<path>./zsnes-dos.menu</path>
 		<name>ZSNES</name>
