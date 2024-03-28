@@ -1,0 +1,14 @@
+<theme>
+  <formatVersion>7</formatVersion>
+
+  <variables>
+    <mainColor>00FF00</mainColor>
+    <onMainColor>000000</onMainColor>
+
+    <bgColor ifSubset="Style:dark">000000</bgColor>
+    <bgColor ifSubset="Style:light">FFFFFF</bgColor>
+
+    <sectColor ifSubset="Style:dark">FFFFFF</sectColor>
+    <sectColor ifSubset="Style:light">FFFFFF</sectColor>
+  </variables>
+</theme>

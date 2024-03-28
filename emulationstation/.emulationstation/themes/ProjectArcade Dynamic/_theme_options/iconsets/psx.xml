@@ -1,0 +1,33 @@
+<!-- Theme by pajarorrojo
+https://github.com/pajarorrojo/es-theme-PlayStation-X 
+-->
+<theme>
+	<formatVersion>7</formatVersion>
+
+	<view name="menu, system, detailed, grid">
+		<helpsystem name="help">
+			<iconColor>FFFFFFFF</iconColor>
+			<iconUpDown>./psx/updown.svg</iconUpDown>
+			<iconLeftRight>./psx/leftright.svg</iconLeftRight>
+			<iconUpDownLeftRight>./psx/all.svg</iconUpDownLeftRight>
+			<iconA>./psx/a.svg</iconA>
+			<iconB>./psx/b.svg</iconB>
+			<iconX>./psx/x.svg</iconX>
+			<iconY>./psx/y.svg</iconY>
+			<iconL>./psx/l.svg</iconL>
+			<iconR>./psx/r.svg</iconR>
+			<iconStart>./psx/start.svg</iconStart>
+			<iconSelect>./psx/select.svg</iconSelect>
+		</helpsystem>
+	</view>
+
+	<view name="screen">
+
+		<controllerActivity name="controllerActivity">
+			<imagePath>./psx/controller.svg</imagePath>
+		</controllerActivity>
+
+
+	</view>
+
+</theme>
