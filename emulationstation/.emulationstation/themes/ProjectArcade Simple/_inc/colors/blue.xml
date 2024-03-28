@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+  <formatVersion>7</formatVersion>
+	<variables>
+		<baseColor>000000</baseColor>
+		<gradientEndColor>00ff00</gradientEndColor>
+		<centerFadeColor>40609b50</centerFadeColor>    
+		<backgroundColor>000000</backgroundColor>
+		<bottomBarColor>407bc0B9</bottomBarColor>
+		<glowColor>3060Ab24</glowColor>
+		<systemInfoColor>FAFAFFB0</systemInfoColor>
+		<backgroundImage>./_inc/images/projectarcade.jpg</backgroundImage>
+		<groupColor>5178C3</groupColor>
+		<groupSeparatorColor>3B5B96</groupSeparatorColor>
+	</variables>
+</theme>

@@ -1,0 +1,173 @@
+<theme>
+  <formatVersion>7</formatVersion>
+
+  <variables>
+    <fgColor ifSubset="Style:dark">FFFFFF</fgColor>
+    <fgColor ifSubset="Style:light">000000</fgColor>
+  </variables>
+
+  <!--Configurações de ajuda-->
+  <view name="system, basic, detailed, grid">
+    <helpsystem name="help">
+      <textColor>${fgColor}</textColor>
+      <iconColor>${sectColor}</iconColor>
+    </helpsystem>
+  </view>
+
+  <!--Configurações de cores nas listas de jogos-->
+  <view name="basic, detailed, grid">
+    <text name="logoText, md_name">
+      <color>${fgColor}${percent.90}</color>
+      <glowColor>${bgColor}${percent.10}</glowColor>
+      <glowSize>1</glowSize>
+    </text>
+
+    <image name="background">
+      <color>${bgColor}</color>
+    </image>
+
+    <image name="cover_list_fallback" extra="true">
+      <color>${bgColor}</color>
+    </image>
+
+    <textlist name="gamelist">
+      <selectedColor>${onMainColor}</selectedColor>
+      <selectorColor>${mainColor}</selectorColor>
+      <primaryColor>${fgColor}</primaryColor>
+      <secondaryColor>${fgColor}</secondaryColor>
+    </textlist>
+
+    <rating name="md_rating">
+      <color>${sectColor}</color>
+      <unfilledColor>${sectColor}</unfilledColor>
+    </rating>
+  </view>
+
+  <view name="menu">
+    <menuText name="menutext">
+      <selectedColor>${onMainColor}</selectedColor>
+      <selectorColor>${mainColor}</selectorColor>
+      <color>${fgColor}</color>
+      <separatorColor>${fgColor}${percent.5}</separatorColor>
+    </menuText>
+
+    <menuTextSmall name="menutextsmall">
+      <color>${sectColor}</color>
+    </menuTextSmall>
+
+    <menuGroup name="menugroup">
+      <color>${sectColor}</color>
+      <separatorColor>${sectColor}${percent.60}</separatorColor>
+      <backgroundColor>${sectColor}${percent.10}</backgroundColor>
+    </menuGroup>
+
+    <menuBackground name="menubg">
+      <color>${bgColor}</color>
+    </menuBackground>
+
+    <menuText name="menufooter">
+      <color>${fgColor}${percent.80}</color>
+    </menuText>
+
+    <menuText name="menutitle">
+      <color>${fgColor}</color>
+    </menuText>
+
+    <menuTextEdit name="menutextedit" ifSubset="Style:dark">
+      <inactive>./assets/input_inactive-dark.svg</inactive>
+      <active>./assets/input_active-dark.svg</active>
+    </menuTextEdit>
+
+    <menuTextEdit name="menutextedit" ifSubset="Style:light">
+      <inactive>./assets/input_inactive-light.svg</inactive>
+      <active>./assets/input_active-light.svg</active>
+    </menuTextEdit>
+  </view>
+
+  <!--Configurações da view "grid"-->
+  <view name="grid">
+    <imagegrid name="gamegrid" ifSubset="Style:dark">
+      <gameImage>./assets/icons/cartridge-dark.png</gameImage>
+      <folderImage>./assets/icons/folder-dark.png</folderImage>
+    </imagegrid>
+
+    <imagegrid name="gamegrid" ifSubset="Style:light">
+      <gameImage>./assets/icons/cartridge-light.png</gameImage>
+      <folderImage>./assets/icons/folder-light.png</folderImage>
+    </imagegrid>
+
+    <text name="gridtile">
+      <color>${fgColor}</color>
+    </text>
+
+    <text name="gridtile:selected">
+      <color>${onMainColor}</color>
+    </text>
+  </view>
+
+  <customView name="boxes" inherits="grid">
+    <text name="gridtile">
+      <color>FFFFFF</color>
+      <backgroundColor>000000${percent.80}</backgroundColor>
+    </text>
+  </customView>
+
+  <!-- Carousel Config -->
+  <view name="system">
+    <carousel name="systemcarousel">
+      <color ifSubset="Background Style:default">${bgColor}00</color>
+      <color ifSubset="Background Style:custom">${bgColor}00</color>
+    </carousel>
+
+    <!-- System Name -->
+    <text name="systemName">
+      <color>${fgColor}${percent.90}</color>
+      <glowColor>${bgColor}${percent.10}</glowColor>
+      <glowSize>1</glowSize>
+    </text>
+
+    <!-- Total games per system -->
+    <text name="systemInfo">
+      <color>${fgColor}${percent.90}</color>
+      <glowColor>${bgColor}${percent.10}</glowColor>
+      <glowSize>1</glowSize>
+    </text>
+
+    <!-- System Background -->
+    <image name="cover_fallback" extra="true">
+      <color>${bgColor}</color>
+    </image>
+
+    <image name="custom_bg_fg" extra="true">
+      <color>${bgColor}</color>
+    </image>
+
+    <text name="logoText">
+      <color>${fgColor}</color>
+      <glowColor>${mainColor}${percent.10}</glowColor>
+      <glowSize>1</glowSize>
+    </text>
+
+    <!-- System Background -->
+    <image name="osdBackground" extra="true">
+      <color>${bgColor}</color>
+    </image>
+  </view>
+
+  <!-- Clock Settings -->
+  <view name="screen">
+    <text name="clock">
+      <color>${fgColor}</color>
+    </text>
+
+    <batteryIndicator name="batteryIndicator">
+      <color>${fgColor}</color>
+    </batteryIndicator>
+
+    <controllerActivity name="controllerActivity">
+      <color>${fgColor}${percent.30}</color>
+      <activityColor>${mainColor}${percent.70}</activityColor>
+      <hotkeyColor>${mainColor}</hotkeyColor>
+    </controllerActivity>
+  </view>
+</theme>

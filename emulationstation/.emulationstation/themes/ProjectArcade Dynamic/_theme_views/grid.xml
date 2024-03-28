@@ -1,0 +1,464 @@
+<!-- Theme by pajarorrojo
+https://github.com/pajarorrojo/es-theme-PlayStation-X 
+-->
+<theme>
+   <formatVersion>7</formatVersion>
+   <view name="grid">
+
+      <imagegrid name="gamegrid">
+         <imageSource ifSubset="grid-origin:image">image</imageSource>
+         <imageSource ifSubset="grid-origin:thumbnail">thumbnail</imageSource>
+         <imageSource ifSubset="grid-origin:marquee">marquee</imageSource>
+         <imageSource ifSubset="grid-origin:boxart">boxart</imageSource>
+         <imageSource ifSubset="grid-origin:fanart|default">fanart</imageSource>
+         <imageSource ifSubset="grid-origin:titleshot">titleshot</imageSource>
+         <imageSource ifSubset="grid-origin:cartridge">cartridge</imageSource>
+         <autoLayout>5 2</autoLayout>
+         <autoLayout ifSubset="grid-origin:boxart|thumbnail" >9 2</autoLayout>
+         <autoLayout ifSubset="grid-origin:boxart|thumbnail" if="{system.theme} == 'n64' || {system.theme} == 'snes' || {system.theme} == 'gameandwatch'">5 2</autoLayout>
+         <gameImage>./../_theme_inc/images/no-image-default.png</gameImage>
+         <folderImage>./../_theme_inc/images/no-image-default.png</folderImage>
+         <autoLayoutSelectedZoom>1.15</autoLayoutSelectedZoom>
+         <margin>0.005 0.006</margin>
+         <padding>0.005 0.005</padding>
+         <size>0.955 0.45</size>
+         <size ifSubset="aspect-ratio:4-3|5-4">1 0.480</size>
+         <pos>0.022 0.48</pos>
+         <pos ifSubset="aspect-ratio:4-3|5-4">0 0.46</pos>
+         <zIndex>60</zIndex>
+      </imagegrid>
+
+  
+
+      <gridtile name="default">
+         <backgroundEdgeColor>${backgroundgridSelect}</backgroundEdgeColor>
+         <backgroundCenterColor>ffffff99</backgroundCenterColor>
+         <imageSizeMode>minSize</imageSizeMode>
+         <backgroundImage>./_theme_inc/images/caratulas/default-gamelist.png</backgroundImage>
+         <imageSizeMode ifSubset="grid-origin:thumbnail|boxart|cartridge">maxSize</imageSizeMode>
+         <padding>6</padding>
+         <padding ifSubset="aspect-ratio:5-4">7</padding>
+         <padding ifSubset="aspect-ratio:16-9|16-10">8</padding>
+         <padding tinyScreen="true">3</padding>
+         <padding ifSubset="aspect-ratio:4-3" tinyScreen="true">4</padding>
+         <backgroundCornerSize>0 0</backgroundCornerSize>
+         <imageColor>ffffffdd</imageColor>
+         <imageColor ifSubset="grid-origin:marquee">ffffff00</imageColor>
+      </gridtile>
+
+      <gridtile name="selected">
+         <padding ifSubset="aspect-ratio:4-3|5-4">1</padding>
+         <imageColor>ffffff</imageColor>
+         <backgroundCornerSize>0</backgroundCornerSize>
+         <backgroundEdgeColor>${backgroundgrid}</backgroundEdgeColor>
+         <imageColor ifSubset="grid-origin:default">ffffff55</imageColor>
+         <imageColor ifSubset="grid-origin:marquee">ffffff00</imageColor>
+         <backgroundEdgeColor ifSubset="grid-origin:boxart|thumbnail|marquee|cartridge|default">${backgroundgridSelect}00</backgroundEdgeColor>
+      </gridtile>
+
+      <image name="gridtile.marquee" ifSubset="grid-origin:marquee|default">
+		   <pos>0.5 0.5</pos>
+		   <origin>0.5 0.5</origin>
+         <maxSize>0.6 0.6</maxSize>
+		</image>
+
+
+
+      <image name="gridtile.marquee:selected" ifSubset="grid-origin:marquee|default">
+		   <pos>0.5 0.45</pos>
+		   <origin>0.5 0.5</origin>
+         <maxSize>0.8 0.8</maxSize>
+		</image>
+
+      <image name="gridtile.marquee:videoplaying" ifSubset="grid-origin:marquee|default">
+         <pos>0.5 0.15</pos>
+         <maxSize>0.5 0.2</maxSize>
+      </image>
+
+      <ninepatch name="gridtile.background:selected">
+         <animateColor>${backgroundgridSelect}</animateColor>
+         <animateColorTime>500</animateColorTime>
+      </ninepatch>
+
+      <ninepatch name="gridtile.background:selected" ifSubset="grid-origin:thumbnail|cartridge|boxart">
+         <animateColor>00000000</animateColor>
+         <animateColorTime>0</animateColorTime>
+      </ninepatch>
+
+      <image name="gridtile.image">
+         <roundCorners>0</roundCorners>
+      </image>
+
+
+      <image name="gridtile.favorite">
+         <path>./../_theme_inc/images/favorite-corner-left.svg</path>
+         <pos>0 0</pos>
+         <maxSize>0.2 0.2</maxSize>
+         <horizontalAlignment>left</horizontalAlignment>
+         <verticalAlignment>top</verticalAlignment>
+         <origin>0 0</origin>
+         <color>${grid.starFill}cc</color>
+      </image>
+
+      <image name="gridtile.cheevos" if="{global.cheevos} == true">
+         <path>./../_theme_inc/images/trophy-picto.svg</path>
+         <pos>0.83 0.83</pos>
+         <maxSize>0.12 0.12</maxSize>
+         <horizontalAlignment>right</horizontalAlignment>
+         <verticalAlignment>bottom</verticalAlignment>
+         <origin>0 0</origin>
+         <color>F2BC00</color>
+      </image>
+
+      <image name="gridtile.cheevos" if="{system.name} == 'retroachievements'">
+         <visible>false</visible>
+         <color>00000000</color>
+
+      </image>
+
+
+
+      <image name="background" extra="static">
+         <zIndex>50</zIndex>
+         <linearSmooth>true</linearSmooth>
+         <path>./_theme_inc/images/overlay-carousel.png</path>
+      </image>
+
+
+      <image name="background, background-art" extra="true">
+         <origin>0.5 0.5</origin>
+         <pos>0.5 0.5</pos>
+         <minSize>1.001 1.001</minSize>
+         <linearSmooth>true</linearSmooth>
+         <tile>false</tile>
+      </image>
+
+
+
+
+      <text name="gamename-grid" extra="true">
+         <text>{game:name}</text>
+         <alignment>left</alignment>
+         <verticalAlignment>top</verticalAlignment>
+         <size>0.630 0.08</size>
+         <color>ffffff</color>
+         <pos>0.30 0.140</pos>
+         <fontPath>./../_theme_inc/fonts/SST Light.ttf</fontPath>
+         <fontSize>0.060</fontSize>
+         <fontSize ifSubset="aspect-ratio:4-3|5-4">0.050</fontSize>
+         <fontSize tinyScreen="true">0.047</fontSize>
+         <origin>0 0</origin>
+         <glowColor>00000035</glowColor>
+         <glowSize>1</glowSize>
+         <glowOffset>3 2</glowOffset>
+         <zIndex>100</zIndex>
+         <singleLineScroll>true</singleLineScroll>
+         <backgroundColor>ff000000</backgroundColor>
+         
+      </text>
+
+
+      <text name="md_description">
+         <color>ffffff</color>
+         <pos>0.30 0.287</pos>
+         <size>0.55 0.09</size>
+         <size tinyScreen="true">0.55 0.070</size>
+         <fontPath>./../_theme_inc/fonts/SST Light.ttf</fontPath>
+         <fontSize>0.027</fontSize>
+         <lineSpacing>1.1</lineSpacing>
+         <origin>0 0</origin>
+         <backgroundColor>ff000000</backgroundColor>
+         <forceUppercase tinyScreen="true">true</forceUppercase>
+         <zIndex>99</zIndex>
+         <visible ifSubset="game-description:no">false</visible>
+      </text>
+
+
+      <datetime name="md_releasedate" ifSubset="info-bar:YES">
+         <pos>0.3 0.215</pos>
+         <size>0.038 0.035</size>
+         <size ifSubset="aspect-ratio:5-4|3-2|5-3">0.042 0.033</size>
+         <size ifSubset="aspect-ratio:4-3">0.05 0.035</size>
+         <alignment>left</alignment>
+         <verticalAlignment>top</verticalAlignment>
+         <color>${releaseColor}</color>
+         <format>%Y</format>
+         <fontSize>0.023</fontSize>
+         <fontPath>./../_theme_inc/fonts/SST Bold.ttf</fontPath>
+         <zIndex>51</zIndex>
+         <singleLineScroll>true</singleLineScroll>
+         <backgroundColor>ff000000</backgroundColor>
+      </datetime>
+
+      <text name="md_developer" ifSubset="info-bar:YES">
+         <pos>0.335 0.215</pos>
+         <pos ifSubset="aspect-ratio:4-3|5-4|3-2|5-3">0.350 0.215</pos>
+         <pos tinyScreen="true" ifSubset="aspect-ratio:4-3">0.360 0.215</pos>
+         <size>0 0</size>
+         <verticalAlignment>top</verticalAlignment>
+         <fontPath>./../_theme_inc/fonts/SST Bold.ttf</fontPath>
+         <color>${developerColor}</color>
+         <zIndex>52</zIndex>
+         <singleLineScroll>true</singleLineScroll>
+         <backgroundColor>ff000000</backgroundColor>
+         <padding tinyScreen="true">0.006 -0.006</padding>
+      </text>
+
+      <rating name="md_rating" ifSubset="info-bar:YES">
+         <pos>0.3 0.250</pos>
+         <size>0.025 0.025</size>
+         <unfilledColor>${starUnfill}</unfilledColor>
+         <color>${gamelist.starFill}</color>
+         <unfilledPath>./../_theme_inc/images/star_empty.svg</unfilledPath>
+         <zIndex>51</zIndex>
+         <filledPath>./../_theme_inc/images/star_filled.svg</filledPath>
+      </rating>
+
+      <text name="md_genre" ifSubset="info-bar:YES">
+         <pos>0.380 0.245</pos>
+         <pos ifSubset="aspect-ratio:4-3|5-4|3-2">0.405 0.246</pos>
+         <size>0 0</size>
+         <fontPath>./../_theme_inc/fonts/SST Bold.ttf</fontPath>
+         <color>${genreColor}</color>
+         <zIndex>51</zIndex>
+         <singleLineScroll>true</singleLineScroll>
+         <backgroundColor>00000000</backgroundColor>
+         <padding tinyScreen="true">0 -0.005</padding>
+      </text>
+
+
+
+
+      <image name="md_flag, md_players, md_manual,md_nomanual, md_savestate,md_nosavestate">
+         <maxSize>0.025 0.028</maxSize>
+         <y>0.415</y>
+      </image>
+
+      <image name="md_flag" extra="true" ifSubset="info-bar:YES">
+         <x>0.310</x>
+         <maxSize>0.022 0.05</maxSize>
+         <linearSmooth>true</linearSmooth>
+         <zIndex>51</zIndex>
+         <default> ./../_theme_inc/images/star_filled.svg</default>
+      </image>
+
+
+      <text name="md_players" ifSubset="info-bar:YES">
+         <origin>0.5 0.5</origin>
+         <fontPath>./../_theme_inc/fonts/players.ttf</fontPath>
+         <text>1</text>
+         <x>0.340</x>
+         <alignment>center</alignment>
+         <fontSize>0.034</fontSize>
+         <fontSize ifSubset="aspect-ratio:4-3|5-4" tinyScreen="true">0.033</fontSize>
+         <color>Ffffff</color>
+         <zIndex>100</zIndex>
+      </text>
+
+      <image name="md_savestate,md_nosavestate" ifSubset="info-bar:YES">
+         <x>0.370</x>
+         <origin>0.5 0.5</origin>
+         <path>./../_theme_inc/images/SaveState.png</path>
+         <zIndex>150</zIndex>
+      </image>
+
+      <image name="md_manual,md_nomanual" ifSubset="info-bar:YES">
+         <origin>0.5 0.5</origin>
+         <x>0.400</x>
+         <path>./../_theme_inc/images/manual.png</path>
+         <zIndex>100</zIndex>
+      </image>
+
+      <image name="console-grid-view" extra="true" if="${system.manufacturer} == 'Collections'" >
+         <path>./../_theme_inc/images/consoles/{game:system}.png</path>
+         <tile>false</tile>
+         <pos>0.450 0.420</pos>
+         <origin>0.5 0.5</origin>
+         <verticalAlignment>center</verticalAlignment>
+         <alignment>center</alignment>
+         <maxSize>0.05</maxSize>
+         <zIndex>99</zIndex>
+         <linearSmooth>true</linearSmooth>
+         <visible ifSubset="info-bar:NO">false</visible>
+      </image>
+
+      <image name="console-grid-view" if="${system.manufacturer} == 'Collections'" region="eu" />
+      <image name="console-grid-view" if="${system.manufacturer} == 'Collections'" region="jp">
+         <path>./../_theme_inc/images/consoles/jp/{game:system}.png</path>
+      </image>
+      <image name="console-grid-view" if="${system.manufacturer} == 'Collections'" region="us">
+         <path>./../_theme_inc/images/consoles/us/{game:system}.png</path>
+      </image>      
+
+      <text name="system-name" ifSubset="info-bar:YES" extra="true" if="${system.manufacturer} == 'Collections'">
+         <text>{game:systemName}</text>
+         <pos>0.480 0.398</pos>
+         <size>0 0</size>
+         <fontSize>0.024</fontSize>
+         <fontPath>./../_theme_inc/fonts/SST Bold.ttf</fontPath>
+         <color>ffffff</color>
+         <zIndex>99</zIndex>
+         <origin>0 0</origin>
+         <padding>0.008 0</padding>
+         <backgroundColor>00000066</backgroundColor>
+      </text>
+
+      <text name="md_description, gamename-grid, system-name">
+         <glowColor>00000035</glowColor>
+         <glowSize>1</glowSize>
+         <glowOffset>3 2</glowOffset>
+      </text>
+
+      <text name="md_genre,md_developer">
+         <fontSize>0.023</fontSize>
+      </text>
+
+		<image name="md_nosavestate, md_nomanual">
+			<color>808080</color>
+		</image>
+
+		<image name="md_savestate, md_manual">
+			<color>${grid.starFill}e6</color>
+		</image>
+
+      <image name="md_manual, md_savestate">
+			<storyboard>
+				<animation property="opacity" from="0.4" to="1" duration="350" mode="easeInOut" autoreverse="true" repeat="forever" />
+			</storyboard>
+		</image>
+
+      <image name="linea-inferior" extra="static">
+         <path>./../_theme_inc/images/pixel-blanco.png</path>
+         <pos>0 0.934</pos>
+         <size>1 0.0011</size>
+         <size tinyScreen="true">1 0.005</size>
+         <color>${sistema.lineainferior}</color>
+         <verticalAlignment>top</verticalAlignment>
+         <alignment>left</alignment>
+         <linearSmooth>true</linearSmooth>
+         <zIndex>99</zIndex>
+         <visible>false</visible>
+      </image>
+
+      <rating name="md_rating" ifSubset="info-bar:NO">
+         <pos>-2 -2</pos>
+         <visible>false</visible>
+         <opacity>0</opacity>
+      </rating>
+
+      <image name="md_flag" ifSubset="info-bar:NO">
+         <pos>-2 -2</pos>
+         <visible>false</visible>
+         <opacity>0</opacity>
+      </image>
+
+   </view>
+
+
+   <view name="grid"  ifSubset="main-origin:none, game-video:background|oversize|inside|off|default">
+
+      <text name="gamename-grid">
+         <size>0.9 0.08</size>
+      </text>
+
+      <text name="md_description, gamename-grid">
+         <x>0.025</x>
+      </text>
+
+      <datetime name="md_releasedate">
+         <x>0.025</x>
+      </datetime>
+
+      <text name="md_developer">
+         <x>0.06</x>
+         <x ifSubset="aspect-ratio:4-3|5-4|3-2|5-3">0.075</x>
+         <x tinyScreen="true" ifSubset="aspect-ratio:4-3">0.085</x>
+      </text>
+
+      <rating name="md_rating">
+         <x>0.025</x>
+      </rating>
+
+      <text name="md_genre">
+         <x>0.105</x>
+         <x ifSubset="aspect-ratio:4-3|5-4|3-2">0.130</x>
+      </text>
+
+      <image name="md_flag">
+       <x>0.035</x>
+      </image>
+
+      <text name="md_players">
+         <x>0.065 </x>
+      </text>
+
+      <image name="md_manual,md_nomanual">
+         <x>0.125 </x>
+      </image>
+
+      <image name="md_savestate,md_nosavestate">
+         <x>0.095 </x>
+      </image>
+
+      <image name="console-grid-view"  >
+         <x>0.170</x>
+      </image>
+
+      <text name="system-name" >
+         <x>0.200</x>
+      </text>
+
+
+
+   </view>
+
+   <view name="grid"  ifSubset="game-description:no">
+      <text name="gamename-grid">
+         <y>0.16</y>
+      </text>
+
+      <datetime name="md_releasedate">
+         <y>0.247</y>
+      </datetime>
+
+      <text name="md_developer">
+         <y>0.247</y>
+      </text>
+
+      <text name="md_genre">
+         <y>0.281</y>
+      </text>
+
+      <rating name="md_rating">
+         <y>0.285</y>
+      </rating>
+
+      <image name="md_flag, md_players, md_manual,md_nomanual, md_savestate,md_nosavestate">
+         <y>0.350</y>
+      </image>
+
+      <text name="md_players">
+         <y>0.350</y>
+      </text>
+
+      <text name="system-name" >
+         <y>0.330</y>
+
+      </text>
+
+      <image name="console-grid-view" >
+         <y>0.355</y>
+      </image>
+      
+
+   </view>
+
+   <view name="grid"  ifSubset="info-bar:NO">
+      <text name="md_description">
+         <y>0.225</y>
+      </text>
+   </view>
+
+
+
+</theme>
