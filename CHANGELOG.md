@@ -67,3 +67,15 @@
 - Added the ability to launch games via OpenMSX and Flycast emulators
 - Support for new emulators: SF, mylands, HBMAME, ZiNc
 - When starting the game, it is now possible to display the screensaver (.mp4)
+
+**ProjectArcade 1.6.0-beta2**
+- Minor bug fixes
+- A new mechanism for working with themes (EmulationStation)
+- Update background music
+- Adding new boot animations
+
+**ProjectArcade 1.6.0-beta3**
+- Minor bug fixes
+- Update of the emulatorLauncher
+- Updating emulators
+- Adding ArcadeGUI, a user-friendly interface for managing ProjectArcade configuration
