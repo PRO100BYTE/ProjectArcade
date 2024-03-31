@@ -50,6 +50,7 @@ ProjectArcade can also run in Portable Mode. This means you can play games from 
 - [Adrien Chalard "Kayl"](https://github.com/kaylh) - creator of the RetroBat project, developer
 - [Lorenzolamas](https://github.com/lorenzolamas) - co-founder, community, graphics
 - [Fabrice Caruso](https://github.com/fabricecaruso) - lead developer, theme creation
+- [xReppa](https://github.com/xReppa) - BatGui developer
 - [GetUpOr](https://github.com/getupor) - community, support
 - RetroBoy - community, support
 - [Tartifless](https://github.com/Tartifless) - developer, documentation
@@ -67,9 +68,9 @@ Copyright (c) 2023-2024 PRO100BYTE Team
 
 ProjectArcade is a free open source project based on the Open-Source EmulationStation, emulatorLauncher and RetroBat projects. The software was developed by enthusiasts for non-commercial use, namely a fun pastime. All code written by #TheDayG0ne, Adrien Chalard "Kayl", the RetroBat team and the PRO100BYTE Team, unless licensed under the source project's license, is licensed under the LGPL v3.
 
-It is not allowed to sell ProjectArcade or RetroBat on a pre-installed machine or on any storage devices. 
+It is not allowed to sell ProjectArcade on a pre-installed machine or on any storage devices. 
 ProjectArcade includes softwares which cannot be associated with any commercial activities.
-Shipping ProjectArcade or RetroBat with additional proprietary and copyrighted content is illegal, strictly forbidden and strongly discouraged by the RetroBat Team and PRO100BYTE Team.
+Shipping ProjectArcade with additional proprietary and copyrighted content is illegal, strictly forbidden and strongly discouraged by the RetroBat Team and PRO100BYTE Team.
 Otherwise, you can start a new project off RetroBat or ProjectArcade sources if you follow the same conditions.
 
 Finally, the license which concerns the entire RetroBat and ProjectArcade projects as a work, in particular the written or graphic content broadcast on its various media, is conditioned by the terms of the CC BY-NC-SA 4.0 license.
@@ -93,6 +94,7 @@ A small easter egg for the guys from the RetroBat team: you are the best :)
 - RetroArch by Libretro Team (GPL3 License).
 - PlayStation-X theme by pajarorrojo (CC BY-NC-SA 4.0 License)
 - Elementerial theme by mluizvitor (MIT License)
+- BatGui (c) xReppa (GPL3 License)
 
 ## 💬 Social & Support
 
