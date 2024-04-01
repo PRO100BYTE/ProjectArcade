@@ -42,6 +42,7 @@ ProjectArcade can also run in Portable Mode. This means you can play games from 
 - [Batocera](https://www.batocera.org) - For their wonderful retrogaming dedicated Operating System.
 - [pajarorrojo](https://github.com/pajarorrojo) - For PlayStation-X theme and support
 - [mluizvitor](https://github.com/mluizvitor) - For Elementerial theme
+- [xReppa](https://github.com/xReppa) for BatGui, whose developments were used in the development of ArcadeGUI
 - [NoCopyrightSounds](https://ncs.io) - For an excellent copyright-free music library
 - [Antony Meehan](https://music.yandex.ru/artist/8597156) - For providing wonderful tracks for use in ProjectArcade
 - and other people for their creativity and projects used in ProjectArcade
