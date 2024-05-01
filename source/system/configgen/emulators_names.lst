@@ -17,8 +17,10 @@ dosbox
 duckstation
 eduke32
 eka2l1
+fbneo
 flycast
 fpinball
+gemrb
 gsplus
 gzdoom
 hatari
@@ -26,7 +28,7 @@ hbmame
 hypseus
 jynx
 kega-fusion
-kronos
+lime3ds
 love
 magicengine
 mame
@@ -47,6 +49,7 @@ pico8
 play
 ppsspp
 project64
+psxmame
 raine
 redream
 retroarch
@@ -58,10 +61,16 @@ simcoupe
 simple64
 snes9x
 solarus
+sonic3air
+sonicmania
+sonicretro
+sonicretrocd
 ssf
 steam
 stella
+sudachi
 supermodel
+suyu
 teknoparrot
 theforceengine
 tsugaru

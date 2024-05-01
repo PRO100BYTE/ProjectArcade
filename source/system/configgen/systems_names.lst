@@ -30,6 +30,7 @@ c20
 c64
 camplynx
 cannonball
+casloopy
 cave
 cavestory
 cdi
@@ -68,15 +69,18 @@ gba
 gba2players
 gbc
 gbc2players
+gemrb
 gmaster
 gp32
 gx4000
 gzdoom
 hbmame
 hikaru
+ikemen
 intellivision
 jaguar
 jaguarcd
+karaoke
 lcdgames
 love
 lowresnx
@@ -117,6 +121,7 @@ pc98
 pcengine
 pcenginecd
 pcfx
+pegasus
 pet
 pico8
 pinballfx
@@ -145,6 +150,9 @@ sgb
 snes
 snes-msu
 solarus
+sonic3air
+sonicmania
+sonicretro
 spectravideo
 sufami
 superbroswar
@@ -162,6 +170,7 @@ tutor
 tvgames
 tyrquake
 uzebox
+vc4000
 vectrex
 virtualboy
 vitaquake2
