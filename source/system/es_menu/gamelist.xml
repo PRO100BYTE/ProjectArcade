@@ -155,8 +155,8 @@
 	</game>
 	<game>
 		<path>./dolphin-triforce.menu</path>
-		<name>DolphinWX (Triforce)</name>
-		<desc>Run DolphinWX Emulator (Triforce).</desc>
+		<name>Dolphin Triforce</name>
+		<desc>Run Dolphin Emulator (Triforce).</desc>
 		<image>./media/dolphin-logo.png</image>
 		<marquee>./media/dolphin-logo.png</marquee>
 		<rating>0</rating>
@@ -205,6 +205,23 @@
 		<region>wr</region>
 	</game>
 	<game>
+		<path>./fbneo.menu</path>
+		<name>FBNEO (Multi-System emulator)</name>
+		<desc>Run FBNEO.</desc>
+		<image>./media/fbneo-logo.png</image>
+		<marquee>./media/fbneo-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Team FBNeo</developer>
+		<publisher>Team FBNeo</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
 		<path>./flycast.menu</path>
 		<name>Flycast (Dreamcast, Naomi, Atomiswave)</name>
 		<desc>Run Flycast.</desc>
@@ -221,7 +238,7 @@
 		<lang>en</lang>
 		<region>wr</region>
 	</game>
-    <game>
+	<game>
 		<path>./hatari.menu</path>
 		<name>Hatari (Atari ST)</name>
 		<desc>Run Hatari.</desc>
@@ -272,6 +289,23 @@
 		<lang>en</lang>
 		<region>wr</region>
 	</game>-->
+	<game>
+		<path>./lime3ds.menu</path>
+		<name>Lime (3DS)</name>
+		<desc>Run Lime Emulator (Nintendo 3DS).</desc>
+		<image>./media/lime3ds-logo.svg</image>
+		<marquee>./media/lime3ds-logo.svg</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Lime Team</developer>
+		<publisher>Lime Team</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
 	<game>
 		<path>./m2emulator.menu</path>
 		<name>M2Emulator (Model 2)</name>
@@ -860,6 +894,23 @@
 		<region>wr</region>
 	</game>
 	<game>
+		<path>./psxmame.menu</path>
+		<name>PSXMAME (Playstation-based Arcade)</name>
+		<desc>Run PSXMAME (Playstation-based Arcade).</desc>
+		<image>./media/zinc-logo.png</image>
+		<marquee>./media/zinc-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>MAME Team</developer>
+		<publisher>MAME Team</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
 		<path>./hbmame.menu</path>
 		<name>HBMAME (HomeBrew Arcade Games)</name>
 		<desc>Run HBMAME (HomeBrew Arcade Games).</desc>
@@ -911,6 +962,40 @@
 		<region>wr</region>
 	</game>
 	<game>
+		<path>./sudachi.menu</path>
+		<name>Sudachi (Switch)</name>
+		<desc>Run Sudachi (Switch). This software is not provided by RetroBat.</desc>
+		<image>./media/sudachi-logo.jpg</image>
+		<marquee>./media/sudachi-logo.jpg</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Jarrod Norwell</developer>
+		<publisher>Sudachi</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./suyu.menu</path>
+		<name>Suyu (Switch)</name>
+		<desc>Run Suyu (Switch). This software is not provided by RetroBat.</desc>
+		<image>./media/suyu-logo.png</image>
+		<marquee>./media/suyu-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Suyu Team</developer>
+		<publisher>Suyu Team</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
 		<path>./xemu.menu</path>
 		<name>Xemu (Xbox, Chihiro)</name>
 		<desc>Run Xemu (Xbox, Chihiro).</desc>
@@ -930,7 +1015,7 @@
 	<game>
 		<path>./yuzu.menu</path>
 		<name>Yuzu (Switch)</name>
-		<desc>Run Yuzu (Switch). This software is not provided by RetroBat. You can download it here: https://yuzu-emu.org/downloads/</desc>
+		<desc>Run Yuzu (Switch). This software is not provided by RetroBat.</desc>
 		<image>./media/yuzu-logo.png</image>
 		<marquee>./media/yuzu-logo.png</marquee>
 		<rating>0</rating>
