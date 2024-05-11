@@ -187,7 +187,7 @@
 		<lang>en</lang>
 		<region>wr</region>
 	</game>
-    <game>
+	<game>
 		<path>./eka2l1.menu</path>
 		<name>EKA2L1 (Symbian OS/N-Gage emulator)</name>
 		<desc>Run EKA2L1 (Symbian OS/N-Gage emulator).</desc>
@@ -238,7 +238,7 @@
 		<lang>en</lang>
 		<region>wr</region>
 	</game>
-    <game>
+	<game>
 		<path>./hatari.menu</path>
 		<name>Hatari (Atari ST)</name>
 		<desc>Run Hatari.</desc>
@@ -248,6 +248,23 @@
 		<releasedate />
 		<developer>TuxFamily</developer>
 		<publisher>TuxFamily</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./jgenesis.menu</path>
+		<name>jgenesis (Multi-System)</name>
+		<desc>Run jgenesis (Multi-System).</desc>
+		<image>./media/jgenesis-logo.png</image>
+		<marquee>./media/jgenesis-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>James Groth</developer>
+		<publisher />
 		<genre>Emulator</genre>
 		<playcount />
 		<lastplayed />
@@ -289,6 +306,23 @@
 		<lang>en</lang>
 		<region>wr</region>
 	</game>-->
+	<game>
+		<path>./lime3ds.menu</path>
+		<name>Lime (3DS)</name>
+		<desc>Run Lime Emulator (Nintendo 3DS).</desc>
+		<image>./media/lime3ds-logo.svg</image>
+		<marquee>./media/lime3ds-logo.svg</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Lime Team</developer>
+		<publisher>Lime Team</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
 	<game>
 		<path>./m2emulator.menu</path>
 		<name>M2Emulator (Model 2)</name>
@@ -945,6 +979,40 @@
 		<region>wr</region>
 	</game>
 	<game>
+		<path>./sudachi.menu</path>
+		<name>Sudachi (Switch)</name>
+		<desc>Run Sudachi (Switch). This software is not provided by ProjectArcade.</desc>
+		<image>./media/sudachi-logo.jpg</image>
+		<marquee>./media/sudachi-logo.jpg</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Jarrod Norwell</developer>
+		<publisher>Sudachi</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./suyu.menu</path>
+		<name>Suyu (Switch)</name>
+		<desc>Run Suyu (Switch). This software is not provided by ProjectArcade.</desc>
+		<image>./media/suyu-logo.png</image>
+		<marquee>./media/suyu-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Suyu Team</developer>
+		<publisher>Suyu Team</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
 		<path>./xemu.menu</path>
 		<name>Xemu (Xbox, Chihiro)</name>
 		<desc>Run Xemu (Xbox, Chihiro).</desc>
@@ -964,7 +1032,7 @@
 	<game>
 		<path>./yuzu.menu</path>
 		<name>Yuzu (Switch)</name>
-		<desc>Run Yuzu (Switch). This software is not provided by ProjectArcade. You can download it here: https://yuzu-emu.org/downloads/</desc>
+		<desc>Run Yuzu (Switch). This software is not provided by ProjectArcade.</desc>
 		<image>./media/yuzu-logo.png</image>
 		<marquee>./media/yuzu-logo.png</marquee>
 		<rating>0</rating>
