@@ -1,0 +1,28 @@
+## NTSC
+default:
+  # libretro
+  shaderGL: ntsc/ntsc
+  shader: ntsc/ntsc-simple
+  # ares
+  ares: ntsc/ntsc-simple
+  # emulators using reshader 
+  m2emulator: NTSC_MAME@ntsc.fx
+  supermodel: NTSC_MAME@ntsc.fx
+  hypseus: NTSC_MAME@ntsc.fx
+  daphne: NTSC_MAME@ntsc.fx
+  oricutron: NTSC_MAME@ntsc.fx
+  applewin: NTSC_MAME@ntsc.fx
+  gsplus: NTSC_MAME@ntsc.fx
+  scummvm: NTSC_MAME@ntsc.fx
+  simcoupe: NTSC_MAME@ntsc.fx
+  demul: NTSC_MAME@ntsc.fx
+  demul-old: NTSC_MAME@ntsc.fx
+  phoenix: NTSC_MAME@ntsc.fx
+  bigpemu: NTSC_MAME@ntsc.fx
+  mednafen: NTSC_MAME@ntsc.fx
+  solarus: NTSC_MAME@ntsc.fx
+  redream: NTSC_MAME@ntsc.fx
+  raine: NTSC_MAME@ntsc.fx
+  duckstation: NTSC_MAME@ntsc.fx
+  mupen64: NTSC_MAME@ntsc.fx
+  xemu: NTSC_MAME@ntsc.fx
