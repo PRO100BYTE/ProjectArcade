@@ -85,7 +85,7 @@
 		<lang>en</lang>
 		<region>wr</region>
 	</game>
-	<!--<game>
+	<game>
 		<path>./citra.menu</path>
 		<name>Citra (3DS)</name>
 		<desc>Run Citra Emulator (Nintendo 3DS).</desc>
@@ -101,8 +101,8 @@
 		<gametime />
 		<lang>en</lang>
 		<region>wr</region>
-	</game>-->
-	<!--<game>
+	</game>
+	<game>
 		<path>./citra_canary.menu</path>
 		<name>Citra Canary(3DS)</name>
 		<desc>Run Citra Canary Emulator (Nintendo 3DS).</desc>
@@ -118,7 +118,7 @@
 		<gametime />
 		<lang>en</lang>
 		<region>wr</region>
-	</game>-->
+	</game>
 	<game>
 		<path>./demul-old.menu</path>
 		<name>Demul Old DX11 Plugin (Gaelco)</name>
@@ -155,8 +155,8 @@
 	</game>
 	<game>
 		<path>./dolphin-triforce.menu</path>
-		<name>DolphinWX (Triforce)</name>
-		<desc>Run DolphinWX Emulator (Triforce).</desc>
+		<name>Dolphin Triforce</name>
+		<desc>Run Dolphin Emulator (Triforce).</desc>
 		<image>./media/dolphin-logo.png</image>
 		<marquee>./media/dolphin-logo.png</marquee>
 		<rating>0</rating>
@@ -188,6 +188,40 @@
 		<region>wr</region>
 	</game>
     <game>
+		<path>./eka2l1.menu</path>
+		<name>EKA2L1 (Symbian OS/N-Gage emulator)</name>
+		<desc>Run EKA2L1 (Symbian OS/N-Gage emulator).</desc>
+		<image>./media/eka2l1-logo.png</image>
+		<marquee>./media/eka2l1-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>EKA2L1 Team</developer>
+		<publisher>EKA2L1 Team</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./fbneo.menu</path>
+		<name>FBNEO (Multi-System emulator)</name>
+		<desc>Run FBNEO.</desc>
+		<image>./media/fbneo-logo.png</image>
+		<marquee>./media/fbneo-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Team FBNeo</developer>
+		<publisher>Team FBNeo</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
 		<path>./flycast.menu</path>
 		<name>Flycast (Dreamcast, Naomi, Atomiswave)</name>
 		<desc>Run Flycast.</desc>
@@ -843,6 +877,23 @@
 		<region>wr</region>
 	</game>
 	<game>
+		<path>./psxmame.menu</path>
+		<name>PSXMAME (Playstation-based Arcade)</name>
+		<desc>Run PSXMAME (Playstation-based Arcade).</desc>
+		<image>./media/zinc-logo.png</image>
+		<marquee>./media/zinc-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>MAME Team</developer>
+		<publisher>MAME Team</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
 		<path>./hbmame.menu</path>
 		<name>HBMAME (HomeBrew Arcade Games)</name>
 		<desc>Run HBMAME (HomeBrew Arcade Games).</desc>
@@ -910,7 +961,7 @@
 		<lang>en</lang>
 		<region>wr</region>
 	</game>
-	<!--<game>
+	<game>
 		<path>./yuzu.menu</path>
 		<name>Yuzu (Switch)</name>
 		<desc>Run Yuzu (Switch). This software is not provided by ProjectArcade. You can download it here: https://yuzu-emu.org/downloads/</desc>
@@ -926,8 +977,8 @@
 		<gametime />
 		<lang>en</lang>
 		<region>wr</region>
-	</game>-->
-	<!--<game>
+	</game>
+	<game>
 		<path>./yuzu-early-access.menu</path>
 		<name>Yuzu Early Access (Switch)</name>
 		<desc>Run Yuzu Early Access (Switch). This software is not provided by ProjectArcade.</desc>
@@ -943,7 +994,7 @@
 		<gametime />
 		<lang>en</lang>
 		<region>wr</region>
-	</game>-->
+	</game>
 	<!--<game>
 		<path>./zsnes-dos.menu</path>
 		<name>ZSNES</name>
