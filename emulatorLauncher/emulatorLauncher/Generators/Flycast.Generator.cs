@@ -3,6 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
+using System;
 
 namespace EmulatorLauncher
 {
@@ -11,6 +12,7 @@ namespace EmulatorLauncher
         private BezelFiles _bezelFileInfo;
         private ScreenResolution _resolution;
         private bool _fullscreen;
+        private string _romName;
 
         public FlycastGenerator()
         {
@@ -27,6 +29,7 @@ namespace EmulatorLauncher
             if (!File.Exists(exe))
                 return null;
 
+            _romName = Path.GetFileNameWithoutExtension(rom);
             _fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
             bool wide = SystemConfig.isOptSet("flycast_ratio") && SystemConfig["flycast_ratio"] != "normal";
 
@@ -38,9 +41,10 @@ namespace EmulatorLauncher
 
             SetupConfiguration(path, system, resolution);
 
-            List<string> commandArray = new List<string>();
-
-            commandArray.Add("\"" + rom + "\"");
+            List<string> commandArray = new List<string>
+            {
+                "\"" + rom + "\""
+            };
 
             string args = string.Join(" ", commandArray);
 
@@ -57,8 +61,29 @@ namespace EmulatorLauncher
         {
             string configfile = Path.Combine(path, "emu.cfg");
 
-            using (var ini = IniFile.FromFile(configfile, IniOptions.UseSpaces))
+            using (var ini = IniFile.FromFile(configfile, IniOptions.UseSpaces | IniOptions.KeepEmptyValues | IniOptions.KeepEmptyLines))
             {
+                // RetroAchievements
+                if (Features.IsSupported("cheevos") && SystemConfig.getOptBoolean("retroachievements"))
+                {
+                    ini.WriteValue("achievements", "Enabled", "yes");
+                    ini.WriteValue("achievements", "HardcoreMode", SystemConfig.getOptBoolean("retroachievements.hardcore") ? "yes" : "no");
+
+                    // Inject credentials
+                    if (SystemConfig.isOptSet("retroachievements.username") && SystemConfig.isOptSet("retroachievements.token"))
+                    {
+                        ini.WriteValue("achievements", "Token", SystemConfig["retroachievements.token"]);
+                        ini.WriteValue("achievements", "UserName", SystemConfig["retroachievements.username"]);
+                    }
+                }
+                else
+                {
+                    ini.WriteValue("achievements", "Enabled", "no");
+                    ini.WriteValue("achievements", "HardcoreMode", "no");
+                    ini.WriteValue("achievements", "Token", null);
+                    ini.WriteValue("achievements", "UserName", null);
+                }
+
                 // General
                 BindIniFeature(ini, "config", "Dreamcast.Language", "flycast_language", "6");
                 BindIniFeature(ini, "config", "Dreamcast.Broadcast", "flycast_broadcast", "4");
@@ -198,6 +223,8 @@ namespace EmulatorLauncher
 
                 CreateControllerConfiguration(path, system, ini);
 
+                BindBoolIniFeature(ini, "config", "PerGameVmu", "flycast_vmupergame", "yes", "no");
+
                 ini.Save();
             }
         }
@@ -211,8 +238,7 @@ namespace EmulatorLauncher
 
             int ret = base.RunAndWait(path);
 
-            if (bezel != null)
-                bezel.Dispose();
+            bezel?.Dispose();
 
             return ret;
         }

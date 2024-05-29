@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Globalization;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.Common;
@@ -10,10 +11,10 @@ namespace EmulatorLauncher
 {
     partial class MednafenGenerator : Generator
     {
-        static List<string> systemWithAutoconfig = new List<string>() { "apple2", "gb", "gba", "gg", "lynx", "md", "nes", "ngp", "pce", "pcfx", "psx", "sms", "snes", "ss", "wswan" };
-        static List<string> mouseMapping = new List<string>() { "justifier", "gun", "guncon", "superscope", "zapper" };
-        
-        static Dictionary<string, string> defaultPadType = new Dictionary<string, string>()
+        static readonly List<string> systemWithAutoconfig = new List<string>() { "apple2", "gb", "gba", "gg", "lynx", "md", "nes", "ngp", "pce", "pcfx", "psx", "sms", "snes", "ss", "wswan" };
+        //static readonly List<string> mouseMapping = new List<string>() { "justifier", "gun", "guncon", "superscope", "zapper" };
+
+        static readonly Dictionary<string, string> defaultPadType = new Dictionary<string, string>()
         {
             { "apple2", "gamepad" },
             { "lynx", "builtin.gamepad"},
@@ -32,7 +33,7 @@ namespace EmulatorLauncher
             { "wswan", "gamepad" }
         };
         
-        static Dictionary<string, int> inputPortNb = new Dictionary<string, int>()
+        static readonly Dictionary<string, int> inputPortNb = new Dictionary<string, int>()
         {
             { "apple2", 2 },
             { "lynx", 1 },
@@ -58,6 +59,8 @@ namespace EmulatorLauncher
             if (!systemWithAutoconfig.Contains(mednafenCore))
                 return;
 
+            Dictionary<string, int> double_pads = new Dictionary<string, int>();
+
             // First, set all controllers to none
             if (mednafenCore != "lynx" && mednafenCore !="sms" && mednafenCore != "wswan" && mednafenCore != "gb" && mednafenCore != "gba" && mednafenCore != "ngp" && mednafenCore != "gg")
                 CleanUpConfigFile(mednafenCore, cfg);
@@ -66,10 +69,10 @@ namespace EmulatorLauncher
             int maxPad = inputPortNb[mednafenCore];
 
             foreach (var controller in this.Controllers.OrderBy(i => i.PlayerIndex).Take(maxPad))
-                ConfigureInput(controller, cfg, mednafenCore);
+                ConfigureInput(controller, cfg, mednafenCore, double_pads);
         }
 
-        private void ConfigureInput(Controller controller, MednafenConfigFile cfg, string mednafenCore)
+        private void ConfigureInput(Controller controller, MednafenConfigFile cfg, string mednafenCore, Dictionary<string, int> double_pads)
         {
             if (controller == null || controller.Config == null)
                 return;
@@ -77,11 +80,11 @@ namespace EmulatorLauncher
             if (controller.IsKeyboard && this.Controllers.Count(i => !i.IsKeyboard) == 0)
                 ConfigureKeyboard(controller, cfg, mednafenCore);
             else
-                ConfigureJoystick(controller, cfg, mednafenCore);
+                ConfigureJoystick(controller, cfg, mednafenCore, double_pads);
         }
 
         #region joystick
-        private void ConfigureJoystick(Controller controller, MednafenConfigFile cfg, string mednafenCore)
+        private void ConfigureJoystick(Controller controller, MednafenConfigFile cfg, string mednafenCore, Dictionary<string, int> double_pads)
         {
             if (controller == null)
                 return;
@@ -92,6 +95,31 @@ namespace EmulatorLauncher
 
             if (controller.DirectInput == null)
                 return;
+
+            int nbAxis = controller.NbAxes;
+
+            string guid1 = (controller.Guid.ToString()).Substring(0, 24) + "00000000";
+            // Fetch information in retrobat/system/tools/gamecontrollerdb.txt file
+            SdlToDirectInput dinputCtrl = null;
+            string gamecontrollerDB = Path.Combine(AppConfig.GetFullPath("tools"), "gamecontrollerdb.txt");
+            
+            if (!File.Exists(gamecontrollerDB))
+            {
+                SimpleLogger.Instance.Info("[INFO] gamecontrollerdb.txt file not found in tools folder. Controller mapping will not be available.");
+                gamecontrollerDB = null;
+            }
+
+            if (gamecontrollerDB != null)
+            {
+                SimpleLogger.Instance.Info("[INFO] Player 1. Fetching gamecontrollerdb.txt file with guid : " + guid1);
+
+                dinputCtrl = GameControllerDBParser.ParseByGuid(gamecontrollerDB, guid1);
+
+                if (dinputCtrl == null)
+                    SimpleLogger.Instance.Info("[INFO] Player 1. No controller found in gamecontrollerdb.txt file for guid : " + guid1);
+                else
+                    SimpleLogger.Instance.Info("[INFO] Player 1: " + guid1 + " found in gamecontrollerDB file.");
+            }
 
             int playerIndex = controller.PlayerIndex;
 
@@ -161,15 +189,39 @@ namespace EmulatorLauncher
             }
 
             // Manage gamepad mapping
-            Dictionary<InputKey, string> buttonMapping = xboxmapping;
+            Dictionary<InputKey, string> buttonMapping = dinputMapping;
 
-            if (controller.VendorID == USB_VENDOR.SONY)
-                buttonMapping = ds4ds5dinputmapping;
+            if (controller.IsXInputDevice)
+                buttonMapping = xboxmapping;
+
+            /*if (controller.VendorID == USB_VENDOR.SONY)
+                buttonMapping = ds4ds5dinputmapping;*/
+
+            bool dinput = (buttonMapping == dinputMapping && dinputCtrl != null);
 
             string deviceID = "0x" + controller.DirectInput.ProductGuid.ToString().Replace("-", "");
 
             if (controller.IsXInputDevice)
-                deviceID = "0x000000000000000000010004f3ff000" + controller.XInput.DeviceIndex;
+                deviceID = "0x000000000000000000010004f3ff0000";
+
+            int nsamepad = 0;
+            if (double_pads.ContainsKey(deviceID))
+                nsamepad = double_pads[deviceID];
+            else
+                nsamepad = 0;
+
+            if (nsamepad > 0)
+            {
+                int dinputIndex = this.Controllers.Where(i => i.DirectInput.ProductGuid == controller.DirectInput.ProductGuid).OrderBy(c => c.PlayerIndex).ToList().IndexOf(controller);
+
+                char lastChar = deviceID[deviceID.Length - 1];
+                int lastInt = Convert.ToInt32(lastChar.ToString(), 16);
+                lastInt += dinputIndex;
+                string newLastChar = lastInt.ToString("X");
+                deviceID = deviceID.Substring(0, deviceID.Length - 1) + newLastChar;
+            }
+
+            double_pads[deviceID] = nsamepad + 1;
 
             if (mappingToUse.ContainsKey(mapping))
                 newmapping = mappingToUse[mapping];
@@ -185,7 +237,10 @@ namespace EmulatorLauncher
                         InputKey joyButton = entry.Value;
                         string value = buttonMapping[joyButton];
 
-                        cfg[mednafenCore + ".input.port" + 2 + ".atari." + entry.Key] = "joystick " + deviceID + " " + value;
+                        if (dinput)
+                            cfg[mednafenCore + ".input.port" + 2 + ".atari." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                        else
+                            cfg[mednafenCore + ".input.port" + 2 + ".atari." + entry.Key] = "joystick " + deviceID + " " + value;
                     }
                 }
                 else
@@ -199,7 +254,10 @@ namespace EmulatorLauncher
                     InputKey joyButton = entry.Value;
                     string value = buttonMapping[joyButton];
 
-                    cfg["lynx.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
+                    if (dinput)
+                        cfg["lynx.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                    else
+                        cfg["lynx.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
             }
 
@@ -210,7 +268,10 @@ namespace EmulatorLauncher
                     InputKey joyButton = entry.Value;
                     string value = buttonMapping[joyButton];
 
-                    cfg["gba.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
+                    if (dinput)
+                        cfg["gba.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                    else
+                        cfg["gba.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
             }
 
@@ -221,7 +282,10 @@ namespace EmulatorLauncher
                     InputKey joyButton = entry.Value;
                     string value = buttonMapping[joyButton];
 
-                    cfg["gb.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
+                    if (dinput)
+                        cfg["gb.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                    else
+                        cfg["gb.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
 
                 foreach (var entry in gbtiltmapping)
@@ -229,7 +293,10 @@ namespace EmulatorLauncher
                     InputKey joyButton = entry.Value;
                     string value = buttonMapping[joyButton];
 
-                    cfg["gb.input.tilt.tilt." + entry.Key] = "joystick " + deviceID + " " + value;
+                    if (dinput)
+                        cfg["gb.input.tilt.tilt." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                    else
+                        cfg["gb.input.tilt.tilt." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
             }
 
@@ -240,7 +307,10 @@ namespace EmulatorLauncher
                     InputKey joyButton = entry.Value;
                     string value = buttonMapping[joyButton];
 
-                    cfg["gg.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
+                    if (dinput)
+                        cfg["gg.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                    else
+                        cfg["gg.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
             }
 
@@ -251,7 +321,10 @@ namespace EmulatorLauncher
                     InputKey joyButton = entry.Value;
                     string value = buttonMapping[joyButton];
 
-                    cfg["ngp.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
+                    if (dinput)
+                        cfg["ngp.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                    else
+                        cfg["ngp.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
             }
 
@@ -264,7 +337,10 @@ namespace EmulatorLauncher
                     InputKey joyButton = entry.Value;
                     string value = buttonMapping[joyButton];
 
-                    cfg["wswan.input.builtin." + padType + "." + entry.Key] = "joystick " + deviceID + " " + value;
+                    if (dinput)
+                        cfg["wswan.input.builtin." + padType + "." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                    else
+                        cfg["wswan.input.builtin." + padType + "." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
             }
 
@@ -284,7 +360,10 @@ namespace EmulatorLauncher
                     InputKey joyButton = entry.Value;
                     string value = buttonMapping[joyButton];
 
-                    cfg[mednafenCore + ".input.port" + playerIndex + "." + padType + "." + entry.Key] = "joystick " + deviceID + " " + value;
+                    if (dinput)
+                        cfg[mednafenCore + ".input.port" + playerIndex + "." + padType + "." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                    else
+                        cfg[mednafenCore + ".input.port" + playerIndex + "." + padType + "." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
             }
         }
@@ -539,7 +618,7 @@ namespace EmulatorLauncher
 
         #region controller Mapping
 
-        static Dictionary<string, InputKey> gbmapping = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> gbmapping = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.b },
             { "b", InputKey.a },
@@ -553,7 +632,7 @@ namespace EmulatorLauncher
             { "up", InputKey.up }
         };
 
-        static Dictionary<string, InputKey> gbtiltmapping = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> gbtiltmapping = new Dictionary<string, InputKey>()
         {
             { "down", InputKey.rightanalogdown },
             { "left", InputKey.rightanalogleft },
@@ -561,7 +640,7 @@ namespace EmulatorLauncher
             { "up", InputKey.rightanalogup }
         };
 
-        static Dictionary<string, InputKey> gbamapping = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> gbamapping = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.b },
             { "b", InputKey.a },
@@ -577,7 +656,7 @@ namespace EmulatorLauncher
             { "up", InputKey.up }
         };
 
-        static Dictionary<string, InputKey> ggmapping = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> ggmapping = new Dictionary<string, InputKey>()
         {
             { "button1", InputKey.a },
             { "button2", InputKey.b },
@@ -590,7 +669,7 @@ namespace EmulatorLauncher
             { "up", InputKey.up }
         };
 
-        static Dictionary<string, InputKey> lynxmapping = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> lynxmapping = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.b },
             { "b", InputKey.a },
@@ -605,7 +684,7 @@ namespace EmulatorLauncher
             { "up", InputKey.up }
         };
 
-        static Dictionary<string, InputKey> mdgamepad = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> mdgamepad = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.y },
             { "b", InputKey.a },
@@ -620,7 +699,7 @@ namespace EmulatorLauncher
             { "up", InputKey.up }
         };
 
-        static Dictionary<string, InputKey> mdgamepad2 = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> mdgamepad2 = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.a },
             { "b", InputKey.b },
@@ -633,7 +712,7 @@ namespace EmulatorLauncher
             { "up", InputKey.up }
         };
 
-        static Dictionary<string, InputKey> mdgamepad6 = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> mdgamepad6 = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.y },
             { "b", InputKey.a },
@@ -649,7 +728,7 @@ namespace EmulatorLauncher
             { "z", InputKey.pagedown },
         };
 
-        static Dictionary<string, InputKey> nesgamepad = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> nesgamepad = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.b },
             { "b", InputKey.a },
@@ -663,7 +742,7 @@ namespace EmulatorLauncher
             { "up", InputKey.up },
         };
 
-        static Dictionary<string, InputKey> ngpmapping = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> ngpmapping = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.a },
             { "b", InputKey.b },
@@ -676,7 +755,7 @@ namespace EmulatorLauncher
             { "up", InputKey.up }
         };
 
-        static Dictionary<string, InputKey> pcegamepad = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> pcegamepad = new Dictionary<string, InputKey>()
         {
             { "down", InputKey.down },
             { "i", InputKey.b },
@@ -693,7 +772,7 @@ namespace EmulatorLauncher
             { "vi", InputKey.pagedown },
         };
 
-        static Dictionary<string, InputKey> pcfxgamepad = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> pcfxgamepad = new Dictionary<string, InputKey>()
         {
             { "down", InputKey.down },
             { "i", InputKey.b },
@@ -711,7 +790,7 @@ namespace EmulatorLauncher
             { "vi", InputKey.pagedown },
         };
 
-        static Dictionary<string, InputKey> psxgamepad = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> psxgamepad = new Dictionary<string, InputKey>()
         {
             { "circle", InputKey.b },
             { "cross", InputKey.a },
@@ -729,7 +808,7 @@ namespace EmulatorLauncher
             { "up", InputKey.up }
         };
 
-        static Dictionary<string, InputKey> psxdualshock = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> psxdualshock = new Dictionary<string, InputKey>()
         {
             { "circle", InputKey.b },
             { "cross", InputKey.a },
@@ -757,7 +836,7 @@ namespace EmulatorLauncher
             { "up", InputKey.up }
         };
 
-        static Dictionary<string, InputKey> snesgamepad = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> snesgamepad = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.b },
             { "b", InputKey.a },
@@ -775,7 +854,7 @@ namespace EmulatorLauncher
             { "y", InputKey.y },
         };
 
-        static Dictionary<string, InputKey> ssgamepad = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> ssgamepad = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.b },
             { "b", InputKey.a },
@@ -792,7 +871,7 @@ namespace EmulatorLauncher
             { "z", InputKey.pageup }
         };
 
-        static Dictionary<string, InputKey> apple2gamepad = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> apple2gamepad = new Dictionary<string, InputKey>()
         {
             { "button1", InputKey.a },
             { "button2", InputKey.b },
@@ -803,7 +882,7 @@ namespace EmulatorLauncher
             { "up", InputKey.up }
         };
 
-        static Dictionary<string, InputKey> apple2joystick = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> apple2joystick = new Dictionary<string, InputKey>()
         {
             { "button1", InputKey.a },
             { "button2", InputKey.b },
@@ -814,7 +893,7 @@ namespace EmulatorLauncher
             { "stick_up", InputKey.leftanalogup }
         };
 
-        static Dictionary<string, InputKey> apple2atari = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> apple2atari = new Dictionary<string, InputKey>()
         {
             { "button", InputKey.a },
             { "down", InputKey.down },
@@ -823,7 +902,7 @@ namespace EmulatorLauncher
             { "up", InputKey.up }
         };
 
-        static Dictionary<string, InputKey> smsgamepad = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> smsgamepad = new Dictionary<string, InputKey>()
         {
             { "down", InputKey.down },
             { "fire1", InputKey.a },
@@ -836,7 +915,7 @@ namespace EmulatorLauncher
             { "up", InputKey.up }
         };
 
-        static Dictionary<string, InputKey> wswanhorizontal = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> wswanhorizontal = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.b },
             { "b", InputKey.a },
@@ -853,7 +932,7 @@ namespace EmulatorLauncher
             { "up-y", InputKey.leftanalogup }
         };
 
-        static Dictionary<string, InputKey> wswanvertical = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> wswanvertical = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.b },
             { "ap", InputKey.x },
@@ -870,7 +949,7 @@ namespace EmulatorLauncher
             { "up-y", InputKey.up }
         };
 
-        static Dictionary<string, InputKey> wswanhorizontalkb = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> wswanhorizontalkb = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.b },
             { "b", InputKey.a },
@@ -887,7 +966,7 @@ namespace EmulatorLauncher
             { "up-y", InputKey.pagedown }
         };
 
-        static Dictionary<string, InputKey> wswanverticalkb = new Dictionary<string, InputKey>()
+        static readonly Dictionary<string, InputKey> wswanverticalkb = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.b },
             { "ap", InputKey.x },
@@ -906,7 +985,7 @@ namespace EmulatorLauncher
         #endregion
 
         #region Gun Mapping
-        static Dictionary<string, int> gunPort = new Dictionary<string, int>()
+        static readonly Dictionary<string, int> gunPort = new Dictionary<string, int>()
         {
             { "nes", 1 },
             { "snes", 2 },
@@ -914,14 +993,14 @@ namespace EmulatorLauncher
             { "psx", 1 }
         };
 
-        static Dictionary<string, string> gunName = new Dictionary<string, string>()
+        static readonly Dictionary<string, string> gunName = new Dictionary<string, string>()
         {
             { "nes", "zapper" },
             { "snes", "superscope" },
             { "ss", "gun" }
         };
 
-        static Dictionary<string, string> neszapper = new Dictionary<string, string>()
+        static readonly Dictionary<string, string> neszapper = new Dictionary<string, string>()
         {
             { "away_trigger", "mouse 0x0 button_right" },
             { "trigger", "mouse 0x0 button_left" },
@@ -929,7 +1008,7 @@ namespace EmulatorLauncher
             { "y_axis", "mouse 0x0 cursor_y-+" },
         };
 
-        static Dictionary<string, string> psxguncon = new Dictionary<string, string>()
+        static readonly Dictionary<string, string> psxguncon = new Dictionary<string, string>()
         {
             { "a", "mouse 0x0 button_right" },
             { "b", "mouse 0x0 button_middle" },
@@ -939,7 +1018,7 @@ namespace EmulatorLauncher
             { "y_axis", "mouse 0x0 cursor_y-+" },
         };
 
-        static Dictionary<string, string> psxjustifier = new Dictionary<string, string>()
+        static readonly Dictionary<string, string> psxjustifier = new Dictionary<string, string>()
         {
             { "o", "mouse 0x0 button_right" },
             { "offscreen_shot", "keyboard 0x0 44" },    //space
@@ -949,7 +1028,7 @@ namespace EmulatorLauncher
             { "y_axis", "mouse 0x0 cursor_y-+" },
         };
 
-        static Dictionary<string, string> snessuperscope = new Dictionary<string, string>()
+        static readonly Dictionary<string, string> snessuperscope = new Dictionary<string, string>()
         {
             { "cursor", "mouse 0x0 button_right" },
             { "offscreen_shot", "keyboard 0x0 44" },    //space
@@ -960,7 +1039,7 @@ namespace EmulatorLauncher
             { "y_axis", "mouse 0x0 cursor_y-+" },
         };
 
-        static Dictionary<string, string> saturngun = new Dictionary<string, string>()
+        static readonly Dictionary<string, string> saturngun = new Dictionary<string, string>()
         {
             { "offscreen_shot", "mouse 0x0 button_right" },
             { "start", "mouse 0x0 button_middle" },
@@ -971,7 +1050,7 @@ namespace EmulatorLauncher
         #endregion
 
         #region Mapping link
-        static Dictionary<string, Dictionary<string, InputKey> > mappingToUse = new Dictionary<string, Dictionary<string, InputKey>>()
+        static readonly Dictionary<string, Dictionary<string, InputKey> > mappingToUse = new Dictionary<string, Dictionary<string, InputKey>>()
         {
             { "apple2_gamepad", apple2gamepad },
             { "apple2_joystick", apple2joystick },
@@ -990,13 +1069,13 @@ namespace EmulatorLauncher
             { "wswan_gamepadraa", wswanvertical }
         };
 
-        static Dictionary<string, Dictionary<string, InputKey>> mappingToUsekb = new Dictionary<string, Dictionary<string, InputKey>>()
+        static readonly Dictionary<string, Dictionary<string, InputKey>> mappingToUsekb = new Dictionary<string, Dictionary<string, InputKey>>()
         {
             { "wswan_gamepad", wswanhorizontalkb },
             { "wswan_gamepadraa", wswanverticalkb }
         };
 
-        static Dictionary<string, Dictionary<string, string>> gunMappingToUse = new Dictionary<string, Dictionary<string, string>>()
+        static readonly Dictionary<string, Dictionary<string, string>> gunMappingToUse = new Dictionary<string, Dictionary<string, string>>()
         {
             { "nes", neszapper },
             { "snes", snessuperscope },
@@ -1007,7 +1086,7 @@ namespace EmulatorLauncher
         #endregion
 
         #region Mednafen keycodes
-        static Dictionary<SDL.SDL_Keycode, int> mednafenKeyCodes = new Dictionary<SDL.SDL_Keycode, int>()
+        static readonly Dictionary<SDL.SDL_Keycode, int> mednafenKeyCodes = new Dictionary<SDL.SDL_Keycode, int>()
         {
             { SDL.SDL_Keycode.SDLK_UNKNOWN, 0 },
             { SDL.SDL_Keycode.SDLK_a, 4 },
@@ -1230,7 +1309,7 @@ namespace EmulatorLauncher
             { SDL.SDL_Keycode.SDLK_SLEEP, 282 }
         };
 
-        static Dictionary<SDL.SDL_Keycode, SDL.SDL_Keycode> azertyLayoutMapping = new Dictionary<SDL.SDL_Keycode, SDL.SDL_Keycode>()
+        static readonly Dictionary<SDL.SDL_Keycode, SDL.SDL_Keycode> azertyLayoutMapping = new Dictionary<SDL.SDL_Keycode, SDL.SDL_Keycode>()
         {
             { SDL.SDL_Keycode.SDLK_a, SDL.SDL_Keycode.SDLK_q },
             { SDL.SDL_Keycode.SDLK_q, SDL.SDL_Keycode.SDLK_a },
@@ -1245,7 +1324,36 @@ namespace EmulatorLauncher
         #endregion
 
         #region dinputMappping
-        static Dictionary<InputKey, string> ds4ds5dinputmapping = new Dictionary<InputKey, string>()
+
+        static readonly Dictionary<InputKey, string> dinputMapping = new Dictionary<InputKey, string>()
+        {
+            { InputKey.b, "b" },
+            { InputKey.a, "a" },
+            { InputKey.y, "x" },
+            { InputKey.x, "y" },
+            { InputKey.up, "dpup" },
+            { InputKey.down, "dpdown" },
+            { InputKey.left, "dpleft" },
+            { InputKey.right, "dpright" },
+            { InputKey.pageup, "leftshoulder" },
+            { InputKey.pagedown, "rightshoulder" },
+            { InputKey.l2, "lefttrigger" },
+            { InputKey.r2, "righttrigger" },
+            { InputKey.l3, "leftstick" },
+            { InputKey.r3, "rightstick" },
+            { InputKey.select, "back" },
+            { InputKey.start, "start" },
+            { InputKey.leftanalogup, "-lefty" },
+            { InputKey.leftanalogdown, "+lefty" },
+            { InputKey.leftanalogleft, "-leftx" },
+            { InputKey.leftanalogright, "+leftx" },
+            { InputKey.rightanalogup, "-righty" },
+            { InputKey.rightanalogdown, "+righty" },
+            { InputKey.rightanalogleft, "-rightx" },
+            { InputKey.rightanalogright, "+rightx" },
+        };
+
+        /*static readonly Dictionary<InputKey, string> ds4ds5dinputmapping = new Dictionary<InputKey, string>()
         {
             { InputKey.b, "button_2" },
             { InputKey.a, "button_1" },
@@ -1271,9 +1379,9 @@ namespace EmulatorLauncher
             { InputKey.rightanalogdown, "abs_5+" },
             { InputKey.rightanalogleft, "abs_2-" },
             { InputKey.rightanalogright, "abs_2+" },
-        };
+        };*/
 
-        static Dictionary<InputKey, string> xboxmapping = new Dictionary<InputKey, string>()
+        static readonly Dictionary<InputKey, string> xboxmapping = new Dictionary<InputKey, string>()
         {
             { InputKey.b, "button_13" },
             { InputKey.a, "button_12" },
@@ -1308,7 +1416,7 @@ namespace EmulatorLauncher
                 cfg[core + ".input.port" + i] = core == "apple2" ? "paddle" : "none";
         }
 
-        static Dictionary<string, int> inputPortCleanupNb = new Dictionary<string, int>()
+        static readonly Dictionary<string, int> inputPortCleanupNb = new Dictionary<string, int>()
         {
             { "apple2", 2 },
             { "md", 8 },
@@ -1319,5 +1427,85 @@ namespace EmulatorLauncher
             { "snes", 2 },
             { "ss", 12 }
         };
+
+        private string GetDinputMapping(SdlToDirectInput c, string buttonkey, int nbAxis)
+        {
+            if (c == null)
+                return "";
+
+            if (c.ButtonMappings == null)
+            {
+                SimpleLogger.Instance.Info("[INFO] No mapping found for the controller.");
+                return "";
+            }
+
+            if (!c.ButtonMappings.ContainsKey(buttonkey))
+            {
+                SimpleLogger.Instance.Info("[INFO] No mapping found for " + buttonkey + " in gamecontrollerdb file");
+                return "";
+            }
+
+            int direction = 1;
+
+            if (buttonkey.StartsWith("-"))
+            {
+                buttonkey = buttonkey.Substring(1);
+                direction = -1;
+            }
+            else if (buttonkey.StartsWith("+"))
+            {
+                buttonkey = buttonkey.Substring(1);
+            }
+
+            string button = c.ButtonMappings[buttonkey];
+
+            if (button.StartsWith("b"))
+            {
+                int buttonID = (button.Substring(1).ToInteger());
+                return "button_" + buttonID;
+            }
+
+            else if (button.StartsWith("h"))
+            {
+                int hatID = button.Substring(3).ToInteger();
+
+                switch (hatID)
+                {
+                    case 1:
+                        return "abs_" + (nbAxis + 1) + "-";
+                    case 2:
+                        return "abs_" + nbAxis + "+";
+                    case 4:
+                        return "abs_" + (nbAxis + 1) + "+";
+                    case 8:
+                        return "abs_" + nbAxis + "-";
+                }
+            }
+
+            else if (button.StartsWith("a") || button.StartsWith("-a") || button.StartsWith("+a"))
+            {
+                int axisID = button.Substring(1).ToInteger();
+
+                if (button.StartsWith("-a"))
+                {
+                    axisID = button.Substring(2).ToInteger();
+                    direction = -1;
+                }
+
+                else if (button.StartsWith("+a"))
+                {
+                    axisID = button.Substring(2).ToInteger();
+                    direction = 1;
+                }
+
+                else if (button.StartsWith("a"))
+                    axisID = button.Substring(1).ToInteger();
+
+                if (direction == 1) return "abs_" + axisID + "+";
+                else return "abs_" + axisID + "-";
+            }
+
+            return "";
+        }
     }
 }

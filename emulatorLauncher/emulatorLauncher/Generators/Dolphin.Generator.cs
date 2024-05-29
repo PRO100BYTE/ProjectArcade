@@ -70,7 +70,7 @@ namespace EmulatorLauncher
             {
                 string sysconf = Path.Combine(AppConfig.GetFullPath("saves"), "dolphin", "User", "Wii", "shared2", "sys", "SYSCONF");
                 if (File.Exists(sysconf))
-                    writeWiiSysconfFile(sysconf);
+                    WriteWiiSysconfFile(sysconf);
                 else
                     SimpleLogger.Instance.Info("[WARNING] Wii Nand file not found in : " + sysconf);
             }
@@ -78,11 +78,24 @@ namespace EmulatorLauncher
             SetupGeneralConfig(path, system, emulator, core, rom);
             SetupGfxConfig(path);
             SetupStateSlotConfig(path);
+            SetupCheevos(path);
 
-            DolphinControllers.WriteControllersConfig(path, system, rom, _triforce);
+            DolphinControllers.WriteControllersConfig(path, system, _triforce);
 
             if (Path.GetExtension(rom).ToLowerInvariant() == ".m3u")
                 rom = rom.Replace("\\", "/");
+
+            string[] extensions = new string[] { ".m3u", ".gcz", ".iso", ".ciso", ".wbfs", ".wad", ".rvz", ".wia" };
+            if (Path.GetExtension(rom).ToLowerInvariant() == ".zip" || Path.GetExtension(rom).ToLowerInvariant() == ".7z")
+            {
+                string uncompressedRomPath = this.TryUnZipGameIfNeeded(system, rom, false, false);
+                if (Directory.Exists(uncompressedRomPath))
+                {
+                    string[] romFiles = Directory.GetFiles(uncompressedRomPath).OrderBy(file => Array.IndexOf(extensions, Path.GetExtension(file).ToLowerInvariant())).ToArray();
+                    rom = romFiles.FirstOrDefault(file => extensions.Any(ext => Path.GetExtension(file).Equals(ext, StringComparison.OrdinalIgnoreCase)));
+                    ValidateUncompressedGame();
+                }
+            }
 
             string saveState = "";
             if (File.Exists(SystemConfig["state_file"]))
@@ -126,8 +139,6 @@ namespace EmulatorLauncher
                     // Fullscreen
                     if (_bezelFileInfo != null)
                         ini.WriteValue("Settings", "BorderlessFullscreen", "True");
-                    else
-                        ini.WriteValue("Settings", "BorderlessFullscreen", "False");
 
                     // Ratio
                     if (SystemConfig.isOptSet("ratio"))
@@ -242,8 +253,49 @@ namespace EmulatorLauncher
             }
             catch { }
         }
-    
-        private string getGameCubeLangFromEnvironment()
+
+        private void SetupCheevos(string path)
+        {
+            string iniFile = Path.Combine(path, "User", "Config", "RetroAchievements.ini");
+
+            try
+            {
+                using (var ini = new IniFile(iniFile, IniOptions.UseSpaces))
+                {
+                    // Enable cheevos is needed
+                    if (Features.IsSupported("cheevos") && SystemConfig.getOptBoolean("retroachievements"))
+                    {
+                        ini.WriteValue("Achievements", "Enabled", "True");
+                        ini.WriteValue("Achievements", "AchievementsEnabled", "True");
+                        ini.WriteValue("Achievements", "EncoreEnabled", SystemConfig.getOptBoolean("retroachievements.encore") ? "True" : "False");
+                        ini.WriteValue("Achievements", "HardcoreEnabled", SystemConfig.getOptBoolean("retroachievements.hardcore") ? "True" : "False");
+                        ini.WriteValue("Achievements", "LeaderboardsEnabled", SystemConfig.getOptBoolean("retroachievements.leaderboards") ? "True" : "False");
+                        ini.WriteValue("Achievements", "RichPresenceEnabled", SystemConfig.getOptBoolean("retroachievements.richpresence") ? "True" : "False");
+                        ini.WriteValue("Achievements", "UnofficialEnabled", "False");
+                        ini.WriteValue("Achievements", "BadgesEnabled", "True");
+                        ini.WriteValue("Achievements", "ProgressEnabled", SystemConfig.getOptBoolean("retroachievements.challenge_indicators") ? "True" : "False");
+
+                        // Inject credentials
+                        if (SystemConfig.isOptSet("retroachievements.username") && SystemConfig.isOptSet("retroachievements.token"))
+                        {
+                            ini.WriteValue("Achievements", "Username", SystemConfig["retroachievements.username"]);
+                            ini.WriteValue("Achievements", "ApiToken", SystemConfig["retroachievements.token"]);
+                        }
+                    }
+                    else
+                    {
+                        ini.WriteValue("Achievements", "Enabled", "False");
+                        ini.WriteValue("Achievements", "AchievementsEnabled", "False");
+                        ini.WriteValue("Achievements", "HardcoreEnabled", "False");
+                        ini.WriteValue("Achievements", "BadgesEnabled", "False");
+                        ini.WriteValue("Achievements", "ProgressEnabled", "False");
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private string GetGameCubeLangFromEnvironment()
         {
             var availableLanguages = new Dictionary<string, string>() 
             { 
@@ -253,15 +305,14 @@ namespace EmulatorLauncher
             var lang = GetCurrentLanguage();
             if (!string.IsNullOrEmpty(lang))
             {
-                string ret;
-                if (availableLanguages.TryGetValue(lang, out ret))
+                if (availableLanguages.TryGetValue(lang, out string ret))
                     return ret;
             }
 
             return "0";
         }
 
-        private int getWiiLangFromEnvironment()
+        private int GetWiiLangFromEnvironment()
         {
             var availableLanguages = new Dictionary<string, int>()
             {
@@ -271,28 +322,27 @@ namespace EmulatorLauncher
             var lang = GetCurrentLanguage();
             if (!string.IsNullOrEmpty(lang))
             {
-                int ret;
-                if (availableLanguages.TryGetValue(lang, out ret))
+                if (availableLanguages.TryGetValue(lang, out int ret))
                     return ret;
             }
 
             return 1;
         }
 
-        private void writeWiiSysconfFile(string path)
+        private void WriteWiiSysconfFile(string path)
         {
             if (!File.Exists(path))
                 return;
 
             SimpleLogger.Instance.Info("[INFO] Writing to wii system nand in : " + path);
 
-            int langId = 1;
+            int langId;
             int barPos = 0;
 
             if (SystemConfig.isOptSet("wii_language") && !string.IsNullOrEmpty(SystemConfig["wii_language"]))
                 langId = SystemConfig["wii_language"].ToInteger();
             else
-                langId = getWiiLangFromEnvironment();
+                langId = GetWiiLangFromEnvironment();
 
             if (SystemConfig.isOptSet("sensorbar_position") && !string.IsNullOrEmpty(SystemConfig["sensorbar_position"]))
                 barPos = SystemConfig["sensorbar_position"].ToInteger();
@@ -335,8 +385,7 @@ namespace EmulatorLauncher
             {
                 using (var ini = new IniFile(iniFile, IniOptions.UseSpaces | IniOptions.KeepEmptyValues))
                 {
-                    Rectangle emulationStationBounds;
-                    if (IsEmulationStationWindowed(out emulationStationBounds, true) && !SystemConfig.getOptBoolean("forcefullscreen"))
+                    if (IsEmulationStationWindowed(out Rectangle emulationStationBounds, true) && !SystemConfig.getOptBoolean("forcefullscreen"))
                     {
                         _windowRect = emulationStationBounds;
                         _bezelFileInfo = null;
@@ -382,8 +431,8 @@ namespace EmulatorLauncher
                     }
                     else
                     {
-                        ini.WriteValue("Core", "SelectedLanguage", getGameCubeLangFromEnvironment());
-                        ini.WriteValue("Core", "GameCubeLanguage", getGameCubeLangFromEnvironment());
+                        ini.WriteValue("Core", "SelectedLanguage", GetGameCubeLangFromEnvironment());
+                        ini.WriteValue("Core", "GameCubeLanguage", GetGameCubeLangFromEnvironment());
                     }
 
                     // Audio
@@ -512,6 +561,7 @@ namespace EmulatorLauncher
                                 ini.WriteValue("Core", "SIDevice" + i, "0");
                         }
                     }
+                    
                     // Disable auto updates
                     string updateTrack = ini.GetValue("AutoUpdate", "UpdateTrack");
                     if (updateTrack != "")
@@ -581,8 +631,7 @@ namespace EmulatorLauncher
                 }
             }
 
-            if (bezel != null)
-                bezel.Dispose();
+            bezel?.Dispose();
 
             return ret;
         }

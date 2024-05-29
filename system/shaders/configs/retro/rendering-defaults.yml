@@ -1,0 +1,59 @@
+## RETRO
+default:
+  # shader affects retroarch shaders
+  shaderGL: interpolation/sharp-bilinear-simple
+  shader: pixel-art-scaling/sharp-bilinear-simple
+  # ares
+  ares: pixel-art-scaling/sharp-bilinear-simple
+  # scanline affect fba2x
+  scanline: true
+# Reshader  
+model2:
+  shader: disabled
+model3:
+  shader: disabled
+# NINTENDO
+gba:
+  shader: handheld/bevel
+  ares: handheld/bevel
+gb:
+  shader: handheld/bevel
+  ares: handheld/bevel
+gb2players:
+  shader: handheld/bevel
+gbc:
+  shader: handheld/bevel
+  ares: handheld/bevel
+gbc2players:
+  shader: handheld/bevel
+3ds:
+  shader: reshade/nds
+nds:
+  shader: reshade/nds
+gc:
+  shader: anti-aliasing/fxaa
+wii:
+  shader: anti-aliasing/fxaa
+# Sega
+dreamcast:
+  shader: anti-aliasing/fxaa
+gamegear:
+  shader: handheld/simpletex_lcd+gbc-color
+  ares: handheld/simpletex_lcd+gbc-color
+#
+ngp:
+  shader: handheld/bevel
+  ares: handheld/bevel
+ngpc:
+  shader: handheld/bevel
+  ares: handheld/bevel
+lynx:
+  shader: handheld/bevel
+wswan:
+  shader: handheld/bevel
+  ares: handheld/bevel
+wswanc:
+  shader: handheld/bevel
+  ares: handheld/bevel
+psp:
+  shader: handheld/bevel

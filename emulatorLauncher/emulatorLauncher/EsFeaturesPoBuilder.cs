@@ -216,7 +216,7 @@ namespace EmulatorLauncher
                 "Report-Msgid-Bugs-To: \\n",
                 "POT-Creation-Date: 2021-12-16 12:57+0100\\n",
                 "PO-Revision-Date: \\n",
-                "Language-Team: Retrobat Team, PRO100BYTE Team\\n",
+                "Language-Team: RetroBat, ProjectArcade\\n",
                 "Language: %LANG%\\n",
                 "MIME-Version: 1.0\\n",
                 "Content-Type: text/plain; charset=UTF-8\\n",

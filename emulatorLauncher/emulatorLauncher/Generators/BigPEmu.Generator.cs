@@ -3,13 +3,16 @@ using System.IO;
 using System.Diagnostics;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
+using System.Linq;
+using System;
 
 namespace EmulatorLauncher
 {
-    class BigPEmuGenerator : Generator
+    partial class BigPEmuGenerator : Generator
     {
         private BezelFiles _bezelFileInfo;
         private ScreenResolution _resolution;
+        private string _path;
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
@@ -19,23 +22,49 @@ namespace EmulatorLauncher
             if (!File.Exists(exe))
                 return null;
 
+            string[] extensions = new string[] { ".cue", ".cdi", ".j64",".jag", ".rom", ".bin", ".prg", ".cof", ".abs" };
+            if (Path.GetExtension(rom).ToLowerInvariant() == ".zip" || Path.GetExtension(rom).ToLowerInvariant() == ".7z")
+            {
+                string uncompressedRomPath = this.TryUnZipGameIfNeeded(system, rom, false, false);
+                if (Directory.Exists(uncompressedRomPath))
+                {
+                    string[] romFiles = Directory.GetFiles(uncompressedRomPath).OrderBy(file => Array.IndexOf(extensions, Path.GetExtension(file).ToLowerInvariant())).ToArray();
+                    rom = romFiles.FirstOrDefault(file => extensions.Any(ext => Path.GetExtension(file).Equals(ext, StringComparison.OrdinalIgnoreCase)));
+                    ValidateUncompressedGame();
+                }
+            }
+
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
+            _path = path;
+
             //Applying bezels
-            if (!ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution))
-                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+            if (fullscreen && (!SystemConfig.isOptSet("bigpemu_renderer") || SystemConfig["bigpemu_renderer"] == "BigPEmu_Video_OpenGL"))
+            {
+                if (!ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution))
+                    _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+            }
+
+            else if (fullscreen && (SystemConfig["bigpemu_renderer"] == "BigPEmu_Video_D3D12"))
+            {
+                if (!ReshadeManager.Setup(ReshadeBezelType.dxgi, ReshadePlatform.x64, system, rom, path, resolution))
+                    _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+            }
 
             _resolution = resolution;
 
-            List<string> commandArray = new List<string>();
-
-            //arguments:
-            //first argument must always be the rom
-            //-localdata : specify to use the config file stored in "userdata" folder within emulator folder instead of the one in %APPDATA%
-            commandArray.Add("\"" + rom + "\"");
-            commandArray.Add("-localdata");
+            List<string> commandArray = new List<string>
+            {
+                //arguments:
+                //first argument must always be the rom
+                //-localdata : specify to use the config file stored in "userdata" folder within emulator folder instead of the one in %APPDATA%
+                "\"" + rom + "\"",
+                "-localdata"
+            };
 
             string args = string.Join(" ", commandArray);
 
-            SetupConfiguration(path, system, resolution);
+            SetupConfiguration(path, system, resolution, fullscreen);
 
             return new ProcessStartInfo()
             {
@@ -46,10 +75,8 @@ namespace EmulatorLauncher
         }
 
         //Configuration file in json format "BigPEmuConfig.bigpcfg"
-        private void SetupConfiguration(string path, string system, ScreenResolution resolution = null)
+        private void SetupConfiguration(string path, string system, ScreenResolution resolution = null, bool fullscreen = false)
         {
-            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
-
             //open userdata config file
             string folder = Path.Combine(path, "userdata");
             if (!Directory.Exists(folder))
@@ -64,6 +91,8 @@ namespace EmulatorLauncher
             {
                 var json = DynamicJson.Load(configfile);
                 var bigpemucore = json.GetOrCreateContainer("BigPEmuConfig");
+
+                BindFeature(bigpemucore, "VideoPlugin", "bigpemu_renderer", "BigPEmu_Video_OpenGL");
 
                 //system part
                 var jsonSystem = bigpemucore.GetOrCreateContainer("System");
@@ -135,6 +164,8 @@ namespace EmulatorLauncher
                 else
                     bigpemucore["ScreenEffect"] = "";
 
+                ConfigureControllers(bigpemucore);
+
                 //save
                 json.Save();
             }
@@ -149,12 +180,17 @@ namespace EmulatorLauncher
 
             int ret = base.RunAndWait(path);
 
-            if (bezel != null)
-                bezel.Dispose();
+            bezel?.Dispose();
 
             if (ret == 1)
+            {
+                ReshadeManager.UninstallReshader(ReshadeBezelType.opengl, _path);
+                ReshadeManager.UninstallReshader(ReshadeBezelType.dxgi, _path);
                 return 0;
+            }
 
+            ReshadeManager.UninstallReshader(ReshadeBezelType.opengl, _path);
+            ReshadeManager.UninstallReshader(ReshadeBezelType.dxgi, _path);
             return ret;
         }
     }

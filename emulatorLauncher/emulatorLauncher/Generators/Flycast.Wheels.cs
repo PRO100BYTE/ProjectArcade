@@ -4,8 +4,6 @@ using System.IO;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.Joysticks;
-using EmulatorLauncher.Common.EmulationStation;
-using System.Windows;
 
 namespace EmulatorLauncher
 {
@@ -23,6 +21,7 @@ namespace EmulatorLauncher
 
             bool isArcade = system != "dreamcast";
             bool serviceMenu = SystemConfig.isOptSet("flycast_service_menu") && SystemConfig.getOptBoolean("flycast_service_menu");
+            bool racingController = SystemConfig.isOptSet("flycast_racing_controller") && SystemConfig.getOptBoolean("flycast_racing_controller");
             List<Wheel> usableWheels = new List<Wheel>();
             string wheelTech1 = "sdl";
             string wheelTech2 = "sdl";
@@ -177,8 +176,8 @@ namespace EmulatorLauncher
                             switch (layout)
                             {
                                 case "triggers_ax":
-                                    analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Throttle, -1) + ":btn_trigger_right");
-                                    analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Brake, -1) + ":btn_trigger_left");
+                                    analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Throttle, -1) + (racingController ? ":btn_trigger2_right" : ":btn_trigger_right"));
+                                    analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Brake, -1) + (racingController ? ":btn_trigger2_left" : ":btn_trigger_left"));
                                     digitalBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Geardown) + ":btn_x");
                                     digitalBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Gearup) + ":btn_a");
                                     digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "b") + ":btn_b");
@@ -186,8 +185,8 @@ namespace EmulatorLauncher
                                     break;
 
                                 case "triggers_manual":
-                                    analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Throttle, -1) + ":btn_trigger_right");
-                                    analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Brake, -1) + ":btn_trigger_left");
+                                    analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Throttle, -1) + (racingController ? ":btn_trigger2_right" : ":btn_trigger_right"));
+                                    analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Brake, -1) + (racingController ? ":btn_trigger2_left" : ":btn_trigger_left"));
                                     digitalBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Gear4) + ":btn_b");
                                     digitalBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Gear2) + ":btn_a");
                                     digitalBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Gear3) + ":btn_y");
@@ -215,8 +214,8 @@ namespace EmulatorLauncher
 
                         else
                         {
-                            analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Throttle, -1) + ":btn_trigger_right");
-                            analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Brake, -1) + ":btn_trigger_left");
+                            analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Throttle, -1) + (racingController ? ":btn_trigger2_right" : ":btn_trigger_right"));
+                            analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Brake, -1) + (racingController ? ":btn_trigger2_left" : ":btn_trigger_left"));
                             digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "b") + ":btn_b");
                             digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "a") + ":btn_a");
                             digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "y") + ":btn_y");
@@ -231,13 +230,91 @@ namespace EmulatorLauncher
                     {
                         analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Steer, -1) + ":btn_analog_left");
                         analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Steer, 1) + ":btn_analog_right");
-                        analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Throttle, -1) + ":btn_trigger_right");
-                        analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Brake, -1) + ":btn_trigger_left");
+                        analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Throttle, -1) + (racingController ? ":btn_trigger2_right" : ":btn_trigger_right"));
+                        analogBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Brake, -1) + (racingController ? ":btn_trigger2_left" : ":btn_trigger_left"));
 
                         digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "dpleft") + ":btn_dpad1_left");
                         digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "dpright") + ":btn_dpad1_right");
 
-                        if (SystemConfig.isOptSet("flycast_arcadewheel_layout") && !string.IsNullOrEmpty(SystemConfig["flycast_arcadewheel_layout"]))
+                        if (!SystemConfig.isOptSet("flycast_arcadewheel_layout"))
+                        {
+                            if (_romName.StartsWith("initd"))
+                            {
+                                digitalBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Geardown) + ":btn_b");
+                                digitalBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Gearup) + ":btn_a");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "y") + ":btn_dpad1_down");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "x") + ":insert_card");
+                            }
+                            else if (_romName.StartsWith("18wheel"))
+                            {
+                                digitalBinds.Add(GetWheelKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Gearup) + ":btn_b");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Geardown) + ":btn_c");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "b") + ":btn_a");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "y") + ":btn_dpad1_down");
+                            }
+                            else if (_romName.StartsWith("crzyt"))
+                            {
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Geardown) + ":btn_dpad1_down");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Gearup) + ":btn_dpad1_up");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "y") + ":btn_c");
+                            }
+                            else if (_romName.StartsWith("f355"))
+                            {
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Geardown) + ":btn_a");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Gearup) + ":btn_b");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "y") + ":btn_c");
+                            }
+                            else if (_romName == "tokyobus")
+                            {
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Geardown) + ":btn_b");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Gearup) + ":btn_c");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "y") + ":btn_dpad1_down");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "a") + ":btn_a");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "x") + ":btn_y");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "b") + ":btn_z");
+                            }
+                            else if (_romName.StartsWith("wrungp"))
+                            {
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.DpadUp) + ":axis2_up");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.DpadDown) + ":axis2_down");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Geardown) + ":axis2_left");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Gearup) + ":axis2_right");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "y") + ":btn_dpad1_up");
+                            }
+                            else if (_romName == "ftspeed")
+                            {
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Geardown) + ":btn_dpad1_down");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Gearup) + ":btn_dpad1_up");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "b") + ":btn_a");
+                            }
+                            else if (_romName == "maxspeed")
+                            {
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Geardown) + ":btn_dpad1_down");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Gearup) + ":btn_dpad1_up");
+                            }
+                            else if (_romName.StartsWith("clubk"))
+                            {
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "a") + ":btn_b");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "x") + ":insert_card");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "y") + ":btn_dpad1_down");
+                            }
+                            else if (_romName.StartsWith("kingrt66"))
+                            {
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Geardown) + ":btn_c");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, wheelmapping1.Gearup) + ":btn_x");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "a") + ":btn_a");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "b") + ":btn_b");
+                            }
+                            else if (_romName == "wldrider")
+                            {
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "y") + ":btn_dpad1_down");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "b") + ":btn_dpad1_up");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "a") + ":btn_a");
+                                digitalBinds.Add(GetDinputKeyName(sdlWheel1, wheel1, wheelmapping1, "x") + ":btn_b");
+                            }
+                        }
+
+                        else if (SystemConfig.isOptSet("flycast_arcadewheel_layout") && !string.IsNullOrEmpty(SystemConfig["flycast_arcadewheel_layout"]))
                         {
                             string layout = SystemConfig["flycast_arcadewheel_layout"];
 
@@ -313,7 +390,11 @@ namespace EmulatorLauncher
                 }
 
                 ini.WriteValue("input", "maple_sdl_joystick_" + wheelIndex1, "0");
-                ini.WriteValue("input", "device1", "0");
+
+                if (racingController == false && SystemConfig["flycast_controller1"] == "15")
+                    racingController = true;
+
+                ini.WriteValue("input", "device1", racingController ? "15" : "0");
                 ini.WriteValue("input", "device1.1", "1");
 
                 if (SystemConfig.isOptSet("flycast_extension1") && !string.IsNullOrEmpty(SystemConfig["flycast_extension1"]))
@@ -405,8 +486,8 @@ namespace EmulatorLauncher
                             switch (layout)
                             {
                                 case "triggers_ax":
-                                    analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Throttle, -1) + ":btn_trigger_right");
-                                    analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Brake, -1) + ":btn_trigger_left");
+                                    analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Throttle, -1) + (racingController ? ":btn_trigger2_right" : ":btn_trigger_right"));
+                                    analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Brake, -1) + (racingController ? ":btn_trigger2_left" : ":btn_trigger_left"));
                                     digitalBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Geardown) + ":btn_x");
                                     digitalBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Gearup) + ":btn_a");
                                     digitalBinds.Add(GetDinputKeyName(sdlWheel2, wheel2, wheelmapping2, "b") + ":btn_b");
@@ -414,8 +495,8 @@ namespace EmulatorLauncher
                                     break;
 
                                 case "triggers_manual":
-                                    analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Throttle, -1) + ":btn_trigger_right");
-                                    analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Brake, -1) + ":btn_trigger_left");
+                                    analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Throttle, -1) + (racingController ? ":btn_trigger2_right" : ":btn_trigger_right"));
+                                    analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Brake, -1) + (racingController ? ":btn_trigger2_left" : ":btn_trigger_left"));
                                     digitalBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Gear4) + ":btn_b");
                                     digitalBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Gear2) + ":btn_a");
                                     digitalBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Gear3) + ":btn_y");
@@ -443,8 +524,8 @@ namespace EmulatorLauncher
 
                         else
                         {
-                            analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Throttle, -1) + ":btn_trigger_right");
-                            analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Brake, -1) + ":btn_trigger_left");
+                            analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Throttle, -1) + (racingController ? ":btn_trigger2_right" : ":btn_trigger_right"));
+                            analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Brake, -1) + (racingController ? ":btn_trigger2_left" : ":btn_trigger_left"));
                             digitalBinds.Add(GetDinputKeyName(sdlWheel2, wheel2, wheelmapping2, "b") + ":btn_b");
                             digitalBinds.Add(GetDinputKeyName(sdlWheel2, wheel2, wheelmapping2, "a") + ":btn_a");
                             digitalBinds.Add(GetDinputKeyName(sdlWheel2, wheel2, wheelmapping2, "y") + ":btn_y");
@@ -459,8 +540,8 @@ namespace EmulatorLauncher
                     {
                         analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Steer, -1) + ":btn_analog_left");
                         analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Steer, 1) + ":btn_analog_right");
-                        analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Throttle, -1) + ":btn_trigger_right");
-                        analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Brake, -1) + ":btn_trigger_left");
+                        analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Throttle, -1) + (racingController ? ":btn_trigger2_right" : ":btn_trigger_right"));
+                        analogBinds.Add(GetWheelKeyName(sdlWheel2, wheel2, wheelmapping2, wheelmapping2.Brake, -1) + (racingController ? ":btn_trigger2_left" : ":btn_trigger_left"));
 
                         digitalBinds.Add(GetDinputKeyName(sdlWheel2, wheel2, wheelmapping2, "dpleft") + ":btn_dpad1_left");
                         digitalBinds.Add(GetDinputKeyName(sdlWheel2, wheel2, wheelmapping2, "dpright") + ":btn_dpad1_right");
@@ -540,8 +621,13 @@ namespace EmulatorLauncher
                     ctrlini.Save();
                 }
 
+                if (racingController == false && SystemConfig["flycast_controller2"] == "15")
+                    racingController = true;
+                else if (racingController == false && SystemConfig["flycast_controller2"] != "15")
+                    racingController = false;
+
                 ini.WriteValue("input", "maple_sdl_joystick_" + wheelIndex2, "1");
-                ini.WriteValue("input", "device2", "0");
+                ini.WriteValue("input", "device2", racingController ? "15" : "0");
                 ini.WriteValue("input", "device2.1", "1");
 
                 if (SystemConfig.isOptSet("flycast_extension2") && !string.IsNullOrEmpty(SystemConfig["flycast_extension2"]))

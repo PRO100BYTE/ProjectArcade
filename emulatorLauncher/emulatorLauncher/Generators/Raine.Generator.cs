@@ -41,9 +41,10 @@ namespace EmulatorLauncher
 
             SetupSettings(fullscreen);
 
-            var commandArray = new List<string>();
-            
-            commandArray.Add("-n");
+            var commandArray = new List<string>
+            {
+                "-n"
+            };
 
             if (fullscreen)
             {
@@ -77,12 +78,14 @@ namespace EmulatorLauncher
 
             int ret = base.RunAndWait(path);
 
-            if (bezel != null)
-                bezel.Dispose();
+            bezel?.Dispose();
 
             if (ret == 1)
+            {
+                ReshadeManager.UninstallReshader(ReshadeBezelType.opengl, path.WorkingDirectory);
                 return 0;
-
+            }
+            ReshadeManager.UninstallReshader(ReshadeBezelType.opengl, path.WorkingDirectory);
             return ret;
         }
 

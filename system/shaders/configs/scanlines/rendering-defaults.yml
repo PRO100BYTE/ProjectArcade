@@ -1,0 +1,83 @@
+## SCANLINES
+default:
+  # libretro
+  shader: crt/GritsScanlines
+  # ares
+  ares: crt/GritsScanlines
+  # emulators using reshader 
+  m2emulator: ScanlinesAbs@scanlines-abs.fx
+  supermodel: ScanlinesAbs@scanlines-abs.fx
+  hypseus: ScanlinesAbs@scanlines-abs.fx
+  daphne: ScanlinesAbs@scanlines-abs.fx
+  oricutron: ScanlinesAbs@scanlines-abs.fx
+  applewin: ScanlinesAbs@scanlines-abs.fx
+  gsplus: ScanlinesAbs@scanlines-abs.fx
+  mednafen: ScanlinesAbs@scanlines-abs.fx
+  scummvm: ScanlinesAbs@scanlines-abs.fx
+  simcoupe: ScanlinesAbs@scanlines-abs.fx 
+  demul: ScanlinesAbs@scanlines-abs.fx
+  phoenix: ScanlinesAbs@scanlines-abs.fx
+  bigpemu: ScanlinesAbs@scanlines-abs.fx
+  demul-old: ScanlinesAbs@scanlines-abs.fx
+  solarus: ScanlinesAbs@scanlines-abs.fx
+  redream: ScanlinesAbs@scanlines-abs.fx
+  raine: ScanlinesAbs@scanlines-abs.fx
+  duckstation: ScanlinesAbs@scanlines-abs.fx
+  mupen64: ScanlinesAbs@scanlines-abs.fx
+  xemu: ScanlinesAbs@scanlines-abs.fx
+  ikemen: ScanlinesAbs@scanlines-abs.fx
+n64:
+  shaderGL: interpolation/sharp-bilinear-scanlines
+  shader: pixel-art-scaling/sharp-bilinear-scanlines
+  ares: pixel-art-scaling/sharp-bilinear-scanlines
+gba:
+  shader: handheld/lcd-grid-v2
+  ares: handheld/lcd-grid-v2
+gb:
+  shader: handheld/lcd-grid-v2
+  ares: handheld/lcd-grid-v2
+gb2players:
+  shader: handheld/lcd-grid-v2
+gbc:
+  shader: handheld/lcd-grid-v2
+  ares: handheld/lcd-grid-v2
+gbc2players:
+  shader: handheld/lcd-grid-v2
+nds:
+  shader: handheld/lcd-grid-v2-nds-color
+3ds:
+  shader: handheld/lcd-shader
+virtualboy:
+  shaderGL: interpolation/sharp-bilinear-scanlines
+  shader: pixel-art-scaling/sharp-bilinear-scanlines
+gc:
+  shader: anti-aliasing/fxaa
+wii:
+  shader: anti-aliasing/fxaa
+dreamcast:
+  shader: anti-aliasing/fxaa
+  redream: ScanlinesAbs@scanlines-abs.fx
+gamegear:
+  shader: handheld/lcd-grid-v2
+  ares: handheld/lcd-grid-v2
+ngp:
+  shader: handheld/lcd-grid-v2
+  ares: handheld/lcd-grid-v2
+ngpc:
+  shader: handheld/lcd-grid-v2
+  ares: handheld/lcd-grid-v2
+gw:
+  shader: handheld/lcd-grid-v2
+lynx:
+  shader: handheld/lcd-grid-v2
+  mednafen: ScanlinesAbs@scanlines-abs.fx
+wswan:
+  shader: handheld/lcd-grid-v2
+  ares: handheld/lcd-grid-v2
+  mednafen: ScanlinesAbs@scanlines-abs.fx
+wswanc:
+  shader: handheld/lcd-grid-v2
+  ares: handheld/lcd-grid-v2
+  mednafen: ScanlinesAbs@scanlines-abs.fx
+psp:
+  shader: handheld/lcd-grid-v2

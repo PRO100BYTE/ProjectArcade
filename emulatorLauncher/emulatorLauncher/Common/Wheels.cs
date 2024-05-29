@@ -71,7 +71,17 @@ namespace EmulatorLauncher
             { "VID_044F&PID_B651", WheelType.ThrustmasterFerrariGT },               // Ferrari GT
             { "VID_044F&PID_B653", WheelType.ThrustmasterRallyGT },                 // Rally GT
             { "VID_044F&PID_B654", WheelType.ThrustmasterFerrariGT },               // Ferrari GT
-            { "VID_044F&PID_B677", WheelType.ThrustmasterT150 }                     // T150
+            { "VID_044F&PID_B677", WheelType.ThrustmasterT150 },                    // T150
+            { "VID_044F&PID_B66E", WheelType.ThrustmasterT300RS }                   // T300RS
+        };
+
+        public static List<WheelType> shifterOtherDevice = new List<WheelType>
+        {
+            WheelType.ThrustmasterT300RS,
+            WheelType.ThrustmasterT150,
+            WheelType.ThrustmasterRallyGT,
+            WheelType.ThrustmasterFerrariGT,
+            WheelType.ThrustmasterForceFeedbackRacing,
         };
     }
 
@@ -86,6 +96,7 @@ namespace EmulatorLauncher
         LogitechDrivingForceGT,
         LogitechG25,
         LogitechDrivingForce,
+        ThrustmasterT300RS,
         ThrustmasterT150,
         ThrustmasterRallyGT,
         LogitechMomo,

@@ -1,0 +1,67 @@
+## ZFAST
+default:
+  # libretro
+  shader: crt/zfast-crt
+  # ares
+  ares: crt/zfast-crt
+  # emulators using reshader 
+  mednafen: EasymodeCRT@CRTEasymode.fx
+  m2emulator: EasymodeCRT@CRTEasymode.fx
+  supermodel: EasymodeCRT@CRTEasymode.fx
+  hypseus: EasymodeCRT@CRTEasymode.fx
+  daphne: EasymodeCRT@CRTEasymode.fx
+  oricutron: EasymodeCRT@CRTEasymode.fx
+  applewin: EasymodeCRT@CRTEasymode.fx  
+  gsplus: EasymodeCRT@CRTEasymode.fx
+  scummvm: EasymodeCRT@CRTEasymode.fx
+  simcoupe: EasymodeCRT@CRTEasymode.fx
+  bigpemu: EasymodeCRT@CRTEasymode.fx
+  phoenix: EasymodeCRT@CRTEasymode.fx
+  bigpemu: EasymodeCRT@CRTEasymode.fx
+  demul: EasymodeCRT@CRTEasymode.fx
+  demul-old: EasymodeCRT@CRTEasymode.fx
+  solarus: EasymodeCRT@CRTEasymode.fx
+  redream: EasymodeCRT@CRTEasymode.fx
+  raine: EasymodeCRT@CRTEasymode.fx
+  duckstation: EasymodeCRT@CRTEasymode.fx
+  mupen64: EasymodeCRT@CRTEasymode.fx
+  xemu: EasymodeCRT@CRTEasymode.fx
+  ikemen: EasymodeCRT@CRTEasymode.fx
+# per system overrides  
+gba:
+  shader: handheld/zfast-lcd
+  ares: handheld/zfast-lcd
+gb:
+  shader: handheld/zfast-lcd
+  ares: handheld/zfast-lcd
+gb2players:
+  shader: handheld/zfast-lcd
+gbc:
+  shader: handheld/zfast-lcd
+  ares: handheld/zfast-lcd
+gbc2players:
+  shader: handheld/zfast-lcd
+3ds:
+  shader: handheld/zfast-lcd
+nds:
+  shader: handheld/zfast-lcd
+gamegear:
+  shader: handheld/zfast-lcd
+  ares: handheld/zfast-lcd
+ngp:
+  shader: handheld/zfast-lcd
+  ares: handheld/zfast-lcd
+ngpc:
+  shader: handheld/zfast-lcd
+  ares: handheld/zfast-lcd
+lynx:
+  shader: handheld/zfast-lcd
+  mednafen: EasymodeCRT@CRTEasymode.fx
+wswan:
+  shader: handheld/zfast-lcd
+  ares: handheld/zfast-lcd
+  mednafen: EasymodeCRT@CRTEasymode.fx
+wswanc:
+  shader: handheld/zfast-lcd
+  ares: handheld/zfast-lcd
+  mednafen: EasymodeCRT@CRTEasymode.fx

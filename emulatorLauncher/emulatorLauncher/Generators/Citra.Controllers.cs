@@ -33,7 +33,7 @@ namespace EmulatorLauncher
             if (_sdlVersion == SdlVersion.SDL2_26 && sdlControllerNameMap.ContainsKey(controller.Name))
                 controller.Name = sdlControllerNameMap[controller.Name];
 
-            var guid = controller.GetSdlGuid(SdlVersion.SDL2_26, true);
+            var guid = controller.GetSdlGuid(_sdlVersion, true);
             var citraGuid = guid.ToString().ToLowerInvariant();
 
             //only 1 player so profile is fixed to 1
@@ -99,9 +99,9 @@ namespace EmulatorLauncher
             ProcessStick(controller, profile, "c_stick", ini, citraGuid);
             
             //motion
-            if (SystemConfig.isOptSet("citra_motion") && !string.IsNullOrEmpty(SystemConfig["citra_motion"]))
+            if (SystemConfig.isOptSet("n3ds_motion") && !string.IsNullOrEmpty(SystemConfig["n3ds_motion"]))
             {
-                switch (SystemConfig["citra_motion"])
+                switch (SystemConfig["n3ds_motion"])
                 {
                     case "cemuhook":
                         ini.WriteValue("Controls", profile + "motion_device" + "\\default", "false");
@@ -282,7 +282,7 @@ namespace EmulatorLauncher
             ini.WriteValue("Controls", "touch_from_button_maps\\size", "1");
         }
 
-        static Dictionary<string, string> DefKeys = new Dictionary<string, string>()
+        /*static Dictionary<string, string> DefKeys = new Dictionary<string, string>()
         {
             { "button_a", "code:65,engine:keyboard" },
             { "button_b","code:83,engine:keyboard" },
@@ -303,9 +303,9 @@ namespace EmulatorLauncher
             { "button_home","code:66,engine:keyboard" },
             { "circle_pad","down:code$016777237$1engine$0keyboard,engine:analog_from_button,left:code$016777234$1engine$0keyboard,modifier:code$068$1engine$0keyboard,modifier_scale:0.500000,right:code$016777236$1engine$0keyboard,up:code$016777235$1engine$0keyboard" },
             { "c_stick","down:code$075$1engine$0keyboard,engine:analog_from_button,left:code$074$1engine$0keyboard,modifier:code$068$1engine$0keyboard,modifier_scale:0.500000,right:code$076$1engine$0keyboard,up:code$073$1engine$0keyboard" }, 
-        };
+        };*/
 
-        static InputKeyMapping Mapping = new InputKeyMapping()
+        static readonly InputKeyMapping Mapping = new InputKeyMapping()
         {
             { InputKey.b,               "button_a" },
             { InputKey.a,               "button_b" },
@@ -321,13 +321,13 @@ namespace EmulatorLauncher
             { InputKey.select,          "button_select" },
         };
 
-        static InputKeyMapping Zmapping = new InputKeyMapping()
+        static readonly InputKeyMapping Zmapping = new InputKeyMapping()
         {
             { InputKey.l2,               "button_zl" },
             { InputKey.r2,               "button_zr" },
         };
 
-        static Dictionary<string, string> sdlControllerNameMap = new Dictionary<string, string>()
+        static readonly Dictionary<string, string> sdlControllerNameMap = new Dictionary<string, string>()
         {
             { "DualSense Wireless Controller", "PS5 Controller" },
         };

@@ -12,9 +12,12 @@ namespace EmulatorLauncher
 {
     partial class CxbxGenerator : Generator
     {
-        #region XboxIsoVfs management
-        private string _dokanDriveLetter;
+        public CxbxGenerator()
+        {
+            DependsOnDesktopResolution = false;
+        }
 
+        #region XboxIsoVfs management
         private string MountIso(string rom)
         {
             if (Path.GetExtension(rom).ToLowerInvariant() != ".iso")
@@ -39,9 +42,7 @@ namespace EmulatorLauncher
                 throw new ApplicationException("Dokan 2 is required and is not installed");
             }
 
-            var drive = FileTools.FindFreeDriveLetter();
-            if (drive == null)
-                throw new ApplicationException("Unable to find a free drive letter to mount");
+            var drive = FileTools.FindFreeDriveLetter() ?? throw new ApplicationException("Unable to find a free drive letter to mount");
 
             var xboxIsoVfs = Process.Start(new ProcessStartInfo()
             {
@@ -63,8 +64,6 @@ namespace EmulatorLauncher
                 if (Directory.Exists(drive))
                 {
                     Job.Current.AddProcess(xboxIsoVfs);
-
-                    _dokanDriveLetter = drive;
                     return drive;
                 }
 
@@ -83,14 +82,18 @@ namespace EmulatorLauncher
 
         private ScreenResolution _resolution;
         private BezelFiles _bezelFileInfo;
-        private bool _isUsingCxBxLoader = true;
+        private bool _isUsingCxBxLoader;
+        private bool _chihiro = false;
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
             string path = null;
 
             if ((core != null && core == "chihiro") || (emulator != null && emulator == "chihiro"))
+            {
                 path = AppConfig.GetFullPath("chihiro");
+                _chihiro = true;
+            }
 
             if (string.IsNullOrEmpty(path))
                 path = AppConfig.GetFullPath("cxbx-reloaded");
@@ -101,6 +104,7 @@ namespace EmulatorLauncher
             _isUsingCxBxLoader = true;
 
             string exe = Path.Combine(path, "cxbxr-ldr.exe");
+
             if (!File.Exists(exe))
             {
                 _isUsingCxBxLoader = false;
@@ -136,12 +140,10 @@ namespace EmulatorLauncher
             //Configuration of .ini file
             using (var ini = IniFile.FromFile(Path.Combine(path, "settings.ini"), IniOptions.KeepEmptyValues | IniOptions.AllowDuplicateValues | IniOptions.UseSpaces))
             {
-                var res = resolution;
-                if (res == null)
-                    res = ScreenResolution.CurrentResolution;
+                var res = resolution ?? ScreenResolution.CurrentResolution;
 
                 //Fulscreen Management
-                if (_isUsingCxBxLoader)
+                if (_isUsingCxBxLoader && !_chihiro)
                     ini.WriteValue("video", "FullScreen", "false");
                 else
                 {
@@ -208,7 +210,7 @@ namespace EmulatorLauncher
         /// <summary>
         /// Get XBOX language to write to eeprom, value from features or default language of ES.
         /// </summary>
-        private int getXboxLangFromEnvironment()
+        private int GetXboxLangFromEnvironment()
         {
             var availableLanguages = new Dictionary<string, int>()
             {
@@ -227,8 +229,7 @@ namespace EmulatorLauncher
             var lang = GetCurrentLanguage();
             if (!string.IsNullOrEmpty(lang))
             {
-                int ret;
-                if (availableLanguages.TryGetValue(lang, out ret))
+                if (availableLanguages.TryGetValue(lang, out int ret))
                     return ret;
             }
 
@@ -244,12 +245,12 @@ namespace EmulatorLauncher
             if (!File.Exists(path))
                 return;
 
-            int langId = 1;
+            int langId;
 
             if (SystemConfig.isOptSet("xbox_language") && !string.IsNullOrEmpty(SystemConfig["xbox_language"]))
                 langId = SystemConfig["xbox_language"].ToInteger();
             else
-                langId = getXboxLangFromEnvironment();
+                langId = GetXboxLangFromEnvironment();
 
             // Read eeprom file
             byte[] bytes = File.ReadAllBytes(path);
@@ -348,11 +349,9 @@ namespace EmulatorLauncher
                 }
             }
 
-            if (process != null)
-                process.WaitForExit();
+            process?.WaitForExit();
 
-            if (bezel != null)
-                bezel.Dispose();
+            bezel?.Dispose();
 
             if (process != null)
             {

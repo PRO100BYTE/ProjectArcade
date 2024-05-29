@@ -36,12 +36,12 @@ namespace EmulatorLauncher
                 return;
 
             if (controller.IsKeyboard)
-                ConfigureKeyboard(ini, controller.Config, controller.PlayerIndex);
+                ConfigureKeyboard(controller.Config);
             else
                 ConfigureJoystick(ini, controller, controller.PlayerIndex);
         }
 
-        private void ConfigureKeyboard(IniFile ini, InputConfig keyboard, int playerindex)
+        private void ConfigureKeyboard(InputConfig keyboard)
         {
             if (keyboard == null)
                 return;
@@ -60,8 +60,8 @@ namespace EmulatorLauncher
                 return;
 
             // Initializing controller information
-            string guid = (ctrl.Guid.ToString()).Substring(0, 27) + "00000";
-            SdlToDirectInput controller = null;
+            string guid = (ctrl.Guid.ToString()).Substring(0, 24) + "00000000";
+            SdlToDirectInput controller;
             int index = ctrl.DirectInput != null ? ctrl.DirectInput.JoystickID : ctrl.DeviceIndex;
             string joyNb = "Joypad" + playerindex;
             bool isxinput = ctrl.IsXInputDevice;
@@ -76,7 +76,6 @@ namespace EmulatorLauncher
             if (!File.Exists(gamecontrollerDB))
             {
                 SimpleLogger.Instance.Info("[INFO] gamecontrollerdb.txt file not found in tools folder. Controller mapping will not be available.");
-                gamecontrollerDB = null;
                 return;
             }
             else

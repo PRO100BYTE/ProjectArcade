@@ -27,11 +27,11 @@ namespace EmulatorLauncher
                 ini.ClearSection("player2");
 
                 foreach (var controller in this.Controllers.OrderBy(i => i.PlayerIndex).Take(2))
-                    ConfigureInput(controller, ini, path);
+                    ConfigureInput(controller, ini);
             }
         }
 
-        private void ConfigureInput(Controller controller, IniFile ini, string path)
+        private void ConfigureInput(Controller controller, IniFile ini)
         {
             if (controller == null || controller.Config == null)
                 return;
@@ -39,11 +39,11 @@ namespace EmulatorLauncher
             if (controller.IsKeyboard)
                 return;
             else
-                ConfigureJoystick(controller, ini, path);
+                ConfigureJoystick(controller, ini);
 
         }
 
-        private void ConfigureJoystick(Controller ctrl, IniFile ini, string path)
+        private void ConfigureJoystick(Controller ctrl, IniFile ini)
         {
             if (ctrl == null)
                 return;
@@ -53,7 +53,7 @@ namespace EmulatorLauncher
                 return;
 
             string gamecontrollerDB = Path.Combine(AppConfig.GetFullPath("tools"), "gamecontrollerdb.txt");
-            string guid1 = (ctrl.Guid.ToString()).Substring(0, 27) + "00000";
+            string guid1 = (ctrl.Guid.ToString()).Substring(0, 24) + "00000000";
             SdlToDirectInput controller = null;
 
             SimpleLogger.Instance.Info("[INFO] Player " + ctrl.PlayerIndex + ". Fetching gamecontrollerdb.txt file with guid : " + guid1);
@@ -301,7 +301,7 @@ namespace EmulatorLauncher
             return "null";
         }
 
-        private static Dictionary<string, string> esToDinput = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> esToDinput = new Dictionary<string, string>()
         {
             { "a", "a" },
             { "b", "b" },
@@ -337,10 +337,7 @@ namespace EmulatorLauncher
 
         private static string GetInputKeyName(Controller c, InputKey key, string joy)
         {
-            Int64 pid = -1;
-
-            bool revertAxis = false;
-            key = key.GetRevertedAxis(out revertAxis);
+            Int64 pid;
 
             var input = c.GetDirectInputMapping(key);
             if (input == null)

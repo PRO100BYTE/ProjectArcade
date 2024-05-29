@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.Common.Joysticks;
@@ -10,19 +11,34 @@ namespace EmulatorLauncher
     partial class RyujinxGenerator : Generator
     {
         /// <summary>
-        /// cf. https://github.com/Ryujinx/Ryujinx/blob/master/Ryujinx.SDL2.Common/SDL2Driver.cs#L61
+        /// cf. https://github.com/Ryujinx/Ryujinx/blob/master/src/Ryujinx.SDL2.Common/SDL2Driver.cs#L56
         /// </summary>
         private void UpdateSdlControllersWithHints()
         {
-            var hints = new List<string>();            
-            hints.Add("SDL_HINT_JOYSTICK_HIDAPI_PS4_RUMBLE = 1");
-            hints.Add("SDL_HINT_JOYSTICK_HIDAPI_PS5_RUMBLE = 1");
-            hints.Add("SDL_HINT_JOYSTICK_HIDAPI_JOY_CONS = 1");
-            hints.Add("SDL_HINT_JOYSTICK_HIDAPI_COMBINE_JOY_CONS = 1");
+            string dllPath = Path.Combine(_emulatorPath, "SDL2.dll");
+            _sdlVersion = SdlJoystickGuidManager.GetSdlVersion(dllPath);
 
-            SdlGameController.ReloadWithHints(string.Join(",", hints));
-            Program.Controllers.ForEach(c => c.ResetSdlController());
+            if (Program.Controllers.Count(c => !c.IsKeyboard) == 0)
+                return;
+
+            var hints = new List<string>
+            {
+                "SDL_HINT_JOYSTICK_HIDAPI_PS4_RUMBLE = 1",
+                "SDL_HINT_JOYSTICK_HIDAPI_PS5_RUMBLE = 1",
+                "SDL_HINT_JOYSTICK_HIDAPI_SWITCH_HOME_LED = 0",
+                "SDL_HINT_JOYSTICK_HIDAPI_JOY_CONS = 1",
+                "SDL_HINT_JOYSTICK_HIDAPI_COMBINE_JOY_CONS = 1"
+            };            
+            
+            _sdlMapping = SdlDllControllersMapping.FromDll(dllPath, string.Join(",", hints));
+            if (_sdlMapping == null)
+            {
+                SdlGameController.ReloadWithHints(string.Join(",", hints));
+                Program.Controllers.ForEach(c => c.ResetSdlController());
+            }
         }
+
+        private SdlDllControllersMapping _sdlMapping;
 
         private void CreateControllerConfiguration(DynamicJson json)
         {
@@ -50,7 +66,6 @@ namespace EmulatorLauncher
         /// <param name="input_configs"></param>
         private void ConfigureInput(DynamicJson json, Controller c, List<DynamicJson> input_configs)
         {
-
             if (c == null || c.Config == null)
                 return;
 
@@ -189,16 +204,14 @@ namespace EmulatorLauncher
 
             bool handheld = playerType == "Handheld";
 
-            //Define tech (SDL or XInput)
+            // Define tech (SDL or XInput)
             string tech = c.IsXInputDevice ? "XInput" : "SDL";
 
-            //Get controller index (index is equal to 0 and ++ for each repeated guid)
+            // Get controller index (index is equal to 0 and ++ for each repeated guid)
             int index = 0;
-            List<Controller> same_pad = this.Controllers.Where(i => i.Config != null && i.Guid == c.Guid && !i.IsKeyboard).OrderBy(j => j.DeviceIndex).ToList();
+            var same_pad = this.Controllers.Where(i => i.Config != null && i.Guid == c.Guid && !i.IsKeyboard).OrderBy(j => j.DeviceIndex).ToList();
             if (same_pad.Count > 1)
-            {
                 index = same_pad.IndexOf(c);
-            }
             
             //Build input_config section
             var input_config = new DynamicJson();
@@ -313,14 +326,22 @@ namespace EmulatorLauncher
             
             input_config.SetObject("right_joycon", right_joycon);
 
-            //player identification part
-            //get guid in system.guid format
-            string guid = c.GetSdlGuid(_sdlVersion, true);
-            var newguid = SdlJoystickGuidManager.FromSdlGuidString(guid);
+            // Player identification part
+            // Get guid in system.guid format
+            string guid = (_sdlVersion == SdlVersion.Unknown && c.SdlController.Guid != null) ? c.SdlController.Guid.ToString() : c.GetSdlGuid(_sdlVersion, true);
+
+            if (_sdlMapping != null)
+            {
+                var sdlTrueGuid = _sdlMapping.GetControllerGuid(c.DevicePath);
+                if (sdlTrueGuid != null)
+                    guid = sdlTrueGuid.ToString();
+            }
+
+            var newGuid = SdlJoystickGuidManager.FromSdlGuidString(guid);
 
             input_config["version"] = "1";
             input_config["backend"] = "GamepadSDL2";
-            input_config["id"] = index + "-" + newguid.ToString();
+            input_config["id"] = index + "-" + newGuid.ToString();
             input_config["controller_type"] = playerType;
             input_config["player_index"] = handheld ? "Handheld" : "Player" + playerIndex;
 
@@ -331,7 +352,7 @@ namespace EmulatorLauncher
 
         private static string GetInputKeyName(Controller c, InputKey key, string tech)
         {
-            Int64 pid = -1;
+            Int64 pid;
 
             var input = c.Config[key];
             if (input != null)
@@ -463,7 +484,7 @@ namespace EmulatorLauncher
                 case 0x40000052: return "Up";
                 case 0x40000053: return "NumLock";
                 case 0x40000054: return "KeypadDivide";
-                case 0x40000055: return "KeypadMultiply*";
+                case 0x40000055: return "KeypadMultiply";
                 case 0x40000056: return "KeypadSubtract";
                 case 0x40000057: return "KeypadAdd";
                 case 0x40000058: return "Enter";

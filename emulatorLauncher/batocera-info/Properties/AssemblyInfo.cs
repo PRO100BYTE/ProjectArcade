@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("batocera-info")]
-[assembly: AssemblyDescription("batocera-info for ProjectArcade")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("PRO100BYTE Team")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("batocera-info")]
-[assembly: AssemblyCopyright("Copyright © PRO100BYTE Team 2023-2024")]
-[assembly: AssemblyTrademark("ProjectArcade by PRO100BYTE Team")]
+[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

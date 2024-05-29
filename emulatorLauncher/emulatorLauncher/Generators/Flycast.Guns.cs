@@ -9,6 +9,12 @@ namespace EmulatorLauncher
 {
     partial class FlycastGenerator
     {
+        private static readonly List<string> reloadWithButtonB = new List<string> 
+        { "confmiss", "hotd2", "hotd2e", "hotd2o", "hotd2p", "manicpnc", "mok", "otrigger", "tduno", "tduno2", "zunou", "claychal", 
+            "rangrmsn", "sprtshot", "waidrive", "xtrmhnt2", "xtrmhunt" };
+        private static readonly List<string> useXandB = new List<string> { "kick4csh" };
+        private static readonly List<string> useXandA = new List<string> { "shootopl", "shootpl", "shootplm", "shootplmp" };
+
         private void ConfigureFlycastGuns(IniFile ini, string mappingPath)
         {
             bool useOneGun = SystemConfig.getOptBoolean("one_gun");
@@ -33,9 +39,34 @@ namespace EmulatorLauncher
 
             using (var ctrlini = new IniFile(mappingFile, IniOptions.UseSpaces))
             {
-                ctrlini.WriteValue("digital", "bind0", guninvert ? "1:btn_a" : "1:reload");
-                ctrlini.WriteValue("digital", "bind1", guninvert ? "2:reload" : "2:btn_a");
-                ctrlini.WriteValue("digital", "bind2", "3:btn_start");
+                if (useXandB.Contains(_romName))
+                {
+                    ctrlini.WriteValue("digital", "bind0", "1:btn_x");
+                    ctrlini.WriteValue("digital", "bind1", "2:btn_start");
+                    ctrlini.WriteValue("digital", "bind2", "3:btn_b");
+                }
+                else if (useXandA.Contains(_romName))
+                {
+                    ctrlini.WriteValue("digital", "bind0", "1:btn_a");
+                    ctrlini.WriteValue("digital", "bind1", "2:btn_x");
+                    ctrlini.WriteValue("digital", "bind2", "3:btn_start");
+                }
+                else
+                {
+                    if (reloadWithButtonB.Contains(_romName))
+                    {
+                        ctrlini.WriteValue("digital", "bind0", guninvert ? "1:btn_a" : "1:btn_b");
+                        ctrlini.WriteValue("digital", "bind1", guninvert ? "2:btn_b" : "2:btn_a");
+                    }
+                    else
+                    {
+                        ctrlini.WriteValue("digital", "bind0", guninvert ? "1:btn_a" : "1:reload");
+                        ctrlini.WriteValue("digital", "bind1", guninvert ? "2:reload" : "2:btn_a");
+                    }
+
+                    ctrlini.WriteValue("digital", "bind2", "3:btn_start");
+                }
+                
                 ctrlini.WriteValue("emulator", "dead_zone", "10");
                 ctrlini.WriteValue("emulator", "mapping_name", "Mouse");
                 ctrlini.WriteValue("emulator", "rumble_power", "100");
@@ -74,7 +105,7 @@ namespace EmulatorLauncher
                 string query1 = ("SELECT * FROM Win32_PNPEntity" + " WHERE DeviceID = '" + cleanPath1 + "'").Replace("\\", "\\\\");
                 ManagementObjectSearcher moSearch1 = new ManagementObjectSearcher(query1);
                 ManagementObjectCollection moCollection1 = moSearch1.Get();
-                foreach (ManagementObject mo in moCollection1)
+                foreach (ManagementObject mo in moCollection1.Cast<ManagementObject>())
                 {
                     string desc1 = mo["Description"].ToString();
                     mouseList.Add(mo, desc1);
@@ -83,7 +114,7 @@ namespace EmulatorLauncher
                 string query2 = ("SELECT * FROM Win32_PNPEntity" + " WHERE DeviceID = '" + cleanPath2 + "'").Replace("\\", "\\\\");
                 ManagementObjectSearcher moSearch2 = new ManagementObjectSearcher(query2);
                 ManagementObjectCollection moCollection2 = moSearch2.Get();
-                foreach (ManagementObject mo in moCollection2)
+                foreach (ManagementObject mo in moCollection2.Cast<ManagementObject>())
                 {
                     string desc2 = mo["Description"].ToString();
                     mouseList.Add(mo, desc2);
@@ -96,9 +127,32 @@ namespace EmulatorLauncher
                     
                     using (var ctrlini = new IniFile(mouseMapping, IniOptions.UseSpaces))
                     {
-                        ctrlini.WriteValue("digital", "bind0", guninvert ? "1:btn_a" : "1:reload");
-                        ctrlini.WriteValue("digital", "bind1", guninvert ? "2:reload" : "2:btn_a");
-                        ctrlini.WriteValue("digital", "bind2", "3:btn_start");
+                        if (useXandB.Contains(_romName))
+                        {
+                            ctrlini.WriteValue("digital", "bind0", "1:btn_x");
+                            ctrlini.WriteValue("digital", "bind1", "2:btn_start");
+                            ctrlini.WriteValue("digital", "bind2", "3:btn_b");
+                        }
+                        else if (useXandA.Contains(_romName))
+                        {
+                            ctrlini.WriteValue("digital", "bind0", "1:btn_a");
+                            ctrlini.WriteValue("digital", "bind1", "2:btn_x");
+                            ctrlini.WriteValue("digital", "bind2", "3:btn_start");
+                        }
+                        else
+                        {
+                            if (reloadWithButtonB.Contains(_romName))
+                            {
+                                ctrlini.WriteValue("digital", "bind0", guninvert ? "1:btn_a" : "1:btn_b");
+                                ctrlini.WriteValue("digital", "bind1", guninvert ? "2:btn_b" : "2:btn_a");
+                            }
+                            else
+                            {
+                                ctrlini.WriteValue("digital", "bind0", guninvert ? "1:btn_a" : "1:reload");
+                                ctrlini.WriteValue("digital", "bind1", guninvert ? "2:reload" : "2:btn_a");
+                            }
+                            ctrlini.WriteValue("digital", "bind2", "3:btn_start");
+                        }
                         ctrlini.WriteValue("emulator", "dead_zone", "10");
                         ctrlini.WriteValue("emulator", "mapping_name", "Mouse");
                         ctrlini.WriteValue("emulator", "rumble_power", "100");
