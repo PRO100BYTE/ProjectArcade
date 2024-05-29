@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Diagnostics;
-using EmulatorLauncher.Common;
-using EmulatorLauncher.Common.FileFormats;
-using EmulatorLauncher.Common.EmulationStation;
+using System.Text;
 
 namespace EmulatorLauncher
 {
@@ -33,85 +29,98 @@ namespace EmulatorLauncher
             if (controller.Config == null)
                 return;
 
-            string index = controller.DirectInput != null ? controller.DirectInput.DeviceIndex.ToString() : controller.DeviceIndex.ToString();
+            string index = controller.DeviceIndex.ToString();
 
             if (SystemConfig.isOptSet("eka2l1_controllerindex") && !string.IsNullOrEmpty(SystemConfig["eka2l1_controllerindex"]))
                 index = SystemConfig["eka2l1_controllerindex"];
 
-            List<Dictionary<string, object>> mappings = new List<Dictionary<string, object>>();
+            var mappingInfo = new List<Eka2l1MappingInfo>();
 
-            foreach (var input in inputKeys)
+            if (controller.IsKeyboard)
             {
-                string target = input.Key;
-                string button = input.Value;
-
-                if (button == "red")
+                foreach (var input in keyboardDefaults)
                 {
-                    mappings.Add(new Dictionary<string, object>
+                    mappingInfo.Add(new Eka2l1MappingInfo()
                     {
-                        { "source", new Dictionary<string, object>
+                        Source = new Eka2l1MappingSource()
+                        {
+                            Type = "key",
+                            Data = new Dictionary<string, string>()
                             {
-                                { "type", "key" },
-                                { "data", new Dictionary<string, object>
-                                    {
-                                        { "keycode", "16777267" }
-                                    }
-                                }
+                                { "keycode", input.Value }
                             }
                         },
-                        { "target", target }
+                        Target = input.Key
                     });
                 }
-
-                else if (button == "green")
-                {
-                    mappings.Add(new Dictionary<string, object>
-                    {
-                        { "source", new Dictionary<string, object>
-                            {
-                                { "type", "key" },
-                                { "data", new Dictionary<string, object>
-                                    {
-                                        { "keycode", "16777266" }
-                                    }
-                                }
-                            }
-                        },
-                        { "target", target }
-                    });
-                }
-
-                else
-                {
-                    mappings.Add(new Dictionary<string, object>
-                    {
-                        { "source", new Dictionary<string, object>
-                            {
-                                { "type", "controller" },
-                                { "data", new Dictionary<string, object>
-                                    {
-                                        { "controller_id", index },
-                                        { "button_id", button }
-                                    }
-                                }
-                            }
-                        },
-                        { "target", target }
-                    });
-                }
-                
             }
 
-            string ymlContent = SerializeToYml(mappings);
+            else
+            {
+                foreach (var input in inputKeys)
+                {
+                    string target = input.Key;
+                    string button = input.Value;
+
+                    if (button == "red")
+                    {
+                        mappingInfo.Add(new Eka2l1MappingInfo()
+                        {
+                            Source = new Eka2l1MappingSource()
+                            {
+                                Type = "key",
+                                Data = new Dictionary<string, string>()
+                            {
+                                { "keycode", "16777267" }
+                            }
+                            },
+                            Target = target
+                        });
+                    }
+                    else if (button == "green")
+                    {
+                        mappingInfo.Add(new Eka2l1MappingInfo()
+                        {
+                            Source = new Eka2l1MappingSource()
+                            {
+                                Type = "key",
+                                Data = new Dictionary<string, string>()
+                            {
+                                { "keycode", "16777266" }
+                            }
+                            },
+                            Target = target
+                        });
+                    }
+                    else
+                    {
+                        mappingInfo.Add(new Eka2l1MappingInfo()
+                        {
+                            Source = new Eka2l1MappingSource()
+                            {
+                                Type = "controller",
+                                Data = new Dictionary<string, string>()
+                            {
+                                { "controller_id", index },
+                                { "button_id", button }
+                            }
+                            },
+                            Target = target
+                        });
+                    }
+                }
+            }
+
+            string ymlContent = SerializeToYml(mappingInfo);
             File.WriteAllText(ymlFile, ymlContent);
         }
 
-        private Dictionary<string, string> inputKeys = new Dictionary<string, string>()
+        private readonly Dictionary<string, string> inputKeys = new Dictionary<string, string>()
         {
             { "164", "6" },         // Left softkey - Select
             { "165", "7" },         // Right softkey - Start
-            { "180", "green" },         // Green softkey - rightThumb
-            { "181", "red" },          // Red softkey - N/A
+            { "180", "green" },     // Green softkey - rightThumb
+            { "181", "red" },       // Red softkey - N/A
             { "167", "4" },         // Middle softkey - leftThumb
             { "16", "11" },         // Up - dpad up
             { "17", "13" },         // Down - dpad down
@@ -131,24 +140,68 @@ namespace EmulatorLauncher
             { "127", "309" },       // diese - R2
         };
 
-        static string SerializeToYml(List<Dictionary<string, object>> mappings)
+        private readonly Dictionary<string, string> keyboardDefaults = new Dictionary<string, string>()
         {
-            StringWriter writer = new StringWriter();
+            { "164", "16777264" },
+            { "165", "16777265" },
+            { "180", "16777266" },
+            { "181", "16777267" },
+            { "167", "16777220" },
+            { "16", "16777235" },
+            { "17", "16777237" },
+            { "14", "16777234" },
+            { "15", "16777236" },
+            { "48", "48" },
+            { "49", "49" },
+            { "50", "50" },
+            { "51", "51" },
+            { "52", "52" },
+            { "53", "53" },
+            { "54", "54" },
+            { "55", "55" },
+            { "56", "56" },
+            { "57", "57" },
+            { "42", "42" },
+            { "127", "47" },
+            { "1", "16777219" }
+        };
+
+        class Eka2l1MappingInfo
+        {
+            public Eka2l1MappingSource Source { get; set; }
+            public string Target { get; set; }
+
+            public string ToYml()
+            {
+                var writer = new StringBuilder();
+
+                writer.AppendLine("- source:");
+                writer.AppendLine(string.Format("    type: {0}", Source.Type));
+
+                writer.AppendLine("    data:");
+                foreach (var dataEntry in Source.Data)
+                    writer.AppendLine(string.Format("      {0}: {1}", dataEntry.Key, dataEntry.Value));
+
+                writer.AppendLine(string.Format("  target: {0}", Target));
+
+                return writer.ToString();
+            }
+
+            public override string ToString() { return ToYml(); }
+        }
+
+        class Eka2l1MappingSource
+        {
+            public string Type { get; set; }
+            public Dictionary<string, string> Data { get; set; }
+        }
+
+        static string SerializeToYml(IEnumerable<Eka2l1MappingInfo> mappings)
+        {
+            var writer = new StringBuilder();
 
             foreach (var mapping in mappings)
-            {
-                writer.WriteLine("- source:");
-                writer.WriteLine($"    type: {(mapping["source"] as Dictionary<string, object>)["type"]}");
-
-                var data = (Dictionary<string, object>)(mapping["source"] as Dictionary<string, object>)["data"];
-                writer.WriteLine("    data:");
-                foreach (var dataEntry in data)
-                {
-                    writer.WriteLine($"      {dataEntry.Key}: {dataEntry.Value}");
-                }
-
-                writer.WriteLine($"  target: {mapping["target"]}");
-            }
+                writer.Append(mapping.ToYml());
 
             return writer.ToString();
         }

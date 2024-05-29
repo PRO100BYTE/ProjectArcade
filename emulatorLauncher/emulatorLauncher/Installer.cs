@@ -38,6 +38,7 @@ namespace EmulatorLauncher
             { new Installer("xbox", new string[] { "cxbx-reloaded", "cxbx-r" }, "cxbx.exe") },             
             { new Installer("citra", "citra", "citra-qt.exe") },
             { new Installer("citra-canary", "citra-canary", "citra-qt.exe") },
+            { new Installer("lime3ds", new string[] { "lime3ds" }, new string[] { "lime-qt.exe", "lime3ds-gui.exe" }) },
             { new Installer("daphne") },
             { new Installer("demul") }, 
             { new Installer("demul-old", "demul-old", "demul.exe") }, 
@@ -93,12 +94,23 @@ namespace EmulatorLauncher
             { new Installer("theforceengine", "theforceengine", "TheForceEngine.exe") },
             { new Installer("kronos", "kronos", "kronos.exe") },
             { new Installer("gzdoom", "gzdoom", "gzdoom.exe") },
-            { new Installer("eka2l1", "eka2l1", "eka2l1_qt.exe") }
+            { new Installer("magicengine", "magicengine", "pce.exe") },
+            { new Installer("eka2l1", "eka2l1", "eka2l1_qt.exe") },
+            { new Installer("gemrb", "gemrb", "gemrb.exe") },
+            { new Installer("psxmame", "psxmame", "mame.exe") },
+            { new Installer("fbneo", "fbneo", "fbneo64.exe") },
+            { new Installer("sonic3air", "sonic3air", "Sonic3AIR.exe") },
+            { new Installer("sonicmania", "sonicmania", "RSDKv5U_x64.exe") },
+            { new Installer("sonicretro", "sonicretro", "RSDKv4_64.exe") },
+            { new Installer("sonicretrocd", "sonicretrocd", "RSDKv3_64.exe") },
+            { new Installer("devilutionx", "devilutionx", "devilutionx.exe") },
+            { new Installer("jgenesis", "jgenesis", "jgenesis-gui.exe") },
+            { new Installer("singe2", "singe2", "Singe-v2.10-Windows-x86_64.exe") }
         };
 
         static List<string>noVersionExe = new List<string>()
         {
-            "rmg", "play", "eduke32", "mesen"
+            "flycast", "rmg", "play", "eduke32", "mesen", "fbneo"
         };
 
         #region Properties
@@ -234,7 +246,12 @@ namespace EmulatorLauncher
                 if (Path.GetFileNameWithoutExtension(exe).ToLower() == "retroarch")
                 {
                     var output = ProcessExtensions.RunWithOutput(exe, "--version");
-                    output = StringExtensions.FormatVersionString(output.ExtractString(" -- v", " -- "));
+
+                    string ret = output.ExtractString("Version:", " ("); 
+                    if (string.IsNullOrEmpty(ret))
+                        ret = output.ExtractString(" -- v", " -- "); // Format before 1.16
+
+                    output = StringExtensions.FormatVersionString(ret);
 
                     Version ver = new Version();
                     if (Version.TryParse(output, out ver))
@@ -253,6 +270,15 @@ namespace EmulatorLauncher
                 {
                     var output = ProcessExtensions.RunWithOutput(exe, "--version");
                     output = StringExtensions.FormatVersionString(output.ExtractString("Dolphin ", "\r"));
+
+                    Version ver = new Version();
+                    if (Version.TryParse(output, out ver))
+                        return ver.ToString();
+                }
+                else if (Path.GetFileNameWithoutExtension(exe).ToLower() == "flycast")
+                {
+                    var output = versionInfo.FileVersion.Substring(1);
+                    output = StringExtensions.FormatVersionString(output);
 
                     Version ver = new Version();
                     if (Version.TryParse(output, out ver))

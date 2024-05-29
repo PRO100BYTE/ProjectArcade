@@ -36,9 +36,6 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>projectarcade.ico</ApplicationIcon>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -67,9 +64,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Resources\batocera-systems.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="projectarcade.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

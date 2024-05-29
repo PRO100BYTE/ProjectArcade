@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Diagnostics;
+using System.Threading;
 using System.Windows.Forms;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common;
@@ -22,6 +23,7 @@ namespace EmulatorLauncher
         private ScreenResolution _resolution;
         private bool _isPcsx17;
         private bool _isPcsxqt;
+        private bool _fullscreen;
 
         public override void Cleanup()
         {
@@ -105,16 +107,19 @@ namespace EmulatorLauncher
             
             String path = AppConfig.GetFullPath(emulator);
 
-            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+            _fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
+            if (!_fullscreen)
+                SystemConfig["bezel"] = "none";
 
             // Configuration files
             // QT version has now only 1 ini file versus multiple for wxwidgets version
             if (_isPcsxqt)
-                SetupConfigurationQT(path, rom, system, fullscreen);
+                SetupConfigurationQT(path, rom, system, _fullscreen);
 
             else
             {
-                SetupPaths(system, emulator, core, fullscreen);
+                SetupPaths(_fullscreen);
                 SetupVM();
                 SetupLilyPad();
                 SetupGSDx(resolution);
@@ -162,7 +167,7 @@ namespace EmulatorLauncher
             {
                 commandArray.Add("--portable");
 
-                if (fullscreen)
+                if (_fullscreen)
                     commandArray.Add("--fullscreen");
 
                 commandArray.Add("--nogui");
@@ -191,7 +196,7 @@ namespace EmulatorLauncher
         }
 
         #region wxwidgets version
-        private void SetupPaths(string system, string emulator, string core, bool fullscreen)
+        private void SetupPaths(bool fullscreen)
         {
             if (SystemConfig.getOptBoolean("disableautoconfig"))
                 return;
@@ -691,7 +696,8 @@ namespace EmulatorLauncher
             if (SystemConfig.getOptBoolean("disableautoconfig"))
                 return;
 
-            var biosList = new string[] { "ps2-0230a-20080220.bin", "ps2-0230e-20080220.bin", "ps2-0250e-20100415.bin", "ps2-0230j-20080220.bin", "ps3_ps2_emu_bios.bin" };
+            var biosList = new string[] { "ps2-0230a-20080220.bin", "ps2-0230e-20080220.bin", "ps2-0250e-20100415.bin", "ps2-0230j-20080220.bin", "ps3_ps2_emu_bios.bin", 
+                "SCPH30004R.bin", "scph39001.bin", "SCPH-39004_BIOS_V7_EUR_160.BIN", "SCPH-39001_BIOS_V7_USA_160.BIN", "SCPH-70000_BIOS_V12_JAP_200.BIN" };
 
             string conf = Path.Combine(_path, "inis", "PCSX2.ini");
 
@@ -700,7 +706,7 @@ namespace EmulatorLauncher
                 ini.WriteValue("UI", "HideMouseCursor", "true");
                 CreateControllerConfiguration(ini);
                 SetupGunQT(ini, path);
-                SetupWheelQT(ini, path);
+                SetupWheelQT(ini);
 
                 // Disable auto-update
                 ini.WriteValue("AutoUpdater", "CheckAtStartup", "false");
@@ -743,20 +749,29 @@ namespace EmulatorLauncher
                 if (!Directory.Exists(biosPath))
                     try { Directory.CreateDirectory(biosPath); }
                     catch { }
-                ini.WriteValue("Folders", "Bios", biosPath);
 
                 string biosFile = "ps2-0230a-20080220.bin";                     // Default bios
+
+                if (Directory.GetFiles(biosPath).Length == 0)                 // if no bios, do not set
+                    biosPath = AppConfig.GetFullPath("bios");
+                
+                if (!biosList.Any(b => File.Exists(Path.Combine(biosPath, b))))
+                    throw new ApplicationException("No BIOS found in bios/pcsx2/bios folder.");
 
                 if (!File.Exists(Path.Combine(biosPath, biosFile)))             // if default does not exist, select first one that exists
                     biosFile = biosList.FirstOrDefault(b => File.Exists(Path.Combine(biosPath, b)));
 
                 if (SystemConfig.isOptSet("pcsx2_forcebios") && !string.IsNullOrEmpty(SystemConfig["pcsx2_forcebios"]))                         // Precise bios to use through feature
-                    biosFile = SystemConfig["pcsx2_forcebios"];
+                {
+                    string checkBiosFile = Path.Combine(biosPath, SystemConfig["pcsx2_forcebios"]);
+                    if (File.Exists(checkBiosFile))
+                        biosFile = SystemConfig["pcsx2_forcebios"];
+                }
 
-                if (string.IsNullOrEmpty(biosFile))
-                    throw new ApplicationException("No PS2 BIOS found.");
+                ini.WriteValue("Folders", "Bios", biosPath);
 
-                ini.WriteValue("Filenames", "BIOS", biosFile);
+                if (!string.IsNullOrEmpty(biosFile))
+                    ini.WriteValue("Filenames", "BIOS", biosFile);
 
                 // Cheats Path
                 var cheatsRootPath = AppConfig.GetFullPath("cheats");
@@ -1071,7 +1086,7 @@ namespace EmulatorLauncher
                 ini.AppendValue("GameList", "RecursivePaths", romPath);
         }
         #endregion
-        
+
         public override int RunAndWait(ProcessStartInfo path)
         {
             int ret = 0;
@@ -1097,8 +1112,7 @@ namespace EmulatorLauncher
                         catch { }
                     }
 
-                    if (bezel != null)
-                        bezel.Dispose();
+                    bezel?.Dispose();
 
                     return ret;
                 }
@@ -1148,6 +1162,11 @@ namespace EmulatorLauncher
                     continue;
 
                 User32.SetWindowPos(hWnd, IntPtr.Zero, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP.ASYNCWINDOWPOS);
+                if (SystemConfig["pcsx2_crosshair"] == "disabled")
+                {
+                    Thread.Sleep(500);
+                    User32.ShowWindow(hWnd, SW.SHOWMAXIMIZED);
+                }
                 break;
             }
             return process;

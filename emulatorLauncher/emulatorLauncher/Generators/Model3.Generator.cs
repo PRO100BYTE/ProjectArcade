@@ -22,7 +22,7 @@ namespace EmulatorLauncher
             if (!File.Exists(exe))
                 return null;
 
-            bool isWideScreen = false;
+            bool isWideScreen;
 
             List<string> commandArray = new List<string>();
 
@@ -42,14 +42,14 @@ namespace EmulatorLauncher
             bool wideScreen = SystemConfig["widescreen"] == "1" || SystemConfig["widescreen"] == "2" || (!SystemConfig.isOptSet("widescreen") && isWideScreen);
             bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
+            if ((fullscreen && !SystemConfig.isOptSet("videomode")) || SystemConfig.getOptBoolean("forcefullscreen"))
+                commandArray.Add("-fullscreen");
+
             if (wideScreen)
             {
                 SystemConfig["forceNoBezel"] = "1";
 
                 ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution);
-
-                if (fullscreen)
-                    commandArray.Add("-fullscreen");
 
                 if (SystemConfig["widescreen"] == "2")
                     commandArray.Add("-stretch");
@@ -58,15 +58,13 @@ namespace EmulatorLauncher
             }
             else
             {
-                if (ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution))
-                    commandArray.Add("-fullscreen");
-                else
-                {
+                if (!ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution))
                     _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
-                    if (_bezelFileInfo == null && fullscreen)
-                        commandArray.Add("-fullscreen");
-                }
             }
+
+            // outputs for mamehook
+            if (SystemConfig.isOptSet("supermodel_output") && !string.IsNullOrEmpty(SystemConfig["supermodel_output"]))
+                commandArray.Add("-outputs=" + SystemConfig["supermodel_output"]);
 
             // quad rendering
             if (SystemConfig.isOptSet("quadRendering") && SystemConfig.getOptBoolean("quadRendering"))
@@ -79,6 +77,10 @@ namespace EmulatorLauncher
             // force feedback
             if (SystemConfig.isOptSet("forceFeedback") && SystemConfig.getOptBoolean("forceFeedback"))
                 commandArray.Add("-force-feedback");
+
+            // SuperSampling
+            if (SystemConfig.isOptSet("m3_supersampling") && !string.IsNullOrEmpty(SystemConfig["m3_supersampling"]) && SystemConfig["m3_supersampling"] != "0")
+                commandArray.Add("-ss=" + SystemConfig["m3_supersampling"]);
 
             //Write config in supermodel.ini
             SetupConfiguration(path, wideScreen, fullscreen);
@@ -139,8 +141,7 @@ namespace EmulatorLauncher
             catch { }
             finally
             {
-                if (bezel != null)
-                    bezel.Dispose();
+                bezel?.Dispose();
             }
             return -1;
         }
@@ -154,10 +155,17 @@ namespace EmulatorLauncher
                     using (IniFile ini = new IniFile(iniPath, IniOptions.UseSpaces))
                     {
                         //Fullscreen and widescreen values (should we keep these as commandline take precedent ?
-                        if (fullscreen)
+                        ini.WriteValue(" Global ", "BorderlessWindow", "True");
+                        if ((fullscreen && !SystemConfig.isOptSet("videomode")) || SystemConfig.getOptBoolean("forcefullscreen"))
                             ini.WriteValue(" Global ", "FullScreen", "1");
                         else
+                        {
                             ini.WriteValue(" Global ", "FullScreen", "0");
+                            ini.WriteValue(" Global ", "XResolution", _resolution == null ? Screen.PrimaryScreen.Bounds.Width.ToString() : _resolution.Width.ToString());
+                            ini.WriteValue(" Global ", "YResolution", _resolution == null ? Screen.PrimaryScreen.Bounds.Height.ToString() : _resolution.Height.ToString());
+                            ini.WriteValue(" Global ", "WindowXPosition", "0");
+                            ini.WriteValue(" Global ", "WindowYPosition", "0");
+                        }
 
                         ini.WriteValue(" Global ", "WideScreen", wideScreen ? "1" : "0");
 
@@ -166,6 +174,12 @@ namespace EmulatorLauncher
                         BindBoolIniFeature(ini, " Global ", "MultiThreaded", "m3_thread", "0", "1");
                         BindIniFeature(ini, " Global ", "PowerPCFrequency", "m3_ppc_frequency", "50");
                         BindBoolIniFeature(ini, " Global ", "ShowFrameRate", "m3_fps", "1", "0");
+                        BindBoolIniFeature(ini, " Global ", "WideBackground", "widescreen", "true", "false");
+
+                        if (SystemConfig.isOptSet("supermodel_output") && !string.IsNullOrEmpty(SystemConfig["supermodel_output"]))
+                            ini.WriteValue(" Global ", "Outputs", SystemConfig["supermodel_output"]);
+                        else
+                            ini.Remove(" Global ", "Outputs");
 
                         //force rompath in GUI
                         string rompath = Path.Combine(AppConfig.GetFullPath("roms"), "model3");

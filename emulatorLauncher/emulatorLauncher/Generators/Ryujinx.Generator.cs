@@ -15,49 +15,19 @@ namespace EmulatorLauncher
         }
 
         private SdlVersion _sdlVersion = SdlVersion.SDL2_26;
-        private readonly string _currentESSdlVersion = "2.28.1.0";
+        private string _emulatorPath;
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
             string path = AppConfig.GetFullPath("ryujinx");
+            if (!Directory.Exists(path))
+                return null;
+
+            _emulatorPath = path;
 
             string exe = Path.Combine(path, "Ryujinx.exe");
             if (!File.Exists(exe))
                 return null;
-
-            // Align Ryujinx sdl version with the one from ES to get proper Guid
-            string ESSdl2 = Path.Combine(AppConfig.GetFullPath("retrobat"), "emulationstation", "SDL2.dll");
-            string ESsdlVersion = _currentESSdlVersion;
-            if (File.Exists(ESSdl2))
-            {
-                var ESsdlVersionInfo = FileVersionInfo.GetVersionInfo(ESSdl2);
-                ESsdlVersion = ESsdlVersionInfo.FileMajorPart + "." + ESsdlVersionInfo.FileMinorPart + "." + ESsdlVersionInfo.FileBuildPart + "." + ESsdlVersionInfo.FilePrivatePart;
-            }
-
-            string ryujinxSdl2 = Path.Combine(path, "SDL2.dll");
-            string sdlVersionRyujinx = "";
-            if (File.Exists(ryujinxSdl2))
-            {
-                var sdlVersionInfoRyujinx = FileVersionInfo.GetVersionInfo(ryujinxSdl2);
-                sdlVersionRyujinx = sdlVersionInfoRyujinx.FileMajorPart + "." + sdlVersionInfoRyujinx.FileMinorPart + "." + sdlVersionInfoRyujinx.FileBuildPart + "." + sdlVersionInfoRyujinx.FilePrivatePart;
-            }
-
-            string sourceSDL = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "sdl2", "SDL2_" + ESsdlVersion + "_x64.dll");
-            if (!File.Exists(sourceSDL))
-            {
-                sourceSDL = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "sdl2", "SDL2_" + _currentESSdlVersion + "_x64.dll");
-                ESsdlVersion= _currentESSdlVersion;
-            }
-            
-            if (sdlVersionRyujinx != ESsdlVersion && File.Exists(sourceSDL))
-            {
-                if (File.Exists(ryujinxSdl2))
-                    File.Delete(ryujinxSdl2);
-
-                File.Copy(sourceSDL, ryujinxSdl2);
-            }
-            
-            _sdlVersion = SdlJoystickGuidManager.GetSdlVersion(ryujinxSdl2);
 
             SetupConfiguration(path);
 
@@ -100,8 +70,7 @@ namespace EmulatorLauncher
             string lang = GetCurrentLanguage();
             if (!string.IsNullOrEmpty(lang))
             {
-                string ret;
-                if (availableLanguages.TryGetValue(lang, out ret))
+                if (availableLanguages.TryGetValue(lang, out string ret))
                     return ret;
             }
             return "AmericanEnglish";
@@ -157,7 +126,27 @@ namespace EmulatorLauncher
             
             BindFeature(json, "enable_shader_cache", "enable_shader_cache", "true");
             BindFeature(json, "enable_texture_recompression", "enable_texture_recompression", "false");
-            BindFeature(json, "res_scale", "res_scale", "1");
+
+            // Resolution
+            string res;
+            if (SystemConfig.isOptSet("res_scale") && !string.IsNullOrEmpty(SystemConfig["res_scale"]))
+            {
+                res = SystemConfig["res_scale"];
+
+                if (res.StartsWith("0."))
+                {
+                    json["res_scale"] = "-1";
+                    json["res_scale_custom"] = res;
+                }
+                else
+                {
+                    json["res_scale"] = res;
+                }
+            }
+
+            else
+                json["res_scale"] = "1";
+
             BindFeature(json, "max_anisotropy", "max_anisotropy", "-1");
             BindFeature(json, "aspect_ratio", "aspect_ratio", "Fixed16x9");
 

@@ -101,17 +101,22 @@ namespace EmulatorLauncher
                         ImportXInputButton(userProfile, c, InputKey.pageup, InputMapping.JvsTwoP1Button5, InputMapping.P1Button5);
                         ImportXInputButton(userProfile, c, InputKey.pagedown, InputMapping.JvsTwoP1Button6, InputMapping.P1Button6);
 
+
+                        // Assignation of ExtensionOne buttons
                         if (userProfile.HasAnyXInputButton(InputMapping.ExtensionOne2) && !userProfile.HasAnyXInputButton(InputMapping.P1Button2))
                             ImportXInputButton(userProfile, c, InputKey.b, InputMapping.ExtensionOne2);
-                        else
-                            ImportXInputButton(userProfile, c, InputKey.b, InputMapping.JvsTwoP1Button2, InputMapping.P1Button2);
+                        else if (userProfile.HasAnyXInputButton(InputMapping.ExtensionOne2) && !userProfile.HasAnyXInputButton(InputMapping.P1Button4))
+                            ImportXInputButton(userProfile, c, InputKey.y, InputMapping.ExtensionOne2);
+                        else if (userProfile.HasAnyXInputButton(InputMapping.ExtensionOne2) && !userProfile.HasAnyXInputButton(InputMapping.P1Button3))
+                            ImportXInputButton(userProfile, c, InputKey.x, InputMapping.ExtensionOne2);
+                        else if (userProfile.HasAnyXInputButton(InputMapping.ExtensionOne2) && !userProfile.HasAnyXInputButton(InputMapping.P1Button6))
+                            ImportXInputButton(userProfile, c, InputKey.pagedown, InputMapping.ExtensionOne2);
+                        else if (userProfile.HasAnyXInputButton(InputMapping.ExtensionOne2) && !userProfile.HasAnyXInputButton(InputMapping.P1Button5))
+                            ImportXInputButton(userProfile, c, InputKey.pageup, InputMapping.ExtensionOne2);
                     }
                 }
-                else
+                else   // DirectInput
                 {
-                    //         foreach (var btn in userProfile.JoystickButtons)
-                    //              btn.DirectInputButton = null;
-
                     if (c.Config[InputKey.leftanalogleft] != null)
                     {
                         ImportDirectInputButton(userProfile, c, InputKey.leftanalogup, InputMapping.JvsTwoP1ButtonUp, InputMapping.P1ButtonUp, InputMapping.P1RelativeUp);
@@ -261,19 +266,20 @@ namespace EmulatorLauncher
             if (start == null)
                 return;
 
-            bool reverseAxis;
-            key = key.GetRevertedAxis(out reverseAxis);
+            key = key.GetRevertedAxis(out bool reverseAxis);
 
             var input = ctrl.GetDirectInputMapping(key);
             if (input != null)
             {
-                start.DirectInputButton = new JoystickButton();
-                start.DirectInputButton.JoystickGuid = info.InstanceGuid;
-                start.DirectInputButton.IsAxis = false;
-                start.DirectInputButton.IsAxisMinus = false;
-                start.DirectInputButton.IsFullAxis = false;
-                start.DirectInputButton.IsReverseAxis = false;
-                start.DirectInputButton.PovDirection = 0;
+                start.DirectInputButton = new JoystickButton
+                {
+                    JoystickGuid = info.InstanceGuid,
+                    IsAxis = false,
+                    IsAxisMinus = false,
+                    IsFullAxis = false,
+                    IsReverseAxis = false,
+                    PovDirection = 0
+                };
                 start.DirectInputButton.IsReverseAxis = false;
                 start.DirectInputButton.Button = 0;
 

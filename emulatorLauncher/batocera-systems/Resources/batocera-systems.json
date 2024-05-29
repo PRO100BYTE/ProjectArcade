@@ -521,6 +521,20 @@
     ]
   },
 
+  "casloopy": {
+    "name": "Casio Loopy",
+    "biosFiles": [
+      {
+        "md5": "0e1d8dc0110ecf8201c0cef11ef4a858",
+        "file": "bios/casloopy.zip"
+      },
+      {
+        "md5": "",
+        "file": "bios/mame/hash/casloopy.xml"
+      }
+    ]
+  },
+
   "cdi": {
     "name": "Philips CD-I",
     "biosFiles": [
@@ -1441,7 +1455,7 @@
     ]
   },
 
-    "pcenginecd": {
+  "pcenginecd": {
     "name": "PC Engine CD",
     "biosFiles": [
       {
@@ -1461,6 +1475,20 @@
       {
         "md5": "",
         "file": "bios/fx-scsi.rom"
+      }
+    ]
+  },
+
+  "pegasus": {
+    "name": "Aamber Pegasus",
+    "biosFiles": [
+      {
+        "md5": "fee37d8140e4fab48aac4fdab2847f7d",
+        "file": "bios/pegasus.zip"
+      },
+      {
+        "md5": "",
+        "file": "bios/mame/hash/pegasus_cart.xml"
       }
     ]
   },
@@ -1489,7 +1517,7 @@
     "name": "PSX",
     "biosFiles": [
       {
-        "md5": " c53ca5908936d412331790f4426c6c33",
+        "md5": "c53ca5908936d412331790f4426c6c33",
         "file": "bios/psxonpsp660.bin"
       }
     ]
@@ -1707,6 +1735,16 @@
       {
         "md5": "",
         "file": "bios/mame/hash/tutor.xml"
+      }
+    ]
+  },
+
+  "vc4000": {
+    "name": "VC4000",
+    "biosFiles": [
+      {
+        "md5": "",
+        "file": "bios/mame/hash/vc4000.xml"
       }
     ]
   },

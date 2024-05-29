@@ -53,7 +53,7 @@ namespace EmulatorLauncher
                 return null;
 
             // Setup xml file
-            SetupConfiguration(sharePath, rom);
+            SetupConfiguration(sharePath);
 
             //setting up command line parameters
             var commandArray = new List<string>();
@@ -178,7 +178,7 @@ namespace EmulatorLauncher
             if (!Directory.Exists(scriptspath)) try { Directory.CreateDirectory(scriptspath); }
                 catch { }
 
-            checkOrCreateScripts(scriptspath);
+            CheckOrCreateScripts(scriptspath);
 
             if (romtype != null && romtype == "-cassetteplayer")
             {
@@ -199,7 +199,7 @@ namespace EmulatorLauncher
             commandArray.Add("\"" + rom + "\"");
 
             // Setup controllers (using tcl scripts)
-            commandArray.AddRange(configureControllers(scriptspath));
+            commandArray.AddRange(ConfigureControllers(scriptspath));
 
             string args = string.Join(" ", commandArray);
 
@@ -215,8 +215,7 @@ namespace EmulatorLauncher
         /// Configure emulator features (settings.xml)
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="rom"></param>
-        private void SetupConfiguration(string path, string rom)
+        private void SetupConfiguration(string path)
         {
             string sharepath = Path.Combine(path, "share");
             if (!Directory.Exists(sharepath)) try { Directory.CreateDirectory(sharepath); }
@@ -332,6 +331,23 @@ namespace EmulatorLauncher
             else
                 osdiconset.SetValue(iconset);
 
+            // Fullspeed when loading
+            string fullspeedwhenloading = "false";
+            if (SystemConfig.isOptSet("msx_loadfullspeed") && SystemConfig.getOptBoolean("msx_loadfullspeed"))
+                fullspeedwhenloading = "true";
+
+            XElement fullspeed = xdoc.Descendants()
+            .Where(x => (string)x.Attribute("id") == "fullspeedwhenloading").FirstOrDefault();
+
+            if (fullspeed == null)
+            {
+                fullspeed = new XElement("setting", new XAttribute("id", "fullspeedwhenloading"));
+                fullspeed.SetValue(fullspeedwhenloading);
+                settings.Add(fullspeed);
+            }
+            else
+                fullspeed.SetValue(fullspeedwhenloading);
+
             // Clean existing bindings
             var bindings = topnode.GetOrCreateElement("bindings");
             bindings.RemoveAll();
@@ -356,8 +372,9 @@ namespace EmulatorLauncher
             Thread.Sleep(4000);
             process.WaitForExit();
 
-            if (bezel != null)
-                bezel.Dispose();
+            bezel?.Dispose();
+
+            ReshadeManager.UninstallReshader(ReshadeBezelType.opengl, path.WorkingDirectory);
 
             return 0;
         }
@@ -366,7 +383,7 @@ namespace EmulatorLauncher
         /// Configure emulator features (settings.xml)
         /// </summary>
         /// <param name="path"></param>
-        private void checkOrCreateScripts(string path)
+        private void CheckOrCreateScripts(string path)
         {
             foreach (var script in scriptFiles)
             {
@@ -383,7 +400,7 @@ namespace EmulatorLauncher
             }
         }
 
-        static Dictionary<string, string[]> msxMedias = new Dictionary<string, string[]>()
+        static readonly Dictionary<string, string[]> msxMedias = new Dictionary<string, string[]>()
         {
             { "-cart", new string[] { ".mx1", ".mx2", ".ri", ".rom" } },
             { "-diska", new string[] { ".di1", ".di2", ".dmk", ".dsk", ".fd1", ".fd2", ".xsa" } },
@@ -391,15 +408,15 @@ namespace EmulatorLauncher
             { "-cassetteplayer", new string[] { ".cas", ".wav" } }
         };
 
-        static List<string> machineWithDiskDrive = new List<string>() { "Panasonic_FS-A1GT", "Panasonic_FS-A1WSX", "National_FS-5500F2", "Philips_NMS_8245", "National_CF-3300" };
-        static List<string> machineWithCassette = new List<string>() { "Panasonic_FS-A1WSX", "National_FS-5500F2", "Pioneer_PX-7", "Philips_NMS_8245", "National_CF-3300", "Philips_VG_8020" };
-        static List<string> machineWithLaserdisc = new List<string>() { "Pioneer_PX-7" };
+        static readonly List<string> machineWithDiskDrive = new List<string>() { "Panasonic_FS-A1GT", "Panasonic_FS-A1WSX", "National_FS-5500F2", "Philips_NMS_8245", "National_CF-3300" };
+        static readonly List<string> machineWithCassette = new List<string>() { "Panasonic_FS-A1WSX", "National_FS-5500F2", "Pioneer_PX-7", "Philips_NMS_8245", "National_CF-3300", "Philips_VG_8020" };
+        static readonly List<string> machineWithLaserdisc = new List<string>() { "Pioneer_PX-7" };
 
-        static string defaultDiskMachine = "Panasonic_FS-A1GT";
-        static string defaultMachineCassette = "Panasonic_FS-A1WSX";
-        static string defaultLaserdiscMachine = "Pioneer_PX-7";
+        static readonly string defaultDiskMachine = "Panasonic_FS-A1GT";
+        static readonly string defaultMachineCassette = "Panasonic_FS-A1WSX";
+        static readonly string defaultLaserdiscMachine = "Pioneer_PX-7";
 
-        static Dictionary<string, string[]> scriptFiles = new Dictionary<string, string[]>()
+        static readonly Dictionary<string, string[]> scriptFiles = new Dictionary<string, string[]>()
         {
             { "autoruncassettes", new string[] {"set autoruncassettes on" } },
             { "autorunlaserdisc", new string[] {"set autorunlaserdisc on" } },
@@ -407,7 +424,7 @@ namespace EmulatorLauncher
             { "plugmouse", new string[] { "unplug joyporta", "unplug joyportb", "plug joyporta mouse", "set grabinput on" } }
         };
 
-        static Dictionary<string, string[]> biosFiles = new Dictionary<string, string[]>()
+        static readonly Dictionary<string, string[]> biosFiles = new Dictionary<string, string[]>()
         {
             { "National_CF-3300", new string[] { "cf-3300_basic-bios1.rom", "cf-3300_disk.rom" } },
             { "National_FS-5500F2", new string[] { "fs-5500_basic-bios2.rom", "fs-5500_disk.rom", "fs-5500_kanjibasic.rom", "fs-5500_kanjifont.rom", "fs-5500_msx2sub.rom", "fs-5500_superimp.rom" } },

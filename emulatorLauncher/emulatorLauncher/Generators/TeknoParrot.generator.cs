@@ -14,11 +14,12 @@ using EmulatorLauncher.VPinballLauncher;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.EmulationStation;
+using System.Runtime.InteropServices;
 
 namespace EmulatorLauncher
 {
     partial class TeknoParrotGenerator : Generator
-    {        
+    {
         static Dictionary<string, string> executables = new Dictionary<string, string>()
         {                        
             { "Batman",                          @"Batman\ZeusSP\sdaemon.exe" },
@@ -159,11 +160,6 @@ namespace EmulatorLauncher
         private string _exename;
         private GameProfile _gameProfile;
 
-        public TeknoParrotGenerator()
-        {
-            DependsOnDesktopResolution = true;
-        }
-
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
             string path = AppConfig.GetFullPath("TeknoParrot");
@@ -264,6 +260,7 @@ namespace EmulatorLauncher
 
             List<string> commandArray = new List<string>();
             commandArray.Add("--profile=" + profileName);
+
             if (!SystemConfig.isOptSet("tp_minimize") || SystemConfig.getOptBoolean("tp_minimize"))
                 commandArray.Add("--startMinimized");
             string args = string.Join(" ", commandArray);
@@ -307,8 +304,6 @@ namespace EmulatorLauncher
                 data.UseDiscordRPC = true;
             else
                 data.UseDiscordRPC = false;
-
-            data.CheckForUpdates = false;
 
             File.WriteAllText(parrotData, data.ToXml());
         }
@@ -497,12 +492,11 @@ namespace EmulatorLauncher
             }
         }
 
-        private void killIDZ()
+        private void KillIDZ()
         {
             if (_gameProfile == null || _gameProfile.EmulationProfile != "SegaToolsIDZ")
                 return;
 
-            var currentId = Process.GetCurrentProcess().Id;
             Regex regex = new Regex(@"amdaemon.*");
 
             foreach (Process p in Process.GetProcesses("."))
@@ -648,7 +642,7 @@ namespace EmulatorLauncher
 
             KillProcessTree("BudgieLoader");
             KillProcessTree("OpenParrotKonamiLoader");
-            killIDZ();
+            KillIDZ();
 
             return 0;
         }

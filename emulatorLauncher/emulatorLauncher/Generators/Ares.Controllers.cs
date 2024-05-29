@@ -8,7 +8,7 @@ namespace EmulatorLauncher
 {
     partial class AresGenerator : Generator
     {
-        private void CreateControllerConfiguration(BmlFile bml, string path)
+        private void CreateControllerConfiguration(BmlFile bml)
         {
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
@@ -89,47 +89,65 @@ namespace EmulatorLauncher
             if (joy == null)
                 return;
 
-            string tech = ctrl.IsXInputDevice ? "xinput" : "SDL";
+            string guid = ctrl.SdlController != null ? ctrl.SdlController.Guid.ToString().ToLower() : ctrl.Guid.ToString().ToLower();
 
             var vpad = bml.GetOrCreateContainer("VirtualPad" + playerindex);
-            int index = 0x3 + (ctrl.DeviceIndex* 100000000);
-            string padId = "0x" + index + "/";
+            
+            string prodID = ctrl.DirectInput.ProductId.ToString("X4");
+            string vendorID = ctrl.DirectInput.VendorId.ToString("X");
+            string padId = "0x";
+            
+            int index = ctrl.DeviceIndex;
 
-            vpad["Pad.Up"] = GetInputKeyName(ctrl, InputKey.up, padId, tech);
-            vpad["Pad.Down"] = GetInputKeyName(ctrl, InputKey.down, padId, tech);
-            vpad["Pad.Left"] = GetInputKeyName(ctrl, InputKey.left, padId, tech);
-            vpad["Pad.Right"] = GetInputKeyName(ctrl, InputKey.right, padId, tech);
-            vpad["Select"] = GetInputKeyName(ctrl, InputKey.select, padId, tech);
-            vpad["Start"] = GetInputKeyName(ctrl, InputKey.start, padId, tech);
-            vpad["A..South"] = GetInputKeyName(ctrl, InputKey.a, padId, tech);
-            vpad["B..East"] = GetInputKeyName(ctrl, InputKey.b, padId, tech);
-            vpad["X..West"] = GetInputKeyName(ctrl, InputKey.y, padId, tech);
-            vpad["Y..North"] = GetInputKeyName(ctrl, InputKey.x, padId, tech);
-            vpad["L-Bumper"] = GetInputKeyName(ctrl, InputKey.pageup, padId, tech);
-            vpad["R-Bumper"] = GetInputKeyName(ctrl, InputKey.pagedown, padId, tech);
-            vpad["L-Trigger"] = GetInputKeyName(ctrl, InputKey.l2, padId, tech);
-            vpad["R-Trigger"] = GetInputKeyName(ctrl, InputKey.r2, padId, tech);
-            vpad["L-Stick..Click"] = GetInputKeyName(ctrl, InputKey.l3, padId, tech);
-            vpad["R-Stick..Click"] = GetInputKeyName(ctrl, InputKey.r3, padId, tech);
-            vpad["L-Up"] = GetInputKeyName(ctrl, InputKey.leftanalogup, padId, tech);
-            vpad["L-Down"] = GetInputKeyName(ctrl, InputKey.leftanalogdown, padId, tech);
-            vpad["L-Left"] = GetInputKeyName(ctrl, InputKey.leftanalogleft, padId, tech);
-            vpad["L-Right"] = GetInputKeyName(ctrl, InputKey.leftanalogright, padId, tech);
-            vpad["R-Up"] = GetInputKeyName(ctrl, InputKey.rightanalogup, padId, tech);
-            vpad["R-Down"] = GetInputKeyName(ctrl, InputKey.rightanalogdown, padId, tech);
-            vpad["R-Left"] = GetInputKeyName(ctrl, InputKey.rightanalogleft, padId, tech);
-            vpad["R-Right"] = GetInputKeyName(ctrl, InputKey.rightanalogright, padId, tech);
+            if (index == 0)
+                padId = padId + vendorID + prodID + "/";
+            else
+                padId = padId + index + "0" + vendorID + prodID + "/";
+
+            if (n64StyleControllers.ContainsKey(guid))
+            {
+                Dictionary<string, string> buttons = n64StyleControllers[guid];
+
+                foreach (var button in buttons)
+                    vpad[button.Key] = padId + button.Value + ";;";
+
+                return;
+            }
+
+            vpad["Pad.Up"] = GetInputKeyName(ctrl, InputKey.up, padId);
+            vpad["Pad.Down"] = GetInputKeyName(ctrl, InputKey.down, padId);
+            vpad["Pad.Left"] = GetInputKeyName(ctrl, InputKey.left, padId);
+            vpad["Pad.Right"] = GetInputKeyName(ctrl, InputKey.right, padId);
+            vpad["Select"] = GetInputKeyName(ctrl, InputKey.select, padId);
+            vpad["Start"] = GetInputKeyName(ctrl, InputKey.start, padId);
+            vpad["A..South"] = GetInputKeyName(ctrl, InputKey.a, padId);
+            vpad["B..East"] = GetInputKeyName(ctrl, InputKey.b, padId);
+            vpad["X..West"] = GetInputKeyName(ctrl, InputKey.y, padId);
+            vpad["Y..North"] = GetInputKeyName(ctrl, InputKey.x, padId);
+            vpad["L-Bumper"] = GetInputKeyName(ctrl, InputKey.pageup, padId);
+            vpad["R-Bumper"] = GetInputKeyName(ctrl, InputKey.pagedown, padId);
+            vpad["L-Trigger"] = GetInputKeyName(ctrl, InputKey.l2, padId);
+            vpad["R-Trigger"] = GetInputKeyName(ctrl, InputKey.r2, padId);
+            vpad["L-Stick..Click"] = GetInputKeyName(ctrl, InputKey.l3, padId);
+            vpad["R-Stick..Click"] = GetInputKeyName(ctrl, InputKey.r3, padId);
+            vpad["L-Up"] = GetInputKeyName(ctrl, InputKey.leftanalogup, padId);
+            vpad["L-Down"] = GetInputKeyName(ctrl, InputKey.leftanalogdown, padId);
+            vpad["L-Left"] = GetInputKeyName(ctrl, InputKey.leftanalogleft, padId);
+            vpad["L-Right"] = GetInputKeyName(ctrl, InputKey.leftanalogright, padId);
+            vpad["R-Up"] = GetInputKeyName(ctrl, InputKey.rightanalogup, padId);
+            vpad["R-Down"] = GetInputKeyName(ctrl, InputKey.rightanalogdown, padId);
+            vpad["R-Left"] = GetInputKeyName(ctrl, InputKey.rightanalogleft, padId);
+            vpad["R-Right"] = GetInputKeyName(ctrl, InputKey.rightanalogright, padId);
         }
 
-        private static string GetInputKeyName(Controller c, InputKey key, string padId, string tech)
+        private static string GetInputKeyName(Controller c, InputKey key, string padId)
         {
-            Int64 pid = -1;
+            Int64 pid;
 
             // If controller is nintendo, A/B and X/Y are reversed
             //bool revertbuttons = (c.VendorID == VendorId.USB_VENDOR_NINTENDO);
 
-            bool revertAxis = false;
-            key = key.GetRevertedAxis(out revertAxis);
+            key = key.GetRevertedAxis(out bool revertAxis);
 
             var input = c.Config[key];
             if (input != null)
@@ -285,7 +303,7 @@ namespace EmulatorLauncher
             return ";;";
         }
 
-        static List<string> virtualPadButtons = new List<string>() 
+        static readonly List<string> virtualPadButtons = new List<string>() 
         {
             "Pad.Up", "Pad.Down", "Pad.Left", "Pad.Right",
             "Select", "Start", "A..South", "B..East", "X..West", "Y..North",
@@ -293,9 +311,108 @@ namespace EmulatorLauncher
             "L-Up", "L-Down", "L-Left", "L-Right", "R-Up", "R-Down", "R-Left", "R-Right"
         };
 
-        static List<string> mouseButtons = new List<string>()
+        static readonly List<string> mouseButtons = new List<string>()
         {
             "X", "Y", "Left", "Middle", "Right", "Extra"
+        };
+
+        static readonly Dictionary<string, Dictionary<string, string>> n64StyleControllers = new Dictionary<string, Dictionary<string, string>>()
+        {
+            {
+                // Nintendo Switch Online N64 Controller
+                "0300b7e67e050000192000000000680c",
+                new Dictionary<string, string>()
+                {
+                    { "Pad.Up", "3/11" },
+                    { "Pad.Down", "3/12" },
+                    { "Pad.Left", "3/13" },
+                    { "Pad.Right", "3/14" },
+                    { "Select", "" },
+                    { "Start", "3/6" },
+                    { "A..South", "3/0" },
+                    { "B..East", "" },
+                    { "X..West", "3/1" },
+                    { "Y..North", "" },
+                    { "L-Bumper", "3/9" },
+                    { "R-Bumper", "3/10" },
+                    { "L-Trigger", "" },
+                    { "R-Trigger", "0/4/Hi" },
+                    { "L-Stick..Click", "" },
+                    { "R-Stick..Click", "" },
+                    { "L-Up", "0/1/Lo" },
+                    { "L-Down", "0/1/Hi" },
+                    { "L-Left", "0/0/Lo" },
+                    { "L-Right", "0/0/Hi" },
+                    { "R-Up", "3/3" },
+                    { "R-Down", "0/5/Hi" },
+                    { "R-Left", "3/2" },
+                    { "R-Right", "3/4" },
+                }
+            },
+
+            {
+                // Raphnet 2x N64 Adapter
+                "030000009b2800006300000000000000",
+                new Dictionary<string, string>()
+                {
+                    { "Pad.Up", "3/10" },
+                    { "Pad.Down", "3/11" },
+                    { "Pad.Left", "3/12" },
+                    { "Pad.Right", "3/13" },
+                    { "Select", "" },
+                    { "Start", "3/3" },
+                    { "A..South", "3/0" },
+                    { "B..East", "" },
+                    { "X..West", "3/1" },
+                    { "Y..North", "" },
+                    { "L-Bumper", "3/4" },
+                    { "R-Bumper", "3/5" },
+                    { "L-Trigger", "" },
+                    { "R-Trigger", "3/2" },
+                    { "L-Stick..Click", "" },
+                    { "R-Stick..Click", "" },
+                    { "L-Up", "0/1/Lo" },
+                    { "L-Down", "0/1/Hi" },
+                    { "L-Left", "0/0/Lo" },
+                    { "L-Right", "0/0/Hi" },
+                    { "R-Up", "3/6" },
+                    { "R-Down", "3/7" },
+                    { "R-Left", "3/8" },
+                    { "R-Right", "3/9" },
+                }
+            },
+
+            {
+                // Mayflash N64 Adapter
+                "03000000d620000010a7000000000000",
+                new Dictionary<string, string>()
+                {
+                    { "Pad.Up", "1/1/Lo" },
+                    { "Pad.Down", "1/1/Hi" },
+                    { "Pad.Left", "1/0/Lo" },
+                    { "Pad.Right", "1/0/Hi" },
+                    { "Select", "" },
+                    { "Start", "3/9" },
+                    { "A..South", "3/1" },
+                    { "B..East", "" },
+                    { "X..West", "3/2" },
+                    { "Y..North", "" },
+                    { "L-Bumper", "3/4" },
+                    { "R-Bumper", "3/5" },
+                    { "L-Trigger", "" },
+                    { "R-Trigger", "3/6" },
+                    { "L-Stick..Click", "" },
+                    { "R-Stick..Click", "" },
+                    { "L-Up", "0/1/Lo" },
+                    { "L-Down", "0/1/Hi" },
+                    { "L-Left", "0/0/Lo" },
+                    { "L-Right", "0/0/Hi" },
+                    { "R-Up", "0/3/Lo" },
+                    { "R-Down", "0/3/Hi" },
+                    { "R-Left", "0/2/Lo" },
+                    { "R-Right", "0/2/Hi" },
+                }
+            },
         };
     }
 }

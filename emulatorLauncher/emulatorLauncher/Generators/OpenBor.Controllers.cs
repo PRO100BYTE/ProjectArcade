@@ -131,7 +131,7 @@ namespace EmulatorLauncher
             int nbButtons = c.NbButtons;
             int nbAxes = c.NbAxes;
 
-            // With Custom ProjectArcade Build, Button & Axes count are hardcoded for easiest injection
+            // With Custom Retrobat Build, Button & Axes count are hardcoded for easiest injection
             if (_isCustomRetrobatOpenBor)
             {
                 nbButtons = 20;

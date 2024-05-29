@@ -54,7 +54,7 @@ namespace EmulatorLauncher
             }
 
             SetupGeneralConfig(path, rom, system, core, demulCore);
-            SetupDx11Config(path, rom, system, resolution);
+            SetupDx11Config(path, resolution);
 
             if (demulCore == "dc")
             {
@@ -90,12 +90,14 @@ namespace EmulatorLauncher
                     var biosPath = AppConfig.GetFullPath("bios");
                     var romsPath = AppConfig.GetFullPath("roms");
 
-                    var romsPaths = new List<string>();
-                    romsPaths.Add(Path.Combine(biosPath, "dc"));
-                    romsPaths.Add(biosPath);
-                    romsPaths.Add(Path.GetDirectoryName(rom));
+                    var romsPaths = new List<string>
+                    {
+                        Path.Combine(biosPath, "dc"),
+                        biosPath,
+                        Path.GetDirectoryName(rom)
+                    };
 
-                    foreach (var sys in new string[] { "dreamcast", "naomi", "naomi2", "hikaru", "gaelco", "atomiswave" })
+                    foreach (var sys in new string[] { "cave", "dreamcast", "naomi", "naomi2", "hikaru", "gaelco", "atomiswave" })
                     {
                         var sysPath = Path.Combine(romsPath, sys);
                         if (Directory.Exists(sysPath) && !romsPaths.Contains(sysPath))
@@ -177,7 +179,7 @@ namespace EmulatorLauncher
 
         private string _videoDriverName = "gpuDX11";
 
-        private void SetupDx11Config(string path, string rom, string system, ScreenResolution resolution)
+        private void SetupDx11Config(string path, ScreenResolution resolution)
         {
             string iniFile = Path.Combine(path, _videoDriverName + ".ini");
 
@@ -227,6 +229,8 @@ namespace EmulatorLauncher
                         return "naomi";
                     case "atomiswave":
                         return "awave";
+                    case "cave":
+                        return "cave3rd";
                 }
             }
             
@@ -286,15 +290,17 @@ namespace EmulatorLauncher
             {
                 process.WaitForExit();
 
-                if (bezel != null)
-                    bezel.Dispose();
+                bezel?.Dispose();
+
+                ReshadeManager.UninstallReshader(ReshadeBezelType.dxgi, path.WorkingDirectory);
 
                 try { return process.ExitCode; }
                 catch { }
             }
 
-            if (bezel != null)
-                bezel.Dispose();
+            bezel?.Dispose();
+
+            ReshadeManager.UninstallReshader(ReshadeBezelType.dxgi, path.WorkingDirectory);
 
             return -1;
         }

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Diagnostics;
 using EmulatorLauncher.Common;
-using EmulatorLauncher.Common.Joysticks;
 using EmulatorLauncher.Common.FileFormats;
 
 namespace EmulatorLauncher
@@ -13,26 +12,23 @@ namespace EmulatorLauncher
         {
             DependsOnDesktopResolution = true;
         }
-
-        private SdlVersion _sdlVersion = SdlVersion.Unknown;
         
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
             string path = AppConfig.GetFullPath(emulator.Replace("-", " "));
             if (string.IsNullOrEmpty(path) && emulator.Contains("-"))
                 path = AppConfig.GetFullPath(emulator);
-            
+
             string exe = Path.Combine(path, "yuzu.exe");
             if (!File.Exists(exe))
                 return null;
-
-            string sdl2 = Path.Combine(path, "SDL2.dll");
-            if (File.Exists(sdl2))
-                _sdlVersion = SdlJoystickGuidManager.GetSdlVersion(sdl2);
+            
+            if (!File.Exists(exe))
+                return null;
 
             bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
-            SetupConfiguration(path, rom, fullscreen);
+            SetupConfigurationYuzu(path, rom, fullscreen);
 
             var commandArray = new List<string>();
 
@@ -84,8 +80,7 @@ namespace EmulatorLauncher
             string lang = GetCurrentLanguage();
             if (!string.IsNullOrEmpty(lang))
             {
-                string ret;
-                if (availableLanguages.TryGetValue(lang, out ret))
+                if (availableLanguages.TryGetValue(lang, out string ret))
                     return ret;
             }
 
@@ -109,8 +104,7 @@ namespace EmulatorLauncher
                 ini.WriteValue("UI", "Paths\\gamedirs\\size", _gamedirsSize);
         }
 
-
-        private void SetupConfiguration(string path, string rom, bool fullscreen)
+        private void SetupConfigurationYuzu(string path, string rom, bool fullscreen)
         {
             if (SystemConfig.isOptSet("disableautoconfig") && SystemConfig.getOptBoolean("disableautoconfig"))
                 return;
@@ -232,8 +226,6 @@ namespace EmulatorLauncher
                 ini.WriteValue("WebService", "enable_telemetry", "false");
 
                 //remove exit confirmation
-                ini.WriteValue("UI", "confirmClose\\default", "false");
-                ini.WriteValue("UI", "confirmClose", "false");
                 ini.WriteValue("UI", "confirmStop\\default", "false");
                 ini.WriteValue("UI", "confirmStop", "2");
 
@@ -252,6 +244,8 @@ namespace EmulatorLauncher
 
                 //screenshots path
                 string screenshotpath = AppConfig.GetFullPath("screenshots").Replace("\\", "/") + "/yuzu";
+                if (!Directory.Exists(screenshotpath)) try { Directory.CreateDirectory(screenshotpath); }
+                    catch { }
                 if (!string.IsNullOrEmpty(AppConfig["screenshots"]) && Directory.Exists(AppConfig.GetFullPath("screenshots")))
                 {
                     ini.WriteValue("UI", "Screenshots\\enable_screenshot_save_as\\default", "false");

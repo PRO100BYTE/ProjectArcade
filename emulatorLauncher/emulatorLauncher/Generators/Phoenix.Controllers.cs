@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.IO;
 using System.Xml.Linq;
 using EmulatorLauncher.Common;
-using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.Joysticks;
 using System.Collections.Generic;
-using EmulatorLauncher.Common.EmulationStation;
 
 namespace EmulatorLauncher
 {
@@ -45,16 +42,16 @@ namespace EmulatorLauncher
             if (controller.IsKeyboard)
                 return;
             else
-                ConfigureJoystick(xml, controller, controller.PlayerIndex, gamecontrollerDB);
+                ConfigureJoystick(xml, controller, gamecontrollerDB);
         }
 
-        private void ConfigureJoystick(XElement xml, Controller ctrl, int playerIndex, string gamecontrollerdb)
+        private void ConfigureJoystick(XElement xml, Controller ctrl, string gamecontrollerdb)
         {
             if (ctrl == null)
                 return;
 
             SdlToDirectInput controller = null;
-            string guid = (ctrl.Guid.ToString()).Substring(0, 27) + "00000";
+            string guid = (ctrl.Guid.ToString()).Substring(0, 24) + "00000000";
 
             try { controller = GameControllerDBParser.ParseByGuid(gamecontrollerdb, guid); }
             catch { }

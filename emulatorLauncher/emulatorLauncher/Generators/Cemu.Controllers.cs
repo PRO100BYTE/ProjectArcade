@@ -18,22 +18,29 @@ namespace EmulatorLauncher
         /// <param name="pcsx2ini"></param>
         private void UpdateSdlControllersWithHints()
         {
-            var hints = new List<string>();
-            
-            hints.Add("SDL_HINT_JOYSTICK_HIDAPI_PS4 = 1");
-            hints.Add("SDL_HINT_JOYSTICK_HIDAPI_PS5 = 1");
-            hints.Add("SDL_HINT_JOYSTICK_HIDAPI_PS4_RUMBLE = 1");
-            hints.Add("SDL_HINT_JOYSTICK_HIDAPI_PS5_RUMBLE = 1");
-            hints.Add("SDL_HINT_JOYSTICK_HIDAPI_GAMECUBE = 1");
-            hints.Add("SDL_HINT_JOYSTICK_HIDAPI_SWITCH = 1");
-            hints.Add("SDL_HINT_JOYSTICK_HIDAPI_JOY_CONS = 1");
-            hints.Add("SDL_HINT_JOYSTICK_HIDAPI_STADIA = 1");
-            hints.Add("SDL_HINT_JOYSTICK_HIDAPI_STEAM = 1");
-            hints.Add("SDL_HINT_JOYSTICK_HIDAPI_LUNA = 1");
-            
-            SdlGameController.ReloadWithHints(string.Join(",", hints));
-            Program.Controllers.ForEach(c => c.ResetSdlController());
+            var hints = new List<string>
+            {
+                "SDL_HINT_JOYSTICK_HIDAPI_PS4 = 1",
+                "SDL_HINT_JOYSTICK_HIDAPI_PS5 = 1",
+                "SDL_HINT_JOYSTICK_HIDAPI_PS4_RUMBLE = 1",
+                "SDL_HINT_JOYSTICK_HIDAPI_PS5_RUMBLE = 1",
+                "SDL_HINT_JOYSTICK_HIDAPI_GAMECUBE = 1",
+                "SDL_HINT_JOYSTICK_HIDAPI_SWITCH = 1",
+                "SDL_HINT_JOYSTICK_HIDAPI_JOY_CONS = 1",
+                "SDL_HINT_JOYSTICK_HIDAPI_STADIA = 1",
+                "SDL_HINT_JOYSTICK_HIDAPI_STEAM = 1",
+                "SDL_HINT_JOYSTICK_HIDAPI_LUNA = 1"
+            };            
+
+            _sdlMapping = SdlDllControllersMapping.FromDll(_sdl2dll, string.Join(",", hints));
+            if (_sdlMapping == null)
+            {
+                SdlGameController.ReloadWithHints(string.Join(",", hints));
+                Program.Controllers.ForEach(c => c.ResetSdlController());
+            }
         }
+
+        private SdlDllControllersMapping _sdlMapping;
 
         /// <summary>
         /// Create controller configuration
@@ -50,6 +57,22 @@ namespace EmulatorLauncher
 
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
+
+            // Cleanup existing files for additional controllers
+            if (Controllers.Count > 0)
+            {
+                int count = Controllers.Count - 1;
+
+                if (count < 7)
+                {
+                    for (int i = count; i < 8; i++)
+                    {
+                        string controllerXml = Path.Combine(folder, "controller" + i + ".xml");
+                        if (File.Exists(controllerXml))
+                            File.Delete(controllerXml);
+                    }
+                }
+            }
 
             // If Wiimotes is set, do not use ES controllers but force wiimotes
             if (Program.SystemConfig.isOptSet("use_wiimotes") && (Program.SystemConfig["use_wiimotes"] != "0"))
@@ -74,6 +97,8 @@ namespace EmulatorLauncher
                         continue;
 
                     string controllerXml = Path.Combine(folder, "controller" + (controller.PlayerIndex - 1) + ".xml");
+                    if (File.Exists(controllerXml))
+                        File.Delete(controllerXml);
 
                     // Create xml file with correct settings
                     var settings = new XmlWriterSettings() { Encoding = Encoding.UTF8, Indent = true, IndentChars = ("\t"), OmitXmlDeclaration = false };
@@ -275,10 +300,12 @@ namespace EmulatorLauncher
             if (ctrl.IsXInputDevice)
                 xbox = "yes";
 
+            bool forceXInput = SystemConfig.getOptBoolean("cemu_forcexinput") && xbox =="yes";
+
             // Get joystick data (type, api, guid, index)
             string type;                            //will be used to switch from Gamepad to Pro Controller
-            string api = "SDLController";           //all controllers in cemu are mapped as sdl controllers                              
-            string devicename = joy.DeviceName;
+            string api = forceXInput ? "XInput" : "SDLController";           //all controllers in cemu are mapped as sdl controllers                              
+            string devicename = forceXInput ? ("Controller " + (ctrl.XInput.DeviceIndex).ToString()) : joy.DeviceName;
 
             int index = Program.Controllers
                 .GroupBy(c => c.Guid.ToLowerInvariant())
@@ -288,16 +315,32 @@ namespace EmulatorLauncher
                 .ToList()
                 .IndexOf(ctrl);
 
-            string uuid = index + "_" + ctrl.GetSdlGuid(_sdlVersion, true).ToLowerInvariant(); //string uuid of the cemu config file, based on old sdl2 guids ( pre 2.26 ) without crc-16
+            string uuid = forceXInput ? (ctrl.XInput.DeviceIndex).ToString() : index + "_" + ctrl.GetSdlGuid(_sdlVersion, true).ToLowerInvariant(); //string uuid of the cemu config file, based on old sdl2 guids ( pre 2.26 ) without crc-16
+
+            if (_sdlMapping != null && !forceXInput)
+            {
+                var sdlTrueGuid = _sdlMapping.GetControllerGuid(ctrl.DevicePath);
+                if (sdlTrueGuid != null)
+                    uuid = index + "_" + sdlTrueGuid.ToLowerInvariant();
+            }
 
             // Define type of controller
             // Players 1 defaults to WIIU Gamepad but can be changed in features
             // Player 2 defaults to Pro controller but can be changed in features
             // Players 3 and 4 default to pro controllers and cannot be changed
             bool procontroller = false;
-            if (playerIndex == 0)
+            bool emulatedWiimote = false;
+            bool enableMotion = SystemConfig.getOptBoolean("cemu_enable_motion");
+            string cemuController = "cemu_controllerp" + playerIndex;
+
+            if (Program.SystemConfig.isOptSet(cemuController) && (Program.SystemConfig[cemuController].StartsWith("wiimote")))
             {
-                string cemuController = "cemu_controllerp" + playerIndex;
+                type = "Wiimote";
+                emulatedWiimote = true;
+            }
+
+            else if (playerIndex == 0)
+            {
                 if (Program.SystemConfig.isOptSet(cemuController) && (Program.SystemConfig[cemuController] == "procontroller"))
                 {
                     type = "Wii U Pro Controller";
@@ -312,7 +355,6 @@ namespace EmulatorLauncher
 
             else if (playerIndex == 1)
             {
-                string cemuController = "cemu_controllerp" + playerIndex;
                 if (Program.SystemConfig.isOptSet(cemuController) && (Program.SystemConfig[cemuController] == "gamepad"))
                 {
                     type = "Wii U GamePad";
@@ -335,6 +377,15 @@ namespace EmulatorLauncher
             writer.WriteStartDocument();
             writer.WriteStartElement("emulated_controller");
             writer.WriteElementString("type", type);
+
+            if (emulatedWiimote)
+            {
+                if (SystemConfig.isOptSet("cemu_wiimotep" + playerIndex) && !string.IsNullOrEmpty(SystemConfig["cemu_wiimotep" + playerIndex]))
+                    writer.WriteElementString("device_type", SystemConfig["cemu_wiimotep" + playerIndex]);
+                else
+                    writer.WriteElementString("device_type", enableMotion ? "5" : "0");
+            }
+            
             writer.WriteStartElement("controller");
             writer.WriteElementString("api", api);
             writer.WriteElementString("uuid", uuid);
@@ -345,8 +396,10 @@ namespace EmulatorLauncher
                 writer.WriteElementString("rumble", Program.SystemConfig["cemu_enable_rumble"]);
 
             //set motion if option is set in features
-            if (xbox != "yes" && Program.SystemConfig.isOptSet("cemu_enable_motion") && Program.SystemConfig.getOptBoolean("cemu_enable_motion"))
-                writer.WriteElementString("motion", Program.SystemConfig["cemu_enable_motion"]);
+            if (xbox != "yes" && enableMotion)
+                writer.WriteElementString("motion", "true");
+            else
+                writer.WriteElementString("motion", "false");
 
             //Default deadzones and ranges for axis, rotation and trigger
             writer.WriteStartElement("axis");
@@ -369,73 +422,177 @@ namespace EmulatorLauncher
                 var a = joy[k];
                 if (a != null)
                 {
-                    var val = GetInputValuexml(ctrl, k, api, r);
+                    var val = GetInputValuexml(ctrl, k, r);
                     writer.WriteStartElement("entry");
                     writer.WriteElementString("mapping", v);
-                    writer.WriteElementString("button", GetInputValuexml(ctrl, k, api, r));
+                    writer.WriteElementString("button", GetInputValuexml(ctrl, k, r));
                     writer.WriteEndElement();
                 }
             };
 
+            Action<string, string> WriteMappingXinput = (v, k) =>
+            {
+                writer.WriteStartElement("entry");
+                writer.WriteElementString("mapping", v);
+                writer.WriteElementString("button", k);
+                writer.WriteEndElement();
+            };
+
             //Write mappings of buttons
 
-            //revert gamepadbuttons if set in features
-            if (Program.SystemConfig.getOptBoolean("gamepadbuttons"))
+            // Emulated wiimote
+            if (emulatedWiimote)
             {
-                WriteMapping("1", InputKey.a, false);
-                WriteMapping("2", InputKey.b, false);
-                WriteMapping("3", InputKey.y, false);
-                WriteMapping("4", InputKey.x, false);
-            }
-            else
-            {
-                WriteMapping("1", InputKey.b, false);
-                WriteMapping("2", InputKey.a, false);
-                WriteMapping("3", InputKey.x, false);
-                WriteMapping("4", InputKey.y, false);
+                bool horizontalWiimote = Program.SystemConfig[cemuController] == "wiimote_horizontal";
+                
+                WriteMapping("1", InputKey.pageup, false);      // Wiimote A
+                WriteMapping("2", InputKey.l2, false);          // Wiimote B
+                WriteMapping("3", InputKey.y, false);           // Wiimote 1
+                WriteMapping("4", InputKey.a, false);           // Wiimote 2
+                WriteMapping("7", InputKey.start, false);       // Wiimote +
+                WriteMapping("8", InputKey.select, false);      // Wiimote -
+                WriteMapping("9", InputKey.left, false);        // Wiimote Up
+                WriteMapping("10", InputKey.right, false);      // Wiimote Down
+                WriteMapping("11", InputKey.down, false);       // Wiimote Left
+                WriteMapping("12", InputKey.up, false);         // Wiimote Right
+                WriteMapping("17", InputKey.r3, false);         // Wiimote Home
+
+                // Nunchuk
+                if (SystemConfig["cemu_wiimotep" + playerIndex] == "6" || SystemConfig["cemu_wiimotep" + playerIndex] == "1")
+                {
+                    WriteMapping("5", InputKey.r2, false);                  // Nunchuk Z
+                    WriteMapping("6", InputKey.pagedown, false);            // Nunchuk C
+                    WriteMapping("13", InputKey.leftanalogup, false);       // Nunchuk up
+                    WriteMapping("14", InputKey.leftanalogup, true);        // Nunchuk down
+                    WriteMapping("15", InputKey.leftanalogleft, false);     // Nunchuk left
+                    WriteMapping("16", InputKey.leftanalogleft, true);      // Nunchuk right
+                }
             }
 
-            WriteMapping("5", InputKey.pageup, false);
-            WriteMapping("6", InputKey.pagedown, false);
-            WriteMapping("7", InputKey.l2, false);
-            WriteMapping("8", InputKey.r2, false);
-            WriteMapping("9", InputKey.start, false);
-            WriteMapping("10", InputKey.select, false);
-
-            //Pro controller skips 11 while Gamepad continues numbering
-            if (procontroller)
+            // For XInput
+            else if (forceXInput)
             {
-                WriteMapping("12", InputKey.up, false);
-                WriteMapping("13", InputKey.down, false);
-                WriteMapping("14", InputKey.left, false);
-                WriteMapping("15", InputKey.right, false);
-                WriteMapping("16", InputKey.l3, false);
-                WriteMapping("17", InputKey.r3, false);
-                WriteMapping("18", InputKey.leftanalogup, false);
-                WriteMapping("19", InputKey.leftanalogup, true);
-                WriteMapping("20", InputKey.leftanalogleft, false);
-                WriteMapping("21", InputKey.leftanalogleft, true);
-                WriteMapping("22", InputKey.rightanalogup, false);
-                WriteMapping("23", InputKey.rightanalogup, true);
-                WriteMapping("24", InputKey.rightanalogleft, false);
-                WriteMapping("25", InputKey.rightanalogleft, true);
+                //revert gamepadbuttons if set in features
+                if (Program.SystemConfig.getOptBoolean("gamepadbuttons"))
+                {
+                    WriteMappingXinput("1", "12");
+                    WriteMappingXinput("2", "13");
+                    WriteMappingXinput("3", "14");
+                    WriteMappingXinput("4", "15");
+                }
+                else
+                {
+                    WriteMappingXinput("1", "13");
+                    WriteMappingXinput("2", "12");
+                    WriteMappingXinput("3", "15");
+                    WriteMappingXinput("4", "14");
+                }
+
+                WriteMappingXinput("5", "8");
+                WriteMappingXinput("6", "9");
+                WriteMappingXinput("7", "42");
+                WriteMappingXinput("8", "43");
+                WriteMappingXinput("9", "4");
+                WriteMappingXinput("10", "5");
+
+                //Pro controller skips 11 while Gamepad continues numbering
+                if (procontroller)
+                {
+                    WriteMappingXinput("12", "0");
+                    WriteMappingXinput("13", "1");
+                    WriteMappingXinput("14", "2");
+                    WriteMappingXinput("15", "3");
+                    WriteMappingXinput("16", "6");
+                    WriteMappingXinput("17", "7");
+                    WriteMappingXinput("18", "39");
+                    WriteMappingXinput("19", "45");
+                    WriteMappingXinput("20", "44");
+                    WriteMappingXinput("21", "38");
+                    WriteMappingXinput("22", "41");
+                    WriteMappingXinput("23", "47");
+                    WriteMappingXinput("24", "46");
+                    WriteMappingXinput("25", "40");
+                }
+                else
+                {
+                    WriteMappingXinput("11", "0");
+                    WriteMappingXinput("12", "1");
+                    WriteMappingXinput("13", "2");
+                    WriteMappingXinput("14", "3");
+                    WriteMappingXinput("15", "6");
+                    WriteMappingXinput("16", "7");
+                    WriteMappingXinput("17", "39");
+                    WriteMappingXinput("18", "45");
+                    WriteMappingXinput("19", "44");
+                    WriteMappingXinput("20", "38");
+                    WriteMappingXinput("21", "41");
+                    WriteMappingXinput("22", "47");
+                    WriteMappingXinput("23", "46");
+                    WriteMappingXinput("24", "40");
+                }
             }
+            
+            // Other
             else
             {
-                WriteMapping("11", InputKey.up, false);
-                WriteMapping("12", InputKey.down, false);
-                WriteMapping("13", InputKey.left, false);
-                WriteMapping("14", InputKey.right, false);
-                WriteMapping("15", InputKey.l3, false);
-                WriteMapping("16", InputKey.r3, false);
-                WriteMapping("17", InputKey.leftanalogup, false);
-                WriteMapping("18", InputKey.leftanalogup, true);
-                WriteMapping("19", InputKey.leftanalogleft, false);
-                WriteMapping("20", InputKey.leftanalogleft, true);
-                WriteMapping("21", InputKey.rightanalogup, false);
-                WriteMapping("22", InputKey.rightanalogup, true);
-                WriteMapping("23", InputKey.rightanalogleft, false);
-                WriteMapping("24", InputKey.rightanalogleft, true);
+                //revert gamepadbuttons if set in features
+                if (Program.SystemConfig.getOptBoolean("gamepadbuttons"))
+                {
+                    WriteMapping("1", InputKey.a, false);
+                    WriteMapping("2", InputKey.b, false);
+                    WriteMapping("3", InputKey.y, false);
+                    WriteMapping("4", InputKey.x, false);
+                }
+                else
+                {
+                    WriteMapping("1", InputKey.b, false);
+                    WriteMapping("2", InputKey.a, false);
+                    WriteMapping("3", InputKey.x, false);
+                    WriteMapping("4", InputKey.y, false);
+                }
+
+                WriteMapping("5", InputKey.pageup, false);
+                WriteMapping("6", InputKey.pagedown, false);
+                WriteMapping("7", InputKey.l2, false);
+                WriteMapping("8", InputKey.r2, false);
+                WriteMapping("9", InputKey.start, false);
+                WriteMapping("10", InputKey.select, false);
+
+                //Pro controller skips 11 while Gamepad continues numbering
+                if (procontroller)
+                {
+                    WriteMapping("12", InputKey.up, false);
+                    WriteMapping("13", InputKey.down, false);
+                    WriteMapping("14", InputKey.left, false);
+                    WriteMapping("15", InputKey.right, false);
+                    WriteMapping("16", InputKey.l3, false);
+                    WriteMapping("17", InputKey.r3, false);
+                    WriteMapping("18", InputKey.leftanalogup, false);
+                    WriteMapping("19", InputKey.leftanalogup, true);
+                    WriteMapping("20", InputKey.leftanalogleft, false);
+                    WriteMapping("21", InputKey.leftanalogleft, true);
+                    WriteMapping("22", InputKey.rightanalogup, false);
+                    WriteMapping("23", InputKey.rightanalogup, true);
+                    WriteMapping("24", InputKey.rightanalogleft, false);
+                    WriteMapping("25", InputKey.rightanalogleft, true);
+                }
+                else
+                {
+                    WriteMapping("11", InputKey.up, false);
+                    WriteMapping("12", InputKey.down, false);
+                    WriteMapping("13", InputKey.left, false);
+                    WriteMapping("14", InputKey.right, false);
+                    WriteMapping("15", InputKey.l3, false);
+                    WriteMapping("16", InputKey.r3, false);
+                    WriteMapping("17", InputKey.leftanalogup, false);
+                    WriteMapping("18", InputKey.leftanalogup, true);
+                    WriteMapping("19", InputKey.leftanalogleft, false);
+                    WriteMapping("20", InputKey.leftanalogleft, true);
+                    WriteMapping("21", InputKey.rightanalogup, false);
+                    WriteMapping("22", InputKey.rightanalogup, true);
+                    WriteMapping("23", InputKey.rightanalogleft, false);
+                    WriteMapping("24", InputKey.rightanalogleft, true);
+                }
             }
 
             //close xml sections 
@@ -453,13 +610,13 @@ namespace EmulatorLauncher
         /// <param name="api"></param>
         /// <param name="invertAxis"></param>
         /// <returns></returns>
-        private static string GetInputValuexml(Controller ctrl, InputKey ik, string api, bool invertAxis = false)
+        private static string GetInputValuexml(Controller ctrl, InputKey ik, bool invertAxis = false)
         {
             InputConfig joy = ctrl.Config;
 
             var a = joy[ik];        //inputkey
             Int64 val = a.Id;       //id from es_input config file
-            Int64 pid = 1;          //pid will be used to retrieve value in es_input config file for hat and axis
+            Int64 pid;          //pid will be used to retrieve value in es_input config file for hat and axis
 
             //L1 and R1 for XInput sends wrong id, cemu is based on SDl id's
             if (ctrl.IsXInputDevice && a.Type == "button" && val == 5)
@@ -591,7 +748,7 @@ namespace EmulatorLauncher
                 case 0x40000045: return 123; // F12
             }
 
-            sdlCode = sdlCode & 0xFFFF;
+            sdlCode &= 0xFFFF;
             byte value = (byte)((char)sdlCode).ToString().ToUpper()[0];
             return value;
         }

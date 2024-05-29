@@ -17,8 +17,10 @@ namespace EmulatorLauncher
         /// <param name="ini"></param>
         private void UpdateSdlControllersWithHints()
         {
-            var hints = new List<string>();
-            hints.Add("SDL_JOYSTICK_HIDAPI_WII = 0");
+            var hints = new List<string>
+            {
+                "SDL_JOYSTICK_HIDAPI_WII = 0"
+            };
 
             SdlGameController.ReloadWithHints(string.Join(",", hints));
             Program.Controllers.ForEach(c => c.ResetSdlController());
@@ -167,14 +169,21 @@ namespace EmulatorLauncher
             // Wheels
             int wheelNb = 0;
             bool useWheel = SystemConfig.isOptSet("use_wheel") && SystemConfig.getOptBoolean("use_wheel");
+            if (useWheel)
+                SimpleLogger.Instance.Info("[WHEELS] Wheels enabled.");
+
             bool invertedWheelAxis = false;
             WheelMappingInfo wheelmapping = null;
             string wheelGuid = "nul";
             List<Wheel> usableWheels = new List<Wheel>();
+            bool deportedShifter = false;
+            int shifterID = -1;
 
             foreach (var controller in this.Controllers.Where(c => !c.IsKeyboard))
             {
+                SimpleLogger.Instance.Info("[WHEELS] Fetching Wheel model.");
                 var drivingWheel = Wheel.GetWheelType(controller.DevicePath.ToUpperInvariant());
+                SimpleLogger.Instance.Info("[WHEELS] Wheel model found : " + drivingWheel.ToString());
 
                 if (drivingWheel != WheelType.Default)
                     usableWheels.Add(new Wheel() 
@@ -279,6 +288,7 @@ namespace EmulatorLauncher
                 j1index = SystemConfig["wheel_index"].ToInteger();
                 SimpleLogger.Instance.Info("[INFO] Forcing index of wheel/joystick to " + j1index.ToString());
             }
+            shifterID = j1index - 1;
 
             bool multiplayer = j2index != -1;
             bool enableServiceMenu = SystemConfig.isOptSet("m3_service") && SystemConfig.getOptBoolean("m3_service");
@@ -593,8 +603,8 @@ namespace EmulatorLauncher
             #region dinput
             else if (tech == "dinput")
             {
-                string guid1 = (c1.Guid.ToString()).Substring(0, 27) + "00000";
-                string wheelSdlGuid = wheelGuid != "nul" ? wheelGuid.Substring(0, 27) + "00000" : "nul";
+                string guid1 = (c1.Guid.ToString()).Substring(0, 24) + "00000000";
+                string wheelSdlGuid = wheelGuid != "nul" ? wheelGuid.Substring(0, 24) + "00000000" : "nul";
 
                 // set inputsystem
                 if (multigun)
@@ -605,7 +615,7 @@ namespace EmulatorLauncher
                 else
                     ini.WriteValue(" Global ", "InputSystem", "dinput");
 
-                // Fetch information in ProjectArcade/system/tools/gamecontrollerdb.txt file
+                // Fetch information in retrobat/system/tools/gamecontrollerdb.txt file
                 SdlToDirectInput ctrl1 = null;
                 SdlToDirectInput sdlWheel = null;
                 string gamecontrollerDB = Path.Combine(AppConfig.GetFullPath("tools"), "gamecontrollerdb.txt");
@@ -673,6 +683,18 @@ namespace EmulatorLauncher
 
                     if (useWheel)
                     {
+                        if (Wheel.shifterOtherDevice.Contains(usableWheels[0].Type))
+                            deportedShifter = true;
+
+                        if (SystemConfig.isOptSet("gearstick_deviceid") && !string.IsNullOrEmpty(SystemConfig["gearstick_deviceid"]))
+                        {
+                            deportedShifter = true;
+                            shifterID = SystemConfig["gearstick_deviceid"].ToInteger();
+                        }
+
+                        if (deportedShifter)
+                            SimpleLogger.Instance.Info("[WHEELS] Deported shifter enabled for wheel " + usableWheels[0].Name + " with ID " + shifterID);
+
                         //Steering wheel - left analog stick horizontal axis
                         ini.WriteValue(" Global ", "InputSteeringLeft", GetWheelMapping(wheelmapping.Steer, ctrl1, j1index, "left"));
                         ini.WriteValue(" Global ", "InputSteeringRight", GetWheelMapping(wheelmapping.Steer, ctrl1, j1index, "right"));
@@ -696,6 +718,14 @@ namespace EmulatorLauncher
                             ini.WriteValue(" Global ", "InputGearShiftN", "\"" + GetDinputMapping(j1index, ctrl1, "rightshoulder") + "\"");
                         }
 
+                        else if (deportedShifter)
+                        {
+                            ini.WriteValue(" Global ", "InputGearShift1", GetWheelMapping(wheelmapping.Gear1, ctrl1, j1index, "nul", false, shifterID));
+                            ini.WriteValue(" Global ", "InputGearShift2", GetWheelMapping(wheelmapping.Gear2, ctrl1, j1index, "nul", false, shifterID));
+                            ini.WriteValue(" Global ", "InputGearShift3", GetWheelMapping(wheelmapping.Gear3, ctrl1, j1index, "nul", false, shifterID));
+                            ini.WriteValue(" Global ", "InputGearShift4", GetWheelMapping(wheelmapping.Gear4, ctrl1, j1index, "nul", false, shifterID));
+                            ini.WriteValue(" Global ", "InputGearShiftN", GetWheelMapping(wheelmapping.Gear_reverse, ctrl1, j1index, "nul", false, shifterID));
+                        }
                         else
                         {
                             ini.WriteValue(" Global ", "InputGearShift1", GetWheelMapping(wheelmapping.Gear1, ctrl1, j1index));
@@ -916,7 +946,7 @@ namespace EmulatorLauncher
 
                     if (c2 != null && multiplayer)
                     {
-                        string guid2 = (c2.Guid.ToString()).Substring(0, 27) + "00000";
+                        string guid2 = (c2.Guid.ToString()).Substring(0, 24) + "00000000";
                         SimpleLogger.Instance.Info("[INFO] Player 2. Fetching gamecontrollerdb.txt file with guid : " + guid2);
                         var ctrl2 = gamecontrollerDB == null ? null : GameControllerDBParser.ParseByGuid(gamecontrollerDB, guid2);
                         
@@ -1538,7 +1568,7 @@ namespace EmulatorLauncher
         }
         #endregion
 
-        private string GetDinputMapping(int index, SdlToDirectInput c, string buttonkey, int plus = 1, bool wheel = false)
+        private string GetDinputMapping(int index, SdlToDirectInput c, string buttonkey, int direction = 1, bool wheel = false)
         {
             if (c == null)
                 return "";
@@ -1588,8 +1618,17 @@ namespace EmulatorLauncher
             {
                 int axisID = button.Substring(1).ToInteger();
 
-                if (button.StartsWith("-a") || button.StartsWith("+a"))
+                if (button.StartsWith("-a"))
+                {
                     axisID = button.Substring(2).ToInteger();
+                    direction = -1;
+                }
+
+                else if (button.StartsWith("+a"))
+                {
+                    axisID = button.Substring(2).ToInteger();
+                    direction = 1;
+                }
 
                 else if (button.StartsWith("a"))
                     axisID = button.Substring(1).ToInteger();
@@ -1597,28 +1636,28 @@ namespace EmulatorLauncher
                 switch (axisID)
                 {
                     case 0:
-                        if (plus == 1) return "JOY" + index + "_XAXIS_POS";             // right/down/push
-                        else if (plus == -1) return "JOY" + index + "_XAXIS_NEG";       // left/up/release
+                        if (direction == 1) return "JOY" + index + "_XAXIS_POS";             // right/down/push
+                        else if (direction == -1) return "JOY" + index + "_XAXIS_NEG";       // left/up/release
                         else return "JOY" + index + "_XAXIS";
                     case 1:
-                        if (plus == 1) return "JOY" + index + "_YAXIS_POS";
-                        else if (plus == -1) return "JOY" + index + "_YAXIS_NEG";
+                        if (direction == 1) return "JOY" + index + "_YAXIS_POS";
+                        else if (direction == -1) return "JOY" + index + "_YAXIS_NEG";
                         else return "JOY" + index + "_YAXIS";
                     case 2:
-                        if (plus == 1) return "JOY" + index + "_ZAXIS_POS";
-                        else if (plus == -1) return "JOY" + index + "_ZAXIS_NEG";
+                        if (direction == 1) return "JOY" + index + "_ZAXIS_POS";
+                        else if (direction == -1) return "JOY" + index + "_ZAXIS_NEG";
                         else return "JOY" + index + "_ZAXIS";
                     case 3:
-                        if (plus == 1) return "JOY" + index + "_RXAXIS_POS";
-                        else if (plus == -1) return "JOY" + index + "_RXAXIS_NEG";
+                        if (direction == 1) return "JOY" + index + "_RXAXIS_POS";
+                        else if (direction == -1) return "JOY" + index + "_RXAXIS_NEG";
                         else return "JOY" + index + "_RXAXIS";
                     case 4:
-                        if (plus == 1) return "JOY" + index + "_RYAXIS_POS";
-                        else if (plus == -1) return "JOY" + index + "_RYAXIS_NEG";
+                        if (direction == 1) return "JOY" + index + "_RYAXIS_POS";
+                        else if (direction == -1) return "JOY" + index + "_RYAXIS_NEG";
                         else return "JOY" + index + "_RYAXIS";
                     case 5:
-                        if (plus == 1) return "JOY" + index + "_RZAXIS_POS";
-                        else if(plus == -1) return "JOY" + index + "_RZAXIS_NEG";
+                        if (direction == 1) return "JOY" + index + "_RZAXIS_POS";
+                        else if(direction == -1) return "JOY" + index + "_RZAXIS_NEG";
                         else return "JOY" + index + "_RZAXIS";
                 }
             }
@@ -1626,7 +1665,7 @@ namespace EmulatorLauncher
             return "";
         }
 
-        private string GetWheelMapping(string button, SdlToDirectInput wheel, int index, string direction = "nul", bool invertAxis = false)
+        private string GetWheelMapping(string button, SdlToDirectInput wheel, int index, string direction = "nul", bool invertAxis = false, int shifterid = -1)
         {
             if (wheel == null)
                 return "\"NONE\"";
@@ -1635,9 +1674,21 @@ namespace EmulatorLauncher
 
             if (button.StartsWith("button_"))
             {
-                int buttonID = (button.Substring(7).ToInteger()) + 1;
-                return "\"JOY" + index + "_BUTTON" + buttonID + "\"";
+                if (shifterid != -1)
+                {
+                    int buttonID = (button.Substring(7).ToInteger()) + 1;
+                    return "\"JOY" + shifterid + "_BUTTON" + buttonID + "\"";
+                }
+                else
+                {
+                    int buttonID = (button.Substring(7).ToInteger()) + 1;
+                    return "\"JOY" + index + "_BUTTON" + buttonID + "\"";
+                }
             }
+            
+            else if (button.StartsWith("dp"))
+                return "\"" + GetDinputMapping(index, wheel, button) + "\"";
+
             else
             {
                 switch (button)

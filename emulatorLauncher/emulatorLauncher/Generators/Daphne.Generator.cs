@@ -59,6 +59,7 @@ namespace EmulatorLauncher
         protected string _executableName;
         private string _daphneHomedir;
         private string _symLink;
+        private string _daphnePath;
 
         static string FindFile(string dir, string pattern, Predicate<string> predicate)
         {
@@ -117,6 +118,8 @@ namespace EmulatorLauncher
 
             string emulatorPath = AppConfig.GetFullPath(_executableName);
             string exe = Path.Combine(emulatorPath, _executableName + ".exe");
+            _daphnePath = AppConfig.GetFullPath("daphne");
+
             if (!File.Exists(exe))
             {
                 ExitCode = ExitCodes.EmulatorNotInstalled;
@@ -156,6 +159,9 @@ namespace EmulatorLauncher
 
                 if (directoryName == "actionmax")
                     directoryName = Path.ChangeExtension(directoryName, ".daphne");
+
+                if (directoryName.EndsWith(".singe"))
+                    directoryName = directoryName.Replace(".singe", ".daphne");
 
                 _symLink = Path.Combine(emulatorPath, directoryName);
 
@@ -203,6 +209,13 @@ namespace EmulatorLauncher
 
             if (fullscreen)
                 commandArray.Add("-fullscreen");
+
+            /* 
+            In future we can use -gamepad to use SDL codes for controller settings, however this does not currently allow to specify the controller index...
+            It will also need modification of daphne.controllers.cs with SDL codes instead of dinput numbers
+            if (this.Controllers.Any(c => !c.IsKeyboard))
+                commandArray.Add("-gamepad");
+            */
 
             commandArray.Add("-x");
             commandArray.Add((resolution == null ? Screen.PrimaryScreen.Bounds.Width : resolution.Width).ToString());
@@ -260,7 +273,7 @@ namespace EmulatorLauncher
                 if (bezelFileInfo != null)
                 {
                     string bezelFile = bezelFileInfo.PngFile;
-                    string hypseusBezelFile = Path.Combine(AppConfig.GetFullPath("hypseus"), "bezels", "ProjectArcadeBezel.png");
+                    string hypseusBezelFile = Path.Combine(AppConfig.GetFullPath("hypseus"), "bezels", "retrobatBezel.png");
 
                     if (bezelFile != null && File.Exists(bezelFile))
                     {
@@ -315,6 +328,9 @@ namespace EmulatorLauncher
                 string frameFile = Path.Combine(_daphneHomedir, "framefile");
                 if (Directory.Exists(frameFile))
                     new DirectoryInfo(frameFile).Delete(true);     
+
+                if (_executableName == "daphne")
+                    ReshadeManager.UninstallReshader(ReshadeBezelType.opengl, _daphnePath);
             }
             catch { }
         }

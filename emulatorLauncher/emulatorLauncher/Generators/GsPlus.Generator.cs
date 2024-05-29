@@ -92,8 +92,10 @@ namespace EmulatorLauncher
 
             _resolution = resolution;
 
-            List<string> commandArray = new List<string>();
-            commandArray.Add("-borderless");
+            List<string> commandArray = new List<string>
+            {
+                "-borderless"
+            };
 
             if (this.Controllers.Any(c => !c.IsKeyboard))
             {
@@ -129,12 +131,16 @@ namespace EmulatorLauncher
 
             int ret = base.RunAndWait(path);
 
-            if (bezel != null)
-                bezel.Dispose();
+            bezel?.Dispose();
 
             // GsPlus always returns 1
             if (ret == 1)
-                return 0;
+            {
+                ReshadeManager.UninstallReshader(ReshadeBezelType.opengl, path.WorkingDirectory);
+                ret = 0;
+            }
+
+            ReshadeManager.UninstallReshader(ReshadeBezelType.opengl, path.WorkingDirectory);
 
             return ret;
         }

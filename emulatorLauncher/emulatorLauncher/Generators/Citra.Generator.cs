@@ -25,18 +25,21 @@ namespace EmulatorLauncher
             if (!File.Exists(exe))
                 return null;
 
-            bool isCitraCanary = folderName == "citra-canary";
             bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
             string portableFile = Path.Combine(path, "portable.txt");
             if (!File.Exists(portableFile))
                 File.WriteAllText(portableFile, "");
 
+            string userFolder = Path.Combine(path, "user");
+            if (!Directory.Exists(userFolder))
+                try { Directory.CreateDirectory(userFolder); } catch {}
+
             string sdl2 = Path.Combine(path, "SDL2.dll");
             if (File.Exists(sdl2))
                 _sdlVersion = SdlJoystickGuidManager.GetSdlVersion(sdl2);
 
-            SetupConfiguration(path, isCitraCanary, fullscreen);
+            SetupConfigurationCitra(path, fullscreen);
 
             List<string> commandArray = new List<string>();
             if (fullscreen)
@@ -55,7 +58,7 @@ namespace EmulatorLauncher
             };
         }
 
-        private void SetupConfiguration(string path, bool isCitraCanary = false, bool fullscreen = true)
+        private void SetupConfigurationCitra(string path, bool fullscreen = true)
         {
             if (SystemConfig.getOptBoolean("disableautoconfig"))
                 return;
@@ -84,14 +87,14 @@ namespace EmulatorLauncher
                 ini.WriteValue("Data%20Storage", "use_custom_storage\\default", "false");
                 ini.WriteValue("Data%20Storage", "use_custom_storage", "true");
 
-                string citraNandPath = Path.Combine(AppConfig.GetFullPath("saves"), "3ds", "Citra", "nand");
-                if (!Directory.Exists(citraNandPath)) try { Directory.CreateDirectory(citraNandPath); }
+                string emuNandPath = Path.Combine(AppConfig.GetFullPath("saves"), "3ds", "Citra", "nand");
+                if (!Directory.Exists(emuNandPath)) try { Directory.CreateDirectory(emuNandPath); }
                     catch { }
                 ini.WriteValue("Data%20Storage", "nand_directory\\default", "false");
-                ini.WriteValue("Data%20Storage", "nand_directory", citraNandPath.Replace("\\", "/"));
+                ini.WriteValue("Data%20Storage", "nand_directory", emuNandPath.Replace("\\", "/"));
 
                 // Write nand settings (language)
-                string nandPath = Path.Combine(citraNandPath, "data", "00000000000000000000000000000000", "sysdata", "00010017", "00000000", "config");
+                string nandPath = Path.Combine(emuNandPath, "data", "00000000000000000000000000000000", "sysdata", "00010017", "00000000", "config");
                 if (File.Exists(nandPath))
                     Write3DSnand(nandPath);
 
@@ -149,6 +152,20 @@ namespace EmulatorLauncher
                     {
                         ini.WriteValue("Renderer", "resolution_factor\\default", "true");
                         ini.WriteValue("Renderer", "resolution_factor", "1");
+                    }
+                }
+
+                if (Features.IsSupported("citra_texture_filter"))
+                {
+                    if (SystemConfig.isOptSet("citra_texture_filter"))
+                    {
+                        ini.WriteValue("Renderer", "texture_filter\\default", "false");
+                        ini.WriteValue("Renderer", "texture_filter", SystemConfig["citra_texture_filter"]);
+                    }
+                    else
+                    {
+                        ini.WriteValue("Renderer", "texture_filter\\default", "true");
+                        ini.WriteValue("Renderer", "texture_filter", "0");
                     }
                 }
 
@@ -225,12 +242,12 @@ namespace EmulatorLauncher
             if (!File.Exists(path))
                 return;
 
-            int langId = 1;
+            int langId;
 
             if (SystemConfig.isOptSet("n3ds_language") && !string.IsNullOrEmpty(SystemConfig["n3ds_language"]))
                 langId = SystemConfig["n3ds_language"].ToInteger();
             else
-                langId = get3DSLangFromEnvironment();
+                langId = Get3DSLangFromEnvironment();
 
             // Read nand file
             byte[] bytes = File.ReadAllBytes(path);
@@ -242,7 +259,7 @@ namespace EmulatorLauncher
             File.WriteAllBytes(path, bytes);
         }
 
-        private int get3DSLangFromEnvironment()
+        private int Get3DSLangFromEnvironment()
         {
             var availableLanguages = new Dictionary<string, int>()  //OA = 10, OB = 11 (traditional chinese)
             {
@@ -267,8 +284,7 @@ namespace EmulatorLauncher
             var lang = GetCurrentLanguage();
             if (!string.IsNullOrEmpty(lang))
             {
-                int ret;
-                if (availableLanguages.TryGetValue(lang, out ret))
+                if (availableLanguages.TryGetValue(lang, out int ret))
                     return ret;
             }
 

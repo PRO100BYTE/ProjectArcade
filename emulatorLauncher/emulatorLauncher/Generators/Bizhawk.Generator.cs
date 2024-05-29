@@ -4,6 +4,7 @@ using System.IO;
 using System.Diagnostics;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common;
+using System;
 
 namespace EmulatorLauncher
 {
@@ -12,7 +13,8 @@ namespace EmulatorLauncher
         private BezelFiles _bezelFileInfo;
         private ScreenResolution _resolution;
 
-        private static List<string> preferredRomExtensions = new List<string>() { ".bin", ".cue", ".img", ".iso", ".rom" };
+        private static readonly List<string> preferredRomExtensions = new List<string>() { ".bin", ".cue", ".img", ".iso", ".rom" };
+        private static readonly List<string> zipSystems = new List<string>() { "psx", "saturn", "n64", "n64dd", "pcenginecd", "jaguarcd", "vectrex", "odyssey2", "uzebox" };
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
@@ -28,6 +30,22 @@ namespace EmulatorLauncher
             if (!File.Exists(exe))
                 return null;
 
+            string[] romExtensions = new string[] { ".m3u", ".chd", ".cue", ".ccd", ".cdi", ".iso", ".mds", ".nrg", ".z64", ".n64", ".v64", ".ndd", ".vec", ".uze", ".o2"};
+
+            if (zipSystems.Contains(system) && (Path.GetExtension(rom).ToLowerInvariant() == ".zip" || Path.GetExtension(rom).ToLowerInvariant() == ".7z"))
+            {
+                string uncompressedRomPath = this.TryUnZipGameIfNeeded(system, rom, false, false);
+                if (Directory.Exists(uncompressedRomPath))
+                {
+                    string[] romFiles = Directory.GetFiles(uncompressedRomPath).OrderBy(file => Array.IndexOf(romExtensions, Path.GetExtension(file).ToLowerInvariant())).ToArray();
+                    rom = romFiles.FirstOrDefault(file => romExtensions.Any(ext => Path.GetExtension(file).Equals(ext, StringComparison.OrdinalIgnoreCase)));
+                    ValidateUncompressedGame();
+                }
+            }
+
+            if (Path.GetExtension(rom) == ".chd")
+                throw new ApplicationException("Extension CHD not compatible with Bizhawk");
+
             // Json Config file
             string configFile = Path.Combine(path, "config.ini");
 
@@ -37,7 +55,7 @@ namespace EmulatorLauncher
 
                 SetupGeneralConfig(json,system, core, rom, emulator);
                 SetupCoreOptions(json, system, core, rom);
-                SetupFirmwares(json, system, core);
+                SetupFirmwares(json, system);
                 SetupRetroAchievements(json);
                 CreateControllerConfiguration(json, system, core);
 
@@ -62,9 +80,11 @@ namespace EmulatorLauncher
             }
 
             // Command line arguments
-            var commandArray = new List<string>();
+            var commandArray = new List<string>
+            {
+                "\"" + rom + "\""
+            };
 
-            commandArray.Add("\"" + rom + "\"");
             if (fullscreen)
                 commandArray.Add("--fullscreen");
 
@@ -79,7 +99,7 @@ namespace EmulatorLauncher
             };
         }
 
-        private static Dictionary<string, string> bizhawkPreferredCore = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> bizhawkPreferredCore = new Dictionary<string, string>()
         {
             { "gb", "GB" },
             { "gbc", "GBC" },
@@ -253,7 +273,7 @@ namespace EmulatorLauncher
                 json["GbAsSgb"] = "false";
         }
 
-        private void SetupFirmwares(DynamicJson json, string system, string core)
+        private void SetupFirmwares(DynamicJson json, string system)
         {
             var firmware = json.GetOrCreateContainer("FirmwareUserSpecifications");
 
@@ -535,8 +555,7 @@ namespace EmulatorLauncher
 
             int ret = base.RunAndWait(path);
 
-            if (bezel != null)
-                bezel.Dispose();
+            bezel?.Dispose();
 
             if (ret == 1)
                 return 0;
@@ -544,7 +563,7 @@ namespace EmulatorLauncher
             return ret;
         }
 
-        private static Dictionary<string, string> bizHawkSystems = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> bizHawkSystems = new Dictionary<string, string>()
         {
             { "amstradcpc", "AmstradCPC" },
             { "apple2", "AppleII" },
@@ -593,7 +612,7 @@ namespace EmulatorLauncher
             { "zxspectrum", "ZXSpectrum" },
         };
 
-        private static Dictionary<string, string> bizHawkShortSystems = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> bizHawkShortSystems = new Dictionary<string, string>()
         {
             { "atari2600", "A26" },
             { "atari7800", "A78" },

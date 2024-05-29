@@ -33,9 +33,6 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>projectarcade.ico</ApplicationIcon>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="SharpDX, Version=3.0.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
@@ -93,6 +90,7 @@
     <Compile Include="Joysticks\HidGameDevice.cs" />
     <Compile Include="Joysticks\HidToDirectInput.cs" />
     <Compile Include="Joysticks\InputDevices.cs" />
+    <Compile Include="Joysticks\SdlDllControllersMapping.cs" />
     <Compile Include="Joysticks\SdlGameController.cs" />
     <Compile Include="Joysticks\SdlJoystickGuid.cs" />
     <Compile Include="Joysticks\SdlToDirectInput.cs" />
@@ -171,9 +169,7 @@
     <None Include="Resources\SQLite.Interop.x64.gz" />
     <None Include="Resources\SQLite.Interop.x86.gz" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="projectarcade.ico" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release (

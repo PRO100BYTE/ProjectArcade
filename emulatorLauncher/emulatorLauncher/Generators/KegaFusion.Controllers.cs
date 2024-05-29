@@ -5,10 +5,7 @@ using EmulatorLauncher.Common.Joysticks;
 using System.Collections.Generic;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.EmulationStation;
-using System.Windows;
-using EmulatorLauncher.Common.IMapi2;
 using System;
-using System.Reflection;
 
 namespace EmulatorLauncher
 {
@@ -82,7 +79,7 @@ namespace EmulatorLauncher
                 return;
 
             string gamecontrollerDB = Path.Combine(AppConfig.GetFullPath("tools"), "gamecontrollerdb.txt");
-            string guid = (ctrl.Guid.ToString()).Substring(0, 27) + "00000";
+            string guid = (ctrl.Guid.ToString()).Substring(0, 24) + "00000000";
             SdlToDirectInput controller = null;
 
             SimpleLogger.Instance.Info("[INFO] Player " + ctrl.PlayerIndex + ". Fetching gamecontrollerdb.txt file with guid : " + guid);
@@ -174,10 +171,8 @@ namespace EmulatorLauncher
 
         private string GetInputCode(SdlToDirectInput ctrl, Controller c, InputKey key)
         {
-            bool revertAxis = false;
-            key = key.GetRevertedAxis(out revertAxis);
+            key = key.GetRevertedAxis(out bool revertAxis);
             bool isxinput = c.IsXInputDevice;
-            bool trigger = false;
 
             string esName = (c.Config[key].Name).ToString();
 

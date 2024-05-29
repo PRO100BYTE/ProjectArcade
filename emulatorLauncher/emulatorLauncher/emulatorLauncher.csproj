@@ -74,7 +74,6 @@
     <Compile Include="Controller.cs" />
     <Compile Include="EsFeaturesPoBuilder.cs" />
     <Compile Include="EsSaveStatesExtensions.cs" />
-    <Compile Include="Generators\ProjectArcadeLauncher.Generator.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="InstallerFrm.cs">
       <SubType>Form</SubType>
@@ -105,6 +104,9 @@
       <DependentUpon>Ares.Generator.cs</DependentUpon>
     </Compile>
     <Compile Include="Generators\BigPEmu.Generator.cs" />
+    <Compile Include="Generators\BigPEmu.Controllers.cs">
+      <DependentUpon>BigPEmu.Generator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Generators\Bizhawk.Generator.cs" />
     <Compile Include="Generators\Bizhawk.Controllers.cs">
       <DependentUpon>Bizhawk.Generator.cs</DependentUpon>
@@ -135,6 +137,7 @@
     <Compile Include="Generators\Demul.Controllers.cs">
       <DependentUpon>Demul.Generator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Generators\DevilutionX.Generator.cs" />
     <Compile Include="Generators\Dolphin.Generator.cs" />
     <Compile Include="Generators\Dolphin.Controllers.cs">
       <DependentUpon>Dolphin.Generator.cs</DependentUpon>
@@ -169,6 +172,10 @@
     <Compile Include="Generators\SteamLauncher.Generator.cs">
       <DependentUpon>ExeLauncher.Generator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Generators\Fbneo.Generator.cs" />
+    <Compile Include="Generators\Fbneo.Controllers.cs">
+      <DependentUpon>Fbneo.Generator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Generators\Flycast.Generator.cs" />
     <Compile Include="Generators\Flycast.Controllers.cs">
       <DependentUpon>Flycast.Generator.cs</DependentUpon>
@@ -181,9 +188,14 @@
     </Compile>
     <Compile Include="Generators\ForceEngine.Generator.cs" />
     <Compile Include="Generators\Fpinball.Generator.cs" />
+    <Compile Include="Generators\GemRB.Generator.cs" />
     <Compile Include="Generators\GsPlus.Generator.cs" />
     <Compile Include="Generators\GzDoom.Generator.cs" />
     <Compile Include="Generators\Hatari.Generator.cs" />
+    <Compile Include="Generators\Jgenesis.Generator.cs" />
+    <Compile Include="Generators\Jgenesis.Controllers.cs">
+      <DependentUpon>Jgenesis.Generator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Generators\Jynx.Generator.cs" />
     <Compile Include="Generators\KegaFusion.Generator.cs" />
     <Compile Include="Generators\KegaFusion.Controllers.cs">
@@ -208,6 +220,10 @@
     </Compile>
     <Compile Include="Generators\LibRetro.InputRemap.cs">
       <DependentUpon>LibRetro.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Lime3ds.Generator.cs" />
+    <Compile Include="Generators\Lime3ds.Controllers.cs">
+      <DependentUpon>Lime3ds.Generator.cs</DependentUpon>
     </Compile>
     <Compile Include="Generators\Love.Generator.cs" />
     <Compile Include="Generators\MagicEngine.Generator.cs" />
@@ -284,6 +300,13 @@
     <Compile Include="Generators\Play.Controllers.cs">
       <DependentUpon>Play.Generator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Generators\PortsLauncher.Generator.cs" />
+    <Compile Include="Generators\PortsLauncher.Configuration.cs">
+      <DependentUpon>PortsLauncher.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\PortsLauncher.Controllers.cs">
+      <DependentUpon>PortsLauncher.Generator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Generators\Ppsspp.Generator.cs" />
     <Compile Include="Generators\Ppsspp.Controllers.cs">
       <DependentUpon>Ppsspp.Generator.cs</DependentUpon>
@@ -292,6 +315,10 @@
       <DependentUpon>Ppsspp.Generator.cs</DependentUpon>
     </Compile>
     <Compile Include="Generators\Project64.Generator.cs" />
+    <Compile Include="Generators\PSXMame.Generator.cs" />
+    <Compile Include="Generators\PSXMame.Controllers.cs">
+      <DependentUpon>PSXMame.Generator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Generators\Raine.Generator.cs" />
     <Compile Include="Generators\Redream.Generator.cs" />
     <Compile Include="Generators\Redream.Controllers.cs">
@@ -316,6 +343,7 @@
     <Compile Include="Generators\Simple64.Controllers.cs">
       <DependentUpon>Simple64.Generator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Generators\Singe2.Generator.cs" />
     <Compile Include="Generators\Snes9x.Generator.cs" />
     <Compile Include="Generators\Snes9x.Controllers.cs">
       <DependentUpon>Snes9x.Generator.cs</DependentUpon>
@@ -328,6 +356,14 @@
     <Compile Include="Generators\Stella.Generator.cs" />
     <Compile Include="Generators\Stella.Controllers.cs">
       <DependentUpon>Stella.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Sudachi.Generator.cs" />
+    <Compile Include="Generators\Sudachi.Controllers.cs">
+      <DependentUpon>Sudachi.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Suyu.Generator.cs" />
+    <Compile Include="Generators\Suyu.Controllers.cs">
+      <DependentUpon>Suyu.Generator.cs</DependentUpon>
     </Compile>
     <Compile Include="Generators\TeknoParrot.Generator.cs" />
     <Compile Include="Generators\TeknoParrot.Controllers.cs">
@@ -442,7 +478,6 @@
   <ItemGroup>
     <Content Include="icon.ico" />
     <Content Include="projectarcade.ico" />
-    <None Include="Resources\projectarcade.png" />
     <None Include="Resources\blacklisted-words.txt" />
     <None Include="Resources\retrobat.png" />
     <None Include="Reshader\Bezel.fx" />

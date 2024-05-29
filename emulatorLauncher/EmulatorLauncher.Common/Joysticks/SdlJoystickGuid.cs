@@ -75,6 +75,41 @@ namespace EmulatorLauncher.Common.Joysticks
                 return (USB_PRODUCT)intValue;
             }
         }
+                
+        /// <summary>
+        /// Last byte of the SDL guid
+        /// </summary>
+        public int SubControllerType
+        {
+            get
+            {
+                if (_guid.Length != 32)
+                    return 0;
+
+                string id = _guid.Substring(30, 2).ToUpper();
+                int intValue = int.Parse(id, System.Globalization.NumberStyles.HexNumber);
+                return intValue;
+            }
+        }
+
+        public bool SupportsGuidsWithManufacturerCrc
+        {
+            get
+            {
+                if (WrappedTechID == SdlWrappedTechId.RawInput)
+                    return true;
+
+                if (WrappedTechID == SdlWrappedTechId.HID && VendorId == USB_VENDOR.NINTENDO && SubControllerType > 0)
+                {
+                    // See UpdateDeviceIdentity(SDL_HIDAPI_Device *device)
+                    // if only HIDAPI_SetDeviceName is called -> No manufacturerId
+                    // if HIDAPI_SetDeviceProduct is called -> Guid includes manufacturerId
+                    return SubControllerType < 7 || SubControllerType > 10;
+                }
+
+                return false;
+            }
+        }
 
         public ushort JoystickNameCrc16
         {
@@ -126,47 +161,43 @@ namespace EmulatorLauncher.Common.Joysticks
             if (version == SdlVersion.Unknown || _guid.Length != 32)
                 return new SdlJoystickGuid(_guid);
 
+            var prod = ProductId;
+
             SdlJoystickGuid ret = new SdlJoystickGuid(_guid);
 
-            if (version == SdlVersion.SDL2_30)
+            if (version == SdlVersion.SDL2_30 && ret.SupportsGuidsWithManufacturerCrc)
             {
                 var ctrl = RawInputDevice.GetRawInputControllers()
                     .Where(r => r.VendorId == this.VendorId && r.ProductId == this.ProductId)
                     .FirstOrDefault();
 
-                if (ctrl != null && ctrl.Manufacturer != null)
+                if (ctrl != null)
                 {
-                    // 030044f05e040000e002000000007200
-                    ushort crc = SDL.SDL_crc16(System.Text.Encoding.UTF8.GetBytes(ctrl.Manufacturer));
-                    crc = SDL.SDL_crc16(new byte[] { 32 }, crc);
-                    crc = SDL.SDL_crc16(System.Text.Encoding.UTF8.GetBytes(ctrl.Name), crc);
+                    if (!string.IsNullOrEmpty(ctrl.Name) && !string.IsNullOrEmpty(ctrl.Manufacturer))
+                    {
+                        ushort crc = SDL.SDL_crc16(System.Text.Encoding.UTF8.GetBytes(ctrl.Manufacturer));
+                        crc = SDL.SDL_crc16(new byte[] { 32 }, crc);
+                        crc = SDL.SDL_crc16(System.Text.Encoding.UTF8.GetBytes(ctrl.Name), crc);
 
-                    var crc16 = SDL.SDL_Swap16(crc).ToString("X4");
+                        var crc16 = SDL.SDL_Swap16(crc).ToString("X4");
 
-                    var ggs = _guid.Substring(0, 4) + crc16 + _guid.Substring(8);
-                    return new SdlJoystickGuid(ggs);
-                }
+                        var ggs = _guid.Substring(0, 4) + crc16 + _guid.Substring(8);
+                        return new SdlJoystickGuid(ggs);
+                    }
 
-                else if (ctrl != null && name != null)
-                {
-                    var crc16 = SDL.SDL_Swap16(SDL.SDL_crc16(System.Text.Encoding.UTF8.GetBytes(name ?? ""))).ToString("X4");
+                    if (!string.IsNullOrEmpty(ctrl.Name))
+                    {
+                        var crc16 = SDL.SDL_Swap16(SDL.SDL_crc16(System.Text.Encoding.UTF8.GetBytes(ctrl.Name))).ToString("X4");
 
-                    var ggs = _guid.Substring(0, 4) + crc16 + _guid.Substring(8);
-                    return new SdlJoystickGuid(ggs);
-                }
-
-                else
-                {
-                    // Pre 2.26x : remove '16-bit CRC16 of the joystick name'
-                    var ggs = _guid.Substring(0, 4) + "0000" + _guid.Substring(8);
-                    ret = new SdlJoystickGuid(ggs);
-                    if (version == SdlVersion.SDL2_24)
-                        return ret;
+                        var ggs = _guid.Substring(0, 4) + crc16 + _guid.Substring(8);
+                        return new SdlJoystickGuid(ggs);
+                    }
+                    
+                    return new SdlJoystickGuid(_guid.Substring(0, 4) + "0000" + _guid.Substring(8));
                 }
             }
-
-
-            if (version == SdlVersion.SDL2_26 && name != null)
+            
+            if (version >= SdlVersion.SDL2_26 && name != null)
             {
                 var crc16 = SDL.SDL_Swap16(SDL.SDL_crc16(System.Text.Encoding.UTF8.GetBytes(name ?? ""))).ToString("X4");
 
@@ -189,8 +220,6 @@ namespace EmulatorLauncher.Common.Joysticks
 
             if (VendorId == USB_VENDOR.NINTENDO && !noRemoveDriver)
             {
-                var prod = ProductId;
-
                 if (prod == USB_PRODUCT.NINTENDO_N64_CONTROLLER ||
                     prod == USB_PRODUCT.NINTENDO_SEGA_GENESIS_CONTROLLER ||
                     prod == USB_PRODUCT.NINTENDO_SNES_CONTROLLER ||
@@ -207,6 +236,7 @@ namespace EmulatorLauncher.Common.Joysticks
 
             return ret;
         }
+
         #endregion
 
         #region Operators
@@ -310,8 +340,8 @@ namespace EmulatorLauncher.Common.Joysticks
                 return SdlVersion.Unknown;
             }
 
-            if (version.Major >= 3)
-                return SdlVersion.SDL2_26;
+            if (version.Major >= 3) // SDL3 !???
+                return SdlVersion.SDL2_30;
 
             if (version.Minor >= 30)
                 return SdlVersion.SDL2_30;
@@ -332,6 +362,13 @@ namespace EmulatorLauncher.Common.Joysticks
         /// SDL-2.26.4-no-vcs
         /// <returns></returns>
         public static SdlVersion GetSdlVersionFromStaticBinary(string fileName, SdlVersion defaultValue = SdlVersion.SDL2_0_X)
+        {
+            var version = GetSdlVersionFromStaticBinaryInternal(fileName, defaultValue = SdlVersion.SDL2_0_X);
+            SimpleLogger.Instance.Info("[GetSdlVersionFromStaticBinary] " + version.ToString());
+            return version;
+        }
+
+        private static SdlVersion GetSdlVersionFromStaticBinaryInternal(string fileName, SdlVersion defaultValue = SdlVersion.SDL2_0_X)
         {
             if (!File.Exists(fileName))
                 return defaultValue;
@@ -389,11 +426,11 @@ namespace EmulatorLauncher.Common.Joysticks
 
     public enum SdlVersion
     {
-        Unknown,
-        SDL2_24,
-        SDL2_26,
-        SDL2_30,
-        SDL2_0_X
+        Unknown = 0,
+        SDL2_24 = 224,
+        SDL2_26 = 226,
+        SDL2_30 = 230,
+        SDL2_0_X = 200
     }
 
     public enum SdlWrappedTechId
