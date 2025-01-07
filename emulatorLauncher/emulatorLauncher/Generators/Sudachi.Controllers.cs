@@ -1,14 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.Common.Joysticks;
+using System.Globalization;
 
 namespace EmulatorLauncher
 {
     partial class SudachiGenerator : Generator
     {
+        private Dictionary<string, int> _samePad = new Dictionary<string, int>();
+
         /// <summary>
         /// Cf. https://github.com/sudachi-emu/sudachi/blob/main/src/input_common/drivers/sdl_driver.cpp
         /// </summary>
@@ -38,6 +42,8 @@ namespace EmulatorLauncher
         {
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
+
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for Sudachi");
 
             UpdateSdlControllersWithHints(ini);
 
@@ -92,6 +98,21 @@ namespace EmulatorLauncher
 
             var sudachiGuid = guid.ToString().ToLowerInvariant();
 
+            if (!_samePad.ContainsKey(sudachiGuid))
+                _samePad.Add(sudachiGuid, 0);
+            else
+                _samePad[sudachiGuid] += 1;
+
+            string newGuidPath = Path.Combine(AppConfig.GetFullPath("tools"), "controllerinfo.yml");
+            string newGuid = SdlJoystickGuid.GetGuidFromFile(newGuidPath, controller.Guid, "sudachi");
+            bool multi = SdlJoystickGuid.multiGuid(newGuidPath, controller.Guid);
+
+            if (multi && _samePad[sudachiGuid] > 0)
+                newGuid = SdlJoystickGuid.GetGuidFromFile(newGuidPath, controller.Guid, "sudachi", _samePad[sudachiGuid] + 1);
+
+            if (newGuid != null)
+                sudachiGuid = newGuid;
+
             int index = Program.Controllers
                     .GroupBy(c => c.Guid.ToLowerInvariant())
                     .Where(c => c.Key == controller.Guid.ToLowerInvariant())
@@ -99,6 +120,9 @@ namespace EmulatorLauncher
                     .OrderBy(c => c.GetSdlControllerIndex())
                     .ToList()
                     .IndexOf(controller);
+
+            if (multi)
+                index = 0;
 
             string player = "player_" + (controller.PlayerIndex - 1) + "_";
 
@@ -264,6 +288,8 @@ namespace EmulatorLauncher
 
             ProcessStick(controller, player, "lstick", ini, sudachiGuid, index);
             ProcessStick(controller, player, "rstick", ini, sudachiGuid, index);
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + controller.DevicePath + " to player : " + controller.PlayerIndex.ToString());
         }
 
         private string FromInput(Controller controller, Input input, string guid, int index)
@@ -299,6 +325,9 @@ namespace EmulatorLauncher
             var cfg = controller.Config;
 
             string name = player + stickName;
+            string deadzone = "0.15";
+            if (SystemConfig.isOptSet("sudachi_deadzone") && !string.IsNullOrEmpty(SystemConfig["sudachi_deadzone"]))
+                deadzone = (SystemConfig["sudachi_deadzone"].ToDouble() / 100).ToString(CultureInfo.InvariantCulture);
 
             var leftVal = cfg[stickName == "lstick" ? InputKey.joystick1left : InputKey.joystick2left];
             var topVal = cfg[stickName == "lstick" ? InputKey.joystick1up : InputKey.joystick2up];
@@ -315,7 +344,7 @@ namespace EmulatorLauncher
                     sudachitopval = 4;
                 }
 
-                string value = "engine:sdl," + "axis_x:" + sudachileftval + ",port:" + index + ",guid:" + guid + ",axis_y:" + sudachitopval + ",deadzone:0.150000,range:1.000000";
+                string value = "engine:sdl," + "axis_x:" + sudachileftval + ",port:" + index + ",guid:" + guid + ",axis_y:" + sudachitopval + ",deadzone:" + deadzone + ",range:1.000000";
 
                 ini.WriteValue("Controls", name + "\\default", "false");
                 ini.WriteValue("Controls", name, "\"" + value + "\"");

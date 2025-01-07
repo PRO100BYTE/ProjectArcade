@@ -26,6 +26,8 @@ namespace EmulatorLauncher
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return false;
 
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for MAME");
+
             int gunCount = RawLightgun.GetUsableLightGunCount();
             var guns = RawLightgun.GetRawLightguns();
 
@@ -96,40 +98,79 @@ namespace EmulatorLauncher
             }
 
             // Specific Gun4IR & Sinden mapping
-            if (guns[0] != null && guns[0].Type == RawLighGunType.Gun4Ir && SystemConfig["mame_gun_config"] == "gun4ir")
+            if (guns.Length > 0 && SystemConfig.isOptSet("mame_gun_config"))
             {
-                bool multigun4ir = guns[1] != null && guns[1].Type == RawLighGunType.Gun4Ir;
-                ConfigureLightguns(input, RawLighGunType.Gun4Ir, multigun4ir, hbmame);
+                if (guns[0] != null && guns[0].Type == RawLighGunType.Gun4Ir && SystemConfig["mame_gun_config"] == "gun4ir")
+                {
+                    bool multigun4ir = guns[1] != null && guns[1].Type == RawLighGunType.Gun4Ir;
+                    ConfigureLightguns(input, RawLighGunType.Gun4Ir, multigun4ir, hbmame);
 
-                XDocument xdocgun = new XDocument(new XDeclaration("1.0", null, null));
-                xdocgun.Add(mameconfig);
-                mameconfig.Add(system);
-                system.Add(input);
+                    XDocument xdocgun = new XDocument(new XDeclaration("1.0", null, null));
+                    xdocgun.Add(mameconfig);
+                    mameconfig.Add(system);
+                    system.Add(input);
 
-                xdocgun.Save(inputConfig);
+                    xdocgun.Save(inputConfig);
 
-                if (!File.Exists(inputConfig))
-                    return false;
+                    if (!File.Exists(inputConfig))
+                        return false;
 
-                return true;
-            }
+                    return true;
+                }
 
-            else if (guns[0] != null && guns[0].Type == RawLighGunType.SindenLightgun && SystemConfig["mame_gun_config"] == "sinden")
-            {
-                bool multiSinden = guns[1] != null && guns[1].Type == RawLighGunType.SindenLightgun;
-                ConfigureLightguns(input, RawLighGunType.SindenLightgun, multiSinden, hbmame);
+                else if (guns[0] != null && guns[0].Type == RawLighGunType.SindenLightgun && SystemConfig["mame_gun_config"] == "sinden")
+                {
+                    bool multiSinden = guns[1] != null && guns[1].Type == RawLighGunType.SindenLightgun;
+                    ConfigureLightguns(input, RawLighGunType.SindenLightgun, multiSinden, hbmame);
 
-                XDocument xdocgun = new XDocument(new XDeclaration("1.0", null, null));
-                xdocgun.Add(mameconfig);
-                mameconfig.Add(system);
-                system.Add(input);
+                    XDocument xdocgun = new XDocument(new XDeclaration("1.0", null, null));
+                    xdocgun.Add(mameconfig);
+                    mameconfig.Add(system);
+                    system.Add(input);
 
-                xdocgun.Save(inputConfig);
+                    xdocgun.Save(inputConfig);
 
-                if (!File.Exists(inputConfig))
-                    return false;
+                    if (!File.Exists(inputConfig))
+                        return false;
 
-                return true;
+                    return true;
+                }
+
+                else if (guns[0] != null && guns[0].Type == RawLighGunType.RetroShooter && SystemConfig["mame_gun_config"] == "retroshooter")
+                {
+                    bool multiRetroshooters = guns[1] != null && guns[1].Type == RawLighGunType.RetroShooter;
+                    ConfigureLightguns(input, RawLighGunType.RetroShooter, multiRetroshooters, hbmame);
+
+                    XDocument xdocgun = new XDocument(new XDeclaration("1.0", null, null));
+                    xdocgun.Add(mameconfig);
+                    mameconfig.Add(system);
+                    system.Add(input);
+
+                    xdocgun.Save(inputConfig);
+
+                    if (!File.Exists(inputConfig))
+                        return false;
+
+                    return true;
+                }
+
+                else if (guns[0] != null && guns[0].Type == RawLighGunType.Blamcon && SystemConfig["mame_gun_config"] == "blamcon")
+                {
+                    bool multiBlamcon = guns[1] != null && guns[1].Type == RawLighGunType.Blamcon;
+                    ConfigureLightguns(input, RawLighGunType.Blamcon, multiBlamcon, hbmame);
+
+                    XDocument xdocgun = new XDocument(new XDeclaration("1.0", null, null));
+                    xdocgun.Add(mameconfig);
+                    mameconfig.Add(system);
+                    system.Add(input);
+
+                    xdocgun.Save(inputConfig);
+
+                    if (!File.Exists(inputConfig))
+                        return false;
+
+                    return true;
+                }
             }
 
             // Generate controller mapping
@@ -157,6 +198,11 @@ namespace EmulatorLauncher
                     var hIndex = hybridController[controller];
                     joy = "JOYCODE_" + hIndex + "_";
                 }
+
+                // Override index through option
+                string indexOption = "mame_p" + controller.PlayerIndex + "_forceindex";
+                if (SystemConfig.isOptSet(indexOption) && !string.IsNullOrEmpty(SystemConfig[indexOption]))
+                    joy = "JOYCODE_" + SystemConfig[indexOption] + "_";
 
                 // Get dinput mapping information
                 if (!isXinput)
@@ -213,6 +259,16 @@ namespace EmulatorLauncher
                 // define mapping for xInput case
                 var mapping = hbmame? hbxInputMapping : xInputMapping;
 
+                // Invert player 1 & 2 with feature
+                bool invert = SystemConfig.getOptBoolean("mame_indexswitch") && mameControllers.Count > 1;
+                if (invert)
+                {
+                    if (i == 1)
+                        i = 2;
+                    else if (i == 2)
+                        i = 1;
+                }
+
                 // PLAYER 1
                 // Add UI mapping for player 1 to control MAME UI + Service menu
                 if (i == 1)
@@ -232,6 +288,8 @@ namespace EmulatorLauncher
                     else
                         ConfigurePlayersDInput(i, input, ctrlr, joy, mouseIndex2, dpadonly, xinputCtrl);
                 }
+
+                SimpleLogger.Instance.Info("[INFO] Assigned controller " + controller.DevicePath + " to player : " + controller.PlayerIndex.ToString());
             }
 
             // Generate xml document
@@ -1335,6 +1393,10 @@ namespace EmulatorLauncher
                 input.Add(new XElement("mapdevice", new XAttribute("device", "VID_16C0&PID_0F38"), new XAttribute("controller", "GUNCODE_1")));
                 input.Add(new XElement("mapdevice", new XAttribute("device", "VID_16C0&PID_0F01"), new XAttribute("controller", "GUNCODE_1")));
             }
+            else if (lightgunType == RawLighGunType.RetroShooter)
+                input.Add(new XElement("mapdevice", new XAttribute("device", "VID_0483&PID_5750"), new XAttribute("controller", "GUNCODE_1")));
+            else if (lightgunType == RawLighGunType.Blamcon)
+                input.Add(new XElement("mapdevice", new XAttribute("device", "VID_3673&PID_0101"), new XAttribute("controller", "GUNCODE_1")));
 
             if (multi && lightgunType == RawLighGunType.Gun4Ir)
                 input.Add(new XElement("mapdevice", new XAttribute("device", "VID_2341&PID_8043"), new XAttribute("controller", "GUNCODE_2")));
@@ -1343,6 +1405,10 @@ namespace EmulatorLauncher
                 input.Add(new XElement("mapdevice", new XAttribute("device", "VID_16C0&PID_0F39"), new XAttribute("controller", "GUNCODE_2")));
                 input.Add(new XElement("mapdevice", new XAttribute("device", "VID_16C0&PID_0F02"), new XAttribute("controller", "GUNCODE_2")));
             }
+            else if (multi && lightgunType == RawLighGunType.RetroShooter)
+                input.Add(new XElement("mapdevice", new XAttribute("device", "VID_0483&PID_5751"), new XAttribute("controller", "GUNCODE_2")));
+            else if (multi && lightgunType == RawLighGunType.Blamcon)
+                input.Add(new XElement("mapdevice", new XAttribute("device", "VID_3673&PID_0102"), new XAttribute("controller", "GUNCODE_2")));
 
             if (hbmame)
             {

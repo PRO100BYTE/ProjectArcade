@@ -13,16 +13,22 @@ namespace EmulatorLauncher
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
-            //get emulator path based on emulator name
-            string path = AppConfig.GetFullPath("vita3k");
+            SimpleLogger.Instance.Info("[Generator] Getting " + emulator + " path and executable name.");
 
-            //get the executable file
+            string path = AppConfig.GetFullPath("vita3k");
+            if (!Directory.Exists(path))
+                return null;
+
             string exe = Path.Combine(path, "vita3k.exe");
             if (!File.Exists(exe))
                 return null;
 
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
             if (!GetVita3kPrefPath(path))
-                _prefPath = path;
+                _prefPath = Path.Combine(AppConfig.GetFullPath("saves"), "psvita", "vita3k");
+
+            SimpleLogger.Instance.Info("[Generator] Setting '" + _prefPath + "' as content path for the emulator");
 
             // Check if firmware is intalled
             string firmware = Path.Combine(_prefPath, "vs0", "vsh", "initialsetup");
@@ -48,10 +54,7 @@ namespace EmulatorLauncher
                 gameID = rom.Substring(rom.IndexOf('[') + 1, rom.IndexOf(']') - rom.IndexOf('[') - 1);
             }
 
-            //Define command-line arguments
             List<string> commandArray = new List<string>();
-
-            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
             //-w, -f is used to avoid vita3k regenerating the config file as it is very fussy with it !
             //-c to specify the configfile to use
@@ -89,6 +92,93 @@ namespace EmulatorLauncher
                 WorkingDirectory = path,
                 Arguments = args,                
             };
+        }
+
+        //Configure config.yml file
+        private void SetupConfiguration(string path)
+        {
+            if (SystemConfig.getOptBoolean("disableautoconfig"))
+                return;
+
+            var yml = YmlFile.Load(Path.Combine(path, "config.yml"));
+            
+            //First tackle the GUI stuff
+            yml["initial-setup"] = "true";
+            yml["user-auto-connect"] = "true";
+            yml["show-welcome"] = "false";
+
+            // Discord
+            if (SystemConfig.isOptSet("discord") && SystemConfig.getOptBoolean("discord"))
+                yml["discord-rich-presence"] = "true";
+            else
+                yml["discord-rich-presence"] = "false";
+
+            //System language
+            BindFeature(yml, "sys-lang", "psvita_language", GetDefaultvitaLanguage());
+
+            //Then the emulator options
+            BindFeature(yml, "backend-renderer", "backend-renderer", "Vulkan");
+            BindFeatureSlider(yml, "resolution-multiplier", "resolution_multiplier", "1.00", 2);
+            BindBoolFeature(yml, "disable-surface-sync", "disable_surfacesync", "true", "false");
+            BindFeature(yml, "screen-filter", "vita_screenfilter", "Bilinear");
+            BindBoolFeatureOn(yml, "v-sync", "vita_vsync", "true", "false");
+            BindFeature(yml, "anisotropic-filtering", "anisotropic-filtering", "1");
+            BindBoolFeatureOn(yml, "cpu-opt", "cpu_opt", "true", "false");
+            BindBoolFeatureOn(yml, "async-pipeline-compilation", "async_pipeline_compilation", "true", "false");
+            BindBoolFeatureOn(yml, "shader-cache", "shader_cache", "true", "false");
+            BindBoolFeatureOn(yml, "texture-cache", "texture_cache", "true", "false");
+            BindFeature(yml, "performance-overlay", "performance-overlay", "false");
+            BindFeature(yml, "high-accuracy", "vita3k_high_accuracy", "true");
+            BindBoolFeature(yml, "fps-hack", "vita3k_fpshack", "true", "false");
+            BindBoolFeature(yml, "show-gui", "vita3k_gui", "true", "false");
+            BindBoolFeature(yml, "show-compile-shaders", "vita3k_showShaderCompile", "true", "false");
+            yml["check-for-updates"] = "false";
+
+            //Performance overlay options
+            if (SystemConfig.isOptSet("performance-overlay") && SystemConfig["performance-overlay"] != "false")
+            {
+                yml["performance-overlay"] = "true";
+                yml["perfomance-overlay-detail"] = SystemConfig["performance-overlay"];
+            }
+            else
+                yml["performance-overlay"] = "false";
+
+            //write pref-path with emulator path
+            yml["pref-path"] = _prefPath;
+
+            //Add modules if user has set option to manage from RETROBAT
+            if (SystemConfig.isOptSet("modules") && SystemConfig["modules"] == "1")
+            {
+                yml["modules-mode"] = "1";
+                var lleModules = yml.GetOrCreateContainer("lle-modules");
+                
+                //clear existing list of modules and let EL add modules
+                lleModules.Elements.Clear();
+
+                //Start adding modules
+                
+                //libhttp
+                if (SystemConfig.isOptSet("libhttp") && SystemConfig.getOptBoolean("libhttp"))
+                    lleModules.Elements.Add(new YmlElement() { Value = "- libhttp" });
+                
+                //libscemp4
+                if (SystemConfig.isOptSet("libscemp4") && SystemConfig.getOptBoolean("libscemp4"))
+                    lleModules.Elements.Add(new YmlElement() { Value = "- libscemp4" });
+
+                //Add more modules in the future based on user feedback, tests and games requiring specific modules
+            }
+
+            // If user has set feature to AUTOMATIC IN VITA, clear list of modules and set mode to auto
+            else if (SystemConfig.isOptSet("modules") && SystemConfig["modules"] == "0")
+            {
+                yml["modules-mode"] = "0";
+                var lleModules = yml.GetOrCreateContainer("lle-modules");
+                lleModules.Elements.Clear();
+            }
+            //else don't touch the modules container
+            
+            //save config file
+            yml.Save();
         }
 
         /// <summary>
@@ -139,90 +229,6 @@ namespace EmulatorLauncher
             }
 
             return "1";
-        }
-
-        //Configure config.yml file
-        private void SetupConfiguration(string path)
-        {
-            if (SystemConfig.getOptBoolean("disableautoconfig"))
-                return;
-
-            var yml = YmlFile.Load(Path.Combine(path, "config.yml"));
-            
-            //First tackle the GUI stuff
-            yml["initial-setup"] = "true";
-            yml["user-auto-connect"] = "true";
-            yml["show-welcome"] = "false";
-
-            // Discord
-            if (SystemConfig.isOptSet("discord") && SystemConfig.getOptBoolean("discord"))
-                yml["discord-rich-presence"] = "true";
-            else
-                yml["discord-rich-presence"] = "false";
-
-            //System language
-            BindFeature(yml, "sys-lang", "psvita_language", GetDefaultvitaLanguage());
-
-            //Then the emulator options
-            BindFeature(yml, "backend-renderer", "backend-renderer", "Vulkan");
-            BindFeature(yml, "resolution-multiplier", "resolution-multiplier", "1");
-            BindFeature(yml, "disable-surface-sync", "disable_surfacesync", "false");
-            BindFeature(yml, "screen-filter", "vita_screenfilter", "Bilinear");
-            BindFeature(yml, "v-sync", "vsync", "false");
-            BindFeature(yml, "anisotropic-filtering", "anisotropic-filtering", "1");
-            BindFeature(yml, "cpu-opt", "cpu-opt", "true");
-            BindFeature(yml, "shader-cache", "shader-cache", "true");
-            BindFeature(yml, "texture-cache", "texture-cache", "true");
-            BindFeature(yml, "performance-overlay", "performance-overlay", "false");
-            BindFeature(yml, "high-accuracy", "vita3k_high_accuracy", "true");
-            BindFeature(yml, "fps-hack", "vita3k_fpshack", "false");
-
-            //Performance overlay options
-            if (SystemConfig.isOptSet("performance-overlay") && SystemConfig["performance-overlay"] != "false")
-            {
-                yml["performance-overlay"] = "true";
-                yml["perfomance-overlay-detail"] = SystemConfig["performance-overlay"];
-            }
-            else
-                yml["performance-overlay"] = "false";
-
-            //write pref-path with emulator path
-            yml["pref-path"] = _prefPath;
-
-            //Add modules if user has set option to manage from RETROBAT
-            if (SystemConfig.isOptSet("modules") && SystemConfig["modules"] == "1")
-            {
-                yml["modules-mode"] = "1";
-                var lleModules = yml.GetOrCreateContainer("lle-modules");
-                
-                //clear existing list of modules and let EL add modules
-                lleModules.Elements.Clear();
-
-                //Start adding modules
-                
-                //libhttp
-                if (SystemConfig.isOptSet("libhttp") && SystemConfig.getOptBoolean("libhttp"))
-                    lleModules.Elements.Add(new YmlElement() { Value = "- libhttp" });
-                
-                //libscemp4
-                if (SystemConfig.isOptSet("libscemp4") && SystemConfig.getOptBoolean("libscemp4"))
-                    lleModules.Elements.Add(new YmlElement() { Value = "- libscemp4" });
-
-                //Add more modules in the future based on user feedback, tests and games requiring specific modules
-            }
-
-            // If user has set feature to AUTOMATIC IN VITA, clear list of modules and set mode to auto
-            else if (SystemConfig.isOptSet("modules") && SystemConfig["modules"] == "0")
-            {
-                yml["modules-mode"] = "0";
-                var lleModules = yml.GetOrCreateContainer("lle-modules");
-                lleModules.Elements.Clear();
-            }
-            //else don't touch the modules container
-                
-
-            //save config file
-            yml.Save();
         }
 
         private bool GetVita3kPrefPath(string path)

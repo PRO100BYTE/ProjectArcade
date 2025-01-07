@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using EmulatorLauncher.Common;
 using System;
+using EmulatorLauncher.Common.FileFormats;
 
 namespace EmulatorLauncher
 {
@@ -13,9 +14,6 @@ namespace EmulatorLauncher
         {
             DependsOnDesktopResolution = true;
         }
-
-        private ScreenResolution _resolution;
-        private readonly string[] _unzipSystems = { "psx", "ss", "pce" };
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
@@ -31,22 +29,21 @@ namespace EmulatorLauncher
 
             string[] romExtensions = new string[] { ".m3u", ".cue", ".img", ".mdf", ".pbp", ".toc", ".cbn", ".ccd", ".iso", ".cso", ".pce", ".bin", ".mds" };
 
-            if (_unzipSystems.Contains(mednafenCore) && (Path.GetExtension(rom).ToLowerInvariant() == ".7z" || Path.GetExtension(rom).ToLowerInvariant() == ".zip"))
+            if ((Path.GetExtension(rom).ToLowerInvariant() == ".7z" || Path.GetExtension(rom).ToLowerInvariant() == ".squashfs") || (system == "psx" && Path.GetExtension(rom).ToLowerInvariant() == ".zip"))
             {
                 string uncompressedRomPath = this.TryUnZipGameIfNeeded(system, rom, false, false);
                 if (Directory.Exists(uncompressedRomPath))
                 {
-                    string[] romFiles = Directory.GetFiles(uncompressedRomPath).OrderBy(file => Array.IndexOf(romExtensions, Path.GetExtension(file).ToLowerInvariant())).ToArray();
+                    string[] romFiles = Directory.GetFiles(uncompressedRomPath, "*.*", SearchOption.AllDirectories).OrderBy(file => Array.IndexOf(romExtensions, Path.GetExtension(file).ToLowerInvariant())).ToArray();
                     rom = romFiles.FirstOrDefault(file => romExtensions.Any(ext => Path.GetExtension(file).Equals(ext, StringComparison.OrdinalIgnoreCase)));
                     ValidateUncompressedGame();
                 }
             }
 
-            _resolution = resolution;
             bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
             // Configure cfg file
-            SetupConfig(cfg, mednafenCore, system);
+            SetupConfig(cfg, mednafenCore, system, rom);
 
             // Command line arguments
             List<string> commandArray = new List<string>
@@ -63,7 +60,7 @@ namespace EmulatorLauncher
 			commandArray.Add("-video.disable_composition 1");
             commandArray.Add("-video.driver opengl");
             
-            if (mednafenCore == "pce" && AppConfig.isOptSet("bios"))
+            if (mednafenCore == "pce" && system == "pcenginecd")
                 commandArray.Add("-pce.cdbios \"" + Path.Combine(AppConfig.GetFullPath("bios"), "syscard3.pce") + "\"");
          
             commandArray.Add("-" + mednafenCore + ".shader none");
@@ -93,17 +90,19 @@ namespace EmulatorLauncher
             // Force mono
             if (mednafenCore != "nes" && mednafenCore != "apple2")
             {
-                if (Features.IsSupported("forcemono") && SystemConfig.isOptSet("forcemono") && SystemConfig.getOptBoolean("forcemono"))
+                if (Features.IsSupported("mednafen_forcemono") && SystemConfig.isOptSet("mednafen_forcemono") && SystemConfig.getOptBoolean("mednafen_forcemono"))
                     commandArray.Add("-" + mednafenCore + ".forcemono 1");
                 else
                     commandArray.Add("-" + mednafenCore + ".forcemono 0");
             }
 
             // Shader & Bezel
-            var bezels = BezelFiles.GetBezelFiles(system, rom, resolution);
+            if (!fullscreen)
+                SystemConfig["bezel"] = "none";
+            var bezels = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
             var platform = ReshadeManager.GetPlatformFromFile(exe);
 
-            if (ReshadeManager.Setup(ReshadeBezelType.opengl, platform, system, rom, path, resolution, bezels != null) && bezels != null)
+            if (ReshadeManager.Setup(ReshadeBezelType.opengl, platform, system, rom, path, resolution, emulator, bezels != null) && bezels != null)
                 commandArray.Add("-" + mednafenCore + ".stretch full");
             else if (SystemConfig.isOptSet("mednafen_ratio") && !string.IsNullOrEmpty(SystemConfig["mednafen_ratio"]))
                 commandArray.Add("-" + mednafenCore + ".stretch " + SystemConfig["mednafen_ratio"]);
@@ -140,8 +139,8 @@ namespace EmulatorLauncher
             return ret;
         }
 
-        private void SetupConfig(MednafenConfigFile cfg, string mednafenCore, string system)
-        {          
+        private void SetupConfig(MednafenConfigFile cfg, string mednafenCore, string system, string rom)
+        {
             // Inject path loop
             Dictionary<string, string> userPath = new Dictionary<string, string>
                 {
@@ -166,10 +165,15 @@ namespace EmulatorLauncher
             BindMednafenFeature(cfg, "mednafen_apu", "sound.driver", "default");
             BindMednafenFeature(cfg, "mednafen_interlace", "video.deinterlacer", "weave");
             BindMednafenFeature(cfg, "MonitorIndex", "video.fs.display", "-1");
-            BindMednafenBoolFeature(cfg, "mednafen_vsync", "video.glvsync", "0", "1");
+            BindMednafenBoolFeatureOn(cfg, "mednafen_vsync", "video.glvsync", "1", "0");
             BindMednafenBoolFeature(cfg, "autosave", "autosave", "1", "0");
             BindMednafenBoolFeature(cfg, "mednafen_cheats", "cheats", "1", "0");
             BindMednafenBoolFeature(cfg, "mednafen_fps_enable", "fps.autoenable", "1", "0");
+
+            if (Path.GetExtension(rom).ToLowerInvariant() == ".zip")
+                cfg["cd.image_memcache"] = "1";
+            else
+                cfg["cd.image_memcache"] = "0";
 
             // Core Specific settings
             ConfigureMednafenApple2(cfg, mednafenCore);
@@ -188,7 +192,7 @@ namespace EmulatorLauncher
             ConfigureMednafenWswan(cfg, mednafenCore);
 
             // controllers
-            CreateControllerConfiguration(cfg, mednafenCore);
+            CreateControllerConfiguration(cfg, mednafenCore, system);
 
             cfg.Save();
         }
@@ -302,8 +306,8 @@ namespace EmulatorLauncher
             
             for(int i=1; i<9; i++)
             {
-                BindMednafenFeature(cfg, "mednafen_pcfx_mode1", "pcfx.input.port" + i + ".gamepad.mode1.defpos", "auto");
-                BindMednafenFeature(cfg, "mednafen_pcfx_mode2", "pcfx.input.port" + i + ".gamepad.mode2.defpos", "auto");
+                BindMednafenFeature(cfg, "mednafen_pcfx_mode1", "pcfx.input.port" + i + ".gamepad.mode1.defpos", "a");
+                BindMednafenFeature(cfg, "mednafen_pcfx_mode2", "pcfx.input.port" + i + ".gamepad.mode2.defpos", "a");
             }
 
             if (SystemConfig.isOptSet("mednafen_pcfx_multitap") && SystemConfig["mednafen_pcfx_multitap"] == "1")
@@ -459,8 +463,8 @@ namespace EmulatorLauncher
             if (mednafenCore != "snes")
                 return;
 
-            BindMednafenBoolFeature(cfg, "mednafen_snes_h_blend", mednafenCore + ".h_blend", "0", "1"); // H-Blend
-            BindMednafenFeature(cfg, "mednafen_snes_resamp_quality", mednafenCore + ".apu.resamp_quality", "5"); // Sound accuracy
+            BindMednafenBoolFeatureOn(cfg, "mednafen_snes_h_blend", mednafenCore + ".h_blend", "1", "0"); // H-Blend
+            BindMednafenFeatureSlider(cfg, "mednafen_snes_resamp_quality", mednafenCore + ".apu.resamp_quality", "5"); // Sound accuracy
 
             // Multitap
             if (SystemConfig.isOptSet("mednafen_snes_multitap") && SystemConfig["mednafen_snes_multitap"] == "both")
@@ -507,6 +511,29 @@ namespace EmulatorLauncher
                 cfg[settingName] = trueValue;
             else
                 cfg[settingName] = falseValue;
+        }
+
+        private void BindMednafenBoolFeatureOn(MednafenConfigFile cfg, string featureName, string settingName, string trueValue, string falseValue)
+        {
+            if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                cfg[settingName] = falseValue;
+            else
+                cfg[settingName] = trueValue;
+        }
+
+        protected void BindMednafenFeatureSlider(MednafenConfigFile cfg, string featureName, string settingName, string defaultValue, int decimalPlaces = 0)
+        {
+            if (Features.IsSupported(featureName))
+            {
+                if (decimalPlaces > 0 && decimalPlaces < 7)
+                {
+                    int toRemove = 6 - decimalPlaces;
+                    string value = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+                    cfg[settingName] = value.Substring(0, value.Length - toRemove);
+                }
+                else
+                    cfg[settingName] = SystemConfig.GetValueOrDefaultSlider(featureName, defaultValue);
+            }
         }
 
         private string GetMednafenCoreName(string core)

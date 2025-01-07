@@ -15,6 +15,8 @@ namespace EmulatorLauncher
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
 
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for SSF");
+
             // clear existing Input section of ini file
             ini.ClearSection("Input");
 
@@ -111,12 +113,72 @@ namespace EmulatorLauncher
 
             // Define variables to be used
             bool isXinput = ctrl.IsXInputDevice;
+            bool invertTriggers = SystemConfig.getOptBoolean("saturn_invert_triggers");
             SdlToDirectInput dinputController;
 
             // Find controllerMapping in Gamecontrollerdb.txt file
             string gamecontrollerDB = Path.Combine(AppConfig.GetFullPath("tools"), "gamecontrollerdb.txt");
-            string guid = (ctrl.Guid.ToString()).Substring(0, 24) + "00000000";
-            
+            string guid = (ctrl.Guid.ToString()).ToLowerInvariant();
+
+            // Special mapping for saturn-like controllers in json file
+            bool needSatActivationSwitch = false;
+            bool sat_pad = Program.SystemConfig["saturn_pad_ssf"] == "1" || Program.SystemConfig["saturn_pad_ssf"] == "2";
+
+            string saturnjson = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "saturnControllers.json");
+            if (File.Exists(saturnjson))
+            {
+                try
+                {
+                    var saturnControllers = MegadriveController.LoadControllersFromJson(saturnjson);
+
+                    if (saturnControllers != null)
+                    {
+                        MegadriveController saturnGamepad = MegadriveController.GetMDController("ssf", guid, saturnControllers);
+
+                        if (saturnGamepad != null)
+                        {
+                            if (saturnGamepad.ControllerInfo != null)
+                            {
+                                if (saturnGamepad.ControllerInfo.ContainsKey("needActivationSwitch"))
+                                    needSatActivationSwitch = saturnGamepad.ControllerInfo["needActivationSwitch"] == "yes";
+
+                                if (needSatActivationSwitch && !sat_pad)
+                                {
+                                    SimpleLogger.Instance.Info("[Controller] Specific Saturn mapping needs to be activated for this controller.");
+                                    goto BypassSATControllers;
+                                }
+                            }
+
+                            SimpleLogger.Instance.Info("[Controller] Performing specific mapping for " + saturnGamepad.Name);
+
+                            if (saturnGamepad.Mapping != null)
+                            {
+                                string input = saturnGamepad.Mapping["buttons"];
+                                if (Program.SystemConfig["saturn_pad_ssf"] == "2" && saturnGamepad.Mapping["buttons_anal"] != null)
+                                    input = saturnGamepad.Mapping["buttons_anal"];
+                                
+                                ini.WriteValue("Input", padKey, "\"" + input + "\"");
+
+                                SimpleLogger.Instance.Info("[INFO] Assigned controller " + ctrl.DevicePath + " to player : " + ctrl.PlayerIndex.ToString());
+
+                                return;
+                            }
+                            else
+                                SimpleLogger.Instance.Info("[INFO] Missing mapping for Saturn Gamepad, falling back to standard mapping.");
+                        }
+                        else
+                            SimpleLogger.Instance.Info("[Controller] No specific mapping found for Saturn controller.");
+                    }
+                    else
+                        SimpleLogger.Instance.Info("[Controller] Error loading JSON file.");
+                }
+                catch { }
+            }
+
+            BypassSATControllers:
+
+            guid = (ctrl.Guid.ToString()).Substring(0, 24) + "00000000";
+
             if (!File.Exists(gamecontrollerDB))
             {
                 SimpleLogger.Instance.Info("[WARNING] gamecontrollerdb.txt file not found in tools folder. Controller mapping will not be available");
@@ -155,38 +217,38 @@ namespace EmulatorLauncher
                 buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.right, dinputController, isXinput)) + (index * 65536)).ToString());
             }
 
-            if (SystemConfig.isOptSet("ssf_padlayout") && SystemConfig["ssf_padlayout"] == "lr_yz")
+            if (SystemConfig.isOptSet("saturn_padlayout") && SystemConfig["saturn_padlayout"] == "lr_yz")
             {
                 buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.y, dinputController, isXinput)) + (index * 65536)).ToString());
                 buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.a, dinputController, isXinput)) + (index * 65536)).ToString());
                 buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.b, dinputController, isXinput)) + (index * 65536)).ToString());
                 buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.x, dinputController, isXinput)) + (index * 65536)).ToString());
-                buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.pageup, dinputController, isXinput)) + (index * 65536)).ToString());
-                buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.pagedown, dinputController, isXinput)) + (index * 65536)).ToString());
+                buttonMapping.Add("1/" + ((GetInputCode(ctrl, invertTriggers ? InputKey.l2 : InputKey.pageup, dinputController, isXinput)) + (index * 65536)).ToString());
+                buttonMapping.Add("1/" + ((GetInputCode(ctrl, invertTriggers ? InputKey.r2 : InputKey.pagedown, dinputController, isXinput)) + (index * 65536)).ToString());
             }
 
-            else if (SystemConfig.isOptSet("ssf_padlayout") && SystemConfig["ssf_padlayout"] == "lr_xz")
+            else if (SystemConfig.isOptSet("saturn_padlayout") && SystemConfig["saturn_padlayout"] == "lr_xz")
             {
                 buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.y, dinputController, isXinput)) + (index * 65536)).ToString());
                 buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.a, dinputController, isXinput)) + (index * 65536)).ToString());
                 buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.b, dinputController, isXinput)) + (index * 65536)).ToString());
-                buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.pageup, dinputController, isXinput)) + (index * 65536)).ToString());
+                buttonMapping.Add("1/" + ((GetInputCode(ctrl, invertTriggers ? InputKey.l2 : InputKey.pageup, dinputController, isXinput)) + (index * 65536)).ToString());
                 buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.x, dinputController, isXinput)) + (index * 65536)).ToString());
-                buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.pagedown, dinputController, isXinput)) + (index * 65536)).ToString());
+                buttonMapping.Add("1/" + ((GetInputCode(ctrl, invertTriggers ? InputKey.r2 : InputKey.pagedown, dinputController, isXinput)) + (index * 65536)).ToString());
             }
 
             else
             {
                 buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.a, dinputController, isXinput)) + (index * 65536)).ToString());
                 buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.b, dinputController, isXinput)) + (index * 65536)).ToString());
-                buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.pagedown, dinputController, isXinput)) + (index * 65536)).ToString());
+                buttonMapping.Add("1/" + ((GetInputCode(ctrl, invertTriggers ? InputKey.r2 : InputKey.pagedown, dinputController, isXinput)) + (index * 65536)).ToString());
                 buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.y, dinputController, isXinput)) + (index * 65536)).ToString());
                 buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.x, dinputController, isXinput)) + (index * 65536)).ToString());
-                buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.pageup, dinputController, isXinput)) + (index * 65536)).ToString());
+                buttonMapping.Add("1/" + ((GetInputCode(ctrl, invertTriggers ? InputKey.l2 : InputKey.pageup, dinputController, isXinput)) + (index * 65536)).ToString());
             }
 
-            buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.l2, dinputController, isXinput, true)) + (index * 65536)).ToString());
-            buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.r2, dinputController, isXinput, true)) + (index * 65536)).ToString());
+            buttonMapping.Add("1/" + ((GetInputCode(ctrl, invertTriggers ? InputKey.pageup : InputKey.l2, dinputController, isXinput, true)) + (index * 65536)).ToString());
+            buttonMapping.Add("1/" + ((GetInputCode(ctrl, invertTriggers ? InputKey.pagedown : InputKey.r2, dinputController, isXinput, true)) + (index * 65536)).ToString());
             buttonMapping.Add("1/" + ((GetInputCode(ctrl, InputKey.start, dinputController, isXinput)) + (index * 65536)).ToString());
 
             buttonMapping.Add("0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0");
@@ -194,6 +256,8 @@ namespace EmulatorLauncher
             string mapping = string.Join("/", buttonMapping);
 
             ini.WriteValue("Input", padKey, "\"" + mapping + "\"");
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + ctrl.DevicePath + " to player : " + ctrl.PlayerIndex.ToString());
         }
 
         private static int GetInputCode(Controller c, InputKey key, SdlToDirectInput ctrl, bool isXinput = false, bool trigger = false)

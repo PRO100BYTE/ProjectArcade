@@ -67,13 +67,16 @@ namespace EmulatorLauncher.Common.Joysticks
             return controller;
         }
 
-        public static Input GetDinputInput(SdlToDirectInput ctrl, InputKey key, bool isXinput)
+        public static Input GetDinputInput(SdlToDirectInput ctrl, InputKey key, Input input, bool isXinput)
         {
             if (ctrl.ButtonMappings == null)
-                return null;
+                return input;
 
             // Get Name
             string buttonDinputName = SdlToGameControllerDB[key];
+
+            if (!ctrl.ButtonMappings.ContainsKey(buttonDinputName))
+                return input;
 
             string buttonName = ctrl.ButtonMappings[buttonDinputName];
 

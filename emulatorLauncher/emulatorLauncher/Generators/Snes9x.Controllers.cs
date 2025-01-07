@@ -4,6 +4,7 @@ using EmulatorLauncher.Common.FileFormats;
 using System.Linq;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.Common.Joysticks;
+using System.Collections.Generic;
 
 namespace EmulatorLauncher
 {
@@ -14,11 +15,57 @@ namespace EmulatorLauncher
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
 
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for Snes9x");
 
             // clear existing pad sections of file
             for (int i = 1; i <= 8; i++)
             {
                 ini.WriteValue("Controls\\Win", "Joypad" + i + ":Enabled", "FALSE");
+            }
+
+            int padCount = this.Controllers.Count;
+
+            if (SystemConfig.getOptBoolean("use_guns"))
+            {
+                if (SystemConfig.isOptSet("snes9x_guntype"))
+                {
+                    string gunType = SystemConfig["snes9x_guntype"];
+                    switch (gunType)
+                    {
+                        case "justifiers":
+                            _commandArray.Add("-port2");
+                            _commandArray.Add("two-justifiers");
+                            break;
+                        case "justifier":
+                            _commandArray.Add("-port2");
+                            _commandArray.Add("justifier");
+                            break;
+                        case "superscope":
+                            _commandArray.Add("-port2");
+                            _commandArray.Add("superscope");
+                            break;
+                    }
+                }
+            }
+            else if (SystemConfig.isOptSet("snes9x_mouse"))
+            {
+                if (SystemConfig["snes9x_mouse"] == "port1")
+                    _commandArray.Add("-port1");
+                else if (SystemConfig["snes9x_mouse"] == "port2")
+                    _commandArray.Add("-port2");
+                _commandArray.Add("mouse1");
+            }
+            else if (padCount > 4)
+            {
+                _commandArray.Add("-port1");
+                _commandArray.Add("mp5:1234");
+                _commandArray.Add("-port2");
+                _commandArray.Add("mp5:5678");
+            }
+            else if (padCount > 2)
+            {
+                _commandArray.Add("-port1");
+                _commandArray.Add("mp5:1234");
             }
 
             // Inject controllers                
@@ -28,6 +75,24 @@ namespace EmulatorLauncher
             // Some other stuff for background input
             ini.WriteValue("Controls\\Win", "Input:Background", "OFF");
             ini.WriteValue("Controls\\Win", "Input:BackgroundKeyHotkeys", "ON");
+
+            // Hotkeys
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Key:SlotSave", "F5");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Mods:SlotSave", "none");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Key:SlotLoad", "F6");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Mods:SlotLoad", "none");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Key:SlotPlus", "F4");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Mods:SlotPlus", "none");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Key:SlotMinus", "F3");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Mods:SlotMinus", "none");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Key:SaveScreenShot", "F12");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Mods:SaveScreenShot", "none");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Key:Rewind", "F7");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Mods:Rewind", "none");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Key:FastForward", "F8");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Mods:FastForward", "none");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Key:Pause", "F9");
+            ini.WriteValue("Controls\\Win\\Hotkeys", "Mods:Pause", "none");
         }
 
         private void ConfigureInput(IniFile ini, Controller controller)
@@ -117,10 +182,21 @@ namespace EmulatorLauncher
                 ini.WriteValue("Controls\\Win", joyNb + ":Right", GetDinputMapping(index, controller, "dpright", isxinput));
             }
 
-            ini.WriteValue("Controls\\Win", joyNb + ":A", GetDinputMapping(index, controller, "b", isxinput));
-            ini.WriteValue("Controls\\Win", joyNb + ":B", GetDinputMapping(index, controller, "a", isxinput));
-            ini.WriteValue("Controls\\Win", joyNb + ":Y", GetDinputMapping(index, controller, "x", isxinput));
-            ini.WriteValue("Controls\\Win", joyNb + ":X", GetDinputMapping(index, controller, "y", isxinput));
+            if (SystemConfig.getOptBoolean("buttonsInvert"))
+            {
+                ini.WriteValue("Controls\\Win", joyNb + ":A", GetDinputMapping(index, controller, "a", isxinput));
+                ini.WriteValue("Controls\\Win", joyNb + ":B", GetDinputMapping(index, controller, "b", isxinput));
+                ini.WriteValue("Controls\\Win", joyNb + ":Y", GetDinputMapping(index, controller, "y", isxinput));
+                ini.WriteValue("Controls\\Win", joyNb + ":X", GetDinputMapping(index, controller, "x", isxinput));
+            }
+            else
+            {
+                ini.WriteValue("Controls\\Win", joyNb + ":A", GetDinputMapping(index, controller, "b", isxinput));
+                ini.WriteValue("Controls\\Win", joyNb + ":B", GetDinputMapping(index, controller, "a", isxinput));
+                ini.WriteValue("Controls\\Win", joyNb + ":Y", GetDinputMapping(index, controller, "x", isxinput));
+                ini.WriteValue("Controls\\Win", joyNb + ":X", GetDinputMapping(index, controller, "y", isxinput));
+            }
+
             ini.WriteValue("Controls\\Win", joyNb + ":L", GetDinputMapping(index, controller, "leftshoulder", isxinput));
             ini.WriteValue("Controls\\Win", joyNb + ":R", GetDinputMapping(index, controller, "rightshoulder", isxinput));
             ini.WriteValue("Controls\\Win", joyNb + ":Start", GetDinputMapping(index, controller, "start", isxinput));
@@ -154,6 +230,8 @@ namespace EmulatorLauncher
             ini.WriteValue("Controls\\Win", joyNb + "Turbo:R", "Unassigned");
             ini.WriteValue("Controls\\Win", joyNb + "Turbo:Start", "Unassigned");
             ini.WriteValue("Controls\\Win", joyNb + "Turbo:Select", "Unassigned");
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + ctrl.DevicePath + " to player : " + ctrl.PlayerIndex.ToString());
         }
 
         private string GetDinputMapping(int index, SdlToDirectInput c, string buttonkey, bool isxinput, int plus = 0)
@@ -239,7 +317,10 @@ namespace EmulatorLauncher
                     }
                 }
             }
-
+            
+            if (!c.ButtonMappings.ContainsKey(buttonkey))
+                return "Unassigned";
+                
             string button = c.ButtonMappings[buttonkey];
 
             if (button.StartsWith("-a"))

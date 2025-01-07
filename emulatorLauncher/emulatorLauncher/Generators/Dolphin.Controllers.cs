@@ -7,11 +7,14 @@ using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.Joysticks;
+using System.Reflection;
+using System.Diagnostics.Eventing.Reader;
 
 namespace EmulatorLauncher
 {
     class DolphinControllers
     {
+        private static int _p1sdlindex = 0;
         /// <summary>
         /// Cf. https://github.com/dolphin-emu/dolphin/blob/master/Source/Core/InputCommon/ControllerInterface/SDL/SDL.cpp#L191
         /// </summary>
@@ -31,16 +34,20 @@ namespace EmulatorLauncher
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return false;
 
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for Dolphin");
+
             UpdateSdlControllersWithHints();
 
             if (system == "wii")
             {
+                // Guns
                 if (Program.SystemConfig.getOptBoolean("use_guns"))
                 {
                     GenerateControllerConfig_wiilightgun(path, "WiimoteNew.ini", "Wiimote");
                     return true;
                 }
 
+                // Emulated wiimotes
                 else if (Program.SystemConfig.isOptSet("emulatedwiimotes") && Program.SystemConfig.getOptBoolean("emulatedwiimotes"))
                 {
                     GenerateControllerConfig_emulatedwiimotes(path);
@@ -48,16 +55,20 @@ namespace EmulatorLauncher
                     return true;
                 }
 
+                // use real wiimote as emulated
                 else if (Program.SystemConfig.isOptSet("emulatedwiimotes") && Program.SystemConfig["emulatedwiimotes"] != "0" && Program.SystemConfig["emulatedwiimotes"] != "1")
                 {
                     GenerateControllerConfig_realEmulatedwiimotes(path, "WiimoteNew.ini", "Wiimote");
                     return true;
                 }
+
+                // Real wiimotes (default)
                 else
                 {
                     GenerateControllerConfig_realwiimotes(path, "WiimoteNew.ini", "Wiimote");
                 }
 
+                // Additionnaly : configure gamecube pad (except if wii_gamecube is forced to OFF)
                 if (Program.SystemConfig.isOptSet("wii_gamecube") && Program.SystemConfig["wii_gamecube"] == "0")
                     RemoveControllerConfig_gamecube(path, "Dolphin.ini");
 
@@ -132,10 +143,10 @@ namespace EmulatorLauncher
             { InputKey.y,               "Buttons/X" }
         };
 
-        static readonly InputKeyMapping reversedButtonsAB = new InputKeyMapping()
+        static readonly InputKeyMapping reversedButtonsXY = new InputKeyMapping()
         {
-            { InputKey.b,               "Buttons/A" },
-            { InputKey.a,               "Buttons/B" }
+            { InputKey.x,               "Buttons/Y" },
+            { InputKey.y,               "Buttons/X" }
         };
 
         static readonly InputKeyMapping reversedButtonsRotate = new InputKeyMapping()
@@ -208,7 +219,7 @@ namespace EmulatorLauncher
 
             var wiiMapping = new InputKeyMapping(_wiiMapping);
 
-            if (Program.SystemConfig["controller_mode"] != "cc" && Program.SystemConfig["controller_mode"] != "ccp")
+            if (Program.SystemConfig["controller_mode"] != "cc")
             {
                 if (Program.SystemConfig["controller_mode"] == "side")
                 {
@@ -307,10 +318,7 @@ namespace EmulatorLauncher
             // cc : Classic Controller Settings
             else if (Program.SystemConfig["controller_mode"] == "cc" || Program.SystemConfig["controller_mode"] == "ccp")
             {
-                bool revertall = Program.Features.IsSupported("gamepadbuttons") && Program.SystemConfig.isOptSet("gamepadbuttons") && Program.SystemConfig["gamepadbuttons"] == "reverse_all";
-                bool revertAB = Program.Features.IsSupported("gamepadbuttons") && Program.SystemConfig.isOptSet("gamepadbuttons") && Program.SystemConfig["gamepadbuttons"] == "reverse_ab";
-
-                bool pro = Program.SystemConfig["controller_mode"] == "ccp";
+                bool revertall = Program.Features.IsSupported("wii_cc_buttons") && Program.SystemConfig.isOptSet("wii_cc_buttons") && Program.SystemConfig["wii_cc_buttons"] == "xbox";
 
                 extraOptions["Extension"] = "Classic";
 
@@ -325,26 +333,19 @@ namespace EmulatorLauncher
                 {
                     wiiMapping[InputKey.x] = "Classic/Buttons/X";
                     wiiMapping[InputKey.y] = "Classic/Buttons/Y";
-                    wiiMapping[InputKey.b] = revertAB ? "Classic/Buttons/A" : "Classic/Buttons/B";
-                    wiiMapping[InputKey.a] = revertAB ? "Classic/Buttons/B" : "Classic/Buttons/A";
+                    wiiMapping[InputKey.b] = "Classic/Buttons/B";
+                    wiiMapping[InputKey.a] = "Classic/Buttons/A";
                 }
                 wiiMapping[InputKey.select] = "Classic/Buttons/-";
                 wiiMapping[InputKey.start] = "Classic/Buttons/+";
 
-                if (!pro)
-                {
-                    wiiMapping[InputKey.pageup] = "Classic/Buttons/ZL";
-                    wiiMapping[InputKey.pagedown] = "Classic/Buttons/ZR";
-                    wiiMapping[InputKey.l2] = "Classic/Triggers/L";
-                    wiiMapping[InputKey.r2] = "Classic/Triggers/R";
-                }
-                else
-                {
-                    wiiMapping[InputKey.pageup] = "Classic/Triggers/L";
-                    wiiMapping[InputKey.pagedown] = "Classic/Triggers/R";
-                    wiiMapping[InputKey.l2] = "Classic/Buttons/ZL";
-                    wiiMapping[InputKey.r2] = "Classic/Buttons/ZR";
-                }
+                wiiMapping[InputKey.pageup] = "Classic/Buttons/ZL";
+                wiiMapping[InputKey.pagedown] = "Classic/Buttons/ZR";
+                
+                wiiMapping[InputKey.l2] = "Classic/Triggers/L-Analog";
+                wiiMapping[InputKey.r2] = "Classic/Triggers/R-Analog";
+                wiiMapping.Add(InputKey.l2, "Classic/Triggers/L");
+                wiiMapping.Add(InputKey.r2, "Classic/Triggers/R");
 
                 wiiMapping[InputKey.up] = "Classic/D-Pad/Up";
                 wiiMapping[InputKey.down] = "Classic/D-Pad/Down";
@@ -459,9 +460,160 @@ namespace EmulatorLauncher
                 SetWiimoteHotkeys(hotkeyini);
         }
 
+        static Dictionary<string, string> defaultGunMapping = new Dictionary<string, string>
+        {
+            { "Device", "DInput/0/Keyboard Mouse" },
+            { "Source", "1" },
+            { "Buttons/X", "Q" },
+            { "Buttons/B", "`Click 0`" },
+            { "Buttons/Y", "S" },
+            { "Buttons/A", "`Click 1`" },
+            { "Buttons/-", "BACK" },
+            { "Buttons/+", "RETURN" },
+            { "Main Stick/Up", "UP" },
+            { "Main Stick/Down", "DOWN" },
+            { "Main Stick/Left", "LEFT" },
+            { "Main Stick/Right", "RIGHT" },
+            { "Tilt/Modifier/Range", "50." },
+            { "Nunchuk/Stick/Modifier/Range", "50." },
+            { "Nunchuk/Tilt/Modifier/Range", "50." },
+            { "uDraw/Stylus/Modifier/Range", "50." },
+            { "Drawsome/Stylus/Modifier/Range", "50." },
+            { "Buttons/1", "`Click 2`" },
+            { "Buttons/2", "`2`" },
+            { "D-Pad/Up", "UP" },
+            { "D-Pad/Down", "DOWN" },
+            { "D-Pad/Left", "LEFT" },
+            { "D-Pad/Right", "RIGHT" },
+            { "IR/Up", "`Cursor Y-`" },
+            { "IR/Down", "`Cursor Y+`" },
+            { "IR/Left", "`Cursor X-`" },
+            { "IR/Right", "`Cursor X+`" },
+            { "Shake/X", "`Click 2`" },
+            { "Shake/Y", "`Click 2`" },
+            { "Shake/Z", "`Click 2`" },
+            { "Extension", "Nunchuk" },
+            { "Nunchuk/Buttons/C", "LCONTROL" },
+            { "Nunchuk/Buttons/Z", "LSHIFT" },
+            { "Nunchuk/Stick/Up", "W" },
+            { "Nunchuk/Stick/Down", "S" },
+            { "Nunchuk/Stick/Left", "A" },
+            { "Nunchuk/Stick/Right", "D" },
+            { "Nunchuk/Stick/Calibration", "100.00 141.42 100.00 141.42 100.00 141.42 100.00 141.42" },
+            { "Nunchuk/Shake/X", "`Click 2`" },
+            { "Nunchuk/Shake/Y", "`Click 2`" },
+            { "Nunchuk/Shake/Z", "`Click 2`" },
+        };
+
+        static Dictionary<string, string> gunMapping = new Dictionary<string, string>
+        {
+            { "action", "Buttons/A" },
+            { "trigger", "Buttons/B" },
+            { "sub3", "Buttons/Home" },
+            { "select", "Buttons/-" },
+            { "sub1", "Buttons/1" },
+            { "sub2", "Buttons/2" },
+            { "start", "Buttons/+" },
+            { "up", "D-Pad/Up" },
+            { "down", "D-Pad/Down" },
+            { "left", "D-Pad/Left" },
+            { "right", "D-Pad/Right" },
+            { "c", "Nunchuk/Buttons/C" },
+            { "z", "Nunchuk/Buttons/Z" }
+        };
+
+        static Dictionary<string, string> newGunMapping = new Dictionary<string, string>
+        {
+            { "a", "Buttons/A" },
+            { "b", "Buttons/B" },
+            { "home", "Buttons/Home" },
+            { "-", "Buttons/-" },
+            { "1", "Buttons/1" },
+            { "2", "Buttons/2" },
+            { "+", "Buttons/+" },
+            { "up", "D-Pad/Up" },
+            { "down", "D-Pad/Down" },
+            { "left", "D-Pad/Left" },
+            { "right", "D-Pad/Right" },
+            { "tiltforward", "Tilt/Forward" },
+            { "tiltbackward", "Tilt/Backward" },
+            { "tiltleft", "Tilt/Left" },
+            { "tiltright", "Tilt/Right" },
+            { "shake", "Shake/X" },
+            { "c", "Nunchuk/Buttons/C" },
+            { "z", "Nunchuk/Buttons/Z" }
+        };
+
+        static Dictionary<string, string> gunSpecials = new Dictionary<string, string>
+        {
+            { "vertical_offset", "IR/Vertical Offset" },
+            { "yaw", "IR/Total Yaw" },
+            { "pitch", "IR/Total Pitch" },
+            { "ir_down", "IR/Down" },
+            { "ir_up", "IR/Up" },
+            { "ir_left", "IR/Left" },
+            { "ir_right", "IR/Right" }
+        };
+
         private static void GenerateControllerConfig_wiilightgun(string path, string filename, string anyDefKey)
         {
             string iniFile = Path.Combine(path, "User", "Config", filename);
+
+            SimpleLogger.Instance.Info("[INFO] Configuring Lightgun buttons in : " + iniFile);
+
+            string rom = Program.SystemConfig["rom"];
+            var mappingToUse = defaultGunMapping;
+
+            // Search gun game in gamesDB.xml file
+            var game = Program.GunGames.FindGunGame("wii", rom);
+            if (game == null || game.Gun == null)
+            {
+                SimpleLogger.Instance.Info("[GUNS] No gun configuration found for this game.");
+                return;
+            }
+
+            Dictionary<string, string> metadata = new Dictionary<string, string>();
+            if (game.Gun != null)
+            {
+                metadata["vertical_offset"] = game.Gun.VerticalOffset.ToString();
+                metadata["yaw"] = game.Gun.Yaw.ToString();
+                metadata["pitch"] = game.Gun.Pitch.ToString();
+                metadata["action"] = game.Gun.Action;
+                metadata["start"] = game.Gun.Start;
+                metadata["select"] = game.Gun.Select;
+                metadata["trigger"] = game.Gun.Trigger;
+                metadata["ir_down"] = game.Gun.IrDown;
+                metadata["ir_right"] = game.Gun.IrRight;
+                metadata["ir_up"] = game.Gun.IrUp;
+                metadata["ir_left"] = game.Gun.IrLeft;
+                metadata["sub1"] = game.Gun.Sub1;
+            }
+
+            if (metadata == null)
+                return;
+
+            // Modify mapping based on gamesDB.xml file
+            foreach (var x in metadata)
+            {
+                if (x.Value != null && newGunMapping.ContainsKey(x.Value))
+                {
+                    string toReplace = newGunMapping[x.Value];
+                    string newValue = defaultGunMapping[gunMapping[x.Key]];
+                    mappingToUse[toReplace] = newValue;
+                    if (toReplace == "Shake/X")
+                    {
+                        mappingToUse["Shake/Y"] = newValue;
+                        mappingToUse["Shake/Z"] = newValue;
+                    }
+                }
+            }
+
+            // Remove original button mapping
+            foreach (var x in metadata)
+            {
+                if (x.Value != null && gunMapping.ContainsKey(x.Key))
+                    mappingToUse[gunMapping[x.Key]] = "";
+            }
 
             using (IniFile ini = new IniFile(iniFile, IniOptions.UseSpaces))
             {
@@ -471,47 +623,17 @@ namespace EmulatorLauncher
                 }
                 string wiimote = "Wiimote1";
 
-                ini.WriteValue(wiimote, "Device", "DInput/0/Keyboard Mouse");
-                ini.WriteValue(wiimote, "Source", "1");
-                ini.WriteValue(wiimote, "Buttons/X", "Q");
-                ini.WriteValue(wiimote, "Buttons/B", "`Click 0`");
-                ini.WriteValue(wiimote, "Buttons/Y", "S");
-                ini.WriteValue(wiimote, "Buttons/A", "`Click 1`");
-                ini.WriteValue(wiimote, "Buttons/-", "BACK");
-                ini.WriteValue(wiimote, "Buttons/+", "RETURN");
-                ini.WriteValue(wiimote, "Main Stick/Up", "UP");
-                ini.WriteValue(wiimote, "Main Stick/Down", "DOWN");
-                ini.WriteValue(wiimote, "Main Stick/Left", "LEFT");
-                ini.WriteValue(wiimote, "Main Stick/Right", "RIGHT");
-                ini.WriteValue(wiimote, "Tilt/Modifier/Range", "50.");
-                ini.WriteValue(wiimote, "Nunchuk/Stick/Modifier/Range", "50.");
-                ini.WriteValue(wiimote, "Nunchuk/Tilt/Modifier/Range", "50.");
-                ini.WriteValue(wiimote, "uDraw/Stylus/Modifier/Range", "50.");
-                ini.WriteValue(wiimote, "Drawsome/Stylus/Modifier/Range", "50.");
-                ini.WriteValue(wiimote, "Buttons/1", "`Click 2`");
-                ini.WriteValue(wiimote, "Buttons/2", "`2`");
-                ini.WriteValue(wiimote, "D-Pad/Up", "UP");
-                ini.WriteValue(wiimote, "D-Pad/Down", "DOWN");
-                ini.WriteValue(wiimote, "D-Pad/Left", "LEFT");
-                ini.WriteValue(wiimote, "D-Pad/Right", "RIGHT");
-                ini.WriteValue(wiimote, "IR/Up", "`Cursor Y-`");
-                ini.WriteValue(wiimote, "IR/Down", "`Cursor Y+`");
-                ini.WriteValue(wiimote, "IR/Left", "`Cursor X-`");
-                ini.WriteValue(wiimote, "IR/Right", "`Cursor X+`");
-                ini.WriteValue(wiimote, "Shake/X", "`Click 2`");
-                ini.WriteValue(wiimote, "Shake/Y", "`Click 2`");
-                ini.WriteValue(wiimote, "Shake/Z", "`Click 2`");
-                ini.WriteValue(wiimote, "Extension", "Nunchuk");
-                ini.WriteValue(wiimote, "Nunchuk/Buttons/C", "LCONTROL");
-                ini.WriteValue(wiimote, "Nunchuk/Buttons/Z", "LSHIFT");
-                ini.WriteValue(wiimote, "Nunchuk/Stick/Up", "W");
-                ini.WriteValue(wiimote, "Nunchuk/Stick/Down", "S");
-                ini.WriteValue(wiimote, "Nunchuk/Stick/Left", "A");
-                ini.WriteValue(wiimote, "Nunchuk/Stick/Right", "D");
-                ini.WriteValue(wiimote, "Nunchuk/Stick/Calibration", "100.00 141.42 100.00 141.42 100.00 141.42 100.00 141.42");
-                ini.WriteValue(wiimote, "Nunchuk/Shake/X", "`Click 2`");
-                ini.WriteValue(wiimote, "Nunchuk/Shake/Y", "`Click 2`");
-                ini.WriteValue(wiimote, "Nunchuk/Shake/Z", "`Click 2`");
+                foreach (var x in mappingToUse)
+                {
+                    ini.WriteValue(wiimote, x.Key, x.Value);
+                }
+
+                // Write specials
+                foreach (var x in metadata)
+                {
+                    if (x.Value != null && x.Value != "" && gunSpecials.ContainsKey(x.Key))
+                        ini.WriteValue(wiimote, gunSpecials[x.Key], x.Value);
+                }
 
                 ini.Save();
             }
@@ -576,6 +698,7 @@ namespace EmulatorLauncher
 
             SimpleLogger.Instance.Info("[INFO] Writing controller configuration in : " + iniFile);
 
+            
             bool forceSDL = false;
             if (Program.SystemConfig.isOptSet("input_forceSDL") && Program.SystemConfig.getOptBoolean("input_forceSDL"))
                 forceSDL = true;
@@ -589,6 +712,8 @@ namespace EmulatorLauncher
             {
                 foreach (var pad in Program.Controllers.OrderBy(i => i.PlayerIndex).Take(4))
                 {
+                    bool xinputAsSdl = false;
+                    bool isNintendo = pad.VendorID == USB_VENDOR.NINTENDO;
                     string gcpad = anyDefKey + pad.PlayerIndex;
                     ini.ClearSection(gcpad);
 
@@ -624,10 +749,22 @@ namespace EmulatorLauncher
 
                         tech = "SDL";
 
+                        if (pad.IsXInputDevice)
+                        {
+                            xinputAsSdl = true;
+                            tech = "XInput";
+                        }
+
                         deviceName = pad.Name;
 
-                        if (deviceName == "DualSense Wireless Controller")
-                            deviceName = "PS5 Controller";
+                        string newNamePath = Path.Combine(Program.AppConfig.GetFullPath("tools"), "controllerinfo.yml");
+                        if (File.Exists(newNamePath))
+                        {
+                            string newName = SdlJoystickGuid.GetNameFromFile(newNamePath, pad.Guid, "dolphin");
+
+                            if (newName != null)
+                                deviceName = newName;
+                        }
                     }
 
                     if (double_pads.ContainsKey(tech + "/" + deviceName))
@@ -635,13 +772,18 @@ namespace EmulatorLauncher
                     else
                         nsamepad = 0;
 
+                    if (pad.PlayerIndex == 1)
+                        _p1sdlindex = nsamepad;
+
                     double_pads[tech + "/" + deviceName] = nsamepad + 1;
 
                     if (pad.IsXInputDevice)
                         xIndex = pad.XInput != null ? pad.XInput.DeviceIndex : pad.DeviceIndex;
 
-                    if (tech == "XInput")
+                    if (tech == "XInput" && !xinputAsSdl)
                         ini.WriteValue(gcpad, "Device", tech + "/" + xIndex + "/" + deviceName);
+                    else if (xinputAsSdl)
+                        ini.WriteValue(gcpad, "Device", "SDL" + "/" + nsamepad.ToString() + "/" + deviceName);
                     else
                         ini.WriteValue(gcpad, "Device", tech + "/" + nsamepad.ToString() + "/" + deviceName);
 
@@ -649,23 +791,75 @@ namespace EmulatorLauncher
                         foreach (var xtra in extraOptions)
                             ini.WriteValue(gcpad, xtra.Key, xtra.Value);
 
-                    bool revertButtons = Program.Features.IsSupported("gamepadbuttons") && Program.SystemConfig.isOptSet("gamepadbuttons") && Program.SystemConfig["gamepadbuttons"] == "reverse_all";
-                    bool revertButtonsAB = Program.Features.IsSupported("gamepadbuttons") && Program.SystemConfig.isOptSet("gamepadbuttons") && Program.SystemConfig["gamepadbuttons"] == "reverse_ab";
-                    bool revertRotate = Program.Features.IsSupported("gamepadbuttons") && Program.SystemConfig.isOptSet("gamepadbuttons") && Program.SystemConfig["gamepadbuttons"] == "reverse_rotate";
-                    bool rumble = !Program.SystemConfig.getOptBoolean("input_rumble");
+                    bool positional = Program.Features.IsSupported("gamecube_buttons") && Program.SystemConfig.isOptSet("gamecube_buttons") && Program.SystemConfig["gamecube_buttons"] == "position";
+                    bool xboxLayout = Program.Features.IsSupported("gamecube_buttons") && Program.SystemConfig.isOptSet("gamecube_buttons") && Program.SystemConfig["gamecube_buttons"] == "xbox";
+                    bool revertXY = Program.Features.IsSupported("gamecube_buttons") && Program.SystemConfig.isOptSet("gamecube_buttons") && Program.SystemConfig["gamecube_buttons"] == "reverse_ab";
+                    bool rumble = !Program.SystemConfig.isOptSet("input_rumble") || Program.SystemConfig.getOptBoolean("input_rumble");
+
+                    if (isNintendo)
+                    {
+                        string tempMapA = anyMapping[InputKey.a];
+                        string tempMapB = anyMapping[InputKey.b];
+                        string tempMapX = anyMapping[InputKey.x];
+                        string tempMapY = anyMapping[InputKey.y];
+
+                        anyMapping[InputKey.a] = tempMapB;
+                        anyMapping[InputKey.b] = tempMapA;
+                        anyMapping[InputKey.x] = tempMapY;
+                        anyMapping[InputKey.y] = tempMapX;
+                    }
 
                     foreach (var x in anyMapping)
                     {
                         string value = x.Value;
 
-                        if (revertButtons && reversedButtons.ContainsKey(x.Key))
+                        if (xboxLayout && reversedButtons.ContainsKey(x.Key))
+                        {
                             value = reversedButtons[x.Key];
+                            if (isNintendo)
+                            {
+                                if (value == "Buttons/B")
+                                    value = "Buttons/A";
+                                else if (value == "Buttons/A")
+                                    value = "Buttons/B";
+                                else if (value == "Buttons/X")
+                                    value = "Buttons/Y";
+                                else if (value == "Buttons/Y")
+                                    value = "Buttons/X";
+                            }
+                        }
 
-                        if (revertButtonsAB && reversedButtonsAB.ContainsKey(x.Key))
-                            value = reversedButtonsAB[x.Key];
+                        if (revertXY && reversedButtonsXY.ContainsKey(x.Key))
+                        {
+                            value = reversedButtonsXY[x.Key];
+                            if (isNintendo)
+                            {
+                                if (value == "Buttons/B")
+                                    value = "Buttons/A";
+                                else if (value == "Buttons/A")
+                                    value = "Buttons/B";
+                                else if (value == "Buttons/X")
+                                    value = "Buttons/Y";
+                                else if (value == "Buttons/Y")
+                                    value = "Buttons/X";
+                            }
+                        }
 
-                        if (revertRotate && reversedButtonsRotate.ContainsKey(x.Key))
+                        if (positional && reversedButtonsRotate.ContainsKey(x.Key))
+                        {
                             value = reversedButtonsRotate[x.Key];
+                            if (isNintendo)
+                            {
+                                if (value == "Buttons/B")
+                                    value = "Buttons/Y";
+                                else if (value == "Buttons/A")
+                                    value = "Buttons/X";
+                                else if (value == "Buttons/X")
+                                    value = "Buttons/A";
+                                else if (value == "Buttons/Y")
+                                    value = "Buttons/B";
+                            }
+                        }
 
                         if (triforce && Program.SystemConfig.isOptSet("triforce_mapping") && Program.SystemConfig["triforce_mapping"] == "vs4")
                         {
@@ -675,19 +869,19 @@ namespace EmulatorLauncher
 
                         if (pad.Config.Type == "keyboard")
                         {
-                            if (x.Key == InputKey.a && (revertButtons || revertButtonsAB))
+                            if (x.Key == InputKey.a && (xboxLayout))
                                 value = "Buttons/B";
                             else if (x.Key == InputKey.a)
                                 value = "Buttons/A";
-                            else if (x.Key == InputKey.b && (revertButtons || revertButtonsAB))
+                            else if (x.Key == InputKey.b && (xboxLayout))
                                 value = "Buttons/A";
                             else if (x.Key == InputKey.b)
                                 value = "Buttons/B";
-                            else if (x.Key == InputKey.x && revertButtons)
+                            else if (x.Key == InputKey.x && xboxLayout || revertXY)
                                 value = "Buttons/Y";
                             else if (x.Key == InputKey.x)
                                 value = "Buttons/X";
-                            else if (x.Key == InputKey.y && revertButtons)
+                            else if (x.Key == InputKey.y && xboxLayout || revertXY)
                                 value = "Buttons/X";
                             else if (x.Key == InputKey.y)
                                 value = "Buttons/Y";
@@ -723,9 +917,9 @@ namespace EmulatorLauncher
                                     ini.WriteValue(gcpad, reverseAxis, xInputMapping[mapping]);
                             }
 
-                            // Z button is used to access test menu, do not map it with R1
+                            // Z button is used to access test menu, map with R3
                             if (triforce)
-                                ini.WriteValue(gcpad, "Buttons/Z", "`Thumb L`&`Thumb R`");
+                                ini.WriteValue(gcpad, "Buttons/Z", "`Thumb R`");
 
                         }
                         else if (forceSDL)
@@ -851,26 +1045,28 @@ namespace EmulatorLauncher
                         // DEADZONE
                         if (Program.SystemConfig.isOptSet("dolphin_gcpad_deadzone") && !string.IsNullOrEmpty(Program.SystemConfig["dolphin_gcpad_deadzone"]))
                         {
-                            ini.WriteValue(gcpad, "Main Stick/Dead Zone", Program.SystemConfig["dolphin_gcpad_deadzone"]);
-                            ini.WriteValue(gcpad, "C-Stick/Dead Zone", Program.SystemConfig["dolphin_gcpad_deadzone"]);
+                            string deadzone = Program.SystemConfig["dolphin_gcpad_deadzone"].ToIntegerString() + ".0";
+                            ini.WriteValue(gcpad, "Main Stick/Dead Zone", deadzone);
+                            ini.WriteValue(gcpad, "C-Stick/Dead Zone", deadzone);
                         }
                         else
                         {
-                            ini.WriteValue(gcpad, "Main Stick/Dead Zone", "10.0");
-                            ini.WriteValue(gcpad, "C-Stick/Dead Zone", "10.0");
+                            ini.WriteValue(gcpad, "Main Stick/Dead Zone", "15.0");
+                            ini.WriteValue(gcpad, "C-Stick/Dead Zone", "15.0");
                         }
 
                         // SENSITIVITY
                         if (Program.SystemConfig.isOptSet("dolphin_gcpad_sensitivity") && !string.IsNullOrEmpty(Program.SystemConfig["dolphin_gcpad_sensitivity"]))
                         {
-                            ini.WriteValue(gcpad, "Main Stick/Up/Range", Program.SystemConfig["dolphin_gcpad_sensitivity"]);
-                            ini.WriteValue(gcpad, "Main Stick/Down/Range", Program.SystemConfig["dolphin_gcpad_sensitivity"]);
-                            ini.WriteValue(gcpad, "Main Stick/Left/Range", Program.SystemConfig["dolphin_gcpad_sensitivity"]);
-                            ini.WriteValue(gcpad, "Main Stick/Right/Range", Program.SystemConfig["dolphin_gcpad_sensitivity"]);
-                            ini.WriteValue(gcpad, "C-Stick/Up/Range", Program.SystemConfig["dolphin_gcpad_sensitivity"]);
-                            ini.WriteValue(gcpad, "C-Stick/Down/Range", Program.SystemConfig["dolphin_gcpad_sensitivity"]);
-                            ini.WriteValue(gcpad, "C-Stick/Left/Range", Program.SystemConfig["dolphin_gcpad_sensitivity"]);
-                            ini.WriteValue(gcpad, "C-Stick/Right/Range", Program.SystemConfig["dolphin_gcpad_sensitivity"]);
+                            string sensitivity = Program.SystemConfig["dolphin_gcpad_sensitivity"].ToIntegerString() + ".0";
+                            ini.WriteValue(gcpad, "Main Stick/Up/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Main Stick/Down/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Main Stick/Left/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Main Stick/Right/Range", sensitivity);
+                            ini.WriteValue(gcpad, "C-Stick/Up/Range", sensitivity);
+                            ini.WriteValue(gcpad, "C-Stick/Down/Range", sensitivity);
+                            ini.WriteValue(gcpad, "C-Stick/Left/Range", sensitivity);
+                            ini.WriteValue(gcpad, "C-Stick/Right/Range", sensitivity);
                         }
                         else
                         {
@@ -927,56 +1123,58 @@ namespace EmulatorLauncher
                         // DEAD ZONE
                         if (Program.SystemConfig.isOptSet("dolphin_wii_deadzone") && !string.IsNullOrEmpty(Program.SystemConfig["dolphin_wii_deadzone"]))
                         {
-                            ini.WriteValue(gcpad, "Classic/Right Stick/Dead Zone", Program.SystemConfig["dolphin_wii_deadzone"]);
-                            ini.WriteValue(gcpad, "Classic/Left Stick/Dead Zone", Program.SystemConfig["dolphin_wii_deadzone"]);
-                            ini.WriteValue(gcpad, "IR/Dead Zone", Program.SystemConfig["dolphin_wii_deadzone"]);
-                            ini.WriteValue(gcpad, "Tilt/Dead Zone", Program.SystemConfig["dolphin_wii_deadzone"]);
-                            ini.WriteValue(gcpad, "Swing/Dead Zone", Program.SystemConfig["dolphin_wii_deadzone"]);
-                            ini.WriteValue(gcpad, "IMUGyroscope/Dead Zone", Program.SystemConfig["dolphin_wii_deadzone"]);
-                            ini.WriteValue(gcpad, "Nunchuk/Tilt/Dead Zone", Program.SystemConfig["dolphin_wii_deadzone"]);
-                            ini.WriteValue(gcpad, "Nunchuk/Swing/Dead Zone", Program.SystemConfig["dolphin_wii_deadzone"]);
-                            ini.WriteValue(gcpad, "Nunchuk/Stick/Dead Zone", Program.SystemConfig["dolphin_wii_deadzone"]);
+                            string deadzone = Program.SystemConfig["dolphin_wii_deadzone"].ToIntegerString() + ".0";
+                            ini.WriteValue(gcpad, "Classic/Right Stick/Dead Zone", deadzone);
+                            ini.WriteValue(gcpad, "Classic/Left Stick/Dead Zone", deadzone);
+                            ini.WriteValue(gcpad, "IR/Dead Zone", deadzone);
+                            ini.WriteValue(gcpad, "Tilt/Dead Zone", deadzone);
+                            ini.WriteValue(gcpad, "Swing/Dead Zone", deadzone);
+                            ini.WriteValue(gcpad, "IMUGyroscope/Dead Zone", deadzone);
+                            ini.WriteValue(gcpad, "Nunchuk/Tilt/Dead Zone", deadzone);
+                            ini.WriteValue(gcpad, "Nunchuk/Swing/Dead Zone", deadzone);
+                            ini.WriteValue(gcpad, "Nunchuk/Stick/Dead Zone", deadzone);
                         }
                         else
                         {
-                            ini.WriteValue(gcpad, "Classic/Right Stick/Dead Zone", "10.0");
-                            ini.WriteValue(gcpad, "Classic/Left Stick/Dead Zone", "10.0");
-                            ini.WriteValue(gcpad, "IR/Dead Zone", "10.0");
-                            ini.WriteValue(gcpad, "Tilt/Dead Zone", "10.0");
-                            ini.WriteValue(gcpad, "Swing/Dead Zone", "10.0");
-                            ini.WriteValue(gcpad, "IMUGyroscope/Dead Zone", "10.0");
-                            ini.WriteValue(gcpad, "Nunchuk/Tilt/Dead Zone", "10.0");
-                            ini.WriteValue(gcpad, "Nunchuk/Swing/Dead Zone", "10.0");
-                            ini.WriteValue(gcpad, "Nunchuk/Stick/Dead Zone", "10.0");
+                            ini.WriteValue(gcpad, "Classic/Right Stick/Dead Zone", "15.0");
+                            ini.WriteValue(gcpad, "Classic/Left Stick/Dead Zone", "15.0");
+                            ini.WriteValue(gcpad, "IR/Dead Zone", "15.0");
+                            ini.WriteValue(gcpad, "Tilt/Dead Zone", "15.0");
+                            ini.WriteValue(gcpad, "Swing/Dead Zone", "15.0");
+                            ini.WriteValue(gcpad, "IMUGyroscope/Dead Zone", "15.0");
+                            ini.WriteValue(gcpad, "Nunchuk/Tilt/Dead Zone", "15.0");
+                            ini.WriteValue(gcpad, "Nunchuk/Swing/Dead Zone", "15.0");
+                            ini.WriteValue(gcpad, "Nunchuk/Stick/Dead Zone", "15.0");
                         }
 
                         // SENSITIVITY
                         if (Program.SystemConfig.isOptSet("dolphin_wii_sensitivity") && !string.IsNullOrEmpty(Program.SystemConfig["dolphin_wii_sensitivity"]))
                         {
-                            ini.WriteValue(gcpad, "IR/Up/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "IR/Down/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "IR/Left/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "IR/Right/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Tilt/Forward/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Tilt/Left/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Tilt/Backward/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Tilt/Right/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Swing/Up/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Swing/Down/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Swing/Left/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Swing/Right/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Nunchuk/Stick/Up/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Nunchuk/Stick/Down/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Nunchuk/Stick/Left/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Nunchuk/Stick/Right/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Classic/Left Stick/Up/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Classic/Left Stick/Down/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Classic/Left Stick/Left/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Classic/Left Stick/Right/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Classic/Right Stick/Up/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Classic/Right Stick/Down/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Classic/Right Stick/Left/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
-                            ini.WriteValue(gcpad, "Classic/Right Stick/Right/Range", Program.SystemConfig["dolphin_wii_sensitivity"]);
+                            string sensitivity = Program.SystemConfig["dolphin_wii_sensitivity"].ToIntegerString() + ".0";
+                            ini.WriteValue(gcpad, "IR/Up/Range", sensitivity);
+                            ini.WriteValue(gcpad, "IR/Down/Range", sensitivity);
+                            ini.WriteValue(gcpad, "IR/Left/Range", sensitivity);
+                            ini.WriteValue(gcpad, "IR/Right/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Tilt/Forward/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Tilt/Left/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Tilt/Backward/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Tilt/Right/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Swing/Up/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Swing/Down/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Swing/Left/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Swing/Right/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Nunchuk/Stick/Up/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Nunchuk/Stick/Down/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Nunchuk/Stick/Left/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Nunchuk/Stick/Right/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Classic/Left Stick/Up/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Classic/Left Stick/Down/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Classic/Left Stick/Left/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Classic/Left Stick/Right/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Classic/Right Stick/Up/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Classic/Right Stick/Down/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Classic/Right Stick/Left/Range", sensitivity);
+                            ini.WriteValue(gcpad, "Classic/Right Stick/Right/Range", sensitivity);
                         }
                         else
                         {
@@ -1060,7 +1258,16 @@ namespace EmulatorLauncher
                             ini.WriteValue(gcpad, "IR/Auto-Hide", "True");
                         else
                             ini.WriteValue(gcpad, "IR/Auto-Hide", "False");
+
+                        // Relative input for IR cursor
+                        
+                        if (Program.SystemConfig.getOptBoolean("wii_relativecursor"))
+                            ini.WriteValue(gcpad, "IR/Relative Input", "False");
+                        else
+                            ini.WriteValue(gcpad, "IR/Relative Input", "True");
                     }
+
+                    SimpleLogger.Instance.Info("[INFO] Assigned controller " + pad.DevicePath + " to player : " + pad.PlayerIndex.ToString());
                 }
 
                 ini.Save();
@@ -1077,26 +1284,46 @@ namespace EmulatorLauncher
             if (Program.Controllers.Count == 0)
                 return;
 
+            bool forceSDL = false;
+            if (Program.SystemConfig.isOptSet("input_forceSDL") && Program.SystemConfig.getOptBoolean("input_forceSDL"))
+                forceSDL = true;
+
             using (IniFile ini = new IniFile(iniFile, IniOptions.UseSpaces))
             {
                 var c1 = Program.Controllers.FirstOrDefault(c => c.PlayerIndex == 1);
 
                 string tech = "XInput";
                 string deviceName = "Gamepad";
+                int xIndex = 0;
+                bool xinputAsSdl = false;
+
+                if (c1 != null && c1.IsXInputDevice)
+                    xIndex = c1.XInput != null ? c1.XInput.DeviceIndex : c1.DeviceIndex;
 
                 if (c1.Config.Type == "keyboard")
                 {
                     tech = "DInput";
                     deviceName = "Keyboard Mouse";
                 }
-                else if (!c1.IsXInputDevice)
+                else if (!c1.IsXInputDevice || forceSDL)
                 {
+                    if (c1.IsXInputDevice && forceSDL)
+                    {
+                        xinputAsSdl = true;
+                    }
+
                     var s = c1.SdlController;
                     if (s != null)
                     {
-                        tech = "SDL";
+                        tech = xinputAsSdl? "XInput" : "SDL";
                         deviceName = s.Name;
                     }
+
+                    string newNamePath = Path.Combine(Program.AppConfig.GetFullPath("tools"), "controllerinfo.yml");
+                    string newName = SdlJoystickGuid.GetNameFromFile(newNamePath, c1.Guid, "dolphin");
+
+                    if (newName != null)
+                        deviceName = newName;
                 }
 
                 var ssss = "@(" + (GetSDLMappingName(c1, InputKey.hotkey) ?? "") + "&" + (GetSDLMappingName(c1, InputKey.y) ?? "") + ")";
@@ -1104,43 +1331,25 @@ namespace EmulatorLauncher
                 ini.WriteValue("Hotkeys", "Load State/Load State Slot 1", "F1");
                 ini.WriteValue("Hotkeys", "Save State/Save State Slot 1", "@(Shift+F1)");
 
-                if (tech == "XInput")
+                if (c1.Config.Type != "keyboard")
                 {
-                    ini.WriteValue("Hotkeys", "Device", tech + "/" + "0" + "/" + deviceName);
-                    ini.WriteValue("Hotkeys", "General/Toggle Pause", "Back&`Button B`");
-                    ini.WriteValue("Hotkeys", "General/Toggle Fullscreen", "Back&`Button A`");
-                    ini.WriteValue("Hotkeys", "General/Exit", "Back&Start");
+                    if (xinputAsSdl)
+                        ini.WriteValue("Hotkeys", "Device", "SDL" + "/" + _p1sdlindex + "/" + deviceName);
+                    else
+                        ini.WriteValue("Hotkeys", "Device", tech + "/" + xIndex + "/" + deviceName);
+                    ini.WriteValue("Hotkeys", "General/Toggle Pause", c1.IsXInputDevice? "@(Back+`Button B`)" : "@(Back+`Button E`)");
+                    ini.WriteValue("Hotkeys", "General/Toggle Fullscreen", c1.IsXInputDevice ? "@(Back+`Button A`)" : "@(Back+`Button S`)");
+                    ini.WriteValue("Hotkeys", "General/Exit", "@(Back+Start)");
 
                     // SaveStates
-                    ini.WriteValue("Hotkeys", "General/Take Screenshot", "@(Back+`Button X`)"); // Use Same value as SaveState....
-                    ini.WriteValue("Hotkeys", "Save State/Save to Selected Slot", "@(Back+`Button X`)");
-                    ini.WriteValue("Hotkeys", "Load State/Load from Selected Slot", "@(Back+`Button Y`)");
+                    ini.WriteValue("Hotkeys", "General/Take Screenshot", c1.IsXInputDevice ? "@(Back+`Button X`)" : "@(Back+`Button W`)"); // Use Same value as SaveState....
+                    ini.WriteValue("Hotkeys", "Save State/Save to Selected Slot", c1.IsXInputDevice ? "@(Back+`Button X`)" : "@(Back+`Button W`)");
+                    ini.WriteValue("Hotkeys", "Load State/Load from Selected Slot", c1.IsXInputDevice ? "@(Back+`Button Y`)" : "@(Back+`Button N`)");
                     ini.WriteValue("Hotkeys", "Other State Hotkeys/Increase Selected State Slot", "@(Back+`Pad N`)");
                     ini.WriteValue("Hotkeys", "Other State Hotkeys/Decrease Selected State Slot", "@(Back+`Pad S`)");
 
-                    ini.WriteValue("Hotkeys", "General/Eject Disc", "Back&`Shoulder L`");
-                    ini.WriteValue("Hotkeys", "General/Change Disc", "Back&`Shoulder R`");
-                }
-                else if (tech == "SDL")
-                {
-                    bool revert = c1.VendorID == USB_VENDOR.NINTENDO;
-                    ini.WriteValue("Hotkeys", "Device", tech + "/" + "0" + "/" + deviceName);
-                    ini.WriteValue("Hotkeys", "General/Toggle Pause", revert ? "`Button 4`&`Button 0`" : "`Button 4`&`Button 1`");
-                    ini.WriteValue("Hotkeys", "General/Toggle Fullscreen", revert ? "`Button 4`&`Button 1`" : "`Button 4`&`Button 0`");
-
-                    ini.WriteValue("Hotkeys", "General/Exit", "`Button 4`&`Button 6`");
-
-                    var save = (GetSDLMappingName(c1, InputKey.hotkey) ?? "") + "&" + (GetSDLMappingName(c1, InputKey.y) ?? "");
-                    ini.WriteValue("Hotkeys", "General/Take Screenshot", save); // Use Same value as SaveState....
-                    ini.WriteValue("Hotkeys", "Save State/Save to Selected Slot", save);
-                    ini.WriteValue("Hotkeys", "Load State/Load from Selected Slot", (GetSDLMappingName(c1, InputKey.hotkey) ?? "") + "&" + (GetSDLMappingName(c1, InputKey.x) ?? ""));
-
-                    // Save State/Save to Selected Slot = @(`Button 6`+`Button 2`)
-
-                    ini.WriteValue("Hotkeys", "General/Take Screenshot", "`Button 4`&`Full Axis 5+`");
-
-                    ini.WriteValue("Hotkeys", "General/Eject Disc", "`Button 4`&`Button 9`");
-                    ini.WriteValue("Hotkeys", "General/Change Disc", "`Button 4`&`Button 10`");
+                    ini.WriteValue("Hotkeys", "Emulation Speed/Decrease Emulation Speed", "@(Back+`Shoulder L`)");
+                    ini.WriteValue("Hotkeys", "Emulation Speed/Increase Emulation Speed", "@(Back+`Shoulder R`)");
                 }
                 else        // Keyboard
                 {
@@ -1149,8 +1358,8 @@ namespace EmulatorLauncher
                     ini.WriteValue("Hotkeys", "General/Toggle Fullscreen", "@(Alt+RETURN)");
                     ini.WriteValue("Hotkeys", "General/Exit", "ESCAPE");
                     ini.WriteValue("Hotkeys", "General/Take Screenshot", "`F9`");
-                    ini.WriteValue("Hotkeys", "General/Eject Disc", "Alt&E");
-                    ini.WriteValue("Hotkeys", "General/Change Disc", "Alt&S");
+                    ini.WriteValue("Hotkeys", "General/Eject Disc", "Alt+E");
+                    ini.WriteValue("Hotkeys", "General/Change Disc", "Alt+S");
                 }
             }
         }

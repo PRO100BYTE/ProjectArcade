@@ -13,6 +13,8 @@ namespace EmulatorLauncher
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
+            SimpleLogger.Instance.Info("[Generator] Getting " + emulator + " path and executable name.");
+
             string path = AppConfig.GetFullPath("mgba");
 
             string exe = Path.Combine(path, "mgba.exe");
@@ -20,8 +22,8 @@ namespace EmulatorLauncher
                 return null;
 
             //Applying bezels
-            if (!ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution))
-                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+            if (!ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution, emulator))
+                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
 
             _resolution = resolution;
             bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
@@ -127,20 +129,14 @@ namespace EmulatorLauncher
                 else
                     ini.WriteValue("ports.qt", "resampleVideo", "0");
 
-                if (SystemConfig.isOptSet("mgba_fps") && SystemConfig.getOptBoolean("mgba_fps"))
-                    ini.WriteValue("ports.qt", "showFps", "1");
-                else
-                    ini.WriteValue("ports.qt", "showFps", "0");
+                BindBoolIniFeature(ini, "ports.qt", "showFps", "mgba_fps", "1", "0");
 
                 if (SystemConfig.isOptSet("discord") && SystemConfig.getOptBoolean("discord"))
                     ini.WriteValue("ports.qt", "useDiscordPresence", "1");
                 else
                     ini.WriteValue("ports.qt", "useDiscordPresence", "0");
 
-                if (SystemConfig.isOptSet("mgba_skipbios") && SystemConfig.getOptBoolean("mgba_skipbios"))
-                    ini.WriteValue("ports.qt", "skipBios", "1");
-                else
-                    ini.WriteValue("ports.qt", "skipBios", "0");
+                BindBoolIniFeature(ini, "ports.qt", "skipBios", "mgba_skipbios", "1", "0");
 
                 // Drivers
                 if (SystemConfig.isOptSet("mgba_renderer") && SystemConfig.getOptBoolean("mgba_renderer"))
@@ -149,10 +145,7 @@ namespace EmulatorLauncher
                     ini.WriteValue("ports.qt", "hwaccelVideo", "1");
 
                 // Internal resolution
-                if (SystemConfig.isOptSet("internal_resolution") && !string.IsNullOrEmpty(SystemConfig["internal_resolution"]))
-                    ini.WriteValue("ports.qt", "videoScale", SystemConfig["internal_resolution"]);
-                else
-                    ini.WriteValue("ports.qt", "videoScale", "4");
+                BindIniFeatureSlider(ini, "ports.qt", "videoScale", "internal_resolution", "4");
 
                 // Shaders
                 if (SystemConfig.isOptSet("mgba_shader") && !string.IsNullOrEmpty(SystemConfig["mgba_shader"]))

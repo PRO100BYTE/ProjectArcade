@@ -25,17 +25,24 @@ namespace EmulatorLauncher
                 return null;
 
             rom = this.TryUnZipGameIfNeeded(system, rom, true);
+            bool autodetect = false;
+            string romFile = null;
 
             if (Directory.Exists(rom))
             {
-                rom = Directory.GetFiles(rom, "*.scummvm").FirstOrDefault();
-                if (string.IsNullOrEmpty(rom))
-                    throw new ApplicationException("Unable to find scummvm file in the provided folder");
+                romFile = Directory.GetFiles(rom, "*.scummvm").FirstOrDefault();
+                if (string.IsNullOrEmpty(romFile))
+                {
+                    autodetect = true;
+                    SimpleLogger.Instance.Info("[INFO] Unable to find scummvm file in the provided folder, trying auto-detect.");
+                }
+                else
+                    rom = romFile;
             }
 
             var platform = ReshadeManager.GetPlatformFromFile(exe);
-            if (!ReshadeManager.Setup(ReshadeBezelType.opengl, platform, system, rom, path, resolution))
-                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+            if (!ReshadeManager.Setup(ReshadeBezelType.opengl, platform, system, rom, path, resolution, emulator))
+                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
             
             _resolution = resolution;
 
@@ -52,17 +59,28 @@ namespace EmulatorLauncher
 
             commandArray.Add("--no-console");
             commandArray.Add("--config=\"" + iniPath + "\"");
-            commandArray.Add("--logfile=\"" + Path.ChangeExtension(iniPath, ".log") + "\"");            
-            commandArray.Add("-p\"" + Path.GetDirectoryName(rom)+"\"");
+            commandArray.Add("--logfile=\"" + Path.ChangeExtension(iniPath, ".log") + "\"");
 
-            string gameName = File.ReadAllText(rom);
+            if (File.Exists(rom))
+                commandArray.Add("-p\"" + Path.GetDirectoryName(rom)+"\"");
+            else
+                commandArray.Add("-p\"" + rom + "\"");
+
+            string gameName = null;
+            
+            if (File.Exists(rom))
+                gameName = File.ReadAllText(rom);
 
             if (string.IsNullOrEmpty(gameName))
-                gameName = Path.GetFileNameWithoutExtension(rom).ToLowerInvariant();
+                autodetect = true;
             else
-                gameName = gameName.Trim();               
+            {
+                gameName = gameName.Trim();
+                commandArray.Add("\"" + gameName + "\"");
+            }
 
-            commandArray.Add("\"" + gameName + "\"");
+            if (autodetect && string.IsNullOrEmpty(gameName))
+                commandArray.Add("--auto-detect");
 
             var args = string.Join(" ", commandArray.ToArray()); // .Select(a => a.Contains(" ") ? "\"" + a + "\"" : a)
 
@@ -78,6 +96,8 @@ namespace EmulatorLauncher
         {
             using (IniFile ini = new IniFile(iniPath))
             {
+                BindIniFeature(ini, "scummvm", "rotation_mode", "scumm_rotation", "0");
+
                 if (Features.IsSupported("gfx_mode") && SystemConfig.isOptSet("gfx_mode"))
                     ini.WriteValue("scummvm", "gfx_mode", SystemConfig["gfx_mode"]);
                 else

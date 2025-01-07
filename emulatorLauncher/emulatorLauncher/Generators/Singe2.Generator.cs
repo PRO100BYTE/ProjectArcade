@@ -6,6 +6,7 @@ using EmulatorLauncher.Common;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System.Windows.Forms;
+using System.Globalization;
 
 namespace EmulatorLauncher
 {
@@ -84,8 +85,8 @@ namespace EmulatorLauncher
 
             ConfigureControls(_symLink, Path.Combine(path, "Singe"));
 
-            if (!ReshadeManager.Setup(ReshadeBezelType.d3d9, ReshadePlatform.x64, system, rom, path, resolution))
-                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+            if (!ReshadeManager.Setup(ReshadeBezelType.d3d9, ReshadePlatform.x64, system, rom, path, resolution, emulator))
+                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
 
             _resolution = resolution;
 
@@ -110,7 +111,7 @@ namespace EmulatorLauncher
             if (!SystemConfig.isOptSet("singe2_debug") || !SystemConfig.getOptBoolean("singe2_debug"))
                 commandArray.Add("-z");
 
-            if (SystemConfig.getOptBoolean("singe2_crosshair"))
+            if (SystemConfig.isOptSet("singe2_crosshair") && !SystemConfig.getOptBoolean("singe2_crosshair"))
                 commandArray.Add("-n");
 
             commandArray.Add("-v");
@@ -157,7 +158,7 @@ namespace EmulatorLauncher
 
                 string deadzone = "15000";
                 if (SystemConfig.isOptSet("singe2_deadzone") && !string.IsNullOrEmpty(SystemConfig["singe2_deadzone"]))
-                    deadzone = SystemConfig["singe2_deadzone"];
+                    deadzone = (SystemConfig["singe2_deadzone"].ToDouble() * 1000).ToString(CultureInfo.InvariantCulture);
 
                 string file = Path.Combine(path, "controls.cfg");
                 string[] lines = 

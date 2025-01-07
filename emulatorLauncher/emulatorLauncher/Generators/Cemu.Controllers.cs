@@ -51,9 +51,13 @@ namespace EmulatorLauncher
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
 
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for Cemu");
+
             UpdateSdlControllersWithHints();
 
             string folder = Path.Combine(path, "controllerProfiles");
+            if (_cemu21)
+                folder = Path.Combine(path, "portable", "controllerProfiles");
 
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
@@ -146,15 +150,24 @@ namespace EmulatorLauncher
             writer.WriteElementString("uuid", "keyboard");
             writer.WriteElementString("display_name", "Keyboard");
             writer.WriteStartElement("axis");
-            writer.WriteElementString("deadzone", "0.25");
+            if (Program.SystemConfig.isOptSet("cemu_deadzone") && !string.IsNullOrEmpty(Program.SystemConfig["cemu_deadzone"]))
+                writer.WriteElementString("deadzone", Program.SystemConfig["cemu_deadzone"].Substring(0, 4));
+            else
+                writer.WriteElementString("deadzone", "0.25");
             writer.WriteElementString("range", "1");
             writer.WriteEndElement();//end of axis
             writer.WriteStartElement("rotation");
-            writer.WriteElementString("deadzone", "0.25");
+            if (Program.SystemConfig.isOptSet("cemu_deadzone") && !string.IsNullOrEmpty(Program.SystemConfig["cemu_deadzone"]))
+                writer.WriteElementString("deadzone", Program.SystemConfig["cemu_deadzone"].Substring(0, 4));
+            else
+                writer.WriteElementString("deadzone", "0.25");
             writer.WriteElementString("range", "1");
             writer.WriteEndElement();//end of rotation
             writer.WriteStartElement("trigger");
-            writer.WriteElementString("deadzone", "0.25");
+            if (Program.SystemConfig.isOptSet("cemu_trigger_deadzone") && !string.IsNullOrEmpty(Program.SystemConfig["cemu_trigger_deadzone"]))
+                writer.WriteElementString("deadzone", Program.SystemConfig["cemu_trigger_deadzone"].Substring(0, 4));
+            else
+                writer.WriteElementString("deadzone", "0.25");
             writer.WriteElementString("range", "1");
             writer.WriteEndElement();//end of trigger
             writer.WriteStartElement("mappings");
@@ -230,19 +243,33 @@ namespace EmulatorLauncher
 
             //set rumble if option is set
             if (Program.SystemConfig.isOptSet("cemu_enable_rumble") && !string.IsNullOrEmpty(Program.SystemConfig["cemu_enable_rumble"]))
-                writer.WriteElementString("rumble", Program.SystemConfig["cemu_enable_rumble"]);
+            {
+                if (Program.SystemConfig["cemu_enable_rumble"].Length > 4)
+                    writer.WriteElementString("rumble", Program.SystemConfig["cemu_enable_rumble"].Substring(0, 4));
+                else
+                    writer.WriteElementString("rumble", Program.SystemConfig["cemu_enable_rumble"]);
+            }
 
             //Default deadzones and ranges for axis, rotation and trigger
             writer.WriteStartElement("axis");
-            writer.WriteElementString("deadzone", "0.25");
+            if (Program.SystemConfig.isOptSet("cemu_deadzone") && !string.IsNullOrEmpty(Program.SystemConfig["cemu_deadzone"]))
+                writer.WriteElementString("deadzone", Program.SystemConfig["cemu_deadzone"].Substring(0, 4));
+            else
+                writer.WriteElementString("deadzone", "0.25");
             writer.WriteElementString("range", "1");
             writer.WriteEndElement();//end of axis
             writer.WriteStartElement("rotation");
-            writer.WriteElementString("deadzone", "0.25");
+            if (Program.SystemConfig.isOptSet("cemu_deadzone") && !string.IsNullOrEmpty(Program.SystemConfig["cemu_deadzone"]))
+                writer.WriteElementString("deadzone", Program.SystemConfig["cemu_deadzone"].Substring(0, 4));
+            else
+                writer.WriteElementString("deadzone", "0.25");
             writer.WriteElementString("range", "1");
             writer.WriteEndElement();//end of rotation
             writer.WriteStartElement("trigger");
-            writer.WriteElementString("deadzone", "0.25");
+            if (Program.SystemConfig.isOptSet("cemu_trigger_deadzone") && !string.IsNullOrEmpty(Program.SystemConfig["cemu_trigger_deadzone"]))
+                writer.WriteElementString("deadzone", Program.SystemConfig["cemu_trigger_deadzone"].Substring(0, 4));
+            else
+                writer.WriteElementString("deadzone", "0.25");
             writer.WriteElementString("range", "1");
             writer.WriteEndElement();//end of trigger
             writer.WriteElementString("packet_delay", "25");
@@ -300,6 +327,7 @@ namespace EmulatorLauncher
             if (ctrl.IsXInputDevice)
                 xbox = "yes";
 
+            bool replaceGuid = false;
             bool forceXInput = SystemConfig.getOptBoolean("cemu_forcexinput") && xbox =="yes";
 
             // Get joystick data (type, api, guid, index)
@@ -315,13 +343,18 @@ namespace EmulatorLauncher
                 .ToList()
                 .IndexOf(ctrl);
 
-            string uuid = forceXInput ? (ctrl.XInput.DeviceIndex).ToString() : index + "_" + ctrl.GetSdlGuid(_sdlVersion, true).ToLowerInvariant(); //string uuid of the cemu config file, based on old sdl2 guids ( pre 2.26 ) without crc-16
+            string newGuidPath = Path.Combine(AppConfig.GetFullPath("tools"), "controllerinfo.yml");
+            string newGuid = SdlJoystickGuid.GetGuidFromFile(newGuidPath, ctrl.Guid, "cemu");
+            if (newGuid != null)
+                replaceGuid = true;
+
+            string uuid = forceXInput ? (ctrl.XInput.DeviceIndex).ToString() : index + "_" + (replaceGuid ? newGuid : ctrl.GetSdlGuid(_sdlVersion, true).ToLowerInvariant()); //string uuid of the cemu config file, based on old sdl2 guids ( pre 2.26 ) without crc-16
 
             if (_sdlMapping != null && !forceXInput)
             {
                 var sdlTrueGuid = _sdlMapping.GetControllerGuid(ctrl.DevicePath);
                 if (sdlTrueGuid != null)
-                    uuid = index + "_" + sdlTrueGuid.ToLowerInvariant();
+                    uuid = index + "_" + (replaceGuid ? newGuid : sdlTrueGuid.ToLowerInvariant());
             }
 
             // Define type of controller
@@ -393,7 +426,12 @@ namespace EmulatorLauncher
 
             //set rumble if option is set
             if (Program.SystemConfig.isOptSet("cemu_enable_rumble") && !string.IsNullOrEmpty(Program.SystemConfig["cemu_enable_rumble"]))
-                writer.WriteElementString("rumble", Program.SystemConfig["cemu_enable_rumble"]);
+            {
+                if (Program.SystemConfig["cemu_enable_rumble"].Length > 4)
+                    writer.WriteElementString("rumble", Program.SystemConfig["cemu_enable_rumble"].Substring(0, 4));
+                else
+                    writer.WriteElementString("rumble", Program.SystemConfig["cemu_enable_rumble"]);
+            }
 
             //set motion if option is set in features
             if (xbox != "yes" && enableMotion)
@@ -403,15 +441,24 @@ namespace EmulatorLauncher
 
             //Default deadzones and ranges for axis, rotation and trigger
             writer.WriteStartElement("axis");
-            writer.WriteElementString("deadzone", "0.25");
+            if (Program.SystemConfig.isOptSet("cemu_deadzone") && !string.IsNullOrEmpty(Program.SystemConfig["cemu_deadzone"]))
+                writer.WriteElementString("deadzone", Program.SystemConfig["cemu_deadzone"].Substring(0, 4));
+            else
+                writer.WriteElementString("deadzone", "0.25");
             writer.WriteElementString("range", "1");
             writer.WriteEndElement();//end of axis
             writer.WriteStartElement("rotation");
-            writer.WriteElementString("deadzone", "0.25");
+            if (Program.SystemConfig.isOptSet("cemu_deadzone") && !string.IsNullOrEmpty(Program.SystemConfig["cemu_deadzone"]))
+                writer.WriteElementString("deadzone", Program.SystemConfig["cemu_deadzone"].Substring(0, 4));
+            else
+                writer.WriteElementString("deadzone", "0.25");
             writer.WriteElementString("range", "1");
             writer.WriteEndElement();//end of rotation
             writer.WriteStartElement("trigger");
-            writer.WriteElementString("deadzone", "0.25");
+            if (Program.SystemConfig.isOptSet("cemu_trigger_deadzone") && !string.IsNullOrEmpty(Program.SystemConfig["cemu_trigger_deadzone"]))
+                writer.WriteElementString("deadzone", Program.SystemConfig["cemu_trigger_deadzone"].Substring(0, 4));
+            else
+                writer.WriteElementString("deadzone", "0.25");
             writer.WriteElementString("range", "1");
             writer.WriteEndElement();//end of trigger
             writer.WriteStartElement("mappings");
@@ -529,7 +576,25 @@ namespace EmulatorLauncher
                     WriteMappingXinput("22", "47");
                     WriteMappingXinput("23", "46");
                     WriteMappingXinput("24", "40");
-                }
+
+                    if (SystemConfig.isOptSet("cemu_gamepadscreen") && !string.IsNullOrEmpty(SystemConfig["cemu_gamepadscreen"]))
+                    {
+                        string screenButton = SystemConfig["cemu_gamepadscreen"];
+
+                        switch (screenButton)
+                        {
+                            case "leftstick":
+                                WriteMappingXinput("26", "7");
+                                break;
+                            case "rightstick":
+                                WriteMappingXinput("26", "8");
+                                break;
+                            case "select":
+                                WriteMappingXinput("26", "5");
+                                break;
+                        }
+                    }
+                } 
             }
             
             // Other
@@ -592,6 +657,24 @@ namespace EmulatorLauncher
                     WriteMapping("22", InputKey.rightanalogup, true);
                     WriteMapping("23", InputKey.rightanalogleft, false);
                     WriteMapping("24", InputKey.rightanalogleft, true);
+
+                    if (SystemConfig.isOptSet("cemu_gamepadscreen") && !string.IsNullOrEmpty(SystemConfig["cemu_gamepadscreen"]))
+                    {
+                        string screenButton = SystemConfig["cemu_gamepadscreen"];
+
+                        switch (screenButton)
+                        {
+                            case "leftstick":
+                                WriteMapping("26", InputKey.l3, false);
+                                break;
+                            case "rightstick":
+                                WriteMapping("26", InputKey.r3, false);
+                                break;
+                            case "select":
+                                WriteMapping("26", InputKey.select, false);
+                                break;
+                        }
+                    }
                 }
             }
 
@@ -600,6 +683,8 @@ namespace EmulatorLauncher
             writer.WriteEndElement();//end of controller
             writer.WriteEndElement();//end of emulated_controller
             writer.WriteEndDocument();
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + ctrl.DevicePath + " to player : " + ctrl.PlayerIndex.ToString());
         }
 
         /// <summary>

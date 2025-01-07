@@ -12,12 +12,12 @@ namespace EmulatorLauncher
 {
     partial class Model2Generator : Generator
     {
-
         private BezelFiles _bezelFileInfo;
         private ScreenResolution _resolution;
         private bool _dinput;
         private string _destFile;
         private string _destParent;
+        private string _path;
 
         public Model2Generator()
         {
@@ -26,7 +26,13 @@ namespace EmulatorLauncher
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
+            SimpleLogger.Instance.Info("[Generator] Getting " + emulator + " path and executable name.");
+
             string path = AppConfig.GetFullPath("m2emulator");
+            if (!Directory.Exists(path))
+                return null;
+
+            _path = path;
 
             string exe = Path.Combine(path, "emulator_multicpu.exe");
             if (core != null && core.ToLower().Contains("singlecpu"))
@@ -34,6 +40,8 @@ namespace EmulatorLauncher
 
             if (!File.Exists(exe))
                 return null;
+
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
             string pakDir = Path.Combine(path, "roms");
             if (!Directory.Exists(pakDir))
@@ -72,14 +80,17 @@ namespace EmulatorLauncher
 
             _resolution = resolution;
 
-            if (!ReshadeManager.Setup(ReshadeBezelType.d3d9, ReshadePlatform.x86, system, rom, path, resolution))
-                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+            if (!fullscreen)
+                SystemConfig["bezel"] = "none";
+
+            if (!ReshadeManager.Setup(ReshadeBezelType.d3d9, ReshadePlatform.x86, system, rom, path, resolution, emulator))
+                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
 
             _dinput = false;
             if (SystemConfig.isOptSet("m2_joystick_driver") && SystemConfig["m2_joystick_driver"] == "dinput")
                 _dinput = true;
 
-            SetupConfig(path, resolution, rom);
+            SetupConfig(path, resolution, rom, fullscreen);
             SetupLUAScript(path, rom);
 
             string arg = Path.GetFileNameWithoutExtension(_destFile);
@@ -92,16 +103,18 @@ namespace EmulatorLauncher
             };
         }
 
-        private void SetupConfig(string path, ScreenResolution resolution, string rom)
+        private void SetupConfig(string path, ScreenResolution resolution, string rom, bool fullscreen)
         {
             string iniFile = Path.Combine(path, "Emulator.ini");
-
-            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
             try
             {
                 using (var ini = new IniFile(iniFile))
                 {
+                    // rompath
+                    string rompath = "..\\..\\roms\\model2";
+                    ini.WriteValue("RomDirs", "Dir1", rompath);
+
                     ini.WriteValue("Renderer", "FullMode", "4");
 
                     if (fullscreen)
@@ -116,9 +129,9 @@ namespace EmulatorLauncher
 
                     ini.WriteValue("Renderer", "FullScreenWidth", (resolution == null ? Screen.PrimaryScreen.Bounds.Width : resolution.Width).ToString());
                     ini.WriteValue("Renderer", "FullScreenHeight", (resolution == null ? Screen.PrimaryScreen.Bounds.Height : resolution.Height).ToString());
-                    ini.WriteValue("Renderer", "ForceSync", SystemConfig["VSync"] != "false" ? "1" : "0");
-
-                    BindBoolIniFeature(ini, "Renderer", "Bilinear", "bilinear_filtering", "0", "1");
+                    
+                    BindBoolIniFeatureOn(ini, "Renderer", "ForceSync", "VSync", "1", "0");
+                    BindBoolIniFeatureOn(ini, "Renderer", "Bilinear", "bilinear_filtering", "1", "0");
                     BindBoolIniFeature(ini, "Renderer", "Trilinear", "trilinear_filtering", "1", "0");
                     BindBoolIniFeature(ini, "Renderer", "ForceManaged", "m2_ForceManaged", "1", "0");
                     BindBoolIniFeature(ini, "Renderer", "AutoMip", "m2_AutoMip", "1", "0");
@@ -133,7 +146,7 @@ namespace EmulatorLauncher
 
                     BindBoolIniFeature(ini, "Input", "EnableFF", "m2_force_feedback", "1", "0");
                     BindBoolIniFeature(ini, "Input", "HoldGears", "m2_HoldGears", "1", "0");
-                    BindBoolIniFeature(ini, "Input", "UseRawInput", "m2_rawinput", "0", "1");
+                    BindBoolIniFeature(ini, "Input", "UseRawInput", "m2_rawinput", "1", "0");
 
                     // Gun indexes
                     string mouse1Index = "0";
@@ -143,6 +156,7 @@ namespace EmulatorLauncher
 
                     if (gunCount > 0 && guns.Length > 0)
                     {
+                        SimpleLogger.Instance.Info("[GUNS] Found " + gunCount.ToString() + " usable guns.");
                         mouse1Index = guns[0].Index.ToString();
                         if (gunCount > 1 && guns.Length > 1)
                             mouse2Index = guns[1].Index.ToString();
@@ -156,7 +170,15 @@ namespace EmulatorLauncher
                     ini.WriteValue("Input", "RawDevP1", mouse1Index);
                     ini.WriteValue("Input", "RawDevP2", mouse2Index);
 
-                    BindIniFeature(ini, "Input", "FE_CENTERING_Deadband", "m2_deadzone", "1000");
+                    if (SystemConfig.isOptSet("m2_deadzone") && !string.IsNullOrEmpty(SystemConfig["m2_deadzone"]))
+                    {
+                        string deadzone = SystemConfig["m2_deadzone"].ToIntegerString() + "00";
+                        ini.WriteValue("Input", "FE_CENTERING_Deadband", deadzone);
+                    }
+                    else
+                    {
+                        ini.WriteValue("Input", "FE_CENTERING_Deadband", "1000");
+                    }
 
                     ConfigureInput(path, ini, rom);
                 }
@@ -169,7 +191,13 @@ namespace EmulatorLauncher
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
 
-            else if (Program.SystemConfig.isOptSet("m2_joystick_autoconfig") && Program.SystemConfig["m2_joystick_autoconfig"] == "template")
+            if (!Controllers.Any(c => c.IsXInputDevice) && SystemConfig["m2_joystick_driver"] != "xinput")
+            {
+                SimpleLogger.Instance.Info("No XInput controllers found, switching to DirectInput");
+                ini.WriteValue("Input", "XInput", "0");
+            }
+
+            if (Program.SystemConfig.isOptSet("m2_joystick_autoconfig") && Program.SystemConfig["m2_joystick_autoconfig"] == "template")
             {
                 string inputCFGpath = Path.Combine(path, "CFG");
                 if (!Directory.Exists(inputCFGpath)) try { Directory.CreateDirectory(inputCFGpath); }

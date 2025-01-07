@@ -5,6 +5,7 @@ using System.IO;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.Common.Joysticks;
+using EmulatorLauncher.Common;
 
 namespace EmulatorLauncher
 {
@@ -45,6 +46,8 @@ namespace EmulatorLauncher
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
 
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for Ryujinx");
+
             UpdateSdlControllersWithHints();
 
             //clear existing input_config section to avoid the same controller mapped to different players because of past mapping
@@ -53,8 +56,12 @@ namespace EmulatorLauncher
             //create new input_config section
             var input_configs = new List<DynamicJson>();
 
+            int maxPad = 8;
+            if (SystemConfig.isOptSet("ryujinx_maxcontrollers") && !string.IsNullOrEmpty(SystemConfig["ryujinx_maxcontrollers"]))
+                maxPad = SystemConfig["ryujinx_maxcontrollers"].ToInteger();
+
             //loop controllers
-            foreach (var controller in this.Controllers.OrderBy(i => i.PlayerIndex))
+            foreach (var controller in this.Controllers.OrderBy(i => i.PlayerIndex).Take(maxPad))
                 ConfigureInput(json, controller, input_configs);
         }
 
@@ -348,6 +355,8 @@ namespace EmulatorLauncher
             //add section to file
             input_configs.Add(input_config);
             json.SetObject("input_config", input_configs);
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + c.DevicePath + " to player : " + c.PlayerIndex.ToString());
         }
 
         private static string GetInputKeyName(Controller c, InputKey key, string tech)

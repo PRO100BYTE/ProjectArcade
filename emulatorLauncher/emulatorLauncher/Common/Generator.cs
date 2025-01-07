@@ -9,6 +9,9 @@ using EmulatorLauncher.Common.Compression;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.PadToKeyboard;
+using Newtonsoft.Json.Linq;
+using System.Configuration;
+using ValveKeyValue;
 
 namespace EmulatorLauncher
 {
@@ -107,6 +110,7 @@ namespace EmulatorLauncher
 
         public virtual void Cleanup()
         {
+            SimpleLogger.Instance.Info("[Generator] Cleanup.");
             if (_mountFile != null)
             {
                 // Delete overlay path if it's emptt
@@ -499,6 +503,35 @@ namespace EmulatorLauncher
             }
         }
 
+        protected void BindBoolFeatureOn(System.Xml.Linq.XElement cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                    cfg.SetElementValue(settingName, falseValue);
+                else
+                    cfg.SetElementValue(settingName, trueValue);
+            }
+        }
+
+        protected void BindFeatureSlider(System.Xml.Linq.XElement cfg, string settingName, string featureName, string defaultValue, int decimalPlaces = 0, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (decimalPlaces > 0 && decimalPlaces < 7)
+                {
+                    int toRemove = 6 - decimalPlaces;
+                    string value = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+                    if (value != defaultValue)
+                        cfg.SetElementValue(settingName, SystemConfig.GetValueOrDefault(featureName, value.Substring(0, value.Length - toRemove)));
+                    else
+                        cfg.SetElementValue(settingName, SystemConfig.GetValueOrDefault(featureName, value));
+                }
+                else
+                    cfg.SetElementValue(settingName, defaultValue);
+            }
+        }
+
         // yml and bml bindfeatures
         protected void BindFeature(YmlContainer cfg, string settingName, string featureName, string defaultValue, bool force = false)
         {
@@ -512,6 +545,24 @@ namespace EmulatorLauncher
                 cfg[settingName] = SystemConfig.GetValueOrDefault(featureName, defaultValue);
         }
 
+        protected void BindFeatureSlider(BmlContainer cfg, string settingName, string featureName, string defaultValue, int decimalPlaces = 0, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (decimalPlaces > 0 && decimalPlaces < 7)
+                {
+                    int toRemove = 6 - decimalPlaces;
+                    string value = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+                    if (value != defaultValue)
+                        cfg[settingName] = value.Substring(0, value.Length - toRemove);
+                    else
+                        cfg[settingName] = value;
+                }
+                else
+                    cfg[settingName] = SystemConfig.GetValueOrDefaultSlider(featureName, defaultValue);
+            }
+        }
+
         protected void BindBoolFeature(YmlContainer cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
         {
             if (force || Features.IsSupported(featureName))
@@ -523,6 +574,35 @@ namespace EmulatorLauncher
             }   
         }
 
+        protected void BindBoolFeatureOn(YmlContainer cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                    cfg[settingName] = falseValue;
+                else
+                    cfg[settingName] = trueValue;
+            }
+        }
+
+        protected void BindFeatureSlider(YmlContainer cfg, string settingName, string featureName, string defaultValue, int decimalPlaces = 0, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (decimalPlaces > 0 && decimalPlaces < 7)
+                {
+                    int toRemove = 6 - decimalPlaces;
+                    string value = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+                    if (value != defaultValue)
+                        cfg[settingName] = value.Substring(0, value.Length - toRemove);
+                    else
+                        cfg[settingName] = value;
+                }
+                else
+                    cfg[settingName] = SystemConfig.GetValueOrDefaultSlider(featureName, defaultValue);
+            }
+        }
+
         protected void BindBoolFeature(BmlContainer cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
         {
             if (force || Features.IsSupported(featureName))
@@ -531,6 +611,17 @@ namespace EmulatorLauncher
                     cfg[settingName] = trueValue;
                 else
                     cfg[settingName] = falseValue;
+            }
+        }
+
+        protected void BindBoolFeatureOn(BmlContainer cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                    cfg[settingName] = falseValue;
+                else
+                    cfg[settingName] = trueValue;
             }
         }
 
@@ -553,6 +644,26 @@ namespace EmulatorLauncher
             }
         }
 
+        protected void BindQtBoolIniFeature(IniFile ini, string section, string settingName, string featureName, string trueValue, string falseValue, string defaultValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                bool isCustomValue = SystemConfig.isOptSet(featureName) && !string.IsNullOrEmpty(SystemConfig[featureName]);
+                string value = defaultValue;
+
+                if (SystemConfig.isOptSet(featureName))
+                {
+                    if (SystemConfig.getOptBoolean(featureName))
+                        value = trueValue;
+                    else if (!SystemConfig.getOptBoolean(featureName))
+                        value = falseValue;
+                }
+
+                ini.WriteValue(section, settingName + "\\default", isCustomValue ? "false" : "true");
+                ini.WriteValue(section, settingName, value);
+            }
+        }
+
         // json bindfeatures
         protected void BindFeature(DynamicJson cfg, string settingName, string featureName, string defaultValue, bool force = false)
         {
@@ -571,6 +682,172 @@ namespace EmulatorLauncher
             } 
         }
 
+        protected void BindBoolFeatureOn(DynamicJson cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                    cfg[settingName] = falseValue;
+                else
+                    cfg[settingName] = trueValue;
+            }
+        }
+
+        protected void BindBoolFeatureAuto(DynamicJson cfg, string settingName, string featureName, string trueValue, string falseValue, string autoValue, bool force = false) // use when there is an "auto" value !
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && SystemConfig.getOptBoolean(featureName))
+                    cfg[settingName] = trueValue;
+                else if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                    cfg[settingName] = falseValue;
+                else
+                    cfg[settingName] = autoValue;
+            }
+        }
+
+        protected void BindFeatureSlider(DynamicJson cfg, string settingName, string featureName, string defaultValue, int decimalPlaces = 0, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (decimalPlaces > 0 && decimalPlaces < 7)
+                {
+                    int toRemove = 6 - decimalPlaces;
+                    string value = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+                    if (value != defaultValue)
+                        cfg[settingName] = value.Substring(0, value.Length - toRemove);
+                    else
+                        cfg[settingName] = value;
+                }
+                else
+                    cfg[settingName] = SystemConfig.GetValueOrDefaultSlider(featureName, defaultValue);
+            }
+        }
+
+        // NewtonsoftJson bind features
+        protected void BindFeature(JObject json, string settingsName, string featureName, string defaultValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+                json[settingsName] = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+        }
+
+        protected void BindFeatureInt(JObject json, string settingsName, string featureName, string defaultValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+                json[settingsName] = SystemConfig.GetValueOrDefault(featureName, defaultValue).ToInteger();
+        }
+
+        protected void BindBoolFeature(JObject json, string settingsName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && SystemConfig.getOptBoolean(featureName))
+                    json[settingsName] = trueValue;
+                else
+                    json[settingsName] = falseValue;
+            }
+        }
+
+        protected void BindBoolFeatureInt(JObject json, string settingsName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && SystemConfig.getOptBoolean(featureName))
+                    json[settingsName] = trueValue.ToInteger();
+                else
+                    json[settingsName] = falseValue.ToInteger();
+            }
+        }
+
+        protected void BindBoolFeatureOn(JObject json, string settingsName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                    json[settingsName] = falseValue;
+                else
+                    json[settingsName] = trueValue;
+            }
+        }
+
+        protected void BindBoolFeatureOnInt(JObject json, string settingsName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                    json[settingsName] = falseValue.ToInteger();
+                else
+                    json[settingsName] = trueValue.ToInteger();
+            }
+        }
+
+        protected void BindBoolFeatureAuto(JObject json, string settingsName, string featureName, string trueValue, string falseValue, string autoValue, bool force = false) // use when there is an "auto" value !
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && SystemConfig.getOptBoolean(featureName))
+                    json[settingsName] = trueValue;
+                else if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                    json[settingsName] = falseValue;
+                else
+                    json[settingsName] = autoValue;
+            }
+        }
+
+        protected void BindFeatureSlider(JObject json, string settingsName, string featureName, string defaultValue, int decimalPlaces = 0, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (decimalPlaces > 0 && decimalPlaces < 7)
+                {
+                    int toRemove = 6 - decimalPlaces;
+                    string value = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+                    if (value != defaultValue)
+                        json[settingsName] = value.Substring(0, value.Length - toRemove);
+                    else
+                        json[settingsName] = value;
+                }
+                else
+                    json[settingsName] = SystemConfig.GetValueOrDefaultSlider(featureName, defaultValue);
+            }
+        }
+
+        protected void BindFeatureSliderDouble(JObject json, string settingsName, string featureName, string defaultValue, int decimalPlaces = 0, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (decimalPlaces > 0 && decimalPlaces < 7)
+                {
+                    int toRemove = 6 - decimalPlaces;
+                    string value = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+                    if (value != defaultValue)
+                        json[settingsName] = value.Substring(0, value.Length - toRemove).ToDouble();
+                    else
+                        json[settingsName] = value.ToDouble();
+                }
+                else
+                    json[settingsName] = SystemConfig.GetValueOrDefaultSlider(featureName, defaultValue).ToDouble();
+            }
+        }
+
+        protected void BindFeatureSliderInt(JObject json, string settingsName, string featureName, string defaultValue, int decimalPlaces = 0, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (decimalPlaces > 0 && decimalPlaces < 7)
+                {
+                    int toRemove = 6 - decimalPlaces;
+                    string value = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+                    if (value != defaultValue)
+                        json[settingsName] = value.Substring(0, value.Length - toRemove).ToInteger();
+                    else
+                        json[settingsName] = value.ToInteger();
+                }
+                else
+                    json[settingsName] = SystemConfig.GetValueOrDefaultSlider(featureName, defaultValue).ToInteger();
+            }
+        }
+
         // cfg bindfeatures
         protected void BindBoolFeature(ConfigFile cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
         {
@@ -583,10 +860,52 @@ namespace EmulatorLauncher
             }
         }
 
+        protected void BindBoolFeatureOn(ConfigFile cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                    cfg[settingName] = falseValue;
+                else
+                    cfg[settingName] = trueValue;
+            }
+        }
+
+        protected void BindBoolFeatureAuto(ConfigFile cfg, string settingName, string featureName, string trueValue, string falseValue, string autoValue, bool force = false) // use when there is an "auto" value !
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && SystemConfig.getOptBoolean(featureName))
+                    cfg[settingName] = trueValue;
+                else if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                    cfg[settingName] = falseValue;
+                else
+                    cfg[settingName] = autoValue;
+            }
+        }
+
         protected void BindFeature(ConfigFile cfg, string settingName, string featureName, string defaultValue, bool force = false)
         {
             if (force || Features.IsSupported(featureName))
                 cfg[settingName] = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+        }
+
+        protected void BindFeatureSlider(ConfigFile cfg, string settingName, string featureName, string defaultValue, int decimalPlaces = 0, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (decimalPlaces > 0 && decimalPlaces < 7)
+                {
+                    int toRemove = 6 - decimalPlaces;
+                    string value = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+                    if (value != defaultValue)
+                        cfg[settingName] = value.Substring(0, value.Length - toRemove);
+                    else
+                        cfg[settingName] = value;
+                }
+                else
+                    cfg[settingName] = SystemConfig.GetValueOrDefaultSlider(featureName, defaultValue);
+            }
         }
 
         // ini bindfeatures
@@ -610,6 +929,48 @@ namespace EmulatorLauncher
             }
         }
 
+        protected void BindBoolIniFeatureOn(IniFile ini, string section, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                    ini.WriteValue(section, settingName, falseValue);
+                else
+                    ini.WriteValue(section, settingName, trueValue);
+            }
+        }
+
+        protected void BindIniFeatureSlider(IniFile ini, string section, string settingName, string featureName, string defaultValue, int decimalPlaces = 0, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (decimalPlaces > 0 && decimalPlaces < 7)
+                {
+                    int toRemove = 6 - decimalPlaces;
+                    string value = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+                    if (value != defaultValue)
+                        ini.WriteValue(section, settingName, value.Substring(0, value.Length - toRemove));
+                    else
+                        ini.WriteValue(section, settingName, value);
+                }
+                else
+                    ini.WriteValue(section, settingName, SystemConfig.GetValueOrDefaultSlider(featureName, defaultValue));
+            }
+        }
+
+        protected void BindBoolIniFeatureAuto(IniFile ini, string section, string settingName, string featureName, string trueValue, string falseValue, string autoValue, bool force = false) // use when there is an "auto" value !
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && SystemConfig.getOptBoolean(featureName))
+                    ini.WriteValue(section, settingName, trueValue);
+                else if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                    ini.WriteValue(section, settingName, falseValue);
+                else
+                    ini.WriteValue(section, settingName, autoValue);
+            }
+        }
+
         protected void SetIniPath(IniFile ini, string section, string settingName, string pathName)
         {
             if (!Directory.Exists(pathName))
@@ -618,6 +979,87 @@ namespace EmulatorLauncher
 
             if (!string.IsNullOrEmpty(pathName))
                 ini.WriteValue(section, settingName, pathName);
+        }
+
+        // JGenesis
+        protected void BindBoolIniFeature(IniFileJGenesis ini, string section, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && SystemConfig.getOptBoolean(featureName))
+                    ini.WriteValue(section, settingName, trueValue);
+                else
+                    ini.WriteValue(section, settingName, falseValue);
+            }
+        }
+        protected void BindBoolIniFeatureOn(IniFileJGenesis ini, string section, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                    ini.WriteValue(section, settingName, falseValue);
+                else
+                    ini.WriteValue(section, settingName, trueValue);
+            }
+        }
+
+        protected void BindIniFeatureSlider(IniFileJGenesis ini, string section, string settingName, string featureName, string defaultValue, int decimalPlaces = 0, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (decimalPlaces > 0 && decimalPlaces < 7)
+                {
+                    int toRemove = 6 - decimalPlaces;
+                    string value = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+                    if (value != defaultValue)
+                        ini.WriteValue(section, settingName, value.Substring(0, value.Length - toRemove));
+                    else
+                        ini.WriteValue(section, settingName, value);
+                }
+                else
+                    ini.WriteValue(section, settingName, SystemConfig.GetValueOrDefaultSlider(featureName, defaultValue));
+            }
+        }
+
+        // Fbneo config file
+        protected void BindBoolFeature(FbneoConfigFile cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && SystemConfig.getOptBoolean(featureName))
+                    cfg[settingName] = trueValue;
+                else
+                    cfg[settingName] = falseValue;
+            }
+        }
+
+        protected void BindBoolFeatureOn(FbneoConfigFile cfg, string settingName, string featureName, string trueValue, string falseValue, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (SystemConfig.isOptSet(featureName) && !SystemConfig.getOptBoolean(featureName))
+                    cfg[settingName] = falseValue;
+                else
+                    cfg[settingName] = trueValue;
+            }
+        }
+
+        protected void BindFeatureSlider(FbneoConfigFile cfg, string settingName, string featureName, string defaultValue, int decimalPlaces = 0, bool force = false)
+        {
+            if (force || Features.IsSupported(featureName))
+            {
+                if (decimalPlaces > 0 && decimalPlaces < 7)
+                {
+                    int toRemove = 6 - decimalPlaces;
+                    string value = SystemConfig.GetValueOrDefault(featureName, defaultValue);
+                    if (value != defaultValue)
+                        cfg[settingName] = value.Substring(0, value.Length - toRemove);
+                    else
+                        cfg[settingName] = value;
+                }
+                else
+                    cfg[settingName] = SystemConfig.GetValueOrDefaultSlider(featureName, defaultValue);
+            }
         }
     }
 

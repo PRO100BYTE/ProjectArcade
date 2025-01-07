@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System;
 using System.Diagnostics;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.Joysticks;
 using EmulatorLauncher.Common.FileFormats;
+using System.Linq;
 
 namespace EmulatorLauncher
 {
@@ -15,11 +17,16 @@ namespace EmulatorLauncher
         }
 
         private SdlVersion _sdlVersion = SdlVersion.SDL2_26;
+        private BezelFiles _bezelFileInfo;
+        private ScreenResolution _resolution;
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
-            string folderName = emulator;
-            string path = AppConfig.GetFullPath(folderName);
+            SimpleLogger.Instance.Info("[Generator] Getting " + emulator + " path and executable name.");
+
+            string path = AppConfig.GetFullPath(emulator);
+            if (string.IsNullOrEmpty(path))
+                return null;
 
             string exe = Path.Combine(path, "citra-qt.exe");
             if (!File.Exists(exe))
@@ -39,7 +46,31 @@ namespace EmulatorLauncher
             if (File.Exists(sdl2))
                 _sdlVersion = SdlJoystickGuidManager.GetSdlVersion(sdl2);
 
-            SetupConfigurationCitra(path, fullscreen);
+            SetupConfigurationCitra(path, rom, fullscreen);
+
+            string[] extensions = new string[] { ".3ds", ".3dsx", ".elf", ".axf", ".cci", ".cxi", ".app" };
+            if (Path.GetExtension(rom).ToLowerInvariant() == ".zip" || Path.GetExtension(rom).ToLowerInvariant() == ".7z" || Path.GetExtension(rom).ToLowerInvariant() == ".squashfs")
+            {
+                string uncompressedRomPath = this.TryUnZipGameIfNeeded(system, rom, false, false);
+                if (Directory.Exists(uncompressedRomPath))
+                {
+                    string[] romFiles = Directory.GetFiles(uncompressedRomPath, "*.*", SearchOption.AllDirectories).OrderBy(file => Array.IndexOf(extensions, Path.GetExtension(file).ToLowerInvariant())).ToArray();
+                    rom = romFiles.FirstOrDefault(file => extensions.Any(ext => Path.GetExtension(file).Equals(ext, StringComparison.OrdinalIgnoreCase)));
+                    ValidateUncompressedGame();
+                }
+            }
+
+            if (fullscreen)
+            {
+                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
+                _resolution = resolution;
+
+                if (_bezelFileInfo != null && _bezelFileInfo.PngFile != null)
+                    SimpleLogger.Instance.Info("[INFO] Bezel file selected : " + _bezelFileInfo.PngFile);
+            }
+
+            if (Path.GetExtension(rom).ToLowerInvariant() == ".m3u")
+                rom = File.ReadAllText(rom);
 
             List<string> commandArray = new List<string>();
             if (fullscreen)
@@ -58,7 +89,7 @@ namespace EmulatorLauncher
             };
         }
 
-        private void SetupConfigurationCitra(string path, bool fullscreen = true)
+        private void SetupConfigurationCitra(string path, string rom, bool fullscreen = true)
         {
             if (SystemConfig.getOptBoolean("disableautoconfig"))
                 return;
@@ -70,6 +101,22 @@ namespace EmulatorLauncher
             string conf = Path.Combine(userconfigPath, "qt-config.ini");
             using (var ini = new IniFile(conf))
             {
+                SimpleLogger.Instance.Info("[Generator] Writing Citra configuration file: " + conf);
+
+                // Define rom path
+                string romPath = Path.GetDirectoryName(rom);
+
+                if (!string.IsNullOrEmpty(romPath))
+                {
+                    ini.WriteValue("UI", "Paths\\gamedirs\\3\\path", romPath.Replace("\\", "/"));
+                    ini.WriteValue("UI", "Paths\\gamedirs\\3\\deep_scan\\default", "false");
+                    ini.WriteValue("UI", "Paths\\gamedirs\\3\\deep_scan", "true");
+                }
+
+                int gameDirsSize = ini.GetValue("UI", "Paths\\gamedirs\\size").ToInteger();
+                if (gameDirsSize < 3)
+                    ini.WriteValue("UI", "Paths\\gamedirs\\size", "3");
+
                 ini.WriteValue("UI", "Updater\\check_for_update_on_start\\default", "false");
                 ini.WriteValue("UI", "Updater\\check_for_update_on_start", "false");
 
@@ -145,8 +192,8 @@ namespace EmulatorLauncher
                 {
                     if (SystemConfig.isOptSet("citra_resolution_factor"))
                     {
-                        ini.WriteValue("Renderer", "resolution_factor\\default", SystemConfig["citra_resolution_factor"] == "1" ? "true" : "false");
-                        ini.WriteValue("Renderer", "resolution_factor", SystemConfig["citra_resolution_factor"]);
+                        ini.WriteValue("Renderer", "resolution_factor\\default", SystemConfig["citra_resolution_factor"].Substring(0, 1) == "1" ? "true" : "false");
+                        ini.WriteValue("Renderer", "resolution_factor", SystemConfig["citra_resolution_factor"].Substring(0, 1));
                     }
                     else
                     {
@@ -169,12 +216,27 @@ namespace EmulatorLauncher
                     }
                 }
 
-                if (Features.IsSupported("citra_layout_option"))
+                if (Features.IsSupported("citra_vsync"))
                 {
-                    if (SystemConfig.isOptSet("citra_layout_option"))
+                    if (SystemConfig.isOptSet("citra_vsync") && !SystemConfig.getOptBoolean("citra_vsync"))
+                    {
+                        ini.WriteValue("Renderer", "use_vsync_new\\default", "false");
+                        ini.WriteValue("Renderer", "use_vsync_new", "false");
+                    }
+                    else
+                    {
+                        ini.WriteValue("Renderer", "use_vsync_new\\default", "true");
+                        ini.WriteValue("Renderer", "use_vsync_new", "true");
+                    }
+                }
+
+                if (Features.IsSupported("citraqt_layout_option"))
+                {
+                    if (SystemConfig.isOptSet("citraqt_layout_option"))
                     {
                         ini.WriteValue("Layout", "layout_option\\default", "false");
-                        ini.WriteValue("Layout", "layout_option", SystemConfig["citra_layout_option"]);
+                        ini.WriteValue("Layout", "layout_option", SystemConfig["citraqt_layout_option"]);
+                        SimpleLogger.Instance.Info("[INFO] Setting layout option to : " + SystemConfig["citraqt_layout_option"]);
                     }
                     else
                     {
@@ -214,6 +276,7 @@ namespace EmulatorLauncher
                 {
                     ini.WriteValue("Utility", "custom_textures\\default", "false");
                     ini.WriteValue("Utility", "custom_textures", "true");
+                    SimpleLogger.Instance.Info("[INFO] Custom textures enabled.");
                 }
                 else if (Features.IsSupported("citra_custom_textures"))
                 {
@@ -242,6 +305,8 @@ namespace EmulatorLauncher
             if (!File.Exists(path))
                 return;
 
+            SimpleLogger.Instance.Info("[Generator] Writing to 3DS nand file.");
+
             int langId;
 
             if (SystemConfig.isOptSet("n3ds_language") && !string.IsNullOrEmpty(SystemConfig["n3ds_language"]))
@@ -254,7 +319,10 @@ namespace EmulatorLauncher
 
             var toSet = new byte[] { (byte)langId };
             for (int i = 0; i < toSet.Length; i++)
+            {
                 bytes[128] = toSet[i];
+                bytes[272] = toSet[i];
+            }
 
             File.WriteAllBytes(path, bytes);
         }
@@ -277,6 +345,8 @@ namespace EmulatorLauncher
                 { "ru", 10 },
             };
 
+            SimpleLogger.Instance.Info("[Generator] Getting language from RetroBat language.");
+
             // Special case for Taiwanese which is zh_TW
             if (SystemConfig["Language"] == "zh_TW")
                 return 11;
@@ -289,6 +359,23 @@ namespace EmulatorLauncher
             }
 
             return 1;
+        }
+
+        public override int RunAndWait(ProcessStartInfo path)
+        {
+            FakeBezelFrm bezel = null;
+
+            if (_bezelFileInfo != null)
+                bezel = _bezelFileInfo.ShowFakeBezel(_resolution);
+
+            int ret = base.RunAndWait(path);
+
+            bezel?.Dispose();
+
+            if (ret == 1)
+                return 0;
+
+            return ret;
         }
     }
 }

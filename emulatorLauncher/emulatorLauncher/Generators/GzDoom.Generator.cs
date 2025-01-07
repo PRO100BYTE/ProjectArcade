@@ -41,7 +41,28 @@ namespace EmulatorLauncher
                     throw new ApplicationException("gzdoom file does not contain any launch argument.");
 
                 foreach (var line in lines)
-                    commandArray.Add(line);
+                {
+                    string value = line;
+
+                    if (lines.Length == 1)
+                    {
+                        value = line.Replace("/", "\\");
+                        string filePath = Path.Combine(Path.GetDirectoryName(rom), value.TrimStart('\\'));
+
+                        commandArray.Add("-gamegrp");
+                        commandArray.Add("\"" + filePath + "\"");
+                    }
+
+                    else if (value.StartsWith("\\") || value.StartsWith("/"))
+                    {
+                        value = line.Replace("/", "\\");
+                        string filePath = Path.Combine(Path.GetDirectoryName(rom), value.TrimStart('\\'));
+
+                        commandArray.Add("\"" + filePath + "\"");
+                    }
+                    else
+                        commandArray.Add(line);
+                }
             }
             
             else if (Path.GetExtension(rom).ToLower() == ".gzdoom" && Directory.Exists(rom))
@@ -105,8 +126,8 @@ namespace EmulatorLauncher
                     BindIniFeature(ini, "GlobalSettings", "vid_scalemode", "gzdoom_scalemode", "0");
                     BindIniFeature(ini, "GlobalSettings", "gl_multisample", "gzdoom_msaa", "1");
                     BindIniFeature(ini, "GlobalSettings", "gl_fxaa", "gzdoom_fxaa", "0");
-                    BindBoolIniFeature(ini, "GlobalSettings", "vid_vsync", "gzdoom_vsync", "false", "true");
-                    BindBoolIniFeature(ini, "GlobalSettings", "vid_cropaspect", "gzdoom_cropaspect", "false", "true");
+                    BindBoolIniFeatureOn(ini, "GlobalSettings", "vid_vsync", "gzdoom_vsync", "true", "false");
+                    BindBoolIniFeatureOn(ini, "GlobalSettings", "vid_cropaspect", "gzdoom_cropaspect", "true", "false");
 
                     BindIniFeature(ini, "GlobalSettings", "snd_mididevice", "gzdoom_mididevice", "-5");
 

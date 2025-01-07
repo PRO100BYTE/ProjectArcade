@@ -5,6 +5,7 @@ using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common;
 using System.Linq;
 using System;
+using EmulatorLauncher.Common.EmulationStation;
 
 namespace EmulatorLauncher
 {
@@ -12,6 +13,10 @@ namespace EmulatorLauncher
     {
         private BezelFiles _bezelFileInfo;
         private ScreenResolution _resolution;
+        private SaveStatesWatcher _saveStatesWatcher;
+        private int _saveStateSlot;
+        static List<string> _mdSystems = new List<string>() { "sega_cd", "genesis", "sega_32x" };
+        static List<string> _noZipSystems = new List<string>() { "sega_cd" };
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
@@ -23,6 +28,7 @@ namespace EmulatorLauncher
 
             if (SystemConfig.isOptSet("jgen_gui") && SystemConfig.getOptBoolean("jgen_gui"))
             {
+                SimpleLogger.Instance.Info("[INFO] Running jgenesis-gui, saveStates will not autoload");
                 exe = Path.Combine(path, "jgenesis-gui.exe");
                 gui = true;
             }
@@ -31,12 +37,13 @@ namespace EmulatorLauncher
                 return null;
 
             string hardware = GetJgenesisHardware(system);
+            string jGenSystem = GetJgenesisSystem(system);
 
             bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
             string[] extensions = new string[] { ".cue", ".sms", ".gg", ".md", ".chd", ".nes", ".sfc", ".gb", ".gbc", ".bin" };
 
-            if (Path.GetExtension(rom).ToLower() == ".zip" || Path.GetExtension(rom).ToLower() == ".7z")
+            if (_noZipSystems.Contains(jGenSystem) && (Path.GetExtension(rom).ToLower() == ".zip" || Path.GetExtension(rom).ToLower() == ".7z" || Path.GetExtension(rom).ToLower() == ".squashfs"))
             {
                 string uncompressedRomPath = this.TryUnZipGameIfNeeded(system, rom, false, false);
                 if (Directory.Exists(uncompressedRomPath))
@@ -47,12 +54,27 @@ namespace EmulatorLauncher
                 }
             }
 
+            string savesSystem = GetSavesSystem(system);
+
+            if (Program.HasEsSaveStates && Program.EsSaveStates.IsEmulatorSupported(emulator))
+            {
+                string localPath = Program.EsSaveStates.GetSavePath(system, emulator, core);
+                string emulatorPath = Path.Combine(path, "states", savesSystem);
+
+                _saveStatesWatcher = new JGenesisSaveStatesMonitor(rom, emulatorPath, localPath, Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "savestateicon.png"));
+                _saveStatesWatcher.PrepareEmulatorRepository();
+                _saveStateSlot = _saveStatesWatcher.Slot;
+            }
+            else
+                _saveStatesWatcher = null;
+
             // settings (toml configuration)
-            SetupTomlConfiguration(path, system, fullscreen);
+            SetupTomlConfiguration(path, jGenSystem, system, savesSystem, fullscreen);
 
-            _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+            if (fullscreen)
+                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
+            
             _resolution = resolution;
-
 
             // command line parameters
             var commandArray = new List<string>();
@@ -65,6 +87,12 @@ namespace EmulatorLauncher
                 commandArray.Add(hardware);
             }
 
+            if (_saveStatesWatcher != null && !string.IsNullOrEmpty(SystemConfig["state_file"]) && File.Exists(SystemConfig["state_file"]))
+            {
+                commandArray.Add("--load-save-state");
+                commandArray.Add(_saveStateSlot.ToString());
+            }
+
             string args = string.Join(" ", commandArray);
 
             return new ProcessStartInfo()
@@ -75,7 +103,7 @@ namespace EmulatorLauncher
             };
         }
 
-        private void SetupTomlConfiguration(string path, string system, bool fullscreen)
+        private void SetupTomlConfiguration(string path, string jGenSystem, string system, string savesSystem, bool fullscreen)
         {
             string settingsFile = Path.Combine(path, "jgenesis-config.toml");
 
@@ -90,12 +118,33 @@ namespace EmulatorLauncher
                 { }
             }
 
-            using (IniFile ini = new IniFile(settingsFile, IniOptions.KeepEmptyLines | IniOptions.UseSpaces))
+            using (IniFileJGenesis ini = new IniFileJGenesis(settingsFile, IniOptionsJGenesis.UseSpaces | IniOptionsJGenesis.KeepEmptyValues | IniOptionsJGenesis.KeepEmptyLines))
             {
+                // Paths
+                string savesPath = Path.Combine(AppConfig.GetFullPath("saves"), system, "jgenesis");
+                if (!Directory.Exists(savesPath))
+                    try { Directory.CreateDirectory(savesPath); } catch { }
 
-                string jgenSystem = GetJgenesisSystem(system);
-                if (jgenSystem == null)
-                    return;
+                ini.DeleteSection("game_boy");
+
+                ini.WriteValue("common", "save_path", "\"Custom\"");
+
+                ini.WriteValue("common", "custom_save_path", "'" + savesPath + "'");
+                ini.WriteValue("common", "state_path", "\"EmulatorFolder\"");
+                ini.WriteValue("common", "custom_state_path", "\"\"");
+
+                BindBoolIniFeatureOn(ini, "common", "audio_sync", "jgen_async", "true", "false");
+
+                if (SystemConfig.isOptSet("jgen_prescale") && !string.IsNullOrEmpty(SystemConfig["jgen_prescale"]))
+                {
+                    ini.WriteValue("common", "auto_prescale", "false");
+                    ini.WriteValue("common", "prescale_factor", SystemConfig["jgen_prescale"].ToIntegerString());
+                }
+                else
+                {
+                    ini.WriteValue("common", "prescale_factor", "3");
+                    ini.WriteValue("common", "auto_prescale", "true");
+                }
 
                 ini.WriteValue("common", "launch_in_fullscreen", fullscreen ? "true" : "false");
                 
@@ -126,20 +175,20 @@ namespace EmulatorLauncher
                 else
                     ini.WriteValue("common", "scanlines", "\"" + "None" + "\"");
 
-                ConfigureGameboy(ini, jgenSystem);
-                ConfigureGenesis(ini, jgenSystem);
-                ConfigureNes(ini, jgenSystem);
-                ConfigureSMS(ini, jgenSystem, system);
-                ConfigureSnes(ini, jgenSystem);
+                ConfigureGameboy(ini, jGenSystem);
+                ConfigureGenesis(ini, jGenSystem);
+                ConfigureNes(ini, jGenSystem);
+                ConfigureSMS(ini, jGenSystem, system);
+                ConfigureSnes(ini, jGenSystem);
 
-                SetupControllers(ini, jgenSystem);
+                SetupControllers(ini, jGenSystem);
 
                 // Save toml file
                 ini.Save();
             }
         }
 
-        private void ConfigureGameboy(IniFile ini, string system)
+        private void ConfigureGameboy(IniFileJGenesis ini, string system)
         {
             if (system != "game_boy")
                 return;
@@ -164,10 +213,12 @@ namespace EmulatorLauncher
             BindBoolIniFeature(ini, "game_boy", "pretend_to_be_gba", "jgen_gb_gba", "true", "false");
         }
 
-        private void ConfigureGenesis(IniFile ini, string system)
+        private void ConfigureGenesis(IniFileJGenesis ini, string system)
         {
-            if (system != "genesis" && system != "sega_cd")
+            if (system != "genesis" && system != "sega_cd" && system != "sega_32x")
                 return;
+
+            BindBoolIniFeatureOn(ini, "genesis", "adjust_aspect_ratio_in_2x_resolution", "jgen_gen_aspectadjust", "true", "false");
 
             if (SystemConfig.isOptSet("jgen_genesis_region") && !string.IsNullOrEmpty(SystemConfig["jgen_genesis_region"]))
                 ini.WriteValue("genesis", "forced_region", "\"" + SystemConfig["jgen_genesis_region"] + "\"");
@@ -186,15 +237,15 @@ namespace EmulatorLauncher
 
             BindBoolIniFeature(ini, "genesis", "remove_sprite_limits", "jgen_spritelimit", "true", "false");
 
-            if (SystemConfig["jgen_genesis_pad"] == "3btn")
+            if (SystemConfig.getOptBoolean("md_3buttons"))
             {
-                ini.WriteValue("inputs", "genesis_p1_type", "\"" + "ThreeButton" + "\"");
-                ini.WriteValue("inputs", "genesis_p2_type", "\"" + "ThreeButton" + "\"");
+                ini.WriteValue("input.genesis", "p1_type", "\"" + "ThreeButton" + "\"");
+                ini.WriteValue("input.genesis", "p2_type", "\"" + "ThreeButton" + "\"");
             }
             else
             {
-                ini.WriteValue("inputs", "genesis_p1_type", "\"" + "SixButton" + "\"");
-                ini.WriteValue("inputs", "genesis_p2_type", "\"" + "SixButton" + "\"");
+                ini.WriteValue("input.genesis", "p1_type", "\"" + "SixButton" + "\"");
+                ini.WriteValue("input.genesis", "p2_type", "\"" + "SixButton" + "\"");
             }
 
             if (system == "sega_cd")
@@ -219,12 +270,12 @@ namespace EmulatorLauncher
                 string segaCdBios = Path.Combine(AppConfig.GetFullPath("bios"), regionbios);
 
                 ini.WriteValue("sega_cd", "bios_path", "'" + segaCdBios + "'");
-                BindBoolIniFeature(ini, "sega_cd", "enable_ram_cartridge", "jgen_segacd_ramcart", "false", "true");
+                BindBoolIniFeatureOn(ini, "sega_cd", "enable_ram_cartridge", "jgen_segacd_ramcart", "true", "false");
                 BindBoolIniFeature(ini, "sega_cd", "load_disc_into_ram", "jgen_segacd_loadtoram", "true", "false");
             }
         }
 
-        private void ConfigureNes(IniFile ini, string system)
+        private void ConfigureNes(IniFileJGenesis ini, string system)
         {
             if (system != "nes")
                 return;
@@ -241,10 +292,37 @@ namespace EmulatorLauncher
 
             BindBoolIniFeature(ini, "nes", "remove_sprite_limit", "jgen_spritelimit", "true", "false");
             BindBoolIniFeature(ini, "nes", "pal_black_border", "jgen_nes_palborder", "true", "false");
-            BindBoolIniFeature(ini, "nes", "audio_60hz_hack", "jgen_nes_audiohack", "false", "true");
+            BindBoolIniFeatureOn(ini, "nes", "audio_60hz_hack", "jgen_nes_audiohack", "true", "false");
+
+            // Cropping
+            if (SystemConfig.isOptSet("jgen_nes_crop_sides") && !string.IsNullOrEmpty(SystemConfig["jgen_nes_crop_sides"]))
+            {
+                string cropSide = SystemConfig["jgen_nes_crop_sides"].ToIntegerString();
+                ini.WriteValue("nes.overscan", "top", cropSide);
+                ini.WriteValue("nes.overscan", "bottom", cropSide);
+            }
+            else
+            {
+                ini.WriteValue("nes.overscan", "top", "0");
+                ini.WriteValue("nes.overscan", "bottom", "0");
+            }
+
+            if (SystemConfig.isOptSet("jgen_nes_crop_topdown") && !string.IsNullOrEmpty(SystemConfig["jgen_nes_crop_topdown"]))
+            {
+                string cropVert = SystemConfig["jgen_nes_crop_topdown"].ToIntegerString();
+                ini.WriteValue("nes.overscan", "left", cropVert);
+                ini.WriteValue("nes.overscan", "right", cropVert);
+            }
+            else
+            {
+                ini.WriteValue("nes.overscan", "left", "0");
+                ini.WriteValue("nes.overscan", "right", "0");
+            }
+
+            SetupGuns(ini, system);
         }
 
-        private void ConfigureSMS(IniFile ini, string system, string esSystem)
+        private void ConfigureSMS(IniFileJGenesis ini, string system, string esSystem)
         {
             if (system != "smsgg")
                 return;
@@ -276,10 +354,12 @@ namespace EmulatorLauncher
             else
                 ini.WriteValue("smsgg", "sms_model", esSystem == "gamegear" ? "\"" + "Sms1" + "\"" : "\"" + "Sms2" + "\"");
 
-            BindBoolIniFeature(ini, "smsgg", "fm_sound_unit_enabled", "jgen_sms_fmchip", "false", "true");
+            BindBoolIniFeatureOn(ini, "smsgg", "fm_sound_unit_enabled", "jgen_sms_fmchip", "true", "false");
+            BindBoolIniFeature(ini, "smsgg", "sms_crop_vertical_border", "jgen_sms_cropvert", "true", "false");
+            BindBoolIniFeature(ini, "smsgg", "sms_crop_left_border", "jgen_sms_cropleft", "true", "false");
         }
 
-        private void ConfigureSnes(IniFile ini, string system)
+        private void ConfigureSnes(IniFileJGenesis ini, string system)
         {
             if (system != "snes")
                 return;
@@ -294,41 +374,49 @@ namespace EmulatorLauncher
             else
                 ini.WriteValue("snes", "aspect_ratio", "\"" + "Ntsc" + "\"");
 
-            BindBoolIniFeature(ini, "snes", "audio_60hz_hack", "jgen_snes_audiohack", "false", "true");
-            BindIniFeature(ini, "snes", "gsu_overclock_factor", "jgen_snes_superfx_overclock", "1");
+            BindBoolIniFeatureOn(ini, "snes", "audio_60hz_hack", "jgen_snes_audiohack", "true", "false");
+            BindIniFeatureSlider(ini, "snes", "gsu_overclock_factor", "jgen_snes_superfx_overclock", "1");
 
             SetupGuns(ini, system);
         }
 
-        private void SetupGuns(IniFile ini, string jgenSystem)
+        private void SetupGuns(IniFileJGenesis ini, string jgenSystem)
         {
             if (!SystemConfig.getOptBoolean("use_guns"))
             {
-                ini.WriteValue("inputs", "snes_p2_type", "\"" + "Gamepad" + "\"");
-                ini.WriteValue("inputs", "nes_p2_type", "\"" + "Gamepad" + "\"");
+                ini.WriteValue("input.snes", "p2_type", "\"" + "Gamepad" + "\"");
+                ini.WriteValue("input.nes", "p2_type", "\"" + "Gamepad" + "\"");
                 return;
             }
 
             if (jgenSystem == "snes")
             {
-                ini.WriteValue("inputs", "snes_p2_type", "\"" + "SuperScope" + "\"");
+                ini.DeleteSection("input.snes.mapping_1.super_scope");
+                ini.WriteValue("[[input.snes.mapping_2.super_scope]]", "", null);
 
-                ini.WriteValue("inputs.snes_keyboard.super_scope", "fire", "\"" + "MouseLeft" + "\"");
-                ini.WriteValue("inputs.snes_keyboard.super_scope", "cursor", "\"" + "MouseRight" + "\"");
-                ini.WriteValue("inputs.snes_keyboard.super_scope", "pause", "\"" + "MouseMiddle" + "\"");
+                ini.WriteValue("input.snes", "p2_type", "\"" + "SuperScope" + "\"");
 
-                ini.WriteValue("inputs.snes_super_scope", "fire", "\"" + "MouseLeft" + "\"");
-                ini.WriteValue("inputs.snes_super_scope", "cursor", "\"" + "MouseRight" + "\"");
-                ini.WriteValue("inputs.snes_super_scope", "pause", "\"" + "MouseMiddle" + "\"");
+                ini.WriteValue("[[input.snes.mapping_1.super_scope.fire]]", "type", "\"" + "Mouse" + "\"");
+                ini.WriteValue("[[input.snes.mapping_1.super_scope.fire]]", "button", "\"" + "Left" + "\"");
+                ini.WriteValue("[[input.snes.mapping_1.super_scope.cursor]]", "type", "\"" + "Mouse" + "\"");
+                ini.WriteValue("[[input.snes.mapping_1.super_scope.cursor]]", "button", "\"" + "Right" + "\"");
+                ini.WriteValue("[[input.snes.mapping_1.super_scope.pause]]", "type", "\"" + "Mouse" + "\"");
+                ini.WriteValue("[[input.snes.mapping_1.super_scope.pause]]", "button", "\"" + "Middle" + "\"");
                 return;
             }
 
             if (jgenSystem == "nes")
             {
-                ini.WriteValue("inputs", "nes_p2_type", "\"" + "Zapper" + "\"");
+                ini.DeleteSection("input.nes.mapping_1.zapper");
+                ini.WriteValue("[[input.nes.mapping_2.zapper]]", "", null);
 
-                ini.WriteValue("inputs.nes_zapper", "fire", "\"" + "MouseLeft" + "\"");
-                ini.WriteValue("inputs.nes_zapper", "force_offscreen", "\"" + "MouseRight" + "\"");
+                ini.WriteValue("input.nes", "p2_type", "\"" + "Zapper" + "\"");
+
+                ini.WriteValue("[[input.nes.mapping_1.zapper.fire]]", "type", "\"" + "Mouse" + "\"");
+                ini.WriteValue("[[input.nes.mapping_1.zapper.fire]]", "button", "\"" + "Left" + "\"");
+                ini.WriteValue("[[input.nes.mapping_1.zapper.force_offscreen]]", "type", "\"" + "Mouse" + "\"");
+                ini.WriteValue("[[input.nes.mapping_1.zapper.force_offscreen]]", "button", "\"" + "Right" + "\"");
+                return;
             }
         }
 
@@ -337,10 +425,14 @@ namespace EmulatorLauncher
             switch (System)
             {
                 case "nes":
+                case "famicom":
                     return "nes";
                 case "snes":
+                case "superfamicom":
+                case "sfamicom":
                     return "snes";
                 case "segacd":
+                case "megacd":
                     return "sega_cd";
                 case "megadrive":
                     return "genesis";
@@ -350,6 +442,9 @@ namespace EmulatorLauncher
                 case "gb":
                 case "gbc":
                     return "game_boy";
+                case "sega32x":
+                case "mega32x":
+                    return "sega_32x";
             }
             return null;
         }
@@ -359,19 +454,66 @@ namespace EmulatorLauncher
             switch (System)
             {
                 case "nes":
+                case "famicom":
                     return "Nes";
                 case "snes":
+                case "superfamicom":
+                case "sfamicom":
                     return "Snes";
                 case "segacd":
+                case "megacd":
                     return "SegaCd";
                 case "megadrive":
+                case "genesis":
                     return "Genesis";
                 case "mastersystem":
                 case "gamegear":
+                case "gg":
+                case "ms":
                     return "MasterSystem";
                 case "gb":
                 case "gbc":
+                case "gameboy":
+                case "gameboycolor":
                     return "GameBoy";
+                case "sega32x":
+                case "mega32x":
+                    return "Sega32X";
+            }
+            return null;
+        }
+
+        private string GetSavesSystem(string System)
+        {
+            switch (System)
+            {
+                case "gb":
+                case "gameboy":
+                    return "gb";
+                case "gbc":
+                case "gameboycolor":
+                    return "gbc";
+                case "gamegear":
+                case "gg":
+                    return "gg";
+                case "mastersystem":
+                    return "sms";
+                case "megadrive":
+                case "genesis":
+                    return "md";
+                case "nes":
+                case "famicom":
+                    return "nes";
+                case "segacd":
+                case "megacd":
+                    return "scd";
+                case "sega32x":
+                case "mega32x":
+                    return "32x";
+                case "snes":
+                case "superfamicom":
+                case "sfamicom":
+                    return "sfc";
             }
             return null;
         }
@@ -391,6 +533,17 @@ namespace EmulatorLauncher
                 return 0;
 
             return ret;
+        }
+
+        public override void Cleanup()
+        {
+            if (_saveStatesWatcher != null)
+            {
+                _saveStatesWatcher.Dispose();
+                _saveStatesWatcher = null;
+            }
+
+            base.Cleanup();
         }
     }
 }

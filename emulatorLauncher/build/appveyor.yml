@@ -1,54 +1,31 @@
-version: 1.0.0.{build}
-configuration: Release
-platform: Any CPU
-assembly_info:
-  patch: true
-  file: '**\AssemblyInfo.*'
-  assembly_version: '{version}'
-  assembly_file_version: '{version}'
-  assembly_informational_version: '{version}'
+version: pa{build}.{branch}
+skip_tags: true
 build:
   project: batocera-ports.sln
   verbosity: minimal
 after_build:
-- copy emulatorLauncher\bin\Release\emulatorLauncher.exe .
-- 7z a batocera-ports.zip emulatorLauncher.exe
-- copy EmulatorLauncher.Common\bin\Release\EmulatorLauncher.Common.dll .
-- 7z a batocera-ports.zip EmulatorLauncher.Common.dll
-- copy batocera-retroachievements-info\bin\Release\batocera-retroachievements-info.exe .
-- 7z a batocera-ports.zip batocera-retroachievements-info.exe
-- copy batocera-systems\bin\Release\batocera-systems.exe .
-- 7z a batocera-ports.zip batocera-systems.exe
-- copy batocera-store\bin\Release\batocera-store.exe .
-- 7z a batocera-ports.zip batocera-store.exe
-- copy es-checkversion\bin\Release\es-checkversion.exe .\es-checkversion-test.exe
-- 7z a batocera-ports.zip es-checkversion-test.exe
-- copy es-update\bin\Release\es-update.exe .\es-update-test.exe
-- 7z a batocera-ports.zip es-update-test.exe
-- copy mount\bin\Release\mount.exe .
-- 7z a batocera-ports.zip mount.exe
-- 7z a batocera-ports.zip 7za.exe
-- 7z a batocera-ports.zip 7za.dll
-- 7z a batocera-ports.zip 7zxa.dll
-- 7z a batocera-ports.zip unzip.exe
-- 7z a batocera-ports.zip unzip32.dll
-- 7z a batocera-ports.zip pdftoppm.exe
-- 7z a batocera-ports.zip pdfinfo.exe
-- 7z a batocera-ports.zip rdsquashfs.exe
-- 7z a batocera-ports.zip liblzma.dll
-- 7z a batocera-ports.zip liblzo2-2.dll
-- 7z a batocera-ports.zip libsquashfs.dll
-- 7z a batocera-ports.zip libzstd.dll
-- 7z a batocera-ports.zip xbox-iso-vfs.exe
-- 7z a batocera-ports.zip 7z.exe
-- 7z a batocera-ports.zip 7z.dll
-- 7z a batocera-ports.zip .emulationstation\es_features.cfg
+- cmd: >-
+    del /s /q "C:\projects\EmulationStation\*.config"
+
+    del /s /q "C:\projects\EmulationStation\*.pdb"
+
+    if exist "C:\projects\EmulationStation\ru" rd /s /q "C:\projects\EmulationStation\ru"
+
+    if exist "C:\projects\EmulationStation\es" rd /s /q "C:\projects\EmulationStation\es"
+
+    if exist "C:\projects\EmulationStation\fr" rd /s /q "C:\projects\EmulationStation\fr"
+
+    7z a -tzip emulatorlauncher.zip C:\projects\EmulationStation\*
 artifacts:
-- path: batocera-ports.zip
+- path: emulatorlauncher.zip
 deploy:
 - provider: GitHub
-  tag: continuous
-  release: continuous
+  tag: emulatorlauncher-$(APPVEYOR_BUILD_VERSION)
+  release: emulatorLauncher $(APPVEYOR_BUILD_VERSION)
+  description: emulatorLauncher for ProjectArcade | This release was automatically compiled and published by the AppVeyor service.
   auth_token:
-    secure: afMGqkbqCFPGpQOgnu9WZOaMG2l8hCUPeeGQU9JvZYeQGC+1LcfgXjGJF6LIOFrs
+    secure: aShADtUc5h0xntghttL2paIN46wO9ftml5lCyLJVIUtNLqQos33JPmG7BV/S5D3WoSLthDrlucqUxvYxriz4ZaKoLncf0Zp5YsNqkiL+EWlNcm8Tvub5dm7F1mVo46v1
+  repository: PRO100BYTE/emulatorlauncher
+  artifact: emulatorlauncher.zip
+  prerelease: false
   force_update: true

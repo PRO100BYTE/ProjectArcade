@@ -194,8 +194,8 @@ namespace EmulatorLauncher
                 ini.WriteValue("UI", "hideInactiveMouse\\default", "true");
                 ini.WriteValue("UI", "hideInactiveMouse", "true");
 
-                // Controller applet (disabled by default)
-                if (SystemConfig.isOptSet("sudachi_controller_applet") && SystemConfig.getOptBoolean("sudachi_controller_applet"))
+                // Controller applet
+                if (SystemConfig.isOptSet("sudachi_controller_applet") && !SystemConfig.getOptBoolean("sudachi_controller_applet"))
                 {
                     ini.WriteValue("UI", "disableControllerApplet\\default", "true");
                     ini.WriteValue("UI", "disableControllerApplet", "false");
@@ -294,7 +294,7 @@ namespace EmulatorLauncher
                 BindQtIniFeature(ini, "Renderer", "astc_recompression", "astc_recompression", "0");
 
                 //Core options
-                BindQtIniFeature(ini, "Core", "use_multi_core", "sudachi_multicore", "true");
+                BindQtBoolIniFeature(ini, "Core", "use_multi_core", "sudachi_multicore", "true", "false", "true");
                 BindQtIniFeature(ini, "Core", "memory_layout_mode", "sudachi_memory", "0");
 
                 // CPU accuracy (auto except if the user chooses otherwise)

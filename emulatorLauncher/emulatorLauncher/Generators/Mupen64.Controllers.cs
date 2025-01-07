@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
+using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.Joysticks;
 
@@ -26,6 +24,8 @@ namespace EmulatorLauncher
         {
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
+
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for RMG Mupen64");
 
             // UpdateSdlControllersWithHints();     // No hints found in emulator code
 
@@ -60,10 +60,22 @@ namespace EmulatorLauncher
                 return;
 
             string devicename = joy.DeviceName;
+
+            // override devicename
+            string newNamePath = Path.Combine(Program.AppConfig.GetFullPath("tools"), "controllerinfo.yml");
+            if (File.Exists(newNamePath))
+            {
+                string newName = SdlJoystickGuid.GetNameFromFile(newNamePath, controller.Guid, "mupen64");
+
+                if (newName != null)
+                    devicename = newName;
+            }
+
             int index = controller.SdlController != null ? controller.SdlController.Index : controller.DeviceIndex;
             bool revertbuttons = controller.VendorID == USB_VENDOR.NINTENDO;
-            bool zAsLeftTrigger = SystemConfig["mupen64_inputprofile" + playerIndex] == "c_face_zl" || SystemConfig["mupen64_inputprofile" + playerIndex] == "c_stick_zl";
-            string guid = controller.SdlController != null ? controller.SdlController.Guid.ToString().ToLower() : controller.Guid.ToString().ToLower();
+            bool zAsRightTrigger = SystemConfig.isOptSet("mupen64_inputprofile" + playerIndex) && (SystemConfig["mupen64_inputprofile" + playerIndex] == "c_face" || SystemConfig["mupen64_inputprofile" + playerIndex] == "c_stick");
+            bool xboxLayout = SystemConfig.isOptSet("mupen64_inputprofile" + playerIndex) && SystemConfig["mupen64_inputprofile" + playerIndex] == "xbox";
+            string n64guid = controller.Guid.ToLowerInvariant();
 
             string iniSection = "Rosalie's Mupen GUI - Input Plugin Profile " + (playerIndex - 1);
 
@@ -71,10 +83,10 @@ namespace EmulatorLauncher
             string sensitivity = "100";
             string deadzone = "15";
             if (SystemConfig.isOptSet("mupen64_sensitivity") && !string.IsNullOrEmpty(SystemConfig["mupen64_sensitivity"]))
-                sensitivity = SystemConfig["mupen64_sensitivity"];
+                sensitivity = SystemConfig["mupen64_sensitivity"].ToIntegerString();
 
             if (SystemConfig.isOptSet("mupen64_deadzone") && !string.IsNullOrEmpty(SystemConfig["mupen64_deadzone"]))
-                deadzone = SystemConfig["mupen64_deadzone"];
+                deadzone = SystemConfig["mupen64_deadzone"].ToIntegerString();
 
             ini.WriteValue(iniSection, "PluggedIn", "True");
             ini.WriteValue(iniSection, "DeviceName", devicename);
@@ -97,28 +109,70 @@ namespace EmulatorLauncher
             ini.WriteValue(iniSection, "FilterEventsForButtons", "True");
             ini.WriteValue(iniSection, "FilterEventsForAxis", "True");
 
-            if (n64StyleControllers.ContainsKey(guid))
+            // Special mapping for n64 style controllers
+            string n64json = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "n64Controllers.json");
+            bool needActivationSwitch = false;
+            bool n64_pad = Program.SystemConfig.getOptBoolean("n64_pad");
+
+            if (File.Exists(n64json))
             {
-                ConfigureN64Controller(ini, iniSection, guid);
-
-                if (playerIndex == 1)
+                try
                 {
-                    ConfigureHotkeysN64Controllers(ini, iniSection, guid);
-                    ConfigureEmptyHotkeys(ini, iniSection);
-                }
+                    var n64Controllers = N64Controller.LoadControllersFromJson(n64json);
 
-                return;
+                    if (n64Controllers != null)
+                    {
+                        N64Controller n64Gamepad = N64Controller.GetN64Controller("mupen64", n64guid, n64Controllers);
+
+                        if (n64Gamepad != null)
+                        {
+                            if (n64Gamepad.ControllerInfo != null)
+                            {
+                                if (n64Gamepad.ControllerInfo.ContainsKey("needActivationSwitch"))
+                                    needActivationSwitch = n64Gamepad.ControllerInfo["needActivationSwitch"] == "yes";
+
+                                if (needActivationSwitch && !n64_pad)
+                                {
+                                    SimpleLogger.Instance.Info("[Controller] Specific n64 mapping needs to be activated for this controller.");
+                                    goto BypassSPecialControllers;
+                                }
+
+                                if (n64Gamepad.ControllerInfo.ContainsKey("deviceName") && !string.IsNullOrEmpty(n64Gamepad.ControllerInfo["deviceName"]))
+                                    ini.WriteValue(iniSection, "DeviceName", n64Gamepad.ControllerInfo["deviceName"]);
+                            }
+
+                            SimpleLogger.Instance.Info("[Controller] Performing specific mapping for " + n64Gamepad.Name);
+
+                            ConfigureN64Controller(ini, iniSection, n64Gamepad);
+
+                            if (playerIndex == 1)
+                            {
+                                ConfigureHotkeysN64Controllers(ini, iniSection, n64Gamepad);
+                                ConfigureEmptyHotkeys(ini, iniSection);
+                            }
+                            return;
+                        }
+                        else
+                            SimpleLogger.Instance.Info("[Controller] Gamepad not in JSON file.");
+                    }
+                    else
+                        SimpleLogger.Instance.Info("[Controller] Error loading JSON file.");
+                }
+                catch { }
             }
 
+            BypassSPecialControllers:
+
+            // Default mapping
             if (SystemConfig.isOptSet("mupen64_inputprofile" + playerIndex) && (SystemConfig["mupen64_inputprofile" + playerIndex] == "c_face" || SystemConfig["mupen64_inputprofile" + playerIndex] == "c_face_zl"))
             {
                 ini.WriteValue(iniSection, "A_InputType", "0");
-                ini.WriteValue(iniSection, "A_Name", zAsLeftTrigger ? "rightshoulder" : "leftshoulder");
-                ini.WriteValue(iniSection, "A_Data", zAsLeftTrigger ? "10" : "9");
+                ini.WriteValue(iniSection, "A_Name", zAsRightTrigger ? "leftshoulder" : "rightshoulder");
+                ini.WriteValue(iniSection, "A_Data", zAsRightTrigger ? "9" : "10");
                 ini.WriteValue(iniSection, "A_ExtraData", "0");
                 ini.WriteValue(iniSection, "B_InputType", "1");
-                ini.WriteValue(iniSection, "B_Name", zAsLeftTrigger ? "righttrigger+" : "lefttrigger+");
-                ini.WriteValue(iniSection, "B_Data", zAsLeftTrigger ? "5" : "4");
+                ini.WriteValue(iniSection, "B_Name", zAsRightTrigger ? "lefttrigger+" : "righttrigger+");
+                ini.WriteValue(iniSection, "B_Data", zAsRightTrigger ? "4" : "5");
                 ini.WriteValue(iniSection, "B_ExtraData", "1");
                 ini.WriteValue(iniSection, "Start_InputType", "0");
                 ini.WriteValue(iniSection, "Start_Name", "start");
@@ -164,12 +218,12 @@ namespace EmulatorLauncher
                 ini.WriteValue(iniSection, "LeftTrigger_Data", "4");
                 ini.WriteValue(iniSection, "LeftTrigger_ExtraData", "0");
                 ini.WriteValue(iniSection, "RightTrigger_InputType", "0");
-                ini.WriteValue(iniSection, "RightTrigger_Name", zAsLeftTrigger ? "leftshoulder" : "rightshoulder");
-                ini.WriteValue(iniSection, "RightTrigger_Data", zAsLeftTrigger ? "9" : "10");
+                ini.WriteValue(iniSection, "RightTrigger_Name", zAsRightTrigger ? "rightshoulder" : "leftshoulder");
+                ini.WriteValue(iniSection, "RightTrigger_Data", zAsRightTrigger ? "10" : "9");
                 ini.WriteValue(iniSection, "RightTrigger_ExtraData", "0");
                 ini.WriteValue(iniSection, "ZTrigger_InputType", "1");
-                ini.WriteValue(iniSection, "ZTrigger_Name", zAsLeftTrigger ? "lefttrigger+" : "righttrigger+");
-                ini.WriteValue(iniSection, "ZTrigger_Data", zAsLeftTrigger ? "4" : "5");
+                ini.WriteValue(iniSection, "ZTrigger_Name", zAsRightTrigger ? "righttrigger+" : "lefttrigger+");
+                ini.WriteValue(iniSection, "ZTrigger_Data", zAsRightTrigger ? "5" : "4");
                 ini.WriteValue(iniSection, "ZTrigger_ExtraData", "1");
 
                 ini.WriteValue(iniSection, "AnalogStickUp_InputType", "1");
@@ -192,14 +246,29 @@ namespace EmulatorLauncher
 
             else
             {
-                ini.WriteValue(iniSection, "A_InputType", "0");
-                ini.WriteValue(iniSection, "A_Name", revertbuttons ? "b" : "a");
-                ini.WriteValue(iniSection, "A_Data", revertbuttons ? "1" : "0");
-                ini.WriteValue(iniSection, "A_ExtraData", "0");
-                ini.WriteValue(iniSection, "B_InputType", "0");
-                ini.WriteValue(iniSection, "B_Name", revertbuttons ? "y" : "x");
-                ini.WriteValue(iniSection, "B_Data", revertbuttons ? "3" : "2");
-                ini.WriteValue(iniSection, "B_ExtraData", "0");
+                if (xboxLayout)
+                {
+                    ini.WriteValue(iniSection, "A_InputType", "0");
+                    ini.WriteValue(iniSection, "A_Name", revertbuttons ? "b" : "a");
+                    ini.WriteValue(iniSection, "A_Data", revertbuttons ? "1" : "0");
+                    ini.WriteValue(iniSection, "A_ExtraData", "0");
+                    ini.WriteValue(iniSection, "B_InputType", "0");
+                    ini.WriteValue(iniSection, "B_Name", revertbuttons ? "a" : "b");
+                    ini.WriteValue(iniSection, "B_Data", revertbuttons ? "0" : "1");
+                    ini.WriteValue(iniSection, "B_ExtraData", "0");
+                }
+                else
+                {
+                    ini.WriteValue(iniSection, "A_InputType", "0");
+                    ini.WriteValue(iniSection, "A_Name", revertbuttons ? "b" : "a");
+                    ini.WriteValue(iniSection, "A_Data", revertbuttons ? "1" : "0");
+                    ini.WriteValue(iniSection, "A_ExtraData", "0");
+                    ini.WriteValue(iniSection, "B_InputType", "0");
+                    ini.WriteValue(iniSection, "B_Name", revertbuttons ? "y" : "x");
+                    ini.WriteValue(iniSection, "B_Data", revertbuttons ? "3" : "2");
+                    ini.WriteValue(iniSection, "B_ExtraData", "0");
+                }
+
                 ini.WriteValue(iniSection, "Start_InputType", "0");
                 ini.WriteValue(iniSection, "Start_Name", "start");
                 ini.WriteValue(iniSection, "Start_Data", "6");
@@ -248,8 +317,8 @@ namespace EmulatorLauncher
                 ini.WriteValue(iniSection, "RightTrigger_Data", "10");
                 ini.WriteValue(iniSection, "RightTrigger_ExtraData", "0");
                 ini.WriteValue(iniSection, "ZTrigger_InputType", "1");
-                ini.WriteValue(iniSection, "ZTrigger_Name", zAsLeftTrigger ? "lefttrigger+" : "righttrigger+");
-                ini.WriteValue(iniSection, "ZTrigger_Data", zAsLeftTrigger ? "4" : "5");
+                ini.WriteValue(iniSection, "ZTrigger_Name", zAsRightTrigger ? "righttrigger+" : "lefttrigger+");
+                ini.WriteValue(iniSection, "ZTrigger_Data", zAsRightTrigger ? "5" : "4");
                 ini.WriteValue(iniSection, "ZTrigger_ExtraData", "1");
 
                 ini.WriteValue(iniSection, "AnalogStickUp_InputType", "1");
@@ -275,6 +344,8 @@ namespace EmulatorLauncher
                 ConfigureHotkeys(ini, iniSection);
                 ConfigureEmptyHotkeys(ini, iniSection);
             }
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + controller.DevicePath + " to player : " + controller.PlayerIndex.ToString());
         }
 
         private void ConfigureHotkeys(IniFile ini, string iniSection)
@@ -461,386 +532,28 @@ namespace EmulatorLauncher
             }
         }
 
-        private void ConfigureN64Controller(IniFile ini, string iniSection, string guid)
+        private void ConfigureN64Controller(IniFile ini, string iniSection, N64Controller n64Gamepad)
         {
-            Dictionary<string, string> buttons = n64StyleControllers[guid];
+            if (n64Gamepad.Mapping == null)
+            {
+                SimpleLogger.Instance.Info("[Controller] Missing mapping for N64 controller.");
+                return;
+            }
 
-            foreach (var button in buttons)
+            foreach (var button in n64Gamepad.Mapping)
                 ini.WriteValue(iniSection, button.Key, button.Value);
         }
 
-        private void ConfigureHotkeysN64Controllers(IniFile ini, string iniSection, string guid)
+        private void ConfigureHotkeysN64Controllers(IniFile ini, string iniSection, N64Controller n64Gamepad)
         {
-            Dictionary<string, string> buttons = n64StyleControllersHotkeys[guid];
+            if (n64Gamepad.HotKeyMapping == null)
+            {
+                SimpleLogger.Instance.Info("[Controller] Missing mapping for N64 controller hotkeys.");
+                return;
+            }
 
-            foreach (var button in buttons)
+            foreach (var button in n64Gamepad.HotKeyMapping)
                 ini.WriteValue(iniSection, button.Key, button.Value);
         }
-
-        static readonly Dictionary<string, Dictionary<string, string>> n64StyleControllers = new Dictionary<string, Dictionary<string, string>>()
-        {
-            {
-                // Nintendo Switch Online N64 Controller
-                "0300b7e67e050000192000000000680c",
-                new Dictionary<string, string>()
-                {
-                    { "A_InputType", "0" },
-                    { "A_Name", "a" },
-                    { "A_Data", "0" },
-                    { "A_ExtraData", "0" },
-                    { "B_InputType", "0" },
-                    { "B_Name", "b" },
-                    { "B_Data", "1" },
-                    { "B_ExtraData", "0" },
-                    { "Start_InputType", "0" },
-                    { "Start_Name", "start" },
-                    { "Start_Data", "6" },
-                    { "Start_ExtraData", "0" },
-                    { "DpadUp_InputType", "0" },
-                    { "DpadUp_Name", "dpup" },
-                    { "DpadUp_Data", "11" },
-                    { "DpadUp_ExtraData", "0" },
-                    { "DpadDown_InputType", "0" },
-                    { "DpadDown_Name", "dpdown" },
-                    { "DpadDown_Data", "12" },
-                    { "DpadDown_ExtraData", "0" },
-                    { "DpadLeft_InputType", "0" },
-                    { "DpadLeft_Name", "dpleft" },
-                    { "DpadLeft_Data", "13" },
-                    { "DpadLeft_ExtraData", "0" },
-                    { "DpadRight_InputType", "0" },
-                    { "DpadRight_Name", "dpright" },
-                    { "DpadRight_Data", "14" },
-                    { "DpadRight_ExtraData", "0" },
-                    { "CButtonUp_InputType", "0" },
-                    { "CButtonUp_Name", "y" },
-                    { "CButtonUp_Data", "3" },
-                    { "CButtonUp_ExtraData", "0" },
-                    { "CButtonDown_InputType", "1" },
-                    { "CButtonDown_Name", "righttrigger+" },
-                    { "CButtonDown_Data", "5" },
-                    { "CButtonDown_ExtraData", "1" },
-                    { "CButtonLeft_InputType", "0" },
-                    { "CButtonLeft_Name", "x" },
-                    { "CButtonLeft_Data", "2" },
-                    { "CButtonLeft_ExtraData", "0" },
-                    { "CButtonRight_InputType", "0" },
-                    { "CButtonRight_Name", "back" },
-                    { "CButtonRight_Data", "4" },
-                    { "CButtonRight_ExtraData", "0" },
-                    { "LeftTrigger_InputType", "0" },
-                    { "LeftTrigger_Name", "leftshoulder" },
-                    { "LeftTrigger_Data", "9" },
-                    { "LeftTrigger_ExtraData", "0" },
-                    { "RightTrigger_InputType", "0" },
-                    { "RightTrigger_Name", "rightshoulder" },
-                    { "RightTrigger_Data", "10" },
-                    { "RightTrigger_ExtraData", "0" },
-                    { "ZTrigger_InputType", "1" },
-                    { "ZTrigger_Name", "lefttrigger+" },
-                    { "ZTrigger_Data", "4" },
-                    { "ZTrigger_ExtraData", "1" },
-                    { "AnalogStickUp_InputType", "1" },
-                    { "AnalogStickUp_Name", "lefty-" },
-                    { "AnalogStickUp_Data", "1" },
-                    { "AnalogStickUp_ExtraData", "0" },
-                    { "AnalogStickDown_InputType", "1" },
-                    { "AnalogStickDown_Name", "lefty+" },
-                    { "AnalogStickDown_Data", "1" },
-                    { "AnalogStickDown_ExtraData", "1" },
-                    { "AnalogStickLeft_InputType", "1" },
-                    { "AnalogStickLeft_Name", "leftx-" },
-                    { "AnalogStickLeft_Data", "0" },
-                    { "AnalogStickLeft_ExtraData", "0" },
-                    { "AnalogStickRight_InputType", "1" },
-                    { "AnalogStickRight_Name", "leftx+" },
-                    { "AnalogStickRight_Data", "0" },
-                    { "AnalogStickRight_ExtraData", "1" },
-                }
-            },
-
-            {
-                // Raphnet N64 Adapter
-                "030000009b2800006300000000000000",
-                new Dictionary<string, string>()
-                {
-                    { "DeviceName", "Raphnet N64 Adapter" },
-                    { "A_InputType", "0" },
-                    { "A_Name", "a" },
-                    { "A_Data", "0" },
-                    { "A_ExtraData", "0" },
-                    { "B_InputType", "0" },
-                    { "B_Name", "b" },
-                    { "B_Data", "1" },
-                    { "B_ExtraData", "0" },
-                    { "Start_InputType", "0" },
-                    { "Start_Name", "start" },
-                    { "Start_Data", "6" },
-                    { "Start_ExtraData", "0" },
-                    { "DpadUp_InputType", "0" },
-                    { "DpadUp_Name", "dpup" },
-                    { "DpadUp_Data", "11" },
-                    { "DpadUp_ExtraData", "0" },
-                    { "DpadDown_InputType", "0" },
-                    { "DpadDown_Name", "dpdown" },
-                    { "DpadDown_Data", "12" },
-                    { "DpadDown_ExtraData", "0" },
-                    { "DpadLeft_InputType", "0" },
-                    { "DpadLeft_Name", "dpleft" },
-                    { "DpadLeft_Data", "13" },
-                    { "DpadLeft_ExtraData", "0" },
-                    { "DpadRight_InputType", "0" },
-                    { "DpadRight_Name", "dpright" },
-                    { "DpadRight_Data", "14" },
-                    { "DpadRight_ExtraData", "0" },
-                    { "CButtonUp_InputType", "1" },
-                    { "CButtonUp_Name", "righty-" },
-                    { "CButtonUp_Data", "3" },
-                    { "CButtonUp_ExtraData", "0" },
-                    { "CButtonDown_InputType", "1" },
-                    { "CButtonDown_Name", "righty+" },
-                    { "CButtonDown_Data", "3" },
-                    { "CButtonDown_ExtraData", "1" },
-                    { "CButtonLeft_InputType", "1" },
-                    { "CButtonLeft_Name", "rightx-" },
-                    { "CButtonLeft_Data", "2" },
-                    { "CButtonLeft_ExtraData", "0" },
-                    { "CButtonRight_InputType", "1" },
-                    { "CButtonRight_Name", "rightx+" },
-                    { "CButtonRight_Data", "2" },
-                    { "CButtonRight_ExtraData", "1" },
-                    { "LeftTrigger_InputType", "0" },
-                    { "LeftTrigger_Name", "leftshoulder" },
-                    { "LeftTrigger_Data", "9" },
-                    { "LeftTrigger_ExtraData", "0" },
-                    { "RightTrigger_InputType", "0" },
-                    { "RightTrigger_Name", "rightshoulder" },
-                    { "RightTrigger_Data", "10" },
-                    { "RightTrigger_ExtraData", "0" },
-                    { "ZTrigger_InputType", "1" },
-                    { "ZTrigger_Name", "lefttrigger+" },
-                    { "ZTrigger_Data", "4" },
-                    { "ZTrigger_ExtraData", "1" },
-                    { "AnalogStickUp_InputType", "1" },
-                    { "AnalogStickUp_Name", "lefty-" },
-                    { "AnalogStickUp_Data", "1" },
-                    { "AnalogStickUp_ExtraData", "0" },
-                    { "AnalogStickDown_InputType", "1" },
-                    { "AnalogStickDown_Name", "lefty+" },
-                    { "AnalogStickDown_Data", "1" },
-                    { "AnalogStickDown_ExtraData", "1" },
-                    { "AnalogStickLeft_InputType", "1" },
-                    { "AnalogStickLeft_Name", "leftx-" },
-                    { "AnalogStickLeft_Data", "0" },
-                    { "AnalogStickLeft_ExtraData", "0" },
-                    { "AnalogStickRight_InputType", "1" },
-                    { "AnalogStickRight_Name", "leftx+" },
-                    { "AnalogStickRight_Data", "0" },
-                    { "AnalogStickRight_ExtraData", "1" },
-                }
-            },
-            {
-                // Mayflash N64 Adapter
-                "03000000d620000010a7000000000000",
-                new Dictionary<string, string>()
-                {
-                    { "DeviceName", "Mayflash Magic NS" },
-                    { "A_InputType", "0" },
-                    { "A_Name", "a" },
-                    { "A_Data", "0" },
-                    { "A_ExtraData", "0" },
-                    { "B_InputType", "0" },
-                    { "B_Name", "b" },
-                    { "B_Data", "1" },
-                    { "B_ExtraData", "0" },
-                    { "Start_InputType", "0" },
-                    { "Start_Name", "start" },
-                    { "Start_Data", "6" },
-                    { "Start_ExtraData", "0" },
-                    { "DpadUp_InputType", "0" },
-                    { "DpadUp_Name", "dpup" },
-                    { "DpadUp_Data", "11" },
-                    { "DpadUp_ExtraData", "0" },
-                    { "DpadDown_InputType", "0" },
-                    { "DpadDown_Name", "dpdown" },
-                    { "DpadDown_Data", "12" },
-                    { "DpadDown_ExtraData", "0" },
-                    { "DpadLeft_InputType", "0" },
-                    { "DpadLeft_Name", "dpleft" },
-                    { "DpadLeft_Data", "13" },
-                    { "DpadLeft_ExtraData", "0" },
-                    { "DpadRight_InputType", "0" },
-                    { "DpadRight_Name", "dpright" },
-                    { "DpadRight_Data", "14" },
-                    { "DpadRight_ExtraData", "0" },
-                    { "CButtonUp_InputType", "1" },
-                    { "CButtonUp_Name", "righty-" },
-                    { "CButtonUp_Data", "3" },
-                    { "CButtonUp_ExtraData", "0" },
-                    { "CButtonDown_InputType", "1" },
-                    { "CButtonDown_Name", "righty+" },
-                    { "CButtonDown_Data", "3" },
-                    { "CButtonDown_ExtraData", "1" },
-                    { "CButtonLeft_InputType", "1" },
-                    { "CButtonLeft_Name", "rightx-" },
-                    { "CButtonLeft_Data", "2" },
-                    { "CButtonLeft_ExtraData", "0" },
-                    { "CButtonRight_InputType", "1" },
-                    { "CButtonRight_Name", "rightx+" },
-                    { "CButtonRight_Data", "2" },
-                    { "CButtonRight_ExtraData", "1" },
-                    { "LeftTrigger_InputType", "0" },
-                    { "LeftTrigger_Name", "leftshoulder" },
-                    { "LeftTrigger_Data", "9" },
-                    { "LeftTrigger_ExtraData", "0" },
-                    { "RightTrigger_InputType", "0" },
-                    { "RightTrigger_Name", "rightshoulder" },
-                    { "RightTrigger_Data", "10" },
-                    { "RightTrigger_ExtraData", "0" },
-                    { "ZTrigger_InputType", "1" },
-                    { "ZTrigger_Name", "lefttrigger+" },
-                    { "ZTrigger_Data", "4" },
-                    { "ZTrigger_ExtraData", "1" },
-                    { "AnalogStickUp_InputType", "1" },
-                    { "AnalogStickUp_Name", "lefty-" },
-                    { "AnalogStickUp_Data", "1" },
-                    { "AnalogStickUp_ExtraData", "0" },
-                    { "AnalogStickDown_InputType", "1" },
-                    { "AnalogStickDown_Name", "lefty+" },
-                    { "AnalogStickDown_Data", "1" },
-                    { "AnalogStickDown_ExtraData", "1" },
-                    { "AnalogStickLeft_InputType", "1" },
-                    { "AnalogStickLeft_Name", "leftx-" },
-                    { "AnalogStickLeft_Data", "0" },
-                    { "AnalogStickLeft_ExtraData", "0" },
-                    { "AnalogStickRight_InputType", "1" },
-                    { "AnalogStickRight_Name", "leftx+" },
-                    { "AnalogStickRight_Data", "0" },
-                    { "AnalogStickRight_ExtraData", "1" },
-                }
-            },
-        };
-
-        static readonly Dictionary<string, Dictionary<string, string>> n64StyleControllersHotkeys = new Dictionary<string, Dictionary<string, string>>()
-        {
-            {
-                // Nintendo Switch Online N64 Controller
-                "0300b7e67e050000192000000000680c",
-                new Dictionary<string, string>()
-                {
-                    { "Hotkey_Exit_InputType", "0;0" },
-                    { "Hotkey_Exit_Name", "start;leftstick" },
-                    { "Hotkey_Exit_Data", "6;7" },
-                    { "Hotkey_Exit_ExtraData", "0;0" },
-                    { "Hotkey_Resume_InputType", "0;1" },
-                    { "Hotkey_Resume_Name", "leftstick;righttrigger+" },
-                    { "Hotkey_Resume_Data", "7;5" },
-                    { "Hotkey_Resume_ExtraData", "0;1" },
-                    { "Hotkey_Screenshot_InputType", "0;1" },
-                    { "Hotkey_Screenshot_Name", "leftstick;lefttrigger+" },
-                    { "Hotkey_Screenshot_Data", "7;4" },
-                    { "Hotkey_Screenshot_ExtraData", "0;1" },
-                    { "Hotkey_SpeedFactor50_InputType", "0;0" },
-                    { "Hotkey_SpeedFactor50_Name", "leftstick;dpleft" },
-                    { "Hotkey_SpeedFactor50_Data", "7;13" },
-                    { "Hotkey_SpeedFactor50_ExtraData", "0;0" },
-                    { "Hotkey_SpeedFactor100_InputType", "0;0" },
-                    { "Hotkey_SpeedFactor100_Name", "leftstick;dpup" },
-                    { "Hotkey_SpeedFactor100_Data", "7;11" },
-                    { "Hotkey_SpeedFactor100_ExtraData", "0;0" },
-                    { "Hotkey_SpeedFactor250_InputType", "0;0" },
-                    { "Hotkey_SpeedFactor250_Name", "leftstick;dpright" },
-                    { "Hotkey_SpeedFactor250_Data", "7;14" },
-                    { "Hotkey_SpeedFactor250_ExtraData", "0;0" },
-                    { "Hotkey_SaveState_InputType", "0;0" },
-                    { "Hotkey_SaveState_Name", "leftstick;b" },
-                    { "Hotkey_SaveState_Data", "7;1" },
-                    { "Hotkey_SaveState_ExtraData", "0;0" },
-                    { "Hotkey_LoadState_InputType", "0;0" },
-                    { "Hotkey_LoadState_Name", "leftstick;x" },
-                    { "Hotkey_LoadState_Data", "7;2" },
-                    { "Hotkey_LoadState_ExtraData", "0;0" },
-                }
-            },
-
-            {
-                // Raphnet N64 Adapter
-                "030000009b2800006300000000000000",
-                new Dictionary<string, string>()
-                {
-                    { "Hotkey_Exit_InputType", "0;0" },
-                    { "Hotkey_Exit_Name", "leftshoulder;start" },
-                    { "Hotkey_Exit_Data", "9;6" },
-                    { "Hotkey_Exit_ExtraData", "0;0" },
-                    { "Hotkey_Resume_InputType", "0;1" },
-                    { "Hotkey_Resume_Name", "leftshoulder;righty+" },
-                    { "Hotkey_Resume_Data", "9;3" },
-                    { "Hotkey_Resume_ExtraData", "0;1" },
-                    { "Hotkey_Screenshot_InputType", "0;1" },
-                    { "Hotkey_Screenshot_Name", "leftshoulder;rightx+" },
-                    { "Hotkey_Screenshot_Data", "9;2" },
-                    { "Hotkey_Screenshot_ExtraData", "0;1" },
-                    { "Hotkey_SpeedFactor50_InputType", "0;0" },
-                    { "Hotkey_SpeedFactor50_Name", "leftshoulder;dpleft" },
-                    { "Hotkey_SpeedFactor50_Data", "9;13" },
-                    { "Hotkey_SpeedFactor50_ExtraData", "0;0" },
-                    { "Hotkey_SpeedFactor100_InputType", "0;0" },
-                    { "Hotkey_SpeedFactor100_Name", "leftshoulder;dpup" },
-                    { "Hotkey_SpeedFactor100_Data", "9;11" },
-                    { "Hotkey_SpeedFactor100_ExtraData", "0;0" },
-                    { "Hotkey_SpeedFactor250_InputType", "0;0" },
-                    { "Hotkey_SpeedFactor250_Name", "leftshoulder;dpright" },
-                    { "Hotkey_SpeedFactor250_Data", "9;14" },
-                    { "Hotkey_SpeedFactor250_ExtraData", "0;0" },
-                    { "Hotkey_SaveState_InputType", "0;0" },
-                    { "Hotkey_SaveState_Name", "leftshoulder;b" },
-                    { "Hotkey_SaveState_Data", "9;1" },
-                    { "Hotkey_SaveState_ExtraData", "0;0" },
-                    { "Hotkey_LoadState_InputType", "0;1" },
-                    { "Hotkey_LoadState_Name", "leftshoulder;rightx-" },
-                    { "Hotkey_LoadState_Data", "9;2" },
-                    { "Hotkey_LoadState_ExtraData", "0;0" },
-                }
-            },
-            {
-                // Mayflash N64 Adapter
-                "03000000d620000010a7000000000000",
-                new Dictionary<string, string>()
-                {
-                    { "Hotkey_Exit_InputType", "0;0" },
-                    { "Hotkey_Exit_Name", "leftshoulder;start" },
-                    { "Hotkey_Exit_Data", "9;6" },
-                    { "Hotkey_Exit_ExtraData", "0;0" },
-                    { "Hotkey_Resume_InputType", "0;1" },
-                    { "Hotkey_Resume_Name", "leftshoulder;righty+" },
-                    { "Hotkey_Resume_Data", "9;3" },
-                    { "Hotkey_Resume_ExtraData", "0;1" },
-                    { "Hotkey_Screenshot_InputType", "0;1" },
-                    { "Hotkey_Screenshot_Name", "leftshoulder;rightx+" },
-                    { "Hotkey_Screenshot_Data", "9;2" },
-                    { "Hotkey_Screenshot_ExtraData", "0;1" },
-                    { "Hotkey_SpeedFactor50_InputType", "0;0" },
-                    { "Hotkey_SpeedFactor50_Name", "leftshoulder;dpleft" },
-                    { "Hotkey_SpeedFactor50_Data", "9;13" },
-                    { "Hotkey_SpeedFactor50_ExtraData", "0;0" },
-                    { "Hotkey_SpeedFactor100_InputType", "0;0" },
-                    { "Hotkey_SpeedFactor100_Name", "leftshoulder;dpup" },
-                    { "Hotkey_SpeedFactor100_Data", "9;11" },
-                    { "Hotkey_SpeedFactor100_ExtraData", "0;0" },
-                    { "Hotkey_SpeedFactor250_InputType", "0;0" },
-                    { "Hotkey_SpeedFactor250_Name", "leftshoulder;dpright" },
-                    { "Hotkey_SpeedFactor250_Data", "9;14" },
-                    { "Hotkey_SpeedFactor250_ExtraData", "0;0" },
-                    { "Hotkey_SaveState_InputType", "0;0" },
-                    { "Hotkey_SaveState_Name", "leftshoulder;b" },
-                    { "Hotkey_SaveState_Data", "9;1" },
-                    { "Hotkey_SaveState_ExtraData", "0;0" },
-                    { "Hotkey_LoadState_InputType", "0;1" },
-                    { "Hotkey_LoadState_Name", "leftshoulder;rightx-" },
-                    { "Hotkey_LoadState_Data", "9;2" },
-                    { "Hotkey_LoadState_ExtraData", "0;0" },
-                }
-            },
-        };
     }
 }

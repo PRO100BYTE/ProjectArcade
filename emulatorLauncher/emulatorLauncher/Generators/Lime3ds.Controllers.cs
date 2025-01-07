@@ -1,6 +1,9 @@
 ﻿using System.Linq;
+using System.IO;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.EmulationStation;
+using EmulatorLauncher.Common.Joysticks;
+using EmulatorLauncher.Common;
 
 namespace EmulatorLauncher
 {
@@ -10,6 +13,8 @@ namespace EmulatorLauncher
         {
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
+
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for Lime3DS");
 
             var c1 = Program.Controllers.FirstOrDefault(c => c.PlayerIndex == 1);
 
@@ -30,6 +35,10 @@ namespace EmulatorLauncher
 
             var guid = controller.GetSdlGuid(_sdlVersion, true);
             var limeGuid = guid.ToString().ToLowerInvariant();
+            string newGuidPath = Path.Combine(AppConfig.GetFullPath("tools"), "controllerinfo.yml");
+            string newGuid = SdlJoystickGuid.GetGuidFromFile(newGuidPath, controller.Guid, "lime3ds");
+            if (newGuid != null)
+                limeGuid = newGuid;
 
             //only 1 player so profile is fixed to 1
             ini.WriteValue("Controls", "profile\\default", "true");
@@ -141,6 +150,8 @@ namespace EmulatorLauncher
             ini.WriteValue("Controls", "touch_from_button_maps\\1\\name", "default");
             ini.WriteValue("Controls", "touch_from_button_maps\\1\\entries\\size", "0");
             ini.WriteValue("Controls", "touch_from_button_maps\\size", "1");
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + controller.DevicePath + " to player : " + controller.PlayerIndex.ToString());
         }
 
         private string FromInput(Controller controller, Input input, string guid)

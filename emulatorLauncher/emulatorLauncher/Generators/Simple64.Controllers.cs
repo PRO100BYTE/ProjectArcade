@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
+using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.Joysticks;
 
@@ -24,6 +24,8 @@ namespace EmulatorLauncher
         {
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
+
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for Simple64");
 
             // UpdateSdlControllersWithHints();     // No hints found in emulator code
 
@@ -63,10 +65,23 @@ namespace EmulatorLauncher
                 return;
 
             string devicename = joy.DeviceName;
+
+            // override devicename
+            string newNamePath = Path.Combine(Program.AppConfig.GetFullPath("tools"), "controllerinfo.yml");
+            if (File.Exists(newNamePath))
+            {
+                string newName = SdlJoystickGuid.GetNameFromFile(newNamePath, controller.Guid, "simple64");
+
+                if (newName != null)
+                    devicename = newName;
+            }
+
             int index = controller.SdlController != null ? controller.SdlController.Index : controller.DeviceIndex;
             bool revertbuttons = controller.VendorID == USB_VENDOR.NINTENDO;
-            bool zAsLeftTrigger = SystemConfig["mupen64_inputprofile" + playerIndex] == "c_face_zl" || SystemConfig["mupen64_inputprofile" + playerIndex] == "c_stick_zl";
+            bool zAsRightTrigger = SystemConfig.isOptSet("mupen64_inputprofile" + playerIndex) && (SystemConfig["mupen64_inputprofile" + playerIndex] == "c_face_zl" || SystemConfig["mupen64_inputprofile" + playerIndex] == "c_stick_zl");
+            bool xboxLayout = SystemConfig.isOptSet("mupen64_inputprofile" + playerIndex) && SystemConfig["mupen64_inputprofile" + playerIndex] == "xbox";
             string guid = controller.SdlController != null ? controller.SdlController.Guid.ToString().ToLower() : controller.Guid.ToString().ToLower();
+            string n64guid = controller.Guid.ToLowerInvariant();
 
             string iniSection = "RetroBatAuto-" + playerIndex;
 
@@ -74,39 +89,88 @@ namespace EmulatorLauncher
             string sensitivity = "100";
             string deadzone = "15";
             if (SystemConfig.isOptSet("mupen64_sensitivity") && !string.IsNullOrEmpty(SystemConfig["mupen64_sensitivity"]))
-                sensitivity = SystemConfig["mupen64_sensitivity"];
+                sensitivity = SystemConfig["mupen64_sensitivity"].ToIntegerString();
 
             if (SystemConfig.isOptSet("mupen64_deadzone") && !string.IsNullOrEmpty(SystemConfig["mupen64_deadzone"]))
-                deadzone = SystemConfig["mupen64_deadzone"];
+                deadzone = SystemConfig["mupen64_deadzone"].ToIntegerString();
 
             // ButtonID (SDL)
             // 3 = hat / 4 = button / 5 = axis / 1 or -1 = axis direction (if axis)
 
-            if (n64StyleControllers.ContainsKey(guid))
+            // Special mapping for n64 style controllers
+            string n64json = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "n64Controllers.json");
+            bool needActivationSwitch = false;
+            bool n64_pad = Program.SystemConfig.getOptBoolean("n64_pad");
+
+            if (File.Exists(n64json))
             {
-                ConfigureN64Controller(profileIni, iniSection, guid);
+                try
+                {
+                    var n64Controllers = N64Controller.LoadControllersFromJson(n64json);
 
-                profileIni.WriteValue(iniSection, "Deadzone", deadzone);
-                profileIni.WriteValue(iniSection, "Sensitivity", sensitivity);
+                    if (n64Controllers != null)
+                    {
+                        N64Controller n64Gamepad = N64Controller.GetN64Controller("simple64", n64guid, n64Controllers);
 
-                settingsIni.WriteValue("Controller" + playerIndex, "Profile", iniSection);
+                        if (n64Gamepad != null)
+                        {
+                            if (n64Gamepad.ControllerInfo != null)
+                            {
+                                if (n64Gamepad.ControllerInfo.ContainsKey("needActivationSwitch"))
+                                    needActivationSwitch = n64Gamepad.ControllerInfo["needActivationSwitch"] == "yes";
 
-                string gamepadN64 = index + ":" + devicename;
-                settingsIni.WriteValue("Controller" + playerIndex, "Gamepad", gamepadN64);
+                                if (needActivationSwitch && !n64_pad)
+                                {
+                                    SimpleLogger.Instance.Info("[Controller] Specific n64 mapping needs to be activated for this controller.");
+                                    goto BypassSPecialControllers;
+                                }
 
-                return;
+                                if (n64Gamepad.ControllerInfo.ContainsKey("deviceName") && !string.IsNullOrEmpty(n64Gamepad.ControllerInfo["deviceName"]))
+                                    devicename = n64Gamepad.ControllerInfo["deviceName"];
+                            }
+
+                            SimpleLogger.Instance.Info("[Controller] Performing specific mapping for " + n64Gamepad.Name);
+
+                            ConfigureN64Controller(profileIni, iniSection, n64Gamepad);
+
+                            profileIni.WriteValue(iniSection, "Deadzone", deadzone);
+                            profileIni.WriteValue(iniSection, "Sensitivity", sensitivity);
+
+                            settingsIni.WriteValue("Controller" + playerIndex, "Profile", iniSection);
+
+                            string gamepadN64 = index + ":" + devicename;
+                            settingsIni.WriteValue("Controller" + playerIndex, "Gamepad", gamepadN64);
+
+                            string pakDevice64 = "simple64_pak" + playerIndex;
+                            if (SystemConfig.isOptSet(pakDevice64) && !string.IsNullOrEmpty(SystemConfig[pakDevice64]))
+                                settingsIni.WriteValue("Controller" + playerIndex, "Pak", SystemConfig[pakDevice64]);
+                            else
+                                settingsIni.WriteValue("Controller" + playerIndex, "Pak", "Memory");
+
+                            return;
+                        }
+
+                        else
+                            SimpleLogger.Instance.Info("[Controller] Gamepad not in JSON file.");
+                    }
+                    else
+                        SimpleLogger.Instance.Info("[Controller] Error loading JSON file.");
+                }
+                catch { }
             }
+
+            BypassSPecialControllers:
 
             if (SystemConfig.isOptSet("mupen64_inputprofile" + playerIndex) && (SystemConfig["mupen64_inputprofile" + playerIndex] == "c_face" || SystemConfig["mupen64_inputprofile" + playerIndex] == "c_face_zl"))
             {
                 if (controller.IsXInputDevice)
                 {
-                    profileIni.WriteValue(iniSection, "A", zAsLeftTrigger ? "\"" + "5,4" + "\"" : "\"" + "4,4" + "\"");
-                    profileIni.WriteValue(iniSection, "B", zAsLeftTrigger ? "\"" + "5,5,1" + "\"" : "\"" + "4,5,1" + "\"");
-                    profileIni.WriteValue(iniSection, "Z", zAsLeftTrigger ? "\"" + "4,5,1" + "\"" : "\"" + "5,5,1" + "\"");
+                    profileIni.WriteValue(iniSection, "A", zAsRightTrigger ? "\"" + "4,4" + "\"" : "\"" + "5,4" + "\"");
+                    profileIni.WriteValue(iniSection, "B", zAsRightTrigger ? "\"" + "4,5,1" + "\"" : "\"" + "5,5,1" + "\"");
+                    profileIni.WriteValue(iniSection, "Z", zAsRightTrigger ? "\"" + "5,5,1" + "\"" : "\"" + "4,5,1" + "\"");
                     profileIni.WriteValue(iniSection, "L", "\"" + "6,4" + "\"");
                     profileIni.WriteValue(iniSection, "Start", "\"" + "7,4" + "\"");
-                    profileIni.WriteValue(iniSection, "R", zAsLeftTrigger ? "\"" + "4,4" + "\"" : "\"" + "5,4" + "\"");
+                    profileIni.WriteValue(iniSection, "R", zAsRightTrigger ? "\"" + "5,4" + "\"" : "\"" + "4,4" + "\"");
                     profileIni.WriteValue(iniSection, "DPadL", "\"" + "0,3,8" + "\"");
                     profileIni.WriteValue(iniSection, "DPadR", "\"" + "0,3,2" + "\"");
                     profileIni.WriteValue(iniSection, "DPadU", "\"" + "0,3,1" + "\"");
@@ -122,12 +186,12 @@ namespace EmulatorLauncher
                 }
                 else
                 {
-                    profileIni.WriteValue(iniSection, "A", zAsLeftTrigger ? "\"" + "10,4" + "\"" : "\"" + "9,4" + "\"");
-                    profileIni.WriteValue(iniSection, "B", zAsLeftTrigger ? "\"" + "5,5,1" + "\"" : "\"" + "4,5,1" + "\"");
-                    profileIni.WriteValue(iniSection, "Z", zAsLeftTrigger ? "\"" + "4,5,1" + "\"" : "\"" + "5,5,1" + "\"");
+                    profileIni.WriteValue(iniSection, "A", zAsRightTrigger ? "\"" + "9,4" + "\"" : "\"" + "10,4" + "\"");
+                    profileIni.WriteValue(iniSection, "B", zAsRightTrigger ? "\"" + "4,5,1" + "\"" : "\"" + "5,5,1" + "\"");
+                    profileIni.WriteValue(iniSection, "Z", zAsRightTrigger ? "\"" + "5,5,1" + "\"" : "\"" + "4,5,1" + "\"");
                     profileIni.WriteValue(iniSection, "L", "\"" + "4,4" + "\"");
                     profileIni.WriteValue(iniSection, "Start", "\"" + "6,4" + "\"");
-                    profileIni.WriteValue(iniSection, "R", zAsLeftTrigger ? "\"" + "9,4" + "\"" : "\"" + "10,4" + "\"");
+                    profileIni.WriteValue(iniSection, "R", zAsRightTrigger ? "\"" + "10,4" + "\"" : "\"" + "9,4" + "\"");
                     profileIni.WriteValue(iniSection, "DPadL", "\"" + "13,4" + "\"");
                     profileIni.WriteValue(iniSection, "DPadR", "\"" + "14,4" + "\"");
                     profileIni.WriteValue(iniSection, "DPadU", "\"" + "11,4" + "\"");
@@ -147,9 +211,17 @@ namespace EmulatorLauncher
             {
                 if (controller.IsXInputDevice)
                 {
-                    profileIni.WriteValue(iniSection, "A", revertbuttons ? "\"" + "1,4" + "\"" : "\"" + "0,4" + "\"");
-                    profileIni.WriteValue(iniSection, "B", revertbuttons ? "\"" + "3,4" + "\"" : "\"" + "2,4" + "\"");
-                    profileIni.WriteValue(iniSection, "Z", zAsLeftTrigger ? "\"" + "4,5,1" + "\"" : "\"" + "5,5,1" + "\"");
+                    if (xboxLayout)
+                    {
+                        profileIni.WriteValue(iniSection, "A", revertbuttons ? "\"" + "1,4" + "\"" : "\"" + "0,4" + "\"");
+                        profileIni.WriteValue(iniSection, "B", revertbuttons ? "\"" + "0,4" + "\"" : "\"" + "1,4" + "\"");
+                    }
+                    else
+                    {
+                        profileIni.WriteValue(iniSection, "A", revertbuttons ? "\"" + "1,4" + "\"" : "\"" + "0,4" + "\"");
+                        profileIni.WriteValue(iniSection, "B", revertbuttons ? "\"" + "3,4" + "\"" : "\"" + "2,4" + "\"");
+                    }
+                    profileIni.WriteValue(iniSection, "Z", zAsRightTrigger ? "\"" + "5,5,1" + "\"" : "\"" + "4,5,1" + "\"");
                     profileIni.WriteValue(iniSection, "Start", "\"" + "7,4" + "\"");
                     profileIni.WriteValue(iniSection, "L", "\"" + "4,4" + "\"");
                     profileIni.WriteValue(iniSection, "R", "\"" + "5,4" + "\"");
@@ -168,9 +240,17 @@ namespace EmulatorLauncher
                 }
                 else
                 {
-                    profileIni.WriteValue(iniSection, "A", revertbuttons ? "\"" + "1,4" + "\"" : "\"" + "0,4" + "\"");
-                    profileIni.WriteValue(iniSection, "B", revertbuttons ? "\"" + "3,4" + "\"" : "\"" + "2,4" + "\"");
-                    profileIni.WriteValue(iniSection, "Z", zAsLeftTrigger ? "\"" + "4,5,1" + "\"" : "\"" + "5,5,1" + "\"");
+                    if (xboxLayout)
+                    {
+                        profileIni.WriteValue(iniSection, "A", revertbuttons ? "\"" + "1,4" + "\"" : "\"" + "0,4" + "\"");
+                        profileIni.WriteValue(iniSection, "B", revertbuttons ? "\"" + "0,4" + "\"" : "\"" + "1,4" + "\"");
+                    }
+                    else
+                    {
+                        profileIni.WriteValue(iniSection, "A", revertbuttons ? "\"" + "1,4" + "\"" : "\"" + "0,4" + "\"");
+                        profileIni.WriteValue(iniSection, "B", revertbuttons ? "\"" + "3,4" + "\"" : "\"" + "2,4" + "\"");
+                    }
+                    profileIni.WriteValue(iniSection, "Z", zAsRightTrigger ? "\"" + "5,5,1" + "\"" : "\"" + "4,5,1" + "\"");
                     profileIni.WriteValue(iniSection, "Start", "\"" + "6,4" + "\"");
                     profileIni.WriteValue(iniSection, "L", "\"" + "9,4" + "\"");
                     profileIni.WriteValue(iniSection, "R", "\"" + "10,4" + "\"");
@@ -197,9 +277,16 @@ namespace EmulatorLauncher
             string gamepad  = index + ":" + devicename;
             settingsIni.WriteValue("Controller" + playerIndex, "Gamepad", gamepad);
 
+            string pakDevice = "simple64_pak" + playerIndex;
+            if (SystemConfig.isOptSet(pakDevice) && !string.IsNullOrEmpty(SystemConfig[pakDevice]))
+                settingsIni.WriteValue("Controller" + playerIndex, "Pak", SystemConfig[pakDevice]);
+            else
+                settingsIni.WriteValue("Controller" + playerIndex, "Pak", "Memory");
 
             /*if (playerIndex == 1)
                 ConfigureHotkeys(controller, ini, iniSection);*/
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + controller.DevicePath + " to player : " + controller.PlayerIndex.ToString());
         }
         private void ResetInputSettings(IniFile ini)
         {
@@ -212,100 +299,22 @@ namespace EmulatorLauncher
             }
         }
 
+        private void ConfigureN64Controller(IniFile profileIni, string iniSection, N64Controller gamepad)
+        {
+            if (gamepad.Mapping == null)
+            {
+                SimpleLogger.Instance.Info("[Controller] Missing mapping for N64 controller.");
+                return;
+            }
+
+            foreach (var button in gamepad.Mapping)
+                profileIni.WriteValue(iniSection, button.Key, button.Value);
+        }
+
         // Controller hotkeys are not available in Simple64 yet
         /*private void ConfigureHotkeys(Controller controller, IniFile ini, string iniSection)
         {
            //TBD
         }*/
-
-        private void ConfigureN64Controller(IniFile profileIni, string iniSection, string guid)
-        {
-            Dictionary<string, string> buttons = n64StyleControllers[guid];
-
-            foreach (var button in buttons)
-                profileIni.WriteValue(iniSection, button.Key, button.Value);
-        }
-
-        static readonly Dictionary<string, Dictionary<string, string>> n64StyleControllers = new Dictionary<string, Dictionary<string, string>>()
-        {
-            {
-                // Nintendo Switch Online N64 Controller
-                "0300b7e67e050000192000000000680c",
-                new Dictionary<string, string>()
-                {
-                    { "A", "\"" + "0,4" + "\"" },
-                    { "B", "\"" + "1,4" + "\"" },
-                    { "Z", "\"" + "4,5,1" + "\"" },
-                    { "Start", "\"" + "6,4" + "\"" },
-                    { "L", "\"" + "9,4" + "\"" },
-                    { "R", "\"" + "10,4" + "\"" },
-                    { "DPadL", "\"" + "13,4" + "\"" },
-                    { "DPadR", "\"" + "14,4" + "\"" },
-                    { "DPadU", "\"" + "11,4" + "\"" },
-                    { "DPadD", "\"" + "12,4" + "\"" },
-                    { "CLeft", "\"" + "2,4" + "\"" },
-                    { "CRight", "\"" + "4,4" + "\"" },
-                    { "CUp", "\"" + "3,4" + "\"" },
-                    { "CDown", "\"" + "5,5,-1" + "\"" },
-                    { "AxisLeft", "\"" + "0,5,-1" + "\"" },
-                    { "AxisRight", "\"" + "0,5,1" + "\"" },
-                    { "AxisUp", "\"" + "1,5,-1" + "\"" },
-                    { "AxisDown", "\"" + "1,5,1" + "\"" },
-                }
-            },
-
-            {
-                // Raphnet N64 Dual Adapter
-                "030000009b2800006300000000000000",
-                new Dictionary<string, string>()
-                {
-                    { "A", "\"" + "0,4" + "\"" },
-                    { "B", "\"" + "1,4" + "\"" },
-                    { "Z", "\"" + "2,4" + "\"" },
-                    { "Start", "\"" + "3,4" + "\"" },
-                    { "L", "\"" + "4,4" + "\"" },
-                    { "R", "\"" + "5,4" + "\"" },
-                    { "DPadL", "\"" + "12,4" + "\"" },
-                    { "DPadR", "\"" + "13,4" + "\"" },
-                    { "DPadU", "\"" + "10,4" + "\"" },
-                    { "DPadD", "\"" + "11,4" + "\"" },
-                    { "CLeft", "\"" + "8,4" + "\"" },
-                    { "CRight", "\"" + "9,4" + "\"" },
-                    { "CUp", "\"" + "6,4" + "\"" },
-                    { "CDown", "\"" + "7,4" + "\"" },
-                    { "AxisLeft", "\"" + "0,5,-1" + "\"" },
-                    { "AxisRight", "\"" + "0,5,1" + "\"" },
-                    { "AxisUp", "\"" + "1,5,-1" + "\"" },
-                    { "AxisDown", "\"" + "1,5,1" + "\"" },
-                }
-            },
-
-
-            {
-                // Mayflash N64 Adapter
-                "03000000d620000010a7000000000000",
-                new Dictionary<string, string>()
-                {
-                    { "A", "\"" + "1,4" + "\"" },
-                    { "B", "\"" + "2,4" + "\"" },
-                    { "Z", "\"" + "6,4" + "\"" },
-                    { "Start", "\"" + "9,4" + "\"" },
-                    { "L", "\"" + "4,4" + "\"" },
-                    { "R", "\"" + "5,4" + "\"" },
-                    { "DPadL", "\"" + "0,3,8" + "\"" },
-                    { "DPadR", "\"" + "0,3,2" + "\"" },
-                    { "DPadU", "\"" + "0,3,1" + "\"" },
-                    { "DPadD", "\"" + "0,3,4" + "\"" },
-                    { "CLeft", "\"" + "2,5,-1" + "\"" },
-                    { "CRight", "\"" + "2,5,1" + "\"" },
-                    { "CUp", "\"" + "3,5,-1" + "\"" },
-                    { "CDown", "\"" + "3,5,1" + "\"" },
-                    { "AxisLeft", "\"" + "0,5,-1" + "\"" },
-                    { "AxisRight", "\"" + "0,5,1" + "\"" },
-                    { "AxisUp", "\"" + "1,5,-1" + "\"" },
-                    { "AxisDown", "\"" + "1,5,1" + "\"" },
-                }
-            },
-        };
     }
 }

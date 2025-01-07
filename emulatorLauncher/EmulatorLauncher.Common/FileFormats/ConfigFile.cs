@@ -58,12 +58,15 @@ namespace EmulatorLauncher.Common.FileFormats
             return ret;
         }
 
-        private static string EmptyLine = "------------EmptyLine----------------";
+        private readonly static string EmptyLine = "------------EmptyLine----------------";
 
         public static ConfigFile FromFile(string file, ConfigFileOptions options = null)
         {
-            var ret = new ConfigFile();
-            ret.Options = options;
+            var ret = new ConfigFile
+            {
+                Options = options
+            };
+
             if (!File.Exists(file))
                 return ret;
 
@@ -126,7 +129,7 @@ namespace EmulatorLauncher.Common.FileFormats
                 if (key == "home" && Directory.Exists(Path.Combine(LocalPath, ".emulationstation")))                        
                     return Path.Combine(LocalPath, ".emulationstation");
 
-                if (key == "bios" || key == "saves" || key == "thumbnails" || key == "shaders" || key == "decorations" || key == "screenshots" || key == "roms" || key == "records" || key == "cheats")
+                if (key == "bios" || key == "saves" || key == "thumbnails" || key == "shaders" || key == "decorations" || key == "tattoos" || key == "screenshots" || key == "roms" || key == "records" || key == "cheats")
                 {
                     if (Directory.Exists(Path.GetFullPath(Path.Combine(LocalPath, "..", key))))
                         return Path.Combine(Path.GetFullPath(Path.Combine(LocalPath, "..", key)));
@@ -246,6 +249,19 @@ namespace EmulatorLauncher.Common.FileFormats
             return defaultValue;
         }
 
+        public string GetValueOrDefaultSlider(string key, string defaultValue)
+        {
+            ConfigItem item;
+            if (_data.TryGetValue(FormatKey(key), out item) && item != null)
+                if (!string.IsNullOrEmpty(item.Value))
+                {
+                    string ret = (item.Value).ToIntegerString();
+                    return ret;
+                }
+
+            return defaultValue;
+        }
+
         public virtual bool IsDirty { get; protected set; }
 
         public override string ToString()
@@ -337,7 +353,7 @@ namespace EmulatorLauncher.Common.FileFormats
 
             ConfigItem item;
             if (_data.TryGetValue(FormatKey(key), out item) && item != null)
-                return item.Value != null && (item.Value.ToLower() == "true" || item.Value == "1" || item.Value.ToLower() == "enabled");
+                return item.Value != null && (item.Value.ToLower() == "true" || item.Value == "1" || item.Value.ToLower() == "enabled" || item.Value.ToLower() == "on" || item.Value.ToLower() == "yes");
 
             return false;
         }

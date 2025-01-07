@@ -11,8 +11,10 @@ namespace EmulatorLauncher
 	{
 		private BezelFiles _bezelFileInfo;
 		private ScreenResolution _resolution;
+		private List<string> _commandArray = new List<string>();
 
-		public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
+
+        public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
 		{
 
 			string path = AppConfig.GetFullPath("snes9x");
@@ -24,22 +26,27 @@ namespace EmulatorLauncher
 			if (!File.Exists(exe))
 				return null;
 
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
 			//Applying bezels
+			if (!fullscreen)
+				SystemConfig["forceNoBezel"] = "true";
 
-			if (!ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution))
-				_bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
-
+            if (!ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution, emulator))
+				_bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
 			_resolution = resolution;
 
-            SetupConfiguration(path, rom, system);
+            SetupConfiguration(path, rom, system, fullscreen);
 
-            //List<string> commandArray = new List<string>();
+            _commandArray.Add("\"" + rom + "\"");
+
+            string args = string.Join(" ", _commandArray);
 
             return new ProcessStartInfo()
 			{
 				FileName = exe,
 				WorkingDirectory = path,
-				Arguments = "\"" + rom + "\"",
+				Arguments = args,
 			};
 			
         }
@@ -65,13 +72,11 @@ namespace EmulatorLauncher
             return ret;
 		}
 
-		private void SetupConfiguration(string path, string rom, string system)
+		private void SetupConfiguration(string path, string rom, string system, bool fullscreen)
         {
             string conf = Path.Combine(path, "snes9x.conf");
 			if (!File.Exists(conf))
 				return;
-
-			bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
             using (var ini = IniFile.FromFile(conf, IniOptions.KeepEmptyLines))
 			{
@@ -110,10 +115,11 @@ namespace EmulatorLauncher
 				ini.WriteValue(@"Display\Win", "Fullscreen:EmulateFullscreen", fullscreen ? "TRUE" : "FALSE");
 				ini.WriteValue(@"Display\Win", "Window:Maximized", "TRUE");
 				ini.WriteValue(@"Display\Win", "BlendHiRes", "TRUE");
+				BindBoolIniFeature(ini, "Settings\\Win", "RewindBufferSize", "rewind", "15", "0");
 
-				// Bilinear filtering
+                // Bilinear filtering
 
-				if (SystemConfig.isOptSet("snes9x_bilinear") && SystemConfig.getOptBoolean("snes9x_bilinear"))
+                if (SystemConfig.isOptSet("snes9x_bilinear") && SystemConfig.getOptBoolean("snes9x_bilinear"))
 					ini.WriteValue(@"Display\Win", "Stretch:BilinearFilter", "TRUE");
 				else
 					ini.WriteValue(@"Display\Win", "Stretch:BilinearFilter", "FALSE");

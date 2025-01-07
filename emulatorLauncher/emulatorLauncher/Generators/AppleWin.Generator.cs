@@ -20,7 +20,11 @@ namespace EmulatorLauncher
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
+            SimpleLogger.Instance.Info("[Generator] Getting " + emulator + " path and executable name.");
+
             string path = AppConfig.GetFullPath("applewin");
+            if (!Directory.Exists(path))
+                return null;
 
             string exe = Path.Combine(path, "applewin.exe");
             if (!File.Exists(exe))
@@ -53,7 +57,7 @@ namespace EmulatorLauncher
 
             bool usingReshader = false;
 
-            var bezels = BezelFiles.GetBezelFiles(system, rom, resolution);
+            var bezels = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
 
             // Check if it's retrobat version
             if (!string.IsNullOrEmpty(versionInfo.FileDescription) && versionInfo.FileDescription.Contains("Retrobat"))
@@ -63,7 +67,7 @@ namespace EmulatorLauncher
 
                 commandArray.Add("-opengl");
 
-                usingReshader = ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x86, system, rom, path, resolution, bezels != null);
+                usingReshader = ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x86, system, rom, path, resolution, emulator, bezels != null);
                 if (usingReshader && bezels != null)
                     commandArray.Add("-stretch");
                 else

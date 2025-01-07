@@ -1,19 +1,23 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.Common.FileFormats;
+using EmulatorLauncher.Common.Joysticks;
 
 namespace EmulatorLauncher.Libretro
 {
-    class LibretroControllers
+    partial class LibretroControllers
     {
-        private static bool _n64specialController = false;
+        private static bool _specialController = false;
+        private static bool _specialControllerHotkey = false;
+        private static bool _noHotkey = false;
         private static string _inputDriver = "sdl2";
         private static readonly HashSet<string> disabledAnalogModeSystems = new HashSet<string> { "n64", "dreamcast", "gamecube", "3ds" };
-
+        static readonly List<string> mdSystems = new List<string>() { "megadrive", "genesis", "megadrive-msu", "genesis-msu", "segacd", "megacd", "sega32x", "mega32x" };
         static readonly List<string> systemButtonInvert = new List<string>() { "snes", "snes-msu", "sattelaview", "sufami" };
         static readonly List<string> coreNoRemap = new List<string>() { "mednafen_snes" };
 
@@ -23,10 +27,13 @@ namespace EmulatorLauncher.Libretro
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return false;
 
+            var c1 = Program.Controllers.FirstOrDefault(c => c.PlayerIndex == 1);
+            bool forceDInput = c1 != null && c1.SdlController == null && !c1.IsXInputDevice;
+
             if (Program.SystemConfig["input_driver"] == "xinput")
                 _inputDriver = "xinput";
 
-            if (Program.SystemConfig["input_driver"] == "dinput")
+            if (Program.SystemConfig["input_driver"] == "dinput" || forceDInput)
                 _inputDriver = "dinput";
 
             // no menu in non full uimode
@@ -38,7 +45,8 @@ namespace EmulatorLauncher.Libretro
             foreach (var controller in Program.Controllers)
                 WriteControllerConfig(retroconfig, controller, system, core);
 
-            if (_n64specialController)
+            WriteKBHotKeyConfig(retroconfig, core);
+            if (_specialController && _specialControllerHotkey)
                 return true;
 
             WriteHotKeyConfig(retroconfig);
@@ -107,22 +115,55 @@ namespace EmulatorLauncher.Libretro
 
             foreach (var specialkey in retroarchspecials)
                 retroconfig.DisableAll("input_" + specialkey.Value);
+            retroconfig.DisableAll("input_toggle_fast_forward");
         }
 
-        private static void WriteHotKeyConfig(ConfigFile config)
+        private static void WriteKBHotKeyConfig(ConfigFile config, string core)
         {
             // Keyboard defaults
             config["input_enable_hotkey"] = "nul";
-            config["input_enable_hotkey_axis"] = "nul";
-            config["input_enable_hotkey_btn"] = "nul";
-            config["input_enable_hotkey_mbtn"] = "nul";
 
 #if DEBUG
             config["input_exit_emulator"] = "tilde";
 #else
             config["input_exit_emulator"] = "escape";
 #endif            
+            // Overwrite hotkeys with a file
+            string kbHotkeyFile = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "retroarch_kb_hotkeys.yml");
 
+            if (File.Exists(kbHotkeyFile))
+            {
+                YmlFile ymlFile = YmlFile.Load(kbHotkeyFile);
+
+                if (ymlFile != null)
+                {
+                    YmlContainer kbHotkeyList = ymlFile.Elements.Where(c => c.Name == core).FirstOrDefault() as YmlContainer;
+
+                    if (kbHotkeyList == null)
+                        kbHotkeyList = ymlFile.Elements.Where(c => c.Name == "default").FirstOrDefault() as YmlContainer;
+
+                    if (kbHotkeyList != null)
+                    {
+                        SimpleLogger.Instance.Info("[GENERATOR] Overwriting keyboard hotkeys with values from : " + kbHotkeyFile);
+
+                        var kbHotkeys = kbHotkeyList.Elements;
+
+                        if (kbHotkeys != null & kbHotkeys.Count > 0)
+                        {
+                            foreach (var kbHotkey in kbHotkeys)
+                            {
+                                var hotkey = kbHotkey as YmlElement;
+
+                                if (hotkey != null && hotkey.Name.StartsWith("input_") && !hotkey.Name.EndsWith("_btn") && !hotkey.Name.EndsWith("_mbtn") && !hotkey.Name.EndsWith("_axis"))
+                                    config[hotkey.Name] = hotkey.Value;
+                            }
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // If no file use RetroBat standard
             config["input_menu_toggle"] = "f1";
             config["input_save_state"] = "f2";
             config["input_load_state"] = "f4";
@@ -131,15 +172,20 @@ namespace EmulatorLauncher.Libretro
             config["input_state_slot_increase"] = "f7";
             config["input_screenshot"] = "f8";
             config["input_rewind"] = "backspace";
-            config["hold_fast_forward"] = "l";
+            config["input_hold_fast_forward"] = "l";
             config["input_shader_next"] = "m";
             config["input_shader_prev"] = "n";
             config["input_bind_hold"] = "2";
             config["input_bind_timeout"] = "5";
-
+        }
+        private static void WriteHotKeyConfig(ConfigFile config)
+        {
             var c0 = Program.Controllers.FirstOrDefault(c => c.PlayerIndex == 1);
             if (c0 == null || c0.Config == null)
                 return;
+
+            if (Program.SystemConfig.getOptBoolean("fastforward_toggle"))
+                retroarchspecials[InputKey.right] = "toggle_fast_forward";
 
             if (Misc.HasWiimoteGun())
             {
@@ -197,8 +243,8 @@ namespace EmulatorLauncher.Libretro
                 { InputKey.select, "select"}
             };
 
-            var config = new Dictionary<string, string>();
-
+            // some input adaptations for some cores...
+            // MAME service menu
             if (system == "mame")
             {
                 // Invert Dip switches and set it on r3 instead ( less annoying )
@@ -206,31 +252,12 @@ namespace EmulatorLauncher.Libretro
                 retroarchbtns[InputKey.r3] = "l3";
             }
 
+            if (performSpecialMapping(out Dictionary<string, string> specialConfig, system, controller, retroconfig))
+                return specialConfig;
+
+            // N64: Z is important, in case L2 (z) is not available for this pad, use L1
             if (system == "n64")
             {
-                string guid = controller.SdlController != null ? controller.SdlController.Guid.ToString().ToLower() : controller.Guid.ToString().ToLower();
-                if (n64StyleControllers.ContainsKey(guid))
-                {
-                    Dictionary<string, string> buttons = n64StyleControllers[guid];
-                    Dictionary<string, string> hotkeys = n64StyleControllersSpecial[guid];
-
-                    foreach (var button in buttons)
-                        config[string.Format("input_player{0}_{1}", controller.PlayerIndex, button.Key)] = button.Value;
-
-                    foreach (var hotkey in hotkeys)
-                        config[hotkey.Key] = hotkey.Value;
-
-                    _inputDriver = "sdl2";
-
-                    if (config["input_joypad_driver"] != null)
-                        _inputDriver = config["input_joypad_driver"];
-
-                    _n64specialController = true;
-                    return config;
-                }
-
-                // some input adaptations for some cores...
-                // z is important, in case l2 (z) is not available for this pad, use l1
                 if (controller.Config != null && controller.Config.Input != null && !controller.Config.Input.Any(i => i.Name == InputKey.r2))
                 {
                     retroarchbtns[InputKey.pageup] = "l2";
@@ -247,6 +274,7 @@ namespace EmulatorLauncher.Libretro
                 retroarchbtns[InputKey.y] = "x";
             }
 
+            var config = new Dictionary<string, string>();
             var conflicts = new List<string>();
 
             foreach (var btnkey in retroarchbtns)
@@ -295,8 +323,18 @@ namespace EmulatorLauncher.Libretro
                 }
             }
 
-            if (controller.PlayerIndex == 1)
+            var hotKey = GetInputCode(controller, InputKey.hotkey);
+            if (hotKey == null)
             {
+                SimpleLogger.Instance.Info("[GENERATOR] No hotkey configured, all retroarch shortcuts will be disabled.");
+                _noHotkey = true;
+            }
+            
+            if (controller.PlayerIndex == 1 && !_noHotkey)
+            {
+                if (Program.SystemConfig.getOptBoolean("fastforward_toggle"))
+                    retroarchspecials[InputKey.right] = "toggle_fast_forward";
+
                 foreach (var specialkey in retroarchspecials)
                 {
                     var input = GetInputCode(controller, specialkey.Key);
@@ -338,6 +376,11 @@ namespace EmulatorLauncher.Libretro
 
         private static void WriteControllerConfig(ConfigFile retroconfig, Controller controller, string system, string core)
         {
+            // Dolphin, when using xinput controller, will only work if joypad driver is set to xinput
+            // So set to xinput in auto, if not forced in settings
+            if (controller.PlayerIndex == 1 && core == "dolphin" && controller.IsXInputDevice && !Program.SystemConfig.isOptSet("input_driver"))
+                _inputDriver = "xinput";
+            
             var generatedConfig = GenerateControllerConfig(retroconfig, controller, system, core);
             foreach (var key in generatedConfig)
                 retroconfig[key.Key] = key.Value;
@@ -904,109 +947,6 @@ namespace EmulatorLauncher.Libretro
            { SDL.SDL_Keycode.SDLK_POWER, retro_key.RETROK_POWER },
            { SDL.SDL_Keycode.SDLK_UNDO, retro_key.RETROK_UNDO },
       //     { 0, retro_key.RETROK_UNKNOWN },*/
-        };
-
-        static readonly Dictionary<string, Dictionary<string, string>> n64StyleControllers = new Dictionary<string, Dictionary<string, string>>()
-        {
-            {
-                // Mayflash N64 Adapter
-                "03000000d620000010a7000000000000",
-                new Dictionary<string, string>()
-                {
-                    { "b_btn", "1" },
-                    { "a_axis", "+3" },
-                    { "down_btn", "h0down" },
-                    { "l2_btn", "6" },
-                    { "l_btn", "4" },
-                    { "l_x_minus_axis", "-0" },
-                    { "l_x_plus_axis", "+0" },
-                    { "l_y_minus_axis", "-1" },
-                    { "l_y_plus_axis", "+1" },
-                    { "left_btn", "h0left" },
-                    { "r_btn", "5" },
-                    { "r_x_minus_axis", "-2" },
-                    { "r_x_plus_axis", "+2" },
-                    { "r_y_minus_axis", "-3" },
-                    { "r_y_plus_axis", "+3" },
-                    { "right_btn", "h0right" },
-                    { "select_btn", "4" },
-                    { "start_btn", "9" },
-                    { "up_btn", "h0up" },
-                    { "y_btn", "2" },
-                }
-            },
-
-            {
-                // Raphnet N64 Adapter
-                "030000009b2800006300000000000000",
-                new Dictionary<string, string>()
-                {
-                    { "a_btn", "7" },
-                    { "b_btn", "0" },
-                    { "down_btn", "11" },
-                    { "l2_btn", "2" },
-                    { "l_btn", "4" },
-                    { "l_x_minus_axis", "-0" },
-                    { "l_x_plus_axis", "+0" },
-                    { "l_y_minus_axis", "-1" },
-                    { "l_y_plus_axis", "+1" },
-                    { "left_btn", "12" },
-                    { "r_btn", "5" },
-                    { "r_x_minus_btn", "8" },
-                    { "r_x_plus_btn", "9" },
-                    { "r_y_minus_btn", "6" },
-                    { "r_y_plus_btn", "7" },
-                    { "right_btn", "13" },
-                    { "select_btn", "4" },
-                    { "start_btn", "3" },
-                    { "up_btn", "10" },
-                    { "y_btn", "1" },
-                }
-            },
-        };
-
-        static readonly Dictionary<string, Dictionary<string, string>> n64StyleControllersSpecial = new Dictionary<string, Dictionary<string, string>>()
-        {
-            {
-                // Mayflash N64 Adapter
-                "03000000d620000010a7000000000000",
-                new Dictionary<string, string>()
-                {
-                    { "input_enable_hotkey_btn", "4" },
-                    { "input_joypad_driver", "sdl2" },
-                    { "input_exit_emulator_btn", "9" },
-                    { "input_pause_toggle_axis", "+3" },
-                    { "input_pause_toggle_btn", "nul" },
-                    { "input_menu_toggle_btn", "1" },
-                    { "input_load_state_axis", "-2" },
-                    { "input_load_state_btn", "nul" },
-                    { "input_save_state_btn", "2" },
-                    { "input_ai_service_btn", "5" },
-                    { "input_state_slot_decrease_btn", "h0down" },
-                    { "input_state_slot_increase_btn", "h0up" },
-                    { "input_rewind_btn", "h0left" },
-                    { "input_hold_fast_forward_btn", "h0right" },
-                }
-            },
-            {
-                // Raphnet N64 Adapter
-                "030000009b2800006300000000000000",
-                new Dictionary<string, string>()
-                {
-                    { "input_enable_hotkey_btn", "4" },
-                    { "input_joypad_driver", "sdl2" },
-                    { "input_exit_emulator_btn", "3" },
-                    { "input_pause_toggle_btn", "7" },
-                    { "input_menu_toggle_btn", "0" },
-                    { "input_load_state_btn", "8" },
-                    { "input_save_state_btn", "1" },
-                    { "input_ai_service_btn", "5" },
-                    { "input_state_slot_decrease_btn", "11" },
-                    { "input_state_slot_increase_btn", "10" },
-                    { "input_rewind_btn", "12" },
-                    { "input_hold_fast_forward_btn", "13" },
-                }
-            },
         };
     }
 }

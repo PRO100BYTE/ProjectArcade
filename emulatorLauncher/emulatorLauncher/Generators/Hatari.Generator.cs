@@ -32,7 +32,7 @@ namespace EmulatorLauncher
             string disk = "--disk-a";
             bool diskImage = false;
 
-            _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+            _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
             _resolution = resolution;
 
             var commandArray = new List<string>
@@ -101,7 +101,7 @@ namespace EmulatorLauncher
                 ini.WriteValue("Screen", "bShowDriveLed", "FALSE");
 
                 // Add resolution setting from videomode
-                BindBoolIniFeature(ini, "Screen", "bUseVsync", "hatari_vsync", "FALSE", "TRUE");
+                BindBoolIniFeatureOn(ini, "Screen", "bUseVsync", "hatari_vsync", "TRUE", "FALSE");
 
                 // MEMORY
                 string savesFile = Path.Combine(AppConfig.GetFullPath("saves"), "atarist", "hatari", "hatari.sav");
@@ -180,6 +180,7 @@ namespace EmulatorLauncher
                 // Overwrite values if feature is set
                 if (SystemConfig.isOptSet("hatari_frequency") && !string.IsNullOrEmpty(SystemConfig["hatari_frequency"]))
                     ini.WriteValue("System", "nCpuFreq", SystemConfig["hatari_frequency"]);
+
                 if (SystemConfig.isOptSet("hatari_memory") && !string.IsNullOrEmpty(SystemConfig["hatari_memory"]))
                     ini.WriteValue("Memory", "nMemorySize", SystemConfig["hatari_memory"]);
 
@@ -240,19 +241,24 @@ namespace EmulatorLauncher
 
             if (c.IsKeyboard)
             {
-                ini.WriteValue(joySection, "nJoystickMode", "1");
+                ini.WriteValue(joySection, "nJoystickMode", "2");
                 ini.WriteValue(joySection, "nJoyId", "0");
                 ini.WriteValue(joySection, "kUp", "Up");
                 ini.WriteValue(joySection, "kDown", "Down");
                 ini.WriteValue(joySection, "kLeft", "Left");
                 ini.WriteValue(joySection, "kRight", "Right");
-                ini.WriteValue(joySection, "kFire", "X");
+                ini.WriteValue(joySection, "kFire", "Left Shift");
             }
 
             int index = c.DeviceIndex;
 
-            ini.WriteValue(joySection, "nJoystickMode", "2");
+            ini.WriteValue(joySection, "nJoystickMode", "1");
             ini.WriteValue(joySection, "nJoyId", index.ToString());
+
+            if (SystemConfig.isOptSet("hatari_autofire") && SystemConfig.getOptBoolean("hatari_autofire"))
+                ini.WriteValue(joySection, "bEnableAutoFire", "TRUE");
+            else
+                ini.WriteValue(joySection, "bEnableAutoFire", "FALSE");
         }
 
         public override int RunAndWait(ProcessStartInfo path)
