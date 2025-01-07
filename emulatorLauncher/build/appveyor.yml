@@ -15,6 +15,10 @@ after_build:
 
     if exist "C:\projects\EmulationStation\fr" rd /s /q "C:\projects\EmulationStation\fr"
 
+    if exist "C:\projects\EmulationStation\es-checkversion.exe" ren "C:\projects\EmulationStation\es-checkversion.exe" "es-checkversion-test.exe"
+
+    if exist "C:\projects\EmulationStation\es-update.exe" ren "C:\projects\EmulationStation\es-update.exe" "es-update-test.exe"
+
     7z a -tzip emulatorlauncher.zip C:\projects\EmulationStation\*
 artifacts:
 - path: emulatorlauncher.zip
@@ -27,5 +31,14 @@ deploy:
     secure: aShADtUc5h0xntghttL2paIN46wO9ftml5lCyLJVIUtNLqQos33JPmG7BV/S5D3WoSLthDrlucqUxvYxriz4ZaKoLncf0Zp5YsNqkiL+EWlNcm8Tvub5dm7F1mVo46v1
   repository: PRO100BYTE/emulatorlauncher
   artifact: emulatorlauncher.zip
-  prerelease: false
+  prerelease: true
+  force_update: true
+- provider: GitHub
+  tag: latest
+  release: emulatorLauncher (Latest Build)
+  description: emulatorLauncher for ProjectArcade - Latest Build | This release was automatically compiled and published by the AppVeyor service.
+  auth_token:
+    secure: aShADtUc5h0xntghttL2paIN46wO9ftml5lCyLJVIUtNLqQos33JPmG7BV/S5D3WoSLthDrlucqUxvYxriz4ZaKoLncf0Zp5YsNqkiL+EWlNcm8Tvub5dm7F1mVo46v1
+  repository: PRO100BYTE/emulatorlauncher
+  artifact: emulatorlauncher.zip
   force_update: true
