@@ -1,0 +1,13 @@
+<mamelayout version="2">
+	<element name="bezel">
+		<image file="cdi.png" />
+	</element>
+	<view name="Upright_Artwork">
+		<screen index="0">
+			<bounds x="273" y="24" width="1374" height="1032" />
+		</screen>		
+		<bezel element="bezel">
+			<bounds x="0" y="0" width="1920" height="1080" />
+		</bezel>
+	</view> 
+</mamelayout>
