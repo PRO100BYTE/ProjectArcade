@@ -1,16 +1,16 @@
-﻿; ProjectArcade Installer Script
+﻿; ProjectArcade Installer Build Script
 ;
 ; More info - on GitHub:
 ; https://github.com/PRO100BYTE/ProjectArcade
 ; ---------------------------------------------------------------------
 
-#define MyAppName "ProjectArcade"
-#define MyAppVersion "1.6.0"
-#define MyAppPublisher "PRO100BYTE Team"
-#define MyAppURL "https://projectarcade.ru"
-#define MyPublisherURL "https://pro100byte.ru"
-#define MyAppExeName "projectarcade.exe"
-#define MyAppCopyright "Copyright (C) 2023-2024 PRO100BYTE Team"
+#define PAName "ProjectArcade"
+#define PAVersion "1.6.1"
+#define PADevs "PRO100BYTE Team"
+#define PAURL "https://projectarcade.ru"
+#define PADevsURL "https://pro100byte.ru"
+#define PAExec "projectarcade.exe"
+#define PACopyright "Copyright (C) 2023-2025 PRO100BYTE Team"
 #define public Dependency_Path_NetCoreCheck "dependencies\"
 #define public Dependency_Path_DirectX "dependencies\"
 
@@ -20,14 +20,14 @@
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{B43C3830-8D79-4C32-B4C4-B29BBBAAFFCE}
-AppName={#MyAppName}
-AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
-AppPublisher={#MyAppPublisher}
-AppPublisherURL={#MyPublisherURL}
-AppSupportURL={#MyAppURL}
-AppUpdatesURL={#MyAppURL}
-AppCopyright={#MyAppCopyright}
+AppName={#PAName}
+AppVersion={#PAVersion}
+;AppVerName={#PAName} {#PAVersion}
+AppPublisher={#PADevs}
+AppPublisherURL={#PADevsURL}
+AppSupportURL={#PAURL}
+AppUpdatesURL={#PAURL}
+AppCopyright={#PACopyright}
 DefaultDirName=C:\ProjectArcade
 DisableProgramGroupPage=yes
 LicenseFile=P:\Software\ProjectArcade\ProjectArcade-setupfiles\LICENSE.txt
@@ -39,11 +39,11 @@ WizardImageBackColor=clWhite
 WizardSmallImageFile=P:\Software\ProjectArcade\ProjectArcade-setupfiles\pa-headerlogo.bmp
 WizardSmallImageBackColor=clWhite
 DisableWelcomePage=no
-VersionInfoVersion=1.6.0
+VersionInfoVersion={#PAVersion}
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputDir=P:\Software\ProjectArcade\ProjectArcade-setupbuilds\1.6.0\
-OutputBaseFilename=ProjectArcade-1.6.0_setup
+OutputDir=P:\Software\ProjectArcade\ProjectArcade-setupbuilds\{#PAVersion}\
+OutputBaseFilename=ProjectArcade-{#PAVersion}_setup
 SetupIconFile=P:\Software\ProjectArcade\ProjectArcade-setupfiles\projectarcade.ico
 Compression=lzma2/ultra64
 InternalCompressLevel=ultra
@@ -62,22 +62,22 @@ Name: "russian"; MessagesFile: "P:\Software\ProjectArcade\ProjectArcade-setupfil
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "P:\Software\ProjectArcade\ProjectArcade-builds\1.6.0\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion;
-Source: "P:\Software\ProjectArcade\ProjectArcade-builds\1.6.0\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs;
-Source: "P:\Software\ProjectArcade\ProjectArcade-builds\1.6.0\projectarcade.ini"; DestDir: "{app}"; Flags: ignoreversion;
-Source: "P:\Software\ProjectArcade\ProjectArcade-builds\1.6.0\emulationstation\about.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; 
+Source: "P:\Software\ProjectArcade\ProjectArcade-builds\{#PAVersion}\{#PAExec}"; DestDir: "{app}"; Flags: ignoreversion;
+Source: "P:\Software\ProjectArcade\ProjectArcade-builds\{#PAVersion}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs;
+Source: "P:\Software\ProjectArcade\ProjectArcade-builds\{#PAVersion}\projectarcade.ini"; DestDir: "{app}"; Flags: ignoreversion;
+Source: "P:\Software\ProjectArcade\ProjectArcade-builds\{#PAVersion}\emulationstation\about.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion; 
 ; Attribs: readonly;
-Source: "P:\Software\ProjectArcade\ProjectArcade-builds\1.6.0\emulationstation\version.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion
+Source: "P:\Software\ProjectArcade\ProjectArcade-builds\{#PAVersion}\emulationstation\version.info"; DestDir: "{app}\emulationstation"; Flags: ignoreversion
 ; Attribs: readonly; 
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Comment: "Launch ProjectArcade"; IconFilename: "{app}\projectarcade.exe"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Comment: "Launch ProjectArcade"; IconFilename: "{app}\projectarcade.exe"; Tasks: desktopicon
+Name: "{autoprograms}\{#PAName}"; Filename: "{app}\{#PAExec}"; Comment: "Launch ProjectArcade"; IconFilename: "{app}\projectarcade.exe"
+Name: "{autodesktop}\{#PAName}"; Filename: "{app}\{#PAExec}"; Comment: "Launch ProjectArcade"; IconFilename: "{app}\projectarcade.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#PAExec}"; Description: "{cm:LaunchProgram,{#StringChange(PAName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
 function InitializeSetup: Boolean;
