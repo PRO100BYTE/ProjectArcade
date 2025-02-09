@@ -20,12 +20,15 @@ namespace EmulatorLauncher
             if (!File.Exists(exe))
                 return null;
 
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+
             // settings (xml configuration)
             SetupJsonConfiguration(path, system, rom);
 
-            _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+            if (fullscreen)
+                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
             _resolution = resolution;
-            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+            
 
             // command line parameters
             var commandArray = new List<string>
@@ -73,7 +76,6 @@ namespace EmulatorLauncher
 
             preference["AutomaticallyCheckForUpdates"] = "false";
             preference["SingleInstance"] = "true";
-            preference["AutoLoadPatches"] = "true";
             preference["PauseWhenInBackground"] = "true";
             preference["PauseWhenInMenusAndConfig"] = "true";
             preference["AllowBackgroundInput"] = "true";
@@ -95,8 +97,9 @@ namespace EmulatorLauncher
             else
                 preference["EnableAutoSaveState"] = "false";
 
+            BindBoolFeatureOn(preference, "AutoLoadPatches", "mesen_patches", "true", "false");
             BindBoolFeature(preference, "EnableRewind", "rewind", "true", "false");
-            BindBoolFeature(preference, "DisableOsd", "mesen_osd", "false", "true");
+            BindBoolFeatureOn(preference, "DisableOsd", "mesen_osd", "false", "true");
             BindBoolFeature(preference, "ShowGameTimer", "mesen_timecounter", "true", "false");
             BindBoolFeature(preference, "ShowFps", "mesen_fps", "true", "false");
 
@@ -149,13 +152,13 @@ namespace EmulatorLauncher
             BindFeature(video, "VideoFilter", "mesen_filter", "None");
             BindFeature(video, "AspectRatio", "mesen_ratio", "Auto");
             BindBoolFeature(video, "UseBilinearInterpolation", "bilinear_filtering", "true", "false");
-            BindBoolFeature(video, "VerticalSync", "mesen_vsync", "false", "true");
-            BindFeature(video, "ScanlineIntensity", "mesen_scanlines", "0");
+            BindBoolFeatureOn(video, "VerticalSync", "mesen_vsync", "true", "false");
+            BindFeatureSlider(video, "ScanlineIntensity", "mesen_scanlines", "0");
             BindBoolFeature(video, "FullscreenForceIntegerScale", "integerscale", "true", "false");
 
             // Emulation menu
             var emulation = json.GetOrCreateContainer("Emulation");
-            BindFeature(emulation, "RunAheadFrames", "mesen_runahead", "0");
+            BindFeatureSlider(emulation, "RunAheadFrames", "mesen_runahead", "0");
 
             // Input menu
             var input = json.GetOrCreateContainer("Input");
@@ -193,7 +196,7 @@ namespace EmulatorLauncher
             BindFeature(section, "Region", "mesen_region", "Auto");
             BindFeature(section, "Revision", "mesen_sms_revision", "Compatibility");
             BindBoolFeature(section, "RemoveSpriteLimit", "mesen_spritelimit", "true", "false");
-            BindBoolFeature(section, "EnableFmAudio", "mesen_sms_fmaudio", "false", "true");
+            BindBoolFeatureOn(section, "EnableFmAudio", "mesen_sms_fmaudio", "true", "false");
         }
 
         private void ConfigurePCEngine(DynamicJson section, string system)
@@ -217,7 +220,7 @@ namespace EmulatorLauncher
             else if (system == "sgb")
             {
                 section["Model"] = "SuperGameboy";
-                BindBoolFeature(section, "UseSgb2", "mesen_sgb2", "false", "true");
+                BindBoolFeatureOn(section, "UseSgb2", "mesen_sgb2", "true", "false");
                 BindBoolFeature(section, "HideSgbBorders", "mesen_hidesgbborders", "true", "false");
 
                 // Firmwares for sgb need to be copied to emulator folder

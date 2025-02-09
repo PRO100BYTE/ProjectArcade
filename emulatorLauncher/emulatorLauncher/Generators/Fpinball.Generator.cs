@@ -61,7 +61,7 @@ namespace EmulatorLauncher
                                 regKeyc.SetValue("JoypadDigitalPlunger", JoystickValue(InputKey.a, controller));
                                 regKeyc.SetValue("JoypadToggleHud", JoystickValue(InputKey.y, controller));
                                 regKeyc.SetValue("JoypadNextCamera", JoystickValue(InputKey.b, controller));
-                                regKeyc.SetValue("JoypadExit", -1); //JoystickValue(InputKey.x, controller));
+                                regKeyc.SetValue("JoypadExit", JoystickValue(InputKey.r3, controller));
 
                                 regKeyc.SetValue("JoypadLeftFlipper", JoystickValue(InputKey.pageup, controller));
                                 regKeyc.SetValue("JoypadRightFlipper", JoystickValue(InputKey.pagedown, controller));
@@ -69,7 +69,6 @@ namespace EmulatorLauncher
                                 regKeyc.SetValue("JoypadStartGame", JoystickValue(InputKey.start, controller));
                                 regKeyc.SetValue("JoypadInsertCoin", JoystickValue(InputKey.select, controller));
 
-                                //regKeyc.SetValue("JoypadPause", JoystickValue(InputKey.r3, controller));
                                 regKeyc.SetValue("JoypadPause", JoystickValue(InputKey.x, controller));
                                 regKeyc.SetValue("JoypadBackbox", JoystickValue(InputKey.l3, controller));
 
@@ -197,6 +196,14 @@ namespace EmulatorLauncher
 
         public override PadToKey SetupCustomPadToKeyMapping(PadToKey mapping)
         {
+            
+            if (_bam != null)
+            {
+                var fploaderMapping = mapping.Applications.Where(m => m.Name == "fploader").FirstOrDefault();
+                var fpinballMapping = mapping.Applications.Where(m => m.Name == "Future Pinball").FirstOrDefault();
+                if (fploaderMapping != null && fpinballMapping != null)
+                    fpinballMapping.Input.AddRange(fploaderMapping.Input);
+            }
             return PadToKey.AddOrUpdateKeyMapping(mapping, "future pinball", InputKey.hotkey | InputKey.r3, "(%{PRTSC})");
         }
 
@@ -267,7 +274,7 @@ namespace EmulatorLauncher
                 else
                     regKeyc.SetValue("FullScreen", 0);
 
-                if (SystemConfig.isOptSet("arcademode") && SystemConfig["arcademode"] == "1")
+                if (SystemConfig.isOptSet("arcademode") && SystemConfig.getOptBoolean("arcademode"))
                 {
                     if (Screen.PrimaryScreen.Bounds.Height > Screen.PrimaryScreen.Bounds.Width)
                         regKeyc.SetValue("RotateDegrees", 0); // Already rotated by system
@@ -293,7 +300,7 @@ namespace EmulatorLauncher
                 else
                     regKeyc.SetValue("AspectRatio", 169);
 
-                if (SystemConfig.isOptSet("fp_vsync") && SystemConfig["fp_vsync"] == "0")
+                if (SystemConfig.isOptSet("fp_vsync") && !SystemConfig.getOptBoolean("fp_vsync"))
                     regKeyc.SetValue("VerticalSync", 0);
                 else
                     regKeyc.SetValue("VerticalSync", 1);
@@ -395,8 +402,8 @@ namespace EmulatorLauncher
                 else
                     regKeyc.SetValue("TextureFilter", 0);
 
-                if (SystemConfig.isOptSet("fp_anisotropic"))
-                    regKeyc.SetValue("AnisotropicFiltering", SystemConfig["fp_anisotropic"].ToInteger());
+                if (SystemConfig.isOptSet("fp_anisotropic") && !SystemConfig.getOptBoolean("fp_anisotropic"))
+                    regKeyc.SetValue("AnisotropicFiltering", 0);
                 else
                     regKeyc.SetValue("AnisotropicFiltering", 1);
 

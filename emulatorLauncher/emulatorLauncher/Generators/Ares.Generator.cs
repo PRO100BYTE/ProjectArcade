@@ -16,16 +16,24 @@ namespace EmulatorLauncher
         private BezelFiles _bezelFileInfo;
         private ScreenResolution _resolution;
         private string _path;
+        private string _system;
+        static List<string> _mdSystems = new List<string>() { "genesis", "megadrive", "mega32x", "megacd", "segacd", "sega32x" };
+        static List<string> _n64Systems = new List<string>() { "n64", "n64dd" };
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
+            SimpleLogger.Instance.Info("[Generator] Getting " + emulator + " path and executable name.");
+
             string path = AppConfig.GetFullPath("ares");
+            if (!Directory.Exists(path))
+                return null;
 
             string exe = Path.Combine(path, "ares.exe");
             if (!File.Exists(exe))
                 return null;
 
             _path = path;
+            _system = system;
 
             bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
@@ -42,13 +50,13 @@ namespace EmulatorLauncher
             {
                 case "OpenGL 3.2":
                     ReshadeManager.UninstallReshader(ReshadeBezelType.d3d9, path);
-                    if (!ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution))
-                        _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+                    if (!ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution, emulator))
+                        _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
                     break;
                 case "Direct3D 9.0":
                     ReshadeManager.UninstallReshader(ReshadeBezelType.opengl, path);
-                    if (!ReshadeManager.Setup(ReshadeBezelType.d3d9, ReshadePlatform.x64, system, rom, path, resolution))
-                        _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+                    if (!ReshadeManager.Setup(ReshadeBezelType.d3d9, ReshadePlatform.x64, system, rom, path, resolution, emulator))
+                        _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
                     break;
                 case "GDI":
                     ReshadeManager.UninstallReshader(ReshadeBezelType.d3d9, path);
@@ -170,21 +178,24 @@ namespace EmulatorLauncher
                 video["Shader"] = "None";
 
             BindBoolFeature(video, "ColorBleed", "ares_colobleed", "true", "false");
-            BindBoolFeature(video, "ColorEmulation", "ares_coloremulation", "false", "true");
-            BindBoolFeature(video, "InterframeBlending", "ares_interframe_blend", "false", "true");
+            BindBoolFeatureOn(video, "ColorEmulation", "ares_coloremulation", "true", "false");
+            BindBoolFeatureOn(video, "InterframeBlending", "ares_interframe_blend", "true", "false");
             BindBoolFeature(video, "Overscan", "ares_overscan", "true", "false");
             BindBoolFeature(video, "PixelAccuracy", "ares_pixel_accurate", "true", "false");
             BindFeature(video, "Quality", "ares_n64_quality", "SD");
+            BindFeatureSlider(video, "Luminance", "ares_luminance", "1.0", 2);
+            BindFeatureSlider(video, "Saturation", "ares_saturation", "1.0", 2);
+            BindFeatureSlider(video, "Gamma", "ares_gamma", "1.0", 2);
 
             if (!SystemConfig.isOptSet("ares_n64_quality") || SystemConfig["ares_n64_quality"] == "SD")
                     video["Supersampling"] = "false";
             else
                 BindBoolFeature(video, "Supersampling", "ares_supersampling", "true", "false");
             
-            bool supersample = SystemConfig.isOptSet("ares_supersampling") && SystemConfig.getOptBoolean("ares_supersampling");
+            bool supersample = SystemConfig.getOptBoolean("ares_supersampling");
 
             if (!supersample)
-                BindBoolFeature(video, "WeaveDeinterlacing", "ares_weavedeinterlacing", "false", "true");
+                BindBoolFeatureOn(video, "WeaveDeinterlacing", "ares_weavedeinterlacing", "true", "false");
             else
                 video["WeaveDeinterlacing"] = "false";
 
@@ -222,6 +233,10 @@ namespace EmulatorLauncher
             // Current rom path
             var aresCore = bml.GetOrCreateContainer(core);
             aresCore["Path"] = Path.GetDirectoryName(rom).Replace("\\", "/") + "/";
+
+            // N64 expansion pak
+            var n64bml = bml.GetOrCreateContainer("Nintendo64");
+            BindBoolFeatureOn(n64bml, "ExpansionPak", "ares_ExpansionPak", "true", "false");
         }
 
         private void WriteKeyboardHotkeys(BmlFile bml)
@@ -340,8 +355,8 @@ namespace EmulatorLauncher
                 string biospcecd = Path.Combine(AppConfig.GetFullPath("bios"), "syscard3.pce");
                 if (File.Exists(biospcecd))
                 {
-                    firmware["BIOS.US"] = biospcecd.Replace("\\", "/");
-                    firmware["BIOS.Japan"] = biospcecd.Replace("\\", "/");
+                    firmware["System-Card-3.0.US"] = biospcecd.Replace("\\", "/");
+                    firmware["System-Card-3.0.Japan"] = biospcecd.Replace("\\", "/");
                 }
             }
 
@@ -391,13 +406,8 @@ namespace EmulatorLauncher
 
             if (ret == 1)
             {
-                ReshadeManager.UninstallReshader(ReshadeBezelType.d3d9, _path);
-                ReshadeManager.UninstallReshader(ReshadeBezelType.opengl, _path);
                 return 0;
             }
-
-            ReshadeManager.UninstallReshader(ReshadeBezelType.d3d9, _path);
-            ReshadeManager.UninstallReshader(ReshadeBezelType.opengl, _path);
 
             return ret;
         }

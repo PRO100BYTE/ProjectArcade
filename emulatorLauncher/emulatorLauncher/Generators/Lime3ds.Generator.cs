@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.Joysticks;
 using EmulatorLauncher.Common.FileFormats;
+using System.Linq;
+using EmulatorLauncher.Common.EmulationStation;
 
 namespace EmulatorLauncher
 {
@@ -15,14 +18,20 @@ namespace EmulatorLauncher
         }
 
         private SdlVersion _sdlVersion = SdlVersion.SDL2_30;
+        private BezelFiles _bezelFileInfo;
+        private ScreenResolution _resolution;
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
+            SimpleLogger.Instance.Info("[Generator] Getting " + emulator + " path and executable name.");
+
             string path = AppConfig.GetFullPath(emulator);
 
-            string exe = Path.Combine(path, "lime3ds-gui.exe");
+            string exe = Path.Combine(path, "lime3ds.exe");
             if (!File.Exists(exe))
-                exe = Path.Combine(path, "lime3ds-qt.exe");
+                exe = Path.Combine(path, "lime3ds-gui.exe");    // old executable name
+            if (!File.Exists(exe))
+                exe = Path.Combine(path, "lime-qt.exe");    // even older executable name
 
             if (!File.Exists(exe))
                 return null;
@@ -41,13 +50,36 @@ namespace EmulatorLauncher
             if (File.Exists(sdl2))
                 _sdlVersion = SdlJoystickGuidManager.GetSdlVersion(sdl2);
 
-            SetupConfigurationLime3ds(path, fullscreen);
+            string[] extensions = new string[] { ".3ds", ".3dsx", ".elf", ".axf", ".cci", ".cxi", ".app" };
+            if (Path.GetExtension(rom).ToLowerInvariant() == ".zip" || Path.GetExtension(rom).ToLowerInvariant() == ".7z" || Path.GetExtension(rom).ToLowerInvariant() == ".squashfs")
+            {
+                string uncompressedRomPath = this.TryUnZipGameIfNeeded(system, rom, false, false);
+                if (Directory.Exists(uncompressedRomPath))
+                {
+                    string[] romFiles = Directory.GetFiles(uncompressedRomPath, "*.*", SearchOption.AllDirectories).OrderBy(file => Array.IndexOf(extensions, Path.GetExtension(file).ToLowerInvariant())).ToArray();
+                    rom = romFiles.FirstOrDefault(file => extensions.Any(ext => Path.GetExtension(file).Equals(ext, StringComparison.OrdinalIgnoreCase)));
+                    ValidateUncompressedGame();
+                }
+            }
+
+            SetupConfigurationLime3ds(path, rom, fullscreen);
+
+            if (fullscreen)
+            {
+                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
+                _resolution = resolution;
+                if (_bezelFileInfo != null && _bezelFileInfo.PngFile != null)
+                    SimpleLogger.Instance.Info("[INFO] Bezel file selected : " + _bezelFileInfo.PngFile);
+            }
+
+            if (Path.GetExtension(rom).ToLowerInvariant() == ".m3u")
+                rom = File.ReadAllText(rom);
 
             List<string> commandArray = new List<string>();
             if (fullscreen)
                 commandArray.Add("-f");
             
-            commandArray.Add("-g");
+            //commandArray.Add("-g");
             commandArray.Add("\"" + rom + "\"");
 
             string args = string.Join(" ", commandArray);
@@ -60,18 +92,35 @@ namespace EmulatorLauncher
             };
         }
 
-        private void SetupConfigurationLime3ds(string path, bool fullscreen = true)
+        private void SetupConfigurationLime3ds(string path, string rom, bool fullscreen = true)
         {
             if (SystemConfig.getOptBoolean("disableautoconfig"))
                 return;
 
             string userconfigPath = Path.Combine(path, "user", "config");
             if (!Directory.Exists(userconfigPath))
-                Directory.CreateDirectory(userconfigPath);
+                try { Directory.CreateDirectory(userconfigPath); } catch {}
 
             string conf = Path.Combine(userconfigPath, "qt-config.ini");
             using (var ini = new IniFile(conf))
             {
+                SimpleLogger.Instance.Info("Writing Lime3ds configuration file: " + conf);
+
+                // Define rom path
+                string romPath = Path.GetDirectoryName(rom);
+
+                if (!string.IsNullOrEmpty(romPath))
+                {
+                    ini.WriteValue("UI", "Paths\\gamedirs\\3\\path", romPath.Replace("\\", "/"));
+                    ini.WriteValue("UI", "Paths\\gamedirs\\3\\deep_scan\\default", "false");
+                    ini.WriteValue("UI", "Paths\\gamedirs\\3\\deep_scan", "true");
+                }
+                
+                int gameDirsSize = ini.GetValue("UI", "Paths\\gamedirs\\size").ToInteger();
+                if (gameDirsSize < 3)
+                    ini.WriteValue("UI", "Paths\\gamedirs\\size", "3");
+                
+                // Write settings
                 ini.WriteValue("UI", "Updater\\check_for_update_on_start\\default", "false");
                 ini.WriteValue("UI", "Updater\\check_for_update_on_start", "false");
 
@@ -147,8 +196,8 @@ namespace EmulatorLauncher
                 {
                     if (SystemConfig.isOptSet("lime_resolution_factor"))
                     {
-                        ini.WriteValue("Renderer", "resolution_factor\\default", SystemConfig["lime_resolution_factor"] == "1" ? "true" : "false");
-                        ini.WriteValue("Renderer", "resolution_factor", SystemConfig["lime_resolution_factor"]);
+                        ini.WriteValue("Renderer", "resolution_factor\\default", SystemConfig["lime_resolution_factor"].ToIntegerString() == "1" ? "true" : "false");
+                        ini.WriteValue("Renderer", "resolution_factor", SystemConfig["lime_resolution_factor"].ToIntegerString());
                     }
                     else
                     {
@@ -177,6 +226,7 @@ namespace EmulatorLauncher
                     {
                         ini.WriteValue("Layout", "layout_option\\default", "false");
                         ini.WriteValue("Layout", "layout_option", SystemConfig["lime_layout_option"]);
+                        SimpleLogger.Instance.Info("[INFO] Setting layout option to : " + SystemConfig["lime_layout_option"]);
                     }
                     else
                     {
@@ -216,6 +266,7 @@ namespace EmulatorLauncher
                 {
                     ini.WriteValue("Utility", "custom_textures\\default", "false");
                     ini.WriteValue("Utility", "custom_textures", "true");
+                    SimpleLogger.Instance.Info("[INFO] Custom textures enabled.");
                 }
                 else if (Features.IsSupported("lime_custom_textures"))
                 {
@@ -244,6 +295,8 @@ namespace EmulatorLauncher
             if (!File.Exists(path))
                 return;
 
+            SimpleLogger.Instance.Info("[Generator] Writing to 3DS nand file.");
+
             int langId;
 
             if (SystemConfig.isOptSet("n3ds_language") && !string.IsNullOrEmpty(SystemConfig["n3ds_language"]))
@@ -256,7 +309,10 @@ namespace EmulatorLauncher
 
             var toSet = new byte[] { (byte)langId };
             for (int i = 0; i < toSet.Length; i++)
+            {
                 bytes[128] = toSet[i];
+                bytes[272] = toSet[i];
+            }
 
             File.WriteAllBytes(path, bytes);
         }
@@ -279,6 +335,8 @@ namespace EmulatorLauncher
                 { "ru", 10 },
             };
 
+            SimpleLogger.Instance.Info("[Generator] Getting language from RetroBat language.");
+
             // Special case for Taiwanese which is zh_TW
             if (SystemConfig["Language"] == "zh_TW")
                 return 11;
@@ -291,6 +349,23 @@ namespace EmulatorLauncher
             }
 
             return 1;
+        }
+
+        public override int RunAndWait(ProcessStartInfo path)
+        {
+            FakeBezelFrm bezel = null;
+
+            if (_bezelFileInfo != null)
+                bezel = _bezelFileInfo.ShowFakeBezel(_resolution);
+
+            int ret = base.RunAndWait(path);
+
+            bezel?.Dispose();
+
+            if (ret == 1)
+                return 0;
+
+            return ret;
         }
     }
 }

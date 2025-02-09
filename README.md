@@ -4,7 +4,7 @@
 </h1>
 
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)   [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)   [![Based on RetroBat](https://img.shields.io/badge/RetroBat%20-%20Based%20on?logoColor=brightgreen&label=Based%20on&link=https%3A%2F%2Fgithub.com%2FRetroBat-Official)](https://github.com/retrobat-official)
-   [![itch.io](https://img.shields.io/badge/Itch.io-FA5C5C?logo=itchdotio&logoColor=white)](https://thedayg0ne.itch.io/projectarcade)   [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)   [![GitHub release](https://img.shields.io/github/v/release/PRO100BYTE/ProjectArcade?display_name=release)](https://github.com/PRO100BYTE/ProjectArcade/releases)
+   [![itch.io](https://img.shields.io/badge/Itch.io-FA5C5C?logo=itchdotio&logoColor=white)](https://thedayg0ne.itch.io/projectarcade)   [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)   [![GitHub release](https://img.shields.io/github/v/release/PRO100BYTE/ProjectArcade?display_name=release)](https://github.com/PRO100BYTE/ProjectArcade/releases)   [![Download ProjectArcade](https://img.shields.io/sourceforge/dm/projectarcade.svg)](https://sourceforge.net/projects/projectarcade/files/latest/download)
 
 ProjectArcade is a software for 64-bit versions of Windows designed for retro-gaming and running various emulators of gaming systems.
 
@@ -63,9 +63,9 @@ ProjectArcade License Agreement
 ProjectArcade is a software for 64-bit versions of Windows designed for retro-gaming and running various emulators of gaming systems.
 
 Copyright (c) 2017-2019 Adrien Chalard "Kayl"\
-Copyright (c) 2020-2024 RetroBat Team\
+Copyright (c) 2020-2025 RetroBat Team\
 Copyright (c) 2022-2023 #TheDayG0ne\
-Copyright (c) 2023-2024 PRO100BYTE Team
+Copyright (c) 2023-2025 PRO100BYTE Team
 
 ProjectArcade is a free open source project based on the Open-Source EmulationStation, emulatorLauncher and RetroBat projects. The software was developed by enthusiasts for non-commercial use, namely a fun pastime. All code written by #TheDayG0ne, Adrien Chalard "Kayl", the RetroBat team and the PRO100BYTE Team, unless licensed under the source project's license, is licensed under the LGPL v3.
 
@@ -87,7 +87,7 @@ A small easter egg for the guys from the RetroBat team: you are the best :)
 
 ## © Credits
 
-- RetroBat (c) 2017-2019 Adrien Chalard "Kayl", 2020-2024 RetroBat Team (LGPL v3 and CC BY-NC-SA 4.0 License)
+- RetroBat (c) 2017-2019 Adrien Chalard "Kayl", 2020-2025 RetroBat Team (LGPL v3 and CC BY-NC-SA 4.0 License)
 - EmulationStation (C) 2014 Alec Lofquist, contributions from community (MIT License).
 - EmulatorLauncher (C) Fabrice Caruso, RetroBat Team
 - Carbon Theme (c) Fabrice Caruso (CC BY-NC-SA License). Originally based on the work of Eric Hettervik (Original Carbon Theme) and Nils Bonenberger (Simple Theme).

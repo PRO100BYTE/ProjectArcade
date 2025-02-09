@@ -2,7 +2,7 @@
 
 The official bezels ProjectArcade uses for its decoration sets, forked from Batocera's decorations sets.
 
-These are bundled with every install of ProjectArcade and can be selected by the user from **MAIN MENU** -> **GAME SETTINGS** -> **DEROCATION SET**.
+These are bundled with every install of ProjectArcade and can be selected by the user from **MAIN MENU** -> **GAME SETTINGS** -> **DECORATION SET**.
 
 Each folder contains the "fallback" bezel in its root directory, and a bezel for each system in its system subfolder.
 

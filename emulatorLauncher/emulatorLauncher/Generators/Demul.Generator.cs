@@ -22,6 +22,8 @@ namespace EmulatorLauncher
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
+            SimpleLogger.Instance.Info("[Generator] Getting " + emulator + " path and executable name.");
+
             string folderName = (emulator == "demul-old" || core == "demul-old") ? "demul-old" : "demul";
             if (folderName == "demul-old")
                 _oldVersion = true;
@@ -30,18 +32,25 @@ namespace EmulatorLauncher
             if (string.IsNullOrEmpty(path))
                 path = AppConfig.GetFullPath("demul");
 
+            if (!Directory.Exists(path))
+                return null;
+
             string exe = Path.Combine(path, "demul.exe");
             if (!File.Exists(exe))
                 return null;
 
             string demulCore = GetDemulCore(emulator, core, system);
 
+            bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
+            if (!fullscreen)
+                SystemConfig["forceNoBezel"] = "true";
+
             // Allow fake decorations if ratio is set to 4/3, otherwise disable bezels
             if (SystemConfig.isOptSet("demul_ratio") && SystemConfig["demul_ratio"] != "1")
                 SystemConfig["bezel"] = "none";
 
-            var bezels = BezelFiles.GetBezelFiles(system, rom, resolution);
-            _isUsingReshader = ReshadeManager.Setup(ReshadeBezelType.dxgi, ReshadePlatform.x86, system, rom, path, resolution, bezels != null);
+            var bezels = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
+            _isUsingReshader = ReshadeManager.Setup(ReshadeBezelType.dxgi, ReshadePlatform.x86, system, rom, path, resolution, emulator, bezels != null);
             if (_isUsingReshader)
             {
                 if (bezels != null)
@@ -109,6 +118,12 @@ namespace EmulatorLauncher
 
                     ini.WriteValue("files", "romsPathsCount", romsPaths.Count.ToString());
 
+                    var savesPath = Path.Combine(AppConfig.GetFullPath("saves"), "dreamcast", system, "nvram");
+                    if (!Directory.Exists(savesPath))
+                        try { Directory.CreateDirectory(savesPath); } catch { }
+
+                    ini.WriteValue("files", "nvram", savesPath);
+
                     // Plugins
                     ini.WriteValue("plugins", "directory", @".\plugins\");
 
@@ -119,7 +134,7 @@ namespace EmulatorLauncher
                         gpu = "gpuDX11old.dll";
                     }
 
-                    if (Features.IsSupported("internal_resolution") && SystemConfig.isOptSet("internal_resolution") && SystemConfig["internal_resolution"] != "1")
+                    if (Features.IsSupported("internal_resolution") && SystemConfig.isOptSet("internal_resolution") && !SystemConfig["internal_resolution"].StartsWith("1.0"))
                     {
                         _videoDriverName = "gpuDX11old";
                         gpu = "gpuDX11old.dll";
@@ -161,7 +176,7 @@ namespace EmulatorLauncher
                     else if (Features.IsSupported("dc_broadcast"))
                         ini.WriteValue("main", "broadcast", "1");
 
-                    ini.WriteValue("main", "timehack", SystemConfig["timehack"] != "false" ? "true" : "false");
+                    BindBoolIniFeatureOn(ini, "main", "timehack", "timehack", "true", "false");
                     ini.WriteValue("main", "VMUscreendisable", "true");
                     ini.WriteValue("main", "PausedIfFocusLost", "true");
 
@@ -191,11 +206,11 @@ namespace EmulatorLauncher
                 using (var ini = new IniFile(iniFile, IniOptions.UseSpaces))
                 {
                     ini.WriteValue("main", "UseFullscreen", _isUsingReshader ? "1" : "0");
-                    ini.WriteValue("main", "Vsync", SystemConfig["VSync"] != "false" ? "1" : "0");
+                    BindBoolIniFeatureOn(ini, "main", "Vsync", "VSync", "1", "0");
                     ini.WriteValue("resolution", "Width", resolution.Width.ToString());
                     ini.WriteValue("resolution", "Height", resolution.Height.ToString());
 
-                    BindIniFeature(ini, "main", "scaling", "internal_resolution", "1");
+                    BindIniFeatureSlider(ini, "main", "scaling", "internal_resolution", "1");
                     BindIniFeature(ini, "main", "aspect", "demul_ratio", "1");
 
                     if (SystemConfig.isOptSet("smooth"))
@@ -288,6 +303,12 @@ namespace EmulatorLauncher
 
             if (process != null)
             {
+                if (!_isUsingReshader)
+                {
+                    System.Threading.Thread.Sleep(2000);
+                    SendKeys.SendWait("%~");
+                }
+
                 process.WaitForExit();
 
                 bezel?.Dispose();

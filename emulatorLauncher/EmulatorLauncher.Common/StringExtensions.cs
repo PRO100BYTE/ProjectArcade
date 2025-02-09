@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -63,10 +64,36 @@ namespace EmulatorLauncher.Common
             return ret;
         }
 
+        public static ulong ToUlong(this string value)
+        {
+            ulong ret = 0;
+            ulong.TryParse(value, out ret);
+            return ret;
+        }
+
+        public static string ToIntegerString(this string value)  // To be used with sliders as they save by default with .000000 decimals
+        {
+            double parsedValue;
+
+            if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out parsedValue))
+            {
+                return ((int)parsedValue).ToString();
+            }
+
+            return value;
+        }
+
         public static float ToFloat(this string value)
         {
             float ret = 0;
             float.TryParse(value,System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out ret);
+            return ret;
+        }
+
+        public static double ToDouble(this string value)
+        {
+            double ret = 0;
+            double.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out ret);
             return ret;
         }
 

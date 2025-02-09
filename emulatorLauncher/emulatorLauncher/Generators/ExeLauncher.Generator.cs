@@ -22,7 +22,9 @@ namespace EmulatorLauncher
         private string _systemName;
         private string _exename = null;
         private bool _isGameExePath;
+        private bool _steamRun = false;
         private bool _exeFile;
+        private bool _nonSteam = false;
 
         private GameLauncher _gameLauncher;
 
@@ -49,31 +51,31 @@ namespace EmulatorLauncher
 
             if (extension == ".lnk")
             {
+                SimpleLogger.Instance.Info("[INFO] link file, searching for target.");
                 string target = FileTools.GetShortcutTarget(rom);
-                
+
+                string executableFile = Path.Combine(Path.GetDirectoryName(rom), Path.GetFileNameWithoutExtension(rom) + ".gameexe");
+
                 if (target != "" && target != null)
+                {
                     _isGameExePath = File.Exists(target);
-                
+                    
+                    if (_isGameExePath)
+                        SimpleLogger.Instance.Info("[INFO] Link target file found.");
+                    
+                    // executable process to monitor might be different from the target - user can specify true process executable in a .gameexe file
+                    _exeFile = GetProcessFromFile(rom);
+                }
+
                 // if the target is not found in the link, see if a .gameexe file or a .uwp file exists
                 else
                 {
-                    string executableFile = Path.Combine(Path.GetDirectoryName(rom), Path.GetFileNameWithoutExtension(rom) + ".gameexe");
-                    string uwpexecutableFile = Path.Combine(Path.GetDirectoryName(rom), Path.GetFileNameWithoutExtension(rom) + ".uwp");
-
                     // First case : use has directly specified the executable name in a .gameexe file
-                    if (File.Exists(executableFile))
-                    {
-                        var lines = File.ReadAllLines(executableFile);
-                        if (lines.Length > 0)
-                        {
-                            _exename = lines[0];
-                            _exeFile = true;
-                            SimpleLogger.Instance.Info("[INFO] Executable name specified in .gameexe file: " + _exename);
-                        }
-                    }
+                    _exeFile = GetProcessFromFile(rom);
 
                     // Second case : user has specified the UWP app name in a .uwp file
-                    else if (File.Exists(uwpexecutableFile))
+                    string uwpexecutableFile = Path.Combine(Path.GetDirectoryName(rom), Path.GetFileNameWithoutExtension(rom) + ".uwp");
+                    if (File.Exists(uwpexecutableFile) && !_exeFile)
                     {
                         var romLines = File.ReadAllLines(uwpexecutableFile);
                         if (romLines.Length > 0)
@@ -119,38 +121,90 @@ namespace EmulatorLauncher
                         }
                     }
 
-                    else
-                    {
+                    else if (!_exeFile)
                         SimpleLogger.Instance.Info("[INFO] Impossible to find executable name, using rom file name.");
-                    }
                 }
 
                 if (_isGameExePath)
                 {
                     rom = target;
                     path = Path.GetDirectoryName(target);
+
+                    SimpleLogger.Instance.Info("[INFO] New ROM : " + rom);
                 }
             }
 
             // Define if shortcut is an EpicGame or Steam shortcut
-            if (extension == ".url")
+            else if (extension == ".url")
             {
-                try
-                {
-                    var uri = new Uri(IniFile.FromFile(rom).GetValue("InternetShortcut", "URL"));
+                // executable process to monitor might be different from the target - user can specify true process executable in a .gameexe file
+                _exeFile = GetProcessFromFile(rom);
 
-                    if (launchers.TryGetValue(uri.Scheme, out Func<Uri, GameLauncher> gameLauncherInstanceBuilder))
-                        _gameLauncher = gameLauncherInstanceBuilder(uri);
-                }
-                catch (Exception ex)
+                if (!_exeFile)
                 {
-                    SetCustomError(ex.Message);
-                    SimpleLogger.Instance.Error("[ExeLauncherGenerator] " + ex.Message, ex);
-                    return null;
+                    try
+                    {
+                        var uri = new Uri(IniFile.FromFile(rom).GetValue("InternetShortcut", "URL"));
+
+                        if (launchers.TryGetValue(uri.Scheme, out Func<Uri, GameLauncher> gameLauncherInstanceBuilder))
+                            _gameLauncher = gameLauncherInstanceBuilder(uri);
+                    }
+                    catch (Exception ex)
+                    {
+                        SetCustomError(ex.Message);
+                        SimpleLogger.Instance.Error("[ExeLauncherGenerator] " + ex.Message, ex);
+                        return null;
+                    }
+                }
+
+                // Run Steam games via their shortcuts and not just run the .url file
+                var urlLines = File.ReadAllLines(rom);
+
+                if (urlLines.Length > 0)
+                {
+                    // Get URL to run and add -silent argument
+                    if (urlLines.Any(l => l.StartsWith("URL=steam://rungameid")))
+                    {
+                        string urlline = urlLines.FirstOrDefault(l => l.StartsWith("URL=steam"));
+                        if (!string.IsNullOrEmpty(urlline) && !urlline.Contains("-silent"))
+                        {
+                            for (int i = 0; i < urlLines.Length; i++)
+                            {
+                                if (urlLines[i].StartsWith("URL="))
+                                {
+                                    string temp = urlLines[i];
+                                    urlLines[i] = urlLines[i] + "\"" + " -silent";
+                                }
+                            }
+                            try
+                            {
+                                File.WriteAllLines(rom, urlLines);
+                            }
+                            catch { }
+
+                            _steamRun = true;
+                        }
+                    }
+
+                    // Get executable name from icon path
+                    if (string.IsNullOrEmpty(_exename) && urlLines.Any(l => l.StartsWith("IconFile")))
+                    {
+                        string iconline = urlLines.FirstOrDefault(l => l.StartsWith("IconFile"));
+                        if (iconline.EndsWith(".exe"))
+                        {
+                            string iconPath = iconline.Substring(9, iconline.Length - 9);
+                            _exename = Path.GetFileNameWithoutExtension(iconPath);
+                            if (!string.IsNullOrEmpty(_exename))
+                            {
+                                _nonSteam = true;
+                                SimpleLogger.Instance.Info("[STEAM] Found name of executable from icon info: " + _exename);
+                            }
+                        }
+                    }
                 }
             }
 
-            if (extension == ".game")
+            else if (extension == ".game")
             {
                 string linkTarget = null;
                 string [] lines = File.ReadAllLines(rom);
@@ -226,7 +280,7 @@ namespace EmulatorLauncher
                 }
             }
 
-            if (!File.Exists(rom))
+            if (!File.Exists(rom) && !_steamRun)
                 return null;
 
             if (Path.GetExtension(rom).ToLower() == ".m3u")
@@ -240,7 +294,7 @@ namespace EmulatorLauncher
             }
 
             UpdateMugenConfig(path, fullscreen, resolution);
-            UpdateIkemenConfig(path, system, rom, fullscreen, resolution);
+            UpdateIkemenConfig(path, system, rom, fullscreen, resolution, emulator);
 
             var ret = new ProcessStartInfo()
             {
@@ -252,12 +306,13 @@ namespace EmulatorLauncher
                 ret.Arguments = arguments;
 
             string ext = Path.GetExtension(rom).ToLower();
+            
             if (ext == ".bat" || ext == ".cmd")
             {
                 ret.WindowStyle = ProcessWindowStyle.Hidden;
                 ret.UseShellExecute = true;
             }
-            else if (string.IsNullOrEmpty(_exename))
+            else if (string.IsNullOrEmpty(_exename) && _gameLauncher == null)
             {
                 _exename = Path.GetFileNameWithoutExtension(rom);
                 SimpleLogger.Instance.Info("[INFO] Executable name : " + _exename);
@@ -327,20 +382,21 @@ namespace EmulatorLauncher
 
                 //ini.WriteValue("Video", "Width", resolution.Width.ToString());
                 //ini.WriteValue("Video", "Height", resolution.Height.ToString());
-                ini.WriteValue("Video", "VRetrace", SystemConfig["VRetrace"] != "false" ? "1" : "0");
+
+                BindBoolIniFeatureOn(ini, "Video", "VRetrace", "VRetrace", "1", "0");
                 ini.WriteValue("Video", "FullScreen", fullscreen ? "1" : "0");
 
             }
         }
 
-        private void UpdateIkemenConfig(string path, string system, string rom, bool fullscreen, ScreenResolution resolution)
+        private void UpdateIkemenConfig(string path, string system, string rom, bool fullscreen, ScreenResolution resolution, string emulator)
         {
             if (_systemName != "ikemen")
                 return;
 
             var json = DynamicJson.Load(Path.Combine(path, "save", "config.json"));
 
-            ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution);
+            ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution, emulator);
 
             if (resolution == null)
                 resolution = ScreenResolution.CurrentResolution;
@@ -379,10 +435,27 @@ namespace EmulatorLauncher
                 json["GameHeight"] = resolution.Height.ToString();
             }
 
-            BindFeature(json, "VRetrace", "VRetrace", "1");
+            BindBoolFeatureOn(json, "VRetrace", "VRetrace", "1", "0");
 
             json.Save();
+        }
 
+        private bool GetProcessFromFile(string rom)
+        {
+            string executableFile = Path.Combine(Path.GetDirectoryName(rom), Path.GetFileNameWithoutExtension(rom) + ".gameexe");
+
+            if (!File.Exists(executableFile))
+                return false;
+
+            var lines = File.ReadAllLines(executableFile);
+            if (lines.Length < 1)
+                return false;
+            else
+            {
+                _exename = lines[0].ToString();
+                SimpleLogger.Instance.Info("[INFO] Executable name specified in .gameexe file: " + _exename);
+                return true;
+            }
         }
 
         static string GetStoreAppVersion(string appName)
@@ -405,22 +478,41 @@ namespace EmulatorLauncher
             return output;
         }
 
+        string[] launcherPprocessNames = { "Amazon Games UI", "EADesktop", "EpicGamesLauncher", "steam" };
+
         public override int RunAndWait(ProcessStartInfo path)
         {
-            if (_isGameExePath || _exeFile)
+            if (_isGameExePath || _exeFile || _nonSteam)
             {
+                Dictionary<string, bool> launcherProcessStatusBefore = new Dictionary<string, bool>();
+                Dictionary<string, bool> launcherProcessStatusAfter = new Dictionary<string, bool>();
+                
+                foreach (string processName in launcherPprocessNames)
+                {
+                    bool uiExists = Process.GetProcessesByName(processName).Any();
+
+                    if (uiExists)
+                        launcherProcessStatusBefore.Add(processName, true);
+                }
+
+                int waitttime = 30;
+                if (Program.SystemConfig.isOptSet("steam_wait") && !string.IsNullOrEmpty(Program.SystemConfig["steam_wait"]))
+                    waitttime = Program.SystemConfig["steam_wait"].ToInteger();
+                SimpleLogger.Instance.Info("[INFO] Starting process, waiting " + waitttime.ToString() + " seconds for the game to run before returning to Game List");
+
                 Process process = Process.Start(path);
                 SimpleLogger.Instance.Info("Process started : " + _exename);
                 
-                Thread.Sleep(8000);
-                
+                Thread.Sleep(4000);
+
                 int i = 1;
+
                 Process[] gamelist = Process.GetProcessesByName(_exename);
 
-                while (i <= 3 && gamelist.Length == 0)
+                while (i <= waitttime && gamelist.Length == 0)
                 {
                     gamelist = Process.GetProcessesByName(_exename);
-                    Thread.Sleep(10000);
+                    Thread.Sleep(1000);
                     i++;
                 }
 
@@ -432,10 +524,35 @@ namespace EmulatorLauncher
 
                 else
                 {
+                    foreach (string processName in launcherPprocessNames)
+                    {
+                        bool uihasStarted = Process.GetProcessesByName(processName).Any();
+
+                        if (uihasStarted)
+                            launcherProcessStatusAfter.Add(processName, true);
+                    }
+
                     SimpleLogger.Instance.Info("Process : " + _exename + " found, waiting to exit");
                     Process game = gamelist.OrderBy(p => p.StartTime).FirstOrDefault();
                     game.WaitForExit();
                 }
+
+                foreach (var processName in launcherProcessStatusAfter)
+                {
+                    if (!launcherProcessStatusBefore.ContainsKey(processName.Key) || Program.SystemConfig.getOptBoolean("killsteam"))
+                    {
+                        foreach (var ui in Process.GetProcessesByName(processName.Key))
+                        {
+                            try
+                            {
+                                SimpleLogger.Instance.Info("[INFO] Killing process " + processName.Key);
+                                ui.Kill();
+                            }
+                            catch { }
+                        }
+                    }
+                }
+
                 return 0;
             }
 
@@ -490,18 +607,24 @@ namespace EmulatorLauncher
 
             protected Process GetLauncherExeProcess()
             {
-                Process epicGame = null;
+                Process launcherprocess = null;
 
-                for (int i = 0; i < 30; i++)
+                int waitttime = 30;
+                if (Program.SystemConfig.isOptSet("steam_wait") && !string.IsNullOrEmpty(Program.SystemConfig["steam_wait"]))
+                    waitttime = Program.SystemConfig["steam_wait"].ToInteger();
+
+                SimpleLogger.Instance.Info("[INFO] Starting process, waiting " + waitttime.ToString() + " seconds for the game to run before returning to Game List");
+
+                for (int i = 0; i < waitttime; i++)
                 {
-                    epicGame = Process.GetProcessesByName(LauncherExe).FirstOrDefault();
-                    if (epicGame != null)
+                    launcherprocess = Process.GetProcessesByName(LauncherExe).FirstOrDefault();
+                    if (launcherprocess != null)
                         break;
 
                     Thread.Sleep(1000);
                 }
 
-                return epicGame;
+                return launcherprocess;
             }
         }
     }

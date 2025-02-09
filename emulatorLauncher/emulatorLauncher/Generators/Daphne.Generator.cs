@@ -46,11 +46,29 @@ namespace EmulatorLauncher
                 else
                     commandArray.Add("-force_aspect_ratio");
 
+                if (SystemConfig.isOptSet("hypseus_scalefactor") && !string.IsNullOrEmpty(SystemConfig["hypseus_scalefactor"]) && SystemConfig["hypseus_scalefactor"].Substring(0, 3) != "100")
+                {
+                    string xString = SystemConfig["hypseus_scalefactor"].Substring(0, 3);
+                    int x;
+                    if (int.TryParse(xString, out x))
+                    {
+                        if (x != 0)
+                        {
+                            int result = (int)Math.Round((100.0 * 100.0) / x);
+                            commandArray.Add("-scalefactor");
+                            commandArray.Add(result.ToString());
+                        }
+                    }
+                }
+
                 if (SystemConfig.isOptSet("hypseus_renderer") && SystemConfig["hypseus_renderer"] == "vulkan")
                 {
                     commandArray.Remove("-opengl");
                     commandArray.Add("-vulkan");
                 }
+
+                if (SystemConfig.isOptSet("hypseus_crosshair") && !SystemConfig.getOptBoolean("hypseus_crosshair"))
+                    commandArray.Add("-nocrosshair");
 
                 return;
             }
@@ -83,6 +101,8 @@ namespace EmulatorLauncher
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
+            SimpleLogger.Instance.Info("[Generator] Getting " + emulator + " path and executable name.");
+
             rom = this.TryUnZipGameIfNeeded(system, rom);
 
             string romName = Path.GetFileNameWithoutExtension(rom);
@@ -172,6 +192,7 @@ namespace EmulatorLauncher
                 }
                 catch { }
 
+                SimpleLogger.Instance.Info("[Generator] Creating symbolic link for " + rom + " to " + _symLink);
                 FileTools.CreateSymlink(_symLink, rom, true);
 
                 if (!Directory.Exists(_symLink))
@@ -226,36 +247,69 @@ namespace EmulatorLauncher
             commandArray.Add("-opengl");            
             commandArray.Add("-fastboot");
 
-            if (SystemConfig.getOptBoolean("daphne_vsync") && emulator == "hypseus")
+            if (emulator == "hypseus" && SystemConfig.isOptSet("daphne_vsync") && !SystemConfig.getOptBoolean("daphne_vsync"))
                 commandArray.Add("-novsync");
 
             UpdateCommandline(commandArray);       
             
             // The folder may have a file with the game name and .commands with extra arguments to run the game.
-            if (_executableName == "daphne" && File.Exists(commandsFile))
+            if (File.Exists(commandsFile))
             {
                 string[] file = File.ReadAllText(commandsFile).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 for (int i = 0; i < file.Length; i++)
                 {
                     string s = file[i];
 
-                    if (s == "singe" && commandArray[0] != "singe")
+                    if (_executableName == "daphne")
                     {
-                        commandArray[0] = "singe";
-                        continue;
+                        if (s == "singe" && commandArray[0] != "singe")
+                        {
+                            commandArray[0] = "singe";
+                            continue;
+                        }
+
+                        if (s == romName || s == "singe" || s == "vdlp" || s == "-fullscreen" ||
+                            s == "-opengl" || s == "-vulkan" || s == "-fastboot" || s == "-retropath" || s == "-manymouse" || s == "-ignore_aspect_ratio")
+                            continue;
+
+                        if (s == "-x" || s == "-y" || s == "-framefile" || s == "-script" || s == "script" || s == "-useoverlaysb" || s == "-homedir" || s == "-datadir")
+                        {
+                            i++;
+                            continue;
+                        }
+
+                        commandArray.Add(s);
                     }
-
-                    if (s == romName || s == "singe" || s == "vdlp" || s == "-fullscreen" || 
-                        s == "-opengl" || s == "-vulkan" || s == "-fastboot" || s == "-retropath" || s == "-manymouse")
-                        continue;
-
-                    if (s == "-x" || s == "-y" || s == "-framefile" || s == "-script" || s == "script" || s == "-useoverlaysb" || s == "-homedir" || s == "-datadir")
+                    
+                    else if (_executableName == "hypseus")
                     {
-                        i++;
-                        continue;
-                    }
+                        if (s == "singe" && commandArray[0] != "singe")
+                        {
+                            commandArray[0] = "singe";
+                            continue;
+                        }
 
-                    commandArray.Add(s);
+                        if (s == romName || s == "singe" || s == "vdlp" || s == "-fullscreen" ||
+                            s == "-opengl" || s == "-vulkan" || s == "-fastboot" || s == "-retropath" || s == "-manymouse" || s == "force_aspect_ratio" || 
+                            s == "-ignore_aspect_ratio" || s == " - novsync" || s == "-nolinear_scale" || s == "-nocrosshair")
+                            continue;
+
+                        if (s == "-x" || s == "-y" || s == "-framefile" || s == "-script" || s == "script" || s == "-useoverlaysb" || s == "-homedir" ||
+                            s == "-datadir" || s == "-scalefactor")
+                        {
+                            i++;
+                            continue;
+                        }
+
+                        if (s == "-sinden")
+                        {
+                            i++;
+                            i++;
+                            continue;
+                        }
+
+                        commandArray.Add(s);
+                    }
                 }
             }
 
@@ -264,12 +318,12 @@ namespace EmulatorLauncher
                 if (SystemConfig["ratio"] == "16/9")
                     SystemConfig["bezel"] = "none";
 
-                ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadeManager.GetPlatformFromFile(exe), system, rom, emulatorPath, resolution);
+                ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadeManager.GetPlatformFromFile(exe), system, rom, emulatorPath, resolution, emulator);
             }
 
             else if (emulator == "hypseus")
             {
-                BezelFiles bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+                BezelFiles bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
                 if (bezelFileInfo != null)
                 {
                     string bezelFile = bezelFileInfo.PngFile;

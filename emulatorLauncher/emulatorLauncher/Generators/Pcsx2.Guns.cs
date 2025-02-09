@@ -4,6 +4,7 @@ using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.Common.Joysticks;
+using ValveKeyValue;
 
 namespace EmulatorLauncher
 {
@@ -35,8 +36,8 @@ namespace EmulatorLauncher
             pcsx2ini.ClearSection("USB1");
             pcsx2ini.ClearSection("USB2");
 
-            _forceSDL = Program.SystemConfig.isOptSet("input_forceSDL") && Program.SystemConfig.getOptBoolean("input_forceSDL");
-            _forceDInput = Program.SystemConfig.isOptSet("input_forceSDL") && Program.SystemConfig["input_forceSDL"] == "dinput";
+            _forceSDL = Program.SystemConfig.isOptSet("pcsx2_input_driver_force") && Program.SystemConfig.getOptBoolean("pcsx2_input_driver_force");
+            _forceDInput = Program.SystemConfig.isOptSet("pcsx2_input_driver_force") && Program.SystemConfig["pcsx2_input_driver_force"] == "dinput";
 
             SdlToDirectInput dinputController = null;
             string techPadNumber = null;
@@ -198,7 +199,12 @@ namespace EmulatorLauncher
 
             pcsx2ini.WriteValue(usbSection, "guncon2_custom_config", "false");
             pcsx2ini.WriteValue(usbSection, "guncon2_cursor_color", "#ffffff");
-            pcsx2ini.WriteValue(usbSection, "guncon2_cursor_scale", "1.0");
+
+            // crosshair size
+            string crosshairSize = "1.0";
+            if (SystemConfig.isOptSet("pcsx2_crosshair_size") && !string.IsNullOrEmpty(SystemConfig["pcsx2_crosshair_size"]))
+                crosshairSize = SystemConfig["pcsx2_crosshair_size"].Substring(0, SystemConfig["pcsx2_crosshair_size"].Length - 4);
+            pcsx2ini.WriteValue(usbSection, "guncon2_cursor_scale", crosshairSize);
             pcsx2ini.Remove(usbSection, "guncon2_RelativeUp");
             pcsx2ini.Remove(usbSection, "guncon2_RelativeDown");
             pcsx2ini.Remove(usbSection, "guncon2_RelativeLeft");

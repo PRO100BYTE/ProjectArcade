@@ -31,8 +31,8 @@ namespace EmulatorLauncher
             //Applying bezels
             if (fullscreen)
             {
-                if (!ReshadeManager.Setup(ReshadeBezelType.d3d9, ReshadePlatform.x64, system, rom, path, resolution))
-                    _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+                if (!ReshadeManager.Setup(ReshadeBezelType.d3d9, ReshadePlatform.x64, system, rom, path, resolution, emulator))
+                    _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
             }
 
             _resolution = resolution;
@@ -88,7 +88,7 @@ namespace EmulatorLauncher
                 cfg["szAppRomPaths[2]"] = fbneoBiosPath + "\\";
                 cfg["szAppHiscorePath"] = fbneoBiosPath + "\\";
 
-                string cheatsPath = Path.Combine(AppConfig.GetFullPath("cheats"), "fbneo");
+                string cheatsPath = Path.Combine(fbneoBiosPath, "cheats");
                 if (!Directory.Exists(cheatsPath)) try { Directory.CreateDirectory(cheatsPath); }
                     catch { }
                 cfg["szAppCheatsPath"] = cheatsPath + "\\";
@@ -102,6 +102,11 @@ namespace EmulatorLauncher
                 if (!Directory.Exists(eepromPath)) try { Directory.CreateDirectory(eepromPath); }
                     catch { }
                 cfg["szAppEEPROMPath"] = eepromPath + "\\";
+
+                string blendPath = Path.Combine(eepromPath, "blend");
+                if (!Directory.Exists(blendPath)) try { Directory.CreateDirectory(blendPath); }
+                    catch { }
+                cfg["szAppBlendPath"] = blendPath + "\\";
 
                 // Video driver
                 if (SystemConfig.isOptSet("fbneo_renderer") && !string.IsNullOrEmpty(SystemConfig["fbneo_renderer"]))
@@ -135,7 +140,10 @@ namespace EmulatorLauncher
                 if (SystemConfig.isOptSet("fbneo_scanlines") && SystemConfig["fbneo_scanlines"] != "0")
                 {
                     cfg["bVidScanlines"] = "1";
-                    cfg["nVidScanIntensity"] = SystemConfig["fbneo_scanlines"];
+                    if (SystemConfig["fbneo_scanlines"] == "max")
+                        cfg["nVidScanIntensity"] = "0";
+                    else
+                        cfg["nVidScanIntensity"] = SystemConfig["fbneo_scanlines"];
                 }
                 else
                     cfg["bVidScanlines"] = "0";
@@ -146,17 +154,8 @@ namespace EmulatorLauncher
                 else
                     cfg["nAudSelect"] = "0";
 
-                // Force 60Hz
-                if (SystemConfig.isOptSet("fbneo_force60hz") && SystemConfig.getOptBoolean("fbneo_force60hz"))
-                    cfg["bForce60Hz"] = "1";
-                else
-                    cfg["bForce60Hz"] = "0";
-
-                // Run-Ahead
-                if (SystemConfig.isOptSet("fbneo_runahead") && SystemConfig.getOptBoolean("fbneo_runahead"))
-                    cfg["bRunAhead"] = "1";
-                else
-                    cfg["bRunAhead"] = "0";
+                BindBoolFeature(cfg, "bForce60Hz", "fbneo_force60hz", "1", "0");
+                BindBoolFeature(cfg, "bRunAhead", "fbneo_runahead", "1", "0");
 
                 cfg.Save();
             }

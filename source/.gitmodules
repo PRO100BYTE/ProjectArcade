@@ -7,4 +7,6 @@
 [submodule "launcher"]
 	path = launcher
 	url = https://github.com/RetroBat-Official/retrobat-mfa-launcher
-
+[submodule "system/tattoos"]
+	path = system/tattoos
+	url = https://github.com/RetroBat-Official/retrobat-tattoos

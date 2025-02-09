@@ -9,6 +9,8 @@ using System.Xml.Linq;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.Compression;
+using EmulatorLauncher.Common.EmulationStation;
+using static EmulatorLauncher.PadToKeyboard.SendKey;
 
 namespace EmulatorLauncher
 {
@@ -18,106 +20,122 @@ namespace EmulatorLauncher
         {            
             // emulator / installation folder(s) / executable(s)
             // the 7z filename on the website must be the first installation folder name
-
-            { new Installer("arcadeflashweb") },           
-            { new Installer("libretro", "retroarch" ) }, { new Installer("angle", "retroarch" ) }, // "libretro_cores.7z" ???
-            { new Installer("duckstation", new string[] { "duckstation"}, new string[] { "duckstation-qt-x64-ReleaseLTCG.exe" }) },
-            { new Installer("kega-fusion", "kega-fusion", "Fusion.exe") }, 
-            { new Installer("mesen") }, 
-            { new Installer("model3", "supermodel") }, 
-            { new Installer("supermodel") }, 
-            { new Installer("rpcs3") }, { new Installer("ps3", "rpcs3") }, 
-            { new Installer("pcsx2", new string[] { "pcsx2" }, new string[] { "pcsx2-qt.exe", "pcsx2-qtx64.exe", "pcsx2x64.exe" }) },
-            { new Installer("pcsx2-16", "pcsx2-16", "pcsx2.exe") },
-            { new Installer("fpinball", "fpinball", "Future Pinball.exe") }, { new Installer("bam", "fpinball", "Future Pinball.exe") }, 
-            { new Installer("cemu") }, { new Installer("wiiu", "cemu") },
-            { new Installer("applewin") }, { new Installer("apple2", "applewin") },
-            { new Installer("gsplus") }, { new Installer("apple2gs", "gsplus") },             
-            { new Installer("cxbx", new string[] { "cxbx-reloaded", "cxbx-r" }, "cxbx.exe") }, 
-            { new Installer("chihiro", new string[] { "cxbx-reloaded", "cxbx-r" }, "cxbx.exe") }, 
-            { new Installer("xbox", new string[] { "cxbx-reloaded", "cxbx-r" }, "cxbx.exe") },             
-            { new Installer("citra", "citra", "citra-qt.exe") },
-            { new Installer("citra-canary", "citra-canary", "citra-qt.exe") },
-            { new Installer("lime3ds", new string[] { "lime3ds" }, new string[] { "lime-qt.exe", "lime3ds-gui.exe" }) },
-            { new Installer("daphne") },
-            { new Installer("demul") }, 
-            { new Installer("demul-old", "demul-old", "demul.exe") }, 
-            { new Installer("dolphin", new string[] { "dolphin-emu", "dolphin" }, "dolphin.exe") },
-            { new Installer("flycast", "flycast", "flycast.exe") },
-            { new Installer("simple64", "simple64", "simple64-gui.exe") },
-            { new Installer("mupen64", "mupen64", "RMG.exe") },
-            { new Installer("triforce", new string[] { "dolphin-triforce"}, new string[] { "dolphinWX.exe", "dolphin.exe" }) },
-            { new Installer("dosbox") },
-            { new Installer("hypseus", "hypseus", "hypseus.exe") },
-            { new Installer("love") }, 
-            { new Installer("m2emulator", "m2emulator", "emulator_multicpu.exe") },
-            { new Installer("mednafen", "mednafen") },        
-            { new Installer("mgba", "mgba") }, 
-            { new Installer("openbor") }, 
-            { new Installer("scummvm") },             
-            { new Installer("oricutron") },             
-            { new Installer("ppsspp", "ppsspp", "PPSSPPWindows64.exe") }, 
-            { new Installer("project64", "project64") }, 
-            { new Installer("raine") },             
-            { new Installer("mame64", new string[] { "mame", "mame64" }, new string[] { "mame.exe", "mame64.exe", "mame32.exe" }) },      
-            { new Installer("redream") },             
-            { new Installer("simcoupe") }, 
-            { new Installer("snes9x", "snes9x", "snes9x-x64.exe") }, 
-            { new Installer("solarus", "solarus", "solarus-run.exe") },             
-            { new Installer("tsugaru", "tsugaru", "tsugaru_cui.exe") }, 
-            { new Installer("vpinball", "vpinball", "vpinballx.exe") }, 
-            { new Installer("winuae", "winuae", "winuae64.exe") }, 
-            { new Installer("xemu", "xemu") },
-            { new Installer("nosgba", "nosgba", "no$gba.exe") },
-            { new Installer("yuzu", "yuzu", "yuzu.exe") },
-            { new Installer("ryujinx", "ryujinx", "Ryujinx.exe") },
-            { new Installer("vita3k", "vita3k", "Vita3K.exe") },
-            { new Installer("xenia", "xenia", "xenia.exe") },
-            { new Installer("xenia-canary", "xenia-canary", "xenia_canary.exe" ) },
-            { new Installer("bigpemu", "bigpemu", "BigPEmu.exe") },
-            { new Installer("phoenix", "phoenix", "PhoenixEmuProject.exe") },
-            { new Installer("openmsx", "openmsx", "openmsx.exe") },
-            { new Installer("ssf", "ssf", "SSF.exe") },
-            { new Installer("melonds", "melonds", "melonDS.exe") },
-            { new Installer("hbmame", "hbmame", "hbmameui.exe") },
-            { new Installer("zinc", "zinc", "ZiNc.exe") },
-            { new Installer("eduke32", "eduke32", "eduke32.exe") },
-            { new Installer("play", "play", "Play.exe") },
-            { new Installer("bizhawk", "bizhawk", "EmuHawk.exe") },
+            { new Installer("angle", "retroarch" ) },
+            { new Installer("apple2", "applewin") },
+            { new Installer("apple2gs", "gsplus") },
+            { new Installer("applewin") },
+            { new Installer("arcadeflashweb") },
             { new Installer("ares", "ares", "ares.exe") },
-            { new Installer("ruffle", "ruffle", "ruffle.exe") },
-            { new Installer("zesarux", "zesarux", "zesarux.exe") },
-            { new Installer("jynx", "jynx", "Jynx-Windows-64bit.exe") },
-            { new Installer("hatari", "hatari", "hatari.exe") },
-            { new Installer("xm6pro", "xm6pro", "XM6.exe") },
-            { new Installer("stella", "stella", "Stella.exe") },
-            { new Installer("theforceengine", "theforceengine", "TheForceEngine.exe") },
-            { new Installer("kronos", "kronos", "kronos.exe") },
-            { new Installer("gzdoom", "gzdoom", "gzdoom.exe") },
-            { new Installer("magicengine", "magicengine", "pce.exe") },
+            { new Installer("bam", "fpinball", "Future Pinball.exe") },
+            { new Installer("bigpemu", "bigpemu", "BigPEmu.exe") },
+            { new Installer("bizhawk", "bizhawk", "EmuHawk.exe") },
+            { new Installer("capriceforever", "capriceforever", "Caprice64.exe") },
+            { new Installer("cdogs", new string[] { "cdogs", "cdogs/bin" }, "cdogs-sdl.exe") },
+            { new Installer("cemu", "cemu", "Cemu.exe") },
+            { new Installer("cgenius", "cgenius", "CGenius.exe") },
+            { new Installer("chihiro", new string[] { "cxbx-reloaded", "cxbx-r" }, "cxbx.exe") },
+            { new Installer("citra", "citra", "citra-qt.exe") },
+            { new Installer("citron", "citron", "citron.exe") },
+            { new Installer("corsixth", "corsixth", "CorsixTH.exe") },
+            { new Installer("cxbx", new string[] { "cxbx-reloaded", "cxbx-r" }, "cxbx.exe") },
+            { new Installer("daphne") },
+            { new Installer("demul") },
+            { new Installer("demul-old", "demul-old", "demul.exe") },
+            { new Installer("devilutionx", "devilutionx", "devilutionx.exe") },
+            { new Installer("dhewm3", "dhewm3", "dhewm3.exe") },
+            { new Installer("dolphin", "dolphin-emu", "Dolphin.exe") },
+            { new Installer("dosbox") },
+            { new Installer("duckstation", new string[] { "duckstation"}, new string[] { "duckstation-qt-x64-ReleaseLTCG.exe" }) },
+            { new Installer("eduke32", "eduke32", "eduke32.exe") },
             { new Installer("eka2l1", "eka2l1", "eka2l1_qt.exe") },
-            { new Installer("gemrb", "gemrb", "gemrb.exe") },
-            { new Installer("psxmame", "psxmame", "mame.exe") },
             { new Installer("fbneo", "fbneo", "fbneo64.exe") },
+            { new Installer("flycast", "flycast", "flycast.exe") },
+            { new Installer("fpinball", "fpinball", "Future Pinball.exe") },
+            { new Installer("gemrb", "gemrb", "gemrb.exe") },
+            { new Installer("gsplus") },
+            { new Installer("gzdoom", "gzdoom", "gzdoom.exe") },
+            { new Installer("hatari", "hatari", "hatari.exe") },
+            { new Installer("hbmame", "hbmame", "hbmameui.exe") },
+            { new Installer("hypseus", "hypseus", "hypseus.exe") },
+            { new Installer("jgenesis", "jgenesis", "jgenesis-gui.exe") },
+            { new Installer("jynx", "jynx", "Jynx-Windows-64bit.exe") },
+            { new Installer("kega-fusion", "kega-fusion", "Fusion.exe") },
+            { new Installer("kronos", "kronos", "kronos.exe") },
+            { new Installer("libretro", "retroarch" ) },
+            { new Installer("lime3ds", "lime3ds", "lime3ds.exe") },
+            { new Installer("love") },
+            { new Installer("m2emulator", "m2emulator", "emulator_multicpu.exe") },
+            { new Installer("magicengine", "magicengine", "pce.exe") },
+            { new Installer("mame64", new string[] { "mame", "mame64" }, new string[] { "mame.exe", "mame64.exe", "mame32.exe" }) },
+            { new Installer("mednafen", "mednafen") },
+            { new Installer("melonds", "melonds", "melonDS.exe") },
+            { new Installer("mesen") },
+            { new Installer("mgba", "mgba") },
+            { new Installer("model3", "supermodel") },
+            { new Installer("mupen64", "mupen64", "RMG.exe") },
+            { new Installer("nosgba", "nosgba", "no$gba.exe") },
+            { new Installer("openbor") },
+            { new Installer("opengoal", "opengoal", "gk.exe") },
+            { new Installer("openjazz", "openjazz", "OpenJazz.exe") },
+            { new Installer("openmsx", "openmsx", "openmsx.exe") },
+            { new Installer("oricutron") },
+            { new Installer("pcsx2", "pcsx2", "pcsx2-qt.exe") },
+            { new Installer("pcsx2-16", "pcsx2-16", "pcsx2.exe") },
+            { new Installer("pdark", "pdark", "pd.x86_64.exe") },
+            { new Installer("phoenix", "phoenix", "PhoenixEmuProject.exe") },
+            { new Installer("play", "play", "Play.exe") },
+            { new Installer("ppsspp", "ppsspp", "PPSSPPWindows64.exe") },
+            { new Installer("project64", "project64") },
+            { new Installer("ps3", "rpcs3") },
+            { new Installer("psxmame", "psxmame", "mame.exe") },
+            { new Installer("raine") },
+            { new Installer("raze", "raze", "raze.exe") },
+            { new Installer("redream") },
+            { new Installer("rpcs3") },
+            { new Installer("ruffle", "ruffle", "ruffle.exe") },
+            { new Installer("ryujinx", "ryujinx", "Ryujinx.exe") },
+            { new Installer("scummvm") },
+            { new Installer("shadps4", "shadps4", "shadPS4.exe") },
+            { new Installer("simcoupe") },
+            { new Installer("simple64", "simple64", "simple64-gui.exe") },
+            { new Installer("singe2", "singe2", "Singe-v2.10-Windows-x86_64.exe") },
+            { new Installer("snes9x", "snes9x", "snes9x-x64.exe") },
+            { new Installer("soh", "soh", "soh.exe") },
+            { new Installer("solarus", "solarus", "solarus-run.exe") },
             { new Installer("sonic3air", "sonic3air", "Sonic3AIR.exe") },
             { new Installer("sonicmania", "sonicmania", "RSDKv5U_x64.exe") },
             { new Installer("sonicretro", "sonicretro", "RSDKv4_64.exe") },
             { new Installer("sonicretrocd", "sonicretrocd", "RSDKv3_64.exe") },
-            { new Installer("devilutionx", "devilutionx", "devilutionx.exe") },
-            { new Installer("jgenesis", "jgenesis", "jgenesis-gui.exe") },
-            { new Installer("singe2", "singe2", "Singe-v2.10-Windows-x86_64.exe") }
+            { new Installer("ssf", "ssf", "SSF.exe") },
+            { new Installer("starship", "starship", "Starship.exe") },
+            { new Installer("stella", "stella", "Stella.exe") },
+            { new Installer("supermodel") },
+            { new Installer("theforceengine", "theforceengine", "TheForceEngine.exe") },
+            { new Installer("triforce", new string[] { "dolphin-triforce"}, new string[] { "dolphinWX.exe", "dolphin.exe" }) },
+            { new Installer("tsugaru", "tsugaru", "tsugaru_cui.exe") },
+            { new Installer("vita3k", "vita3k", "Vita3K.exe") },
+            { new Installer("vpinball", new string[] {"vpinball" }, new string[] { "VPinballX.exe", "vpinballx.exe", "VPinballX64.exe" }) },
+            { new Installer("winarcadia", "winarcadia", "WinArcadia.exe") },
+            { new Installer("winuae", "winuae", "winuae64.exe") },
+            { new Installer("xbox", new string[] { "cxbx-reloaded", "cxbx-r" }, "cxbx.exe") },
+            { new Installer("xemu", "xemu") },
+            { new Installer("xenia", "xenia", "xenia.exe") },
+            { new Installer("xenia-canary", "xenia-canary", "xenia_canary.exe" ) },
+            { new Installer("xenia-manager", "xenia-manager", "XeniaManager.DesktopApp.exe") },
+            { new Installer("xm6pro", "xm6pro", "XM6.exe") },
+            { new Installer("yabasanshiro", "yabasanshiro", "yabasanshiro.exe") },
+            { new Installer("yuzu", "yuzu", "yuzu.exe") },
+            { new Installer("zesarux", "zesarux", "zesarux.exe") },
+            { new Installer("zinc", "zinc", "ZiNc.exe") } 
         };
 
-        static List<string>noVersionExe = new List<string>()
-        {
-            "flycast", "rmg", "play", "eduke32", "mesen", "fbneo"
-        };
+        // Some emulators do not set correctly version in executable and require specific treatment !
+        static readonly List<string>noVersionExe = new List<string> { "flycast", "rmg", "play", "eduke32", "mesen", "fbneo" };
 
         #region Properties
         public string Emulator { get; private set; }
         public string[] Folders { get; private set; }
         public string[] Executables { get; private set; }
-
         public string DefaultFolderName { get { return Folders[0]; } }
         public string ServerVersion { get; private set; }
         public string ServerFileName { get; set; }
@@ -219,7 +237,6 @@ namespace EmulatorLauncher
                 installer = installers.Where(g => g.Emulator == emulator).FirstOrDefault();
             if (installer == null)
                 installer = installers.Where(g => g.Folders != null && g.Folders.Any(f => f == emulator)).FirstOrDefault();
-
             if (installer != null && string.IsNullOrEmpty(installer.PackageUrl))
                 return null;
 
@@ -278,9 +295,49 @@ namespace EmulatorLauncher
                 else if (Path.GetFileNameWithoutExtension(exe).ToLower() == "flycast")
                 {
                     var output = versionInfo.FileVersion.Substring(1);
-                    output = StringExtensions.FormatVersionString(output);
-
                     Version ver = new Version();
+                    int firstDashIndex = output.IndexOf('-');
+                    if (firstDashIndex == -1 || output.IndexOf('-', firstDashIndex + 1) == -1)
+                    {
+                        output = StringExtensions.FormatVersionString(output);
+                        
+                        if (Version.TryParse(output, out ver))
+                            return ver.ToString();
+                    }
+
+                    int secondDashIndex = output.IndexOf('-', firstDashIndex + 1);
+                    output = output.Substring(0, secondDashIndex).Replace('-', '.');
+                    string[] parts = output.Split('.');
+                    if (parts.Length == 4)
+                    {
+                        if (Version.TryParse(output, out ver))
+                            return ver.ToString();
+                    }
+                    else if (parts.Length == 3)
+                    {
+                        output = parts[0] + "." + parts[1] + ".0" + "." + parts[2];
+                        if (Version.TryParse(output, out ver))
+                            return ver.ToString();
+                    }
+                    else if (parts.Length == 2)
+                    {
+                        output = parts[0] + "." + parts[1] + ".0" + ".0";
+                        if (Version.TryParse(output, out ver))
+                            return ver.ToString();
+                    }
+                    else if (parts.Length == 1)
+                    {
+                        output = parts[0] + ".0" + ".0" + ".0";
+                        if (Version.TryParse(output, out ver))
+                            return ver.ToString();
+                    }
+                    else if (parts.Length > 4)
+                    {
+                        output = parts[0] + "." + parts[1] + "." + parts[2] + "." + parts[3];
+                        if (Version.TryParse(output, out ver))
+                            return ver.ToString();
+                    }
+
                     if (Version.TryParse(output, out ver))
                         return ver.ToString();
                 }
@@ -302,14 +359,21 @@ namespace EmulatorLauncher
                     if (Version.TryParse(output, out ver))
                         return ver.ToString();
                 }
+                /*else if (Path.GetFileNameWithoutExtension(exe).ToLower() == "play")
+                {
+                    var output = versionInfo.ProductVersion.Substring(0, 7);
+                    output = StringExtensions.FormatVersionString(output);
+
+                    Version ver = new Version();
+                    if (Version.TryParse(output, out ver))
+                        return ver.ToString();
+                }*/
                 else
                 {
                     // Fake version number based on last write time
                     var date = File.GetLastWriteTime(exe).ToUniversalTime().ToString("0.yy.MM.dd");
                     return date;
                 }
-                
-               
             }
             catch { }
 
@@ -460,7 +524,6 @@ namespace EmulatorLauncher
 
             return false;
         }
-
 
         public bool CanInstall()
         {

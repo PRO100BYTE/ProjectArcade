@@ -19,6 +19,8 @@ namespace EmulatorLauncher
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
 
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for Demul");
+
             _isArcade = !nonArcadeSystems.Contains(system);
 
             if (!this.Controllers.Any(c => !c.IsKeyboard))
@@ -34,6 +36,12 @@ namespace EmulatorLauncher
 
                     foreach (var controller in this.Controllers.OrderBy(i => i.PlayerIndex).Take(4))
                         ConfigureInput(controller, ctrlIni, ini, system);
+
+                    // Hotkeys
+                    ctrlIni.WriteValue("GLOBAL0", "SAVESTATE", "87");
+                    ctrlIni.WriteValue("GLOBAL0", "LOADSTATE", "88");
+                    ctrlIni.WriteValue("GLOBAL0", "NEXTSTATE", "68");
+                    ctrlIni.WriteValue("GLOBAL0", "PREVSTATE", "67");
                 }
                 catch { }
             }
@@ -130,12 +138,7 @@ namespace EmulatorLauncher
                 ini.WriteValue(maplePorts[controller.PlayerIndex], "port4", "-1");
             }
 
-            if (SystemConfig.isOptSet("demuldeadzone") && !string.IsNullOrEmpty(SystemConfig["demuldeadzone"]))
-            {
-                string deadzone = SystemConfig["demuldeadzone"];
-                if (deadzone != null)
-                    ctrlIni.WriteValue("GLOBAL0", "DEADZONE", deadzone);
-            }
+            BindIniFeatureSlider(ctrlIni, "GLOBAL0", "DEADZONE", "demuldeadzone", "15");
 
             // Write controller mapping in padDemul.ini file
             if (_isArcade)
@@ -188,8 +191,16 @@ namespace EmulatorLauncher
                 ctrlIni.WriteValue(iniSection, "X", isXInput ? GetXInputCode(controller, InputKey.y, index) : GetDInputCode(controller, InputKey.y, sdlCtrl, index));
                 ctrlIni.WriteValue(iniSection, "Y", isXInput ? GetXInputCode(controller, InputKey.x, index) : GetDInputCode(controller, InputKey.x, sdlCtrl, index));
 
-                ctrlIni.WriteValue(iniSection, "LTRIG", isXInput ? GetXInputCode(controller, InputKey.l2, index) : GetDInputCode(controller, InputKey.l2, sdlCtrl, index));
-                ctrlIni.WriteValue(iniSection, "RTRIG", isXInput ? GetXInputCode(controller, InputKey.r2, index) : GetDInputCode(controller, InputKey.r2, sdlCtrl, index));
+                if (SystemConfig.getOptBoolean("dreamcast_use_shoulders"))
+                {
+                    ctrlIni.WriteValue(iniSection, "LTRIG", isXInput ? GetXInputCode(controller, InputKey.pageup, index) : GetDInputCode(controller, InputKey.pageup, sdlCtrl, index));
+                    ctrlIni.WriteValue(iniSection, "RTRIG", isXInput ? GetXInputCode(controller, InputKey.pagedown, index) : GetDInputCode(controller, InputKey.pagedown, sdlCtrl, index));
+                }
+                else
+                {
+                    ctrlIni.WriteValue(iniSection, "LTRIG", isXInput ? GetXInputCode(controller, InputKey.l2, index) : GetDInputCode(controller, InputKey.l2, sdlCtrl, index));
+                    ctrlIni.WriteValue(iniSection, "RTRIG", isXInput ? GetXInputCode(controller, InputKey.r2, index) : GetDInputCode(controller, InputKey.r2, sdlCtrl, index));
+                }
 
                 ctrlIni.WriteValue(iniSection, "START", isXInput ? GetXInputCode(controller, InputKey.start, index) : GetDInputCode(controller, InputKey.start, sdlCtrl, index));
 
@@ -202,6 +213,8 @@ namespace EmulatorLauncher
                 ctrlIni.WriteValue(iniSection, "S2LEFT", isXInput ? GetXInputCode(controller, InputKey.joystick2left, index) : GetDInputCode(controller, InputKey.joystick2left, sdlCtrl, index));
                 ctrlIni.WriteValue(iniSection, "S2RIGHT", isXInput ? GetXInputCode(controller, InputKey.joystick2right, index) : GetDInputCode(controller, InputKey.joystick2right, sdlCtrl, index));
             }
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + controller.DevicePath + " to player : " + controller.PlayerIndex.ToString());
         }
 
         private static string GetDInputCode(Controller c, InputKey key, SdlToDirectInput ctrl, int index, bool trigger = false)

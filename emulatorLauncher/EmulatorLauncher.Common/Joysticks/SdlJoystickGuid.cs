@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using EmulatorLauncher.Common.FileFormats;
 
 namespace EmulatorLauncher.Common.Joysticks
 {
@@ -235,6 +235,100 @@ namespace EmulatorLauncher.Common.Joysticks
             }
 
             return ret;
+        }
+
+        public static string GetGuidFromFile(string path, string inputGuid, string emulator, int guidIndex = 0)
+        {
+            if (!File.Exists(path))
+                return null;
+
+            try
+            {
+                var yml = YmlFile.Load(path);
+                if (yml != null)
+                {
+                    var controllerInfo = yml.GetContainer(inputGuid.ToLowerInvariant());
+                    if (controllerInfo != null)
+                    {
+                        var emulatorInfo = controllerInfo.GetContainer(emulator);
+                        if (emulatorInfo != null)
+                        {
+                            string outputGuid = emulatorInfo["guid"];
+                            if (guidIndex != 0)
+                            {
+                                string newGuid = "guid" + guidIndex.ToString();
+                                if (emulatorInfo[newGuid] != null)
+                                    outputGuid = emulatorInfo[newGuid];
+                            }
+                            if (!string.IsNullOrEmpty(outputGuid))
+                            {
+                                SimpleLogger.Instance.Info("[INFO] Controller GUID replaced from yml file with: " + outputGuid.ToLowerInvariant());
+                                return outputGuid.ToLowerInvariant();
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            return null;
+        }
+
+        public static string GetNameFromFile(string path, string inputGuid, string emulator)
+        {
+            if (!File.Exists(path))
+                return null;
+
+            try
+            {
+                var yml = YmlFile.Load(path);
+                if (yml != null)
+                {
+                    var controllerInfo = yml.GetContainer(inputGuid.ToLowerInvariant());
+                    if (controllerInfo != null)
+                    {
+                        var emulatorInfo = controllerInfo.GetContainer(emulator);
+                        if (emulatorInfo != null)
+                        {
+                            string outputName = emulatorInfo["name"];
+                            if (!string.IsNullOrEmpty(outputName))
+                            {
+                                SimpleLogger.Instance.Info("[INFO] Controller Name replaced from yml file with: " + outputName);
+                                return outputName;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            return null;
+        }
+
+        public static bool multiGuid(string path, string inputGuid)
+        {
+            if (!File.Exists(path))
+                return false;
+
+            try
+            {
+                var yml = YmlFile.Load(path);
+                if (yml != null)
+                {
+                    var controllerInfo = yml.GetContainer(inputGuid.ToLowerInvariant());
+                    if (controllerInfo != null)
+                    {
+                        bool multi = controllerInfo["multiGuid"] == "true";
+                        if (multi)
+                            return true;
+                        else
+                            return false;
+                    }
+                }
+            }
+            catch { return false; }
+
+            return false;
         }
 
         #endregion
@@ -475,6 +569,7 @@ namespace EmulatorLauncher.Common.Joysticks
     {
         UNKNOWN = 0,
         EIGHTBITDO_XBOX_CONTROLLER = 0x2002,
+        EIGHTBITDO_PRO2_WIRED_CONTROLLER = 0x3106,
         AMAZON_LUNA_CONTROLLER = 0x0419,
         GOOGLE_STADIA_CONTROLLER = 0x9400,
         EVORETRO_GAMECUBE_ADAPTER = 0x1846,

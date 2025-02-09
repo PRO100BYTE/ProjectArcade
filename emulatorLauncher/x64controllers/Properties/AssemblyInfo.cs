@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("x64controllers")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("x64controllers for ProjectArcade")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("PRO100BYTE Team")]
 [assembly: AssemblyProduct("x64controllers")]
-[assembly: AssemblyCopyright("Copyright ©  2024")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright © PRO100BYTE Team 2023-2024")]
+[assembly: AssemblyTrademark("ProjectArcade by PRO100BYTE Team")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

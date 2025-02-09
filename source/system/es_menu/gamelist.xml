@@ -69,6 +69,23 @@
 		<region>wr</region>
 	</game>
 	<game>
+		<path>./capriceforever.menu</path>
+		<name>Caprice Forever (Amstrad CPC)</name>
+		<desc>Run Caprice Forever (Amstrad CPC).</desc>
+		<image>./media/capriceforever-logo.png</image>
+		<marquee>./media/capriceforever-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Frederic Coste (Fredouille)</developer>
+		<publisher>CPC-Power</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>fr</lang>
+		<region>wr</region>
+	</game>
+	<game>
 		<path>./cemu.menu</path>
 		<name>Cemu (Wii U)</name>
 		<desc>Run Cemu Emulator (Wii U).</desc>
@@ -78,6 +95,23 @@
 		<releasedate />
 		<developer>Cemu Team</developer>
 		<publisher>Cemu Team</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./cgenius.menu</path>
+		<name>Commander Genius</name>
+		<desc>Run Commander Genius.</desc>
+		<image>./media/cgenius.png</image>
+		<marquee>./media/cgenius.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>The Commander Genius Team</developer>
+		<publisher>The Commander Genius Team</publisher>
 		<genre>Emulator</genre>
 		<playcount />
 		<lastplayed />
@@ -112,6 +146,23 @@
 		<releasedate />
 		<developer>Citra Team</developer>
 		<publisher>Citra Team</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./citron.menu</path>
+		<name>Citron (Switch)</name>
+		<desc>Run Citron (Switch). This software is not provided by RetroBat.</desc>
+		<image>./media/citron-logo.png</image>
+		<marquee>./media/citron-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Zephyron</developer>
+		<publisher />
 		<genre>Emulator</genre>
 		<playcount />
 		<lastplayed />
@@ -289,7 +340,7 @@
 		<lang>en</lang>
 		<region>wr</region>
 	</game>
-	<!--<game>
+	<game>
 		<path>./kronos.menu</path>
 		<name>Kronos (Saturn)</name>
 		<desc>Run Kronos (Saturn).</desc>
@@ -305,7 +356,7 @@
 		<gametime />
 		<lang>en</lang>
 		<region>wr</region>
-	</game>-->
+	</game>
 	<game>
 		<path>./lime3ds.menu</path>
 		<name>Lime (3DS)</name>
@@ -346,6 +397,23 @@
 		<marquee>./media/magicengine-logo.png</marquee>
 		<developer>David / Cédric Michel</developer>
 		<publisher />
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./mednafen.menu</path>
+		<name>Mednafen (Multi System Emulator)</name>
+		<desc>Run Mednafen (Multi System Emulator).</desc>
+		<image>./media/mednafen-logo.png</image>
+		<marquee>./media/mednafen-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Mednafen Team</developer>
+		<publisher>Mednafen Team</publisher>
 		<genre>Emulator</genre>
 		<playcount />
 		<lastplayed />
@@ -700,6 +768,23 @@
 		<developer>Xenia Team</developer>
 		<publisher>Xenia Team</publisher>
 		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./xenia-manager.menu</path>
+		<name>Xenia Manager (XBOX 360)</name>
+		<desc>Run Xenia Manager (Xbox 360).</desc>
+		<image>./media/xenia-manager-logo.png</image>
+		<marquee>./media/xenia-manager-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>Shazzaam</developer>
+		<publisher />
+		<genre>Tool</genre>
 		<playcount />
 		<lastplayed />
 		<gametime />
@@ -1174,6 +1259,23 @@
 		<releasedate />
 		<developer>Vita3K Team</developer>
 		<publisher>Vita3K Team</publisher>
+		<genre>Emulator</genre>
+		<playcount />
+		<lastplayed />
+		<gametime />
+		<lang>en</lang>
+		<region>wr</region>
+	</game>
+	<game>
+		<path>./yabasanshiro.menu</path>
+		<name>Yabasanshiro (Saturn)</name>
+		<desc>Run Yabasanshiro (Saturn).</desc>
+		<image>./media/yabasanshiro-logo.png</image>
+		<marquee>./media/yabasanshiro-logo.png</marquee>
+		<rating>0</rating>
+		<releasedate />
+		<developer>devmiyax</developer>
+		<publisher />
 		<genre>Emulator</genre>
 		<playcount />
 		<lastplayed />

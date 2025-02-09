@@ -16,6 +16,8 @@ namespace EmulatorLauncher
             if (Program.SystemConfig.isOptSet("zinc_controller_config") && (Program.SystemConfig["zinc_controller_config"] == "none" || Program.SystemConfig["zinc_controller_config"] == "predefined"))
                 return;
 
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for Zinc");
+
             using (var ini = IniFile.FromFile(iniFile, IniOptions.UseSpaces | IniOptions.KeepEmptyValues | IniOptions.KeepEmptyLines))
             {
                 string outputFile = Path.Combine(path, "wberror.txt");
@@ -40,7 +42,6 @@ namespace EmulatorLauncher
                 return;
             else
                 ConfigureJoystick(controller, ini);
-
         }
 
         private void ConfigureJoystick(Controller ctrl, IniFile ini)
@@ -69,6 +70,11 @@ namespace EmulatorLauncher
 
             string playerSection = "player" + ctrl.PlayerIndex.ToString();
 
+            // Force index through feature
+            string indexOption = "zinc_p" + ctrl.PlayerIndex + "_forceindex";
+            if (SystemConfig.isOptSet(indexOption) && !string.IsNullOrEmpty(SystemConfig[indexOption]))
+                index = SystemConfig[indexOption].ToInteger();
+
             string joy = "j" + index.ToString();
 
             if (controller != null)
@@ -84,7 +90,7 @@ namespace EmulatorLauncher
                 ini.WriteValue(playerSection, "coin", GetDInputKeyName(ctrl, controller, InputKey.select, joy));
                 ini.WriteValue(playerSection, "start", GetDInputKeyName(ctrl, controller, InputKey.start, joy));
 
-                if (!SystemConfig.isOptSet("zinc_digital") || SystemConfig["zinc_digital"] != "1")
+                if (!SystemConfig.isOptSet("zinc_digital") || !SystemConfig.getOptBoolean("zinc_digital"))
                 {
                     ini.WriteValue(playerSection, "right", joy + "right");
                     ini.WriteValue(playerSection, "left", joy + "left");
@@ -165,7 +171,7 @@ namespace EmulatorLauncher
                 ini.WriteValue(playerSection, "coin", GetInputKeyName(ctrl, InputKey.select, joy));
                 ini.WriteValue(playerSection, "start", GetInputKeyName(ctrl, InputKey.start, joy));
 
-                if (!SystemConfig.isOptSet("zinc_digital") || SystemConfig["zinc_digital"] != "1")
+                if (!SystemConfig.isOptSet("zinc_digital") || !SystemConfig.getOptBoolean("zinc_digital"))
                 {
                     ini.WriteValue(playerSection, "right", GetInputKeyName(ctrl, InputKey.right, joy));
                     ini.WriteValue(playerSection, "left", GetInputKeyName(ctrl, InputKey.left, joy));
@@ -238,6 +244,8 @@ namespace EmulatorLauncher
                 if (value.Value == "null")
                     ini.Remove(playerSection, value.Key);
             }
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + ctrl.DevicePath + " to player : " + ctrl.PlayerIndex.ToString());
         }
 
         private static string GetDInputKeyName(Controller c, SdlToDirectInput ctrl, InputKey key, string joy)
@@ -301,6 +309,34 @@ namespace EmulatorLauncher
             return "null";
         }
 
+        private static string GetInputKeyName(Controller c, InputKey key, string joy)
+        {
+            Int64 pid;
+
+            var input = c.GetDirectInputMapping(key);
+            if (input == null)
+                return "null";
+
+            long nb = input.Id + 1;
+
+            if (input.Type == "button")
+                return (joy + "b" + nb.ToString());
+
+            if (input.Type == "hat")
+            {
+                pid = input.Value;
+                switch (pid)
+                {
+                    case 1: return (joy + "up");
+                    case 2: return (joy + "right");
+                    case 4: return (joy + "down");
+                    case 8: return (joy + "left");
+                }
+            }
+            return "null";
+        }
+
+        #region dictionaries
         private static readonly Dictionary<string, string> esToDinput = new Dictionary<string, string>()
         {
             { "a", "a" },
@@ -334,32 +370,6 @@ namespace EmulatorLauncher
             { "lefttrigger", "leftstick" },
             { "righttrigger", "rightstick" },
         };
-
-        private static string GetInputKeyName(Controller c, InputKey key, string joy)
-        {
-            Int64 pid;
-
-            var input = c.GetDirectInputMapping(key);
-            if (input == null)
-                return "null";
-
-            long nb = input.Id + 1;
-
-            if (input.Type == "button")
-                return (joy + "b" + nb.ToString());
-
-            if (input.Type == "hat")
-            {
-                pid = input.Value;
-                switch (pid)
-                {
-                    case 1: return (joy + "up");
-                    case 2: return (joy + "right");
-                    case 4: return (joy + "down");
-                    case 8: return (joy + "left");
-                }
-            }
-            return "null";
-        }
+        #endregion
     }
 }

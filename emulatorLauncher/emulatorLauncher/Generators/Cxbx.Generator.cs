@@ -87,6 +87,8 @@ namespace EmulatorLauncher
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
+            SimpleLogger.Instance.Info("[Generator] Getting " + emulator + " path and executable name.");
+
             string path = null;
 
             if ((core != null && core == "chihiro") || (emulator != null && emulator == "chihiro"))
@@ -100,6 +102,9 @@ namespace EmulatorLauncher
 
             if (string.IsNullOrEmpty(path))
                 path = AppConfig.GetFullPath("cxbx-r");
+
+            if (string.IsNullOrEmpty(path))
+                return null;
 
             _isUsingCxBxLoader = true;
 
@@ -120,7 +125,7 @@ namespace EmulatorLauncher
             bool fullscreen = !IsEmulationStationWindowed() || SystemConfig.getOptBoolean("forcefullscreen");
 
             if (_isUsingCxBxLoader)
-                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+                _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
             
             // If rom is a directory
             if (Directory.Exists(rom))
@@ -153,7 +158,7 @@ namespace EmulatorLauncher
                 }
 
                 //Vsync
-                ini.WriteValue("video", "VSync", SystemConfig["VSync"] != "false" ? "true" : "false");
+                BindBoolIniFeatureOn(ini, "video", "VSync", "VSync", "true", "false");
 
                 //Aspect ratio : keep original or stretch
                 if (Features.IsSupported("ratio") && SystemConfig.isOptSet("ratio") && SystemConfig["ratio"] == "stretch")
@@ -165,7 +170,7 @@ namespace EmulatorLauncher
                     ini.WriteValue("video", "MaintainAspect", "true");
 
                 //Internal resolution
-                BindIniFeature(ini, "video", "RenderResolution", "internalresolution", "3");
+                BindIniFeatureSlider(ini, "video", "RenderResolution", "internalresolution", "1");
 
                 //XBE signature
                 BindBoolIniFeature(ini, "gui", "IgnoreInvalidXbeSig", "xbeSignature", "true", "false");

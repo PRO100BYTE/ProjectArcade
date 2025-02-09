@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("mount")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("mount for ProjectArcade")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("PRO100BYTE Team")]
 [assembly: AssemblyProduct("mount")]
-[assembly: AssemblyCopyright("Copyright ©  2022")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright © PRO100BYTE Team 2023-2024")]
+[assembly: AssemblyTrademark("ProjectArcade by PRO100BYTE Team")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

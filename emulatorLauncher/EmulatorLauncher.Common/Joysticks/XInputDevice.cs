@@ -180,10 +180,12 @@ namespace EmulatorLauncher.Common.Joysticks
             Connected = xInput.IsConnected;
             if (!Connected)
                 return;
-
+            Type = xInput.Type;
             SubType = (XINPUT_DEVSUBTYPE)xInput.SubType;
+            Flags = xInput.Flags;
             VendorId = xInput.VendorId;
             ProductId = xInput.ProductId;
+            Wbuttons = xInput.Wbuttons;
         }
 
         public bool Connected { get; private set; }
@@ -192,6 +194,9 @@ namespace EmulatorLauncher.Common.Joysticks
         public XINPUT_DEVSUBTYPE SubType { get; private set; }
         public USB_VENDOR VendorId { get; set; }
         public USB_PRODUCT ProductId { get; set; }
+        public byte Type;
+        public short Flags;
+        public short Wbuttons;
 
         public override string ToString()
         {
@@ -270,6 +275,9 @@ namespace EmulatorLauncher.Common.Joysticks
             public bool IsConnected { get; private set; }        
     
             public byte SubType { get { return _caps.HasValue ? _caps.Value.Capabilities.SubType : (byte) 0; } }
+            public byte Type { get { return _caps.HasValue ? _caps.Value.Capabilities.Type : (byte)0; } }
+            public short Flags { get { return _caps.HasValue ? _caps.Value.Capabilities.Flags : (short)0; } }
+            public short Wbuttons { get { return _caps.HasValue ? _caps.Value.Capabilities.Gamepad.wButtons : (short)0; } }
             public USB_VENDOR VendorId { get { return (USB_VENDOR) (_caps.HasValue ? _caps.Value.vendorId : (short)0); } }
             public USB_PRODUCT ProductId { get { return (USB_PRODUCT) (_caps.HasValue ? _caps.Value.productId : (short)0); } }
 
@@ -343,7 +351,7 @@ namespace EmulatorLauncher.Common.Joysticks
             {
                 [MarshalAs(UnmanagedType.I1)]
                 [FieldOffset(0)]
-                byte Type;
+                public byte Type;
 
                 [MarshalAs(UnmanagedType.I1)]
                 [FieldOffset(1)]
@@ -673,13 +681,15 @@ namespace EmulatorLauncher.Common.Joysticks
         START = 16,
         BACK = 32,
         LEFTTRIGGER = 64,
+        LEFTSTICK = 64,
         RIGHTTRIGGER = 128,
+        RIGHTSTICK = 128,
         LEFTSHOULDER = 256,
         RIGHTSHOULDER = 512,
         A = 4096,
         B = 8192,
-        X = 16384,
-        Y = 32768
+        X = 32768,
+        Y = 16384,
     }
 
     public enum XINPUT_DEVSUBTYPE

@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("emulatorLauncher")]
-[assembly: AssemblyDescription("emulatorLauncher build for ProjectArcade")]
+[assembly: AssemblyDescription("emulatorLauncher for ProjectArcade")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("PRO100BYTE Team, RetroBat Team")]
+[assembly: AssemblyCompany("PRO100BYTE Team")]
 [assembly: AssemblyProduct("emulatorLauncher")]
-[assembly: AssemblyCopyright("Copyright © 2024 PRO100BYTE Team & RetroBat Team")]
-[assembly: AssemblyTrademark("emulatorLauncher")]
+[assembly: AssemblyCopyright("Copyright © PRO100BYTE Team 2023-2025")]
+[assembly: AssemblyTrademark("ProjectArcade by PRO100BYTE Team")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

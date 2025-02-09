@@ -43,7 +43,11 @@ namespace EmulatorLauncher
             _exe = exe;
             _processName = Path.GetFileNameWithoutExtension(exe);
             _version = new Version(10, 0, 0, 0);
-            Version.TryParse(FileVersionInfo.GetVersionInfo(exe).ProductVersion.Replace(",", ".").Replace(" ", ""), out _version);
+
+            // Get version from executable
+            var versionInfo = FileVersionInfo.GetVersionInfo(exe);
+            string versionString = versionInfo.FileMajorPart + "." + versionInfo.FileMinorPart + "." + versionInfo.FileBuildPart + "." + versionInfo.FilePrivatePart;
+            Version.TryParse(versionString, out _version);
 
             rom = this.TryUnZipGameIfNeeded(system, rom, true, false);
             if (Directory.Exists(rom))
@@ -63,6 +67,10 @@ namespace EmulatorLauncher
             string romPath = Path.Combine(Path.GetDirectoryName(rom), "roms");
             if (!Directory.Exists(romPath))
                 romPath = Path.Combine(Path.GetDirectoryName(rom), ".roms");
+            if (!Directory.Exists(romPath))
+                romPath = Path.Combine(AppConfig.GetFullPath("roms"), "vpinball", "roms");
+            if (!Directory.Exists(romPath))
+                romPath = Path.Combine(AppConfig.GetFullPath("roms"), "vpinball", ".roms");
             if (!Directory.Exists(romPath))
                 romPath = null;
 
@@ -203,138 +211,6 @@ namespace EmulatorLauncher
             catch { }
         }
 
-
-        class DirectB2sData
-        {
-            public static DirectB2sData FromFile(string file)
-            {
-                if (!File.Exists(file))
-                    return null;
-
-
-                XmlDocument document = new XmlDocument();
-                document.Load(file);
-
-                XmlElement element = (XmlElement)document.SelectSingleNode("DirectB2SData");
-                if (element == null)
-                    return null;
-
-                var bulbs = new List<Bulb>();
-
-                foreach (XmlElement bulb in element.SelectNodes("Illumination/Bulb"))
-                {
-                    if (!bulb.HasAttribute("Parent") || bulb.GetAttribute("Parent") != "Backglass")
-                        continue;
-
-                    try
-                    {
-                        Bulb item = new Bulb
-                        {
-                            ID = bulb.GetAttribute("ID").ToInteger(),
-                            LightColor = bulb.GetAttribute("LightColor"),
-                            LocX = bulb.GetAttribute("LocX").ToInteger(),
-                            LocY = bulb.GetAttribute("LocY").ToInteger(),
-                            Width = bulb.GetAttribute("Width").ToInteger(),
-                            Height = bulb.GetAttribute("Height").ToInteger(),
-                            Visible = bulb.GetAttribute("Visible") == "1",
-                            IsImageSnippit = bulb.GetAttribute("IsImageSnippit") == "1",
-                            Image = Misc.Base64ToImage(bulb.GetAttribute("Image"))
-                        };
-
-                        if (item.Visible && item.Image != null)
-                            bulbs.Add(item);
-                    }
-                    catch { }
-                }
-
-
-                XmlElement element13 = (XmlElement)element.SelectSingleNode("Images/BackglassImage");
-                if (element13 != null)
-                {
-                    try
-                    {
-                        var image = Misc.Base64ToImage(element13.Attributes["Value"].InnerText);
-                        if (image != null)
-                        {
-                            return new DirectB2sData()
-                            {
-                                Bulbs = bulbs.ToArray(),
-                                Image = image,
-                            };
-                        }
-                    }
-                    catch { }
-                }
-
-                return null;                
-            }
-
-            public Image RenderBackglass(int index = 0)
-            {
-                var bitmap = new Bitmap(Image);
-
-                using (Graphics g = Graphics.FromImage(bitmap))
-                {
-                    foreach (var bulb in Bulbs)
-                    {
-                        if (bulb.IsImageSnippit)
-                            continue;
-
-                        if (index == 0 && (bulb.ID & 1) == 0)
-                            continue;
-
-                        if (index == 1 && (bulb.ID & 1) == 1)
-                            continue;
-
-                        if (index == 3)
-                            continue;
-
-                        Color lightColor = Color.White;
-                        var split = bulb.LightColor.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
-                        if (split.Length == 3)
-                            lightColor = Color.FromArgb(split[0].ToInteger(), split[1].ToInteger(), split[2].ToInteger());
-
-                        using (ImageAttributes imageAttrs = new ImageAttributes())
-                        {
-                            var colorMatrix = new ColorMatrix(new float[][]
-                                    {
-                                        new float[] { lightColor.R / 255f, 0, 0, 0, 0 },
-                                        new float[] { 0, lightColor.G / 255f, 0, 0, 0 },
-                                        new float[] { 0, 0, lightColor.B / 255f, 0, 0 },
-                                        new float[] { 0, 0, 0, 1, 0 },
-                                        new float[] { 0, 0, 0, 0, 1 }
-                                    });
-
-                            imageAttrs.SetColorMatrix(colorMatrix);
-
-                            Rectangle dest = new Rectangle(bulb.LocX, bulb.LocY, bulb.Width, bulb.Height);
-                            g.DrawImage(bulb.Image, dest, 0, 0, bulb.Image.Width, bulb.Image.Height, GraphicsUnit.Pixel, imageAttrs, null, IntPtr.Zero);
-                        }
-                    }
-                }
-
-                return bitmap;
-            }
-
-            public Bulb[] Bulbs { get; private set; }
-            public Image Image { get; private set; }
-
-            public class Bulb
-            {
-                public int ID { get; set; }
-
-                public string LightColor { get; set; }
-                public int LocX { get; set; }
-                public int LocY { get; set; }
-                public int Width { get; set; }
-                public int Height { get; set; }
-                public bool Visible { get; set; }
-                public bool IsImageSnippit { get; set; }
-
-                public Image Image { get; set; }                
-            }
-        }
-
         private static LoadingForm ShowSplash(string rom)
         {
             if (rom == null)
@@ -374,8 +250,6 @@ namespace EmulatorLauncher
 
             return null;
         }
-
-      
 
         private static bool FileUrlValueExists(object value)
         {
@@ -421,6 +295,8 @@ namespace EmulatorLauncher
         {
             try
             {
+                SimpleLogger.Instance.Info("[Generator] Ensuring UltraDMD is registered.");
+
                 // Check for valid out-of-process COM server ( UltraDMD ) 
                 if (IsComServerAvailable(@"CLSID\{E1612654-304A-4E07-A236-EB64D6D4F511}\LocalServer32"))
                     return;
@@ -509,6 +385,8 @@ namespace EmulatorLauncher
 
             try
             {
+                SimpleLogger.Instance.Info("[Generator] Ensuring BackGlass Server is registered.");
+
                 Process px = new Process
                 {
                     EnableRaisingEvents = true
@@ -605,6 +483,8 @@ namespace EmulatorLauncher
 
             try
             {
+                SimpleLogger.Instance.Info("[Generator] Ensuring VpinMame is registered.");
+
                 Process px = new Process
                 {
                     EnableRaisingEvents = true
@@ -636,7 +516,11 @@ namespace EmulatorLauncher
 
             using (var ini = new IniFile(iniFile, IniOptions.UseSpaces | IniOptions.KeepEmptyValues | IniOptions.KeepEmptyLines))
             {
-                if (Screen.AllScreens.Length >= 1 && SystemConfig["enableb2s"] != "0" && !SystemInformation.TerminalServerSession)
+                SimpleLogger.Instance.Info("[Generator] Writing config to VPinballX.ini file.");
+
+                if (Screen.AllScreens.Length > 1 && (!SystemConfig.isOptSet("enableb2s") || SystemConfig.getOptBoolean("enableb2s")) && !SystemInformation.TerminalServerSession)
+                    ini.WriteValue("Controller", "ForceDisableB2S", "0");
+                else if (SystemConfig.getOptBoolean("enableb2s"))
                     ini.WriteValue("Controller", "ForceDisableB2S", "0");
                 else
                     ini.WriteValue("Controller", "ForceDisableB2S", "1");
@@ -681,8 +565,6 @@ namespace EmulatorLauncher
                     ini.WriteValue("Player", "SyncMode", "3");
 
                 // Video options
-                ini.WriteValue("Player", "BallReflection", SystemConfig["vp_ballreflection"] == "1" ? "1" : "0");
-
                 if (SystemConfig.isOptSet("vp_ambient_occlusion") && SystemConfig["vp_ambient_occlusion"] == "dynamic")
                 {
                     ini.WriteValue("Player", "DisableAO", "0");
@@ -698,8 +580,10 @@ namespace EmulatorLauncher
                 ini.WriteValue("Player", "FXAA", SystemConfig.GetValueOrDefault("vp_antialiasing", "0"));
                 ini.WriteValue("Player", "Sharpen", SystemConfig.GetValueOrDefault("vp_sharpen", "0"));
                 
-                ini.WriteValue("Player", "BGSet", SystemConfig["arcademode"] == "1" ? "1" : "0");
-                ini.WriteValue("Player", "ForceAnisotropicFiltering", SystemConfig.getOptBoolean("vp_anisotropic_filtering") ? "0" : "1");
+                ini.WriteValue("Player", "BGSet", SystemConfig.getOptBoolean("arcademode") ? "1" : "0");
+
+                bool aniFilter = !SystemConfig.isOptSet("vp_anisotropic_filtering") || SystemConfig.getOptBoolean("vp_anisotropic_filtering");
+                ini.WriteValue("Player", "ForceAnisotropicFiltering", aniFilter ? "1" : "0");
                 ini.WriteValue("Player", "UseNVidiaAPI", SystemConfig.getOptBoolean("vp_nvidia") ? "1" : "0");
                 ini.WriteValue("Player", "SoftwareVertexProcessing", SystemConfig.getOptBoolean("vp_vertex") ? "1" : "0");
 
@@ -707,11 +591,14 @@ namespace EmulatorLauncher
                 ini.WriteValue("Player", "PlayMusic", SystemConfig.getOptBoolean("vp_music_off") ? "0" : "1");
 
                 // Controls
-                ini.WriteValue("Player", "LRAxis", SystemConfig["nouse_joyaxis"] == "1" ? "0" : "1");
-                ini.WriteValue("Player", "UDAxis", SystemConfig["nouse_joyaxis"] == "1" ? "0" : "2");
-                ini.WriteValue("Player", "PlungerAxis", SystemConfig["nouse_joyaxis"] == "1" ? "0" : "3");
 
-                ini.WriteValue("Player", "DeadZone", SystemConfig.GetValueOrDefault("joy_deadzone", "15"));
+                if (!SystemConfig.getOptBoolean("disableautocontrollers"))
+                {
+                    ini.WriteValue("Player", "LRAxis", SystemConfig.getOptBoolean("nouse_joyaxis") ? "0" : "1");
+                    ini.WriteValue("Player", "UDAxis", SystemConfig.getOptBoolean("nouse_joyaxis") ? "0" : "2");
+                    ini.WriteValue("Player", "PlungerAxis", SystemConfig.getOptBoolean("nouse_joyaxis") ? "0" : "3");
+                    BindIniFeatureSlider(ini, "Player", "DeadZone", "joy_deadzone", "15");
+                }
 
                 ini.WriteValue("Editor", "WindowTop", (Screen.PrimaryScreen.Bounds.Height / 2 - 300).ToString());
                 ini.WriteValue("Editor", "WindowBottom", (Screen.PrimaryScreen.Bounds.Height / 2 + 300).ToString());
@@ -736,7 +623,9 @@ namespace EmulatorLauncher
             regKeyc = vp.CreateSubKey("Controller");
             if (regKeyc != null)
             {
-                if (Screen.AllScreens.Length >= 1 && SystemConfig["enableb2s"] != "0" && !SystemInformation.TerminalServerSession)
+                SimpleLogger.Instance.Info("[Generator] Writing config to registry.");
+
+                if (Screen.AllScreens.Length > 1 && (!SystemConfig.isOptSet("enableb2s") || SystemConfig.getOptBoolean("enableb2s")) && !SystemInformation.TerminalServerSession)
                     SetOption(regKeyc, "ForceDisableB2S", 0);
                 else
                     SetOption(regKeyc, "ForceDisableB2S", 1);
@@ -815,8 +704,10 @@ namespace EmulatorLauncher
                 else
                     SetOption(regKeyc, "FXAA", 0);
 
-                SetOption(regKeyc, "BGSet", SystemConfig["arcademode"] == "1" ? 1 : 0);
-                SetOption(regKeyc, "ForceAnisotropicFiltering", SystemConfig.getOptBoolean("vp_anisotropic_filtering") ? 0 : 1);
+                SetOption(regKeyc, "BGSet", SystemConfig.getOptBoolean("arcademode") ? 1 : 0);
+
+                bool aniFilter = !SystemConfig.isOptSet("vp_anisotropic_filtering") || SystemConfig.getOptBoolean("vp_anisotropic_filtering");
+                SetOption(regKeyc, "ForceAnisotropicFiltering", aniFilter ? 1 : 0);
                 SetOption(regKeyc, "UseNVidiaAPI", SystemConfig.getOptBoolean("vp_nvidia") ? 1 : 0);
                 SetOption(regKeyc, "SoftwareVertexProcessing", SystemConfig.getOptBoolean("vp_vertex") ? 1 : 0);
 
@@ -824,17 +715,19 @@ namespace EmulatorLauncher
                 SetOption(regKeyc, "PlayMusic", SystemConfig.getOptBoolean("vp_music_off") ? 0 : 1);
 
                 // Controls
-                SetOption(regKeyc, "LRAxis", SystemConfig["nouse_joyaxis"] == "1" ? 0 : 1);
-                SetOption(regKeyc, "UDAxis", SystemConfig["nouse_joyaxis"] == "1" ? 0 : 2);
-                SetOption(regKeyc, "PlungerAxis", SystemConfig["nouse_joyaxis"] == "1" ? 0 : 3);
+                if (!SystemConfig.getOptBoolean("disableautocontrollers"))
+                {
+                    SetOption(regKeyc, "LRAxis", SystemConfig.getOptBoolean("nouse_joyaxis") ? 0 : 1);
+                    SetOption(regKeyc, "UDAxis", SystemConfig.getOptBoolean("nouse_joyaxis") ? 0 : 2);
+                    SetOption(regKeyc, "PlungerAxis", SystemConfig.getOptBoolean("nouse_joyaxis") ? 0 : 3);
 
-                int deadzone = 15;
+                    int deadzone = 15;
 
-                if (SystemConfig.isOptSet("joy_deadzone") && !string.IsNullOrEmpty(SystemConfig["joy_deadzone"]))
-                    deadzone = SystemConfig["joy_deadzone"].ToInteger();
-                
-                SetOption(regKeyc, "DeadZone", deadzone);
+                    if (SystemConfig.isOptSet("joy_deadzone") && !string.IsNullOrEmpty(SystemConfig["joy_deadzone"]))
+                        deadzone = SystemConfig["joy_deadzone"].ToIntegerString().ToInteger();
 
+                    SetOption(regKeyc, "DeadZone", deadzone);
+                }
                 regKeyc.Close();
             }
 
@@ -863,6 +756,8 @@ namespace EmulatorLauncher
             var visualPinMame = softwareKey.CreateSubKey("Freeware").CreateSubKey("Visual PinMame");
             if (visualPinMame != null)
             {
+                SimpleLogger.Instance.Info("[Generator] Writing VPinMame config to Registry.");
+
                 DisableVPinMameLicenceDialogs(romPath, visualPinMame);
 
                 visualPinMame.CreateSubKey("default");
@@ -908,6 +803,8 @@ namespace EmulatorLauncher
             if (romPath == null || !Directory.Exists(romPath))
                 return;
 
+            SimpleLogger.Instance.Info("[Generator] Disabling VPinMame Licence prompts for all available table roms.");
+
             string[] romList = Directory.GetFiles(romPath, "*.zip").Select(r => Path.GetFileNameWithoutExtension(r)).Distinct().ToArray();
             foreach (var rom in romList)
             {
@@ -945,6 +842,137 @@ namespace EmulatorLauncher
                 return;
 
             regKeyc.SetValue(name, value);
+        }
+
+        class DirectB2sData
+        {
+            public static DirectB2sData FromFile(string file)
+            {
+                if (!File.Exists(file))
+                    return null;
+
+
+                XmlDocument document = new XmlDocument();
+                document.Load(file);
+
+                XmlElement element = (XmlElement)document.SelectSingleNode("DirectB2SData");
+                if (element == null)
+                    return null;
+
+                var bulbs = new List<Bulb>();
+
+                foreach (XmlElement bulb in element.SelectNodes("Illumination/Bulb"))
+                {
+                    if (!bulb.HasAttribute("Parent") || bulb.GetAttribute("Parent") != "Backglass")
+                        continue;
+
+                    try
+                    {
+                        Bulb item = new Bulb
+                        {
+                            ID = bulb.GetAttribute("ID").ToInteger(),
+                            LightColor = bulb.GetAttribute("LightColor"),
+                            LocX = bulb.GetAttribute("LocX").ToInteger(),
+                            LocY = bulb.GetAttribute("LocY").ToInteger(),
+                            Width = bulb.GetAttribute("Width").ToInteger(),
+                            Height = bulb.GetAttribute("Height").ToInteger(),
+                            Visible = bulb.GetAttribute("Visible") == "1",
+                            IsImageSnippit = bulb.GetAttribute("IsImageSnippit") == "1",
+                            Image = Misc.Base64ToImage(bulb.GetAttribute("Image"))
+                        };
+
+                        if (item.Visible && item.Image != null)
+                            bulbs.Add(item);
+                    }
+                    catch { }
+                }
+
+
+                XmlElement element13 = (XmlElement)element.SelectSingleNode("Images/BackglassImage");
+                if (element13 != null)
+                {
+                    try
+                    {
+                        var image = Misc.Base64ToImage(element13.Attributes["Value"].InnerText);
+                        if (image != null)
+                        {
+                            return new DirectB2sData()
+                            {
+                                Bulbs = bulbs.ToArray(),
+                                Image = image,
+                            };
+                        }
+                    }
+                    catch { }
+                }
+
+                return null;
+            }
+
+            public Image RenderBackglass(int index = 0)
+            {
+                var bitmap = new Bitmap(Image);
+
+                using (Graphics g = Graphics.FromImage(bitmap))
+                {
+                    foreach (var bulb in Bulbs)
+                    {
+                        if (bulb.IsImageSnippit)
+                            continue;
+
+                        if (index == 0 && (bulb.ID & 1) == 0)
+                            continue;
+
+                        if (index == 1 && (bulb.ID & 1) == 1)
+                            continue;
+
+                        if (index == 3)
+                            continue;
+
+                        Color lightColor = Color.White;
+                        var split = bulb.LightColor.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (split.Length == 3)
+                            lightColor = Color.FromArgb(split[0].ToInteger(), split[1].ToInteger(), split[2].ToInteger());
+
+                        using (ImageAttributes imageAttrs = new ImageAttributes())
+                        {
+                            var colorMatrix = new ColorMatrix(new float[][]
+                                    {
+                                        new float[] { lightColor.R / 255f, 0, 0, 0, 0 },
+                                        new float[] { 0, lightColor.G / 255f, 0, 0, 0 },
+                                        new float[] { 0, 0, lightColor.B / 255f, 0, 0 },
+                                        new float[] { 0, 0, 0, 1, 0 },
+                                        new float[] { 0, 0, 0, 0, 1 }
+                                    });
+
+                            imageAttrs.SetColorMatrix(colorMatrix);
+
+                            Rectangle dest = new Rectangle(bulb.LocX, bulb.LocY, bulb.Width, bulb.Height);
+                            g.DrawImage(bulb.Image, dest, 0, 0, bulb.Image.Width, bulb.Image.Height, GraphicsUnit.Pixel, imageAttrs, null, IntPtr.Zero);
+                        }
+                    }
+                }
+
+                return bitmap;
+            }
+
+            public Bulb[] Bulbs { get; private set; }
+            public Image Image { get; private set; }
+
+            public class Bulb
+            {
+                public int ID { get; set; }
+
+                public string LightColor { get; set; }
+                public int LocX { get; set; }
+                public int LocY { get; set; }
+                public int Width { get; set; }
+                public int Height { get; set; }
+                public bool Visible { get; set; }
+                public bool IsImageSnippit { get; set; }
+
+                public Image Image { get; set; }
+            }
         }
     }
 }

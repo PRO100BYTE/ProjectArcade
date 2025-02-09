@@ -33,11 +33,19 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>projectarcade.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="SharpDX, Version=3.0.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="SharpDX.DirectInput">
       <HintPath>..\SharpDX.DirectInput.dll</HintPath>
@@ -72,11 +80,13 @@
     <Compile Include="FileFormats\ConfigFile.cs" />
     <Compile Include="FileFormats\DynamicJson.cs" />
     <Compile Include="FileFormats\IniFile.cs" />
+    <Compile Include="FileFormats\IniFileJGenesis.cs" />
     <Compile Include="FileFormats\IsoFile.cs" />
     <Compile Include="FileFormats\JsonSerializer.cs" />
     <Compile Include="FileFormats\MultiDiskImageFile.cs" />
     <Compile Include="FileFormats\SimpleBml.cs" />
     <Compile Include="FileFormats\SimpleYml.cs" />
+    <Compile Include="FileFormats\StringEncryption.cs" />
     <Compile Include="FileFormats\XmlDeserializer.cs" />
     <Compile Include="FileFormats\XmlExtensions.cs" />
     <Compile Include="FileTools.cs" />
@@ -94,6 +104,7 @@
     <Compile Include="Joysticks\SdlGameController.cs" />
     <Compile Include="Joysticks\SdlJoystickGuid.cs" />
     <Compile Include="Joysticks\SdlToDirectInput.cs" />
+    <Compile Include="Joysticks\SpecialControllers.cs" />
     <Compile Include="Joysticks\VidPid.cs" />
     <Compile Include="Joysticks\WinmmJoystick.cs" />
     <Compile Include="Joysticks\XInputDevice.cs" />
@@ -169,7 +180,9 @@
     <None Include="Resources\SQLite.Interop.x64.gz" />
     <None Include="Resources\SQLite.Interop.x86.gz" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="projectarcade.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release (

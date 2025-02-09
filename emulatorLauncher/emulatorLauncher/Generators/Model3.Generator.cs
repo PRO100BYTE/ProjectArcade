@@ -16,6 +16,8 @@ namespace EmulatorLauncher
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
+            SimpleLogger.Instance.Info("[Generator] Getting " + emulator + " path and executable name.");
+
             string path = AppConfig.GetFullPath("supermodel");
 
             string exe = Path.Combine(path, "supermodel.exe");            
@@ -49,7 +51,7 @@ namespace EmulatorLauncher
             {
                 SystemConfig["forceNoBezel"] = "1";
 
-                ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution);
+                ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution, emulator);
 
                 if (SystemConfig["widescreen"] == "2")
                     commandArray.Add("-stretch");
@@ -58,8 +60,8 @@ namespace EmulatorLauncher
             }
             else
             {
-                if (!ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution))
-                    _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution);
+                if (!ReshadeManager.Setup(ReshadeBezelType.opengl, ReshadePlatform.x64, system, rom, path, resolution, emulator))
+                    _bezelFileInfo = BezelFiles.GetBezelFiles(system, rom, resolution, emulator);
             }
 
             // outputs for mamehook
@@ -79,13 +81,13 @@ namespace EmulatorLauncher
                 commandArray.Add("-force-feedback");
 
             // SuperSampling
-            if (SystemConfig.isOptSet("m3_supersampling") && !string.IsNullOrEmpty(SystemConfig["m3_supersampling"]) && SystemConfig["m3_supersampling"] != "0")
-                commandArray.Add("-ss=" + SystemConfig["m3_supersampling"]);
+            if (SystemConfig.isOptSet("m3_supersampling") && !string.IsNullOrEmpty(SystemConfig["m3_supersampling"]) && SystemConfig["m3_supersampling"].ToIntegerString() != "0")
+                commandArray.Add("-ss=" + SystemConfig["m3_supersampling"].ToIntegerString());
 
             //Write config in supermodel.ini
             SetupConfiguration(path, wideScreen, fullscreen);
 
-            if (SystemConfig["m3_vsync"] == "false")
+            if (SystemConfig.isOptSet("m3_vsync") && !SystemConfig.getOptBoolean("m3_vsync"))
                 commandArray.Add("-no-vsync");
             else
                 commandArray.Add("-vsync");
@@ -169,10 +171,10 @@ namespace EmulatorLauncher
 
                         ini.WriteValue(" Global ", "WideScreen", wideScreen ? "1" : "0");
 
-                        BindBoolIniFeature(ini, " Global ", "Throttle", "throttle", "0", "1");          //throttle - default on
-                        BindBoolIniFeature(ini, " Global ", "New3DEngine", "new3Dengine", "0", "1");    //New3DEngine - setting to OFF will use legacy 3D engine, fixes OpenGL error on older GPUs
+                        BindBoolIniFeatureOn(ini, " Global ", "Throttle", "throttle", "1", "0");          //throttle - default on
+                        BindBoolIniFeatureOn(ini, " Global ", "New3DEngine", "new3Dengine", "1", "0");    //New3DEngine - setting to OFF will use legacy 3D engine, fixes OpenGL error on older GPUs
                         BindBoolIniFeature(ini, " Global ", "MultiThreaded", "m3_thread", "0", "1");
-                        BindIniFeature(ini, " Global ", "PowerPCFrequency", "m3_ppc_frequency", "50");
+                        BindIniFeatureSlider(ini, " Global ", "PowerPCFrequency", "m3_ppc_frequency", "50");
                         BindBoolIniFeature(ini, " Global ", "ShowFrameRate", "m3_fps", "1", "0");
                         BindBoolIniFeature(ini, " Global ", "WideBackground", "widescreen", "true", "false");
 

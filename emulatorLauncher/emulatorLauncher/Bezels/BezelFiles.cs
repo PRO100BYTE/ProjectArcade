@@ -8,10 +8,12 @@ using System.Runtime.InteropServices;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.Lightguns;
 using EmulatorLauncher.Common.FileFormats;
+using EmulatorLauncher;
+using System.Collections.Generic;
 
 namespace EmulatorLauncher
 {
-    class BezelFiles
+    partial class BezelFiles
     {
         public string PngFile { get; set; }
         public string InfoFile { get; set; }
@@ -150,30 +152,30 @@ namespace EmulatorLauncher
         static string[] bezelPaths =
         {            
             // Bezels with exact rom name -> Uses {rom} for rom name
-            "{userpath}\\{bezel}\\games\\{gamesystem}\\{rom}.png",
-            "{systempath}\\{bezel}\\games\\{gamesystem}\\{rom}.png",
-            "{userpath}\\{bezel}\\games\\{rom}.png",
-            "{systempath}\\{bezel}\\games\\{rom}.png",
+            "{userpath}\\{bezel}\\games\\{gamesystem}\\{rom}.png",              // decorations\thebezelproject\games\mame\1942.png
+            "{systempath}\\{bezel}\\games\\{gamesystem}\\{rom}.png",            // system\decorations\thebezelproject\games\mame\1942.png
+            "{userpath}\\{bezel}\\games\\{rom}.png",                            // decorations\thebezelproject\games\1942.png
+            "{systempath}\\{bezel}\\games\\{rom}.png",                          // system\decorations\thebezelproject\games\1942.png
 
             // Bezels with same IndexedRomName -> Uses * instead of rom name
-            "{userpath}\\{bezel}\\games\\{gamesystem}\\*.png",
-            "{systempath}\\{bezel}\\games\\{gamesystem}\\*.png",
-            "{userpath}\\{bezel}\\games\\*.png",
-            "{systempath}\\{bezel}\\games\\*.png",
+            "{userpath}\\{bezel}\\games\\{gamesystem}\\*.png",                  // decorations\thebezelproject\games\mame\*.png
+            "{systempath}\\{bezel}\\games\\{gamesystem}\\*.png",                // system\decorations\thebezelproject\games\mame\*.png
+            "{userpath}\\{bezel}\\games\\*.png",                                // decorations\thebezelproject\games\1942.png
+            "{systempath}\\{bezel}\\games\\*.png",                              // system\decorations\thebezelproject\games\1942.png
 
             // System bezels
-            "{userpath}\\{bezel}\\systems\\{system}.png",
-            "{systempath}\\{bezel}\\systems\\{system}.png",
-            "{userpath}\\{bezel}\\default.png",
-            "{systempath}\\{bezel}\\default.png",
+            "{userpath}\\{bezel}\\systems\\{system}.png",                       // decorations\thebezelproject\systems\mame.png
+            "{systempath}\\{bezel}\\systems\\{system}.png",                     // system\decorations\thebezelproject\systems\mame.png
+            "{userpath}\\{bezel}\\default.png",                                 // decorations\thebezelproject\default.png
+            "{systempath}\\{bezel}\\default.png",                               // system\decorations\thebezelproject\default.png
             
             // Default_unglazed
-            "{userpath}\\default_unglazed\\systems\\{system}.png",
-            "{systempath}\\default_unglazed\\systems\\{system}.png",
+            "{userpath}\\default_unglazed\\systems\\{system}.png",              // decorations\default_unglazed\systems\mame.png
+            "{systempath}\\default_unglazed\\systems\\{system}.png",            // system\decorations\default_unglazed\systems\mame.png
 
             // Default
-            "{userpath}\\default\\systems\\{system}.png",
-            "{systempath}\\default\\systems\\{system}.png"
+            "{userpath}\\default\\systems\\{system}.png",                       // decorations\default\systems\mame.png
+            "{systempath}\\default\\systems\\{system}.png"                      // system\decorations\default\systems\mame.png
         };
 
         private static bool IsPng(string filename)
@@ -196,9 +198,12 @@ namespace EmulatorLauncher
             return false;
         }
 
-        private static string FindBezel(string overlayUser, string overlaySystem, string bezel, string systemName, string romName, string perGameSystem)
+        private static string FindBezel(string overlayUser, string overlaySystem, string bezel, string systemName, string romName, string perGameSystem, string emulator)
         {
             string indexedRomName = romName.AsIndexedRomName();
+
+            // specific cases (eg for 3ds (depending on layout))
+            systemName = GetSpecificBezels(systemName, emulator);
 
             foreach (var path in bezelPaths)
             {
@@ -261,7 +266,7 @@ namespace EmulatorLauncher
             return null;
         }
       
-        public static BezelFiles GetBezelFiles(string systemName, string rom, ScreenResolution resolution)
+        public static BezelFiles GetBezelFiles(string systemName, string rom, ScreenResolution resolution, string emulator = null)
         {
             if (systemName == null || rom == null)
                 return null;
@@ -284,6 +289,12 @@ namespace EmulatorLauncher
                 if (!string.IsNullOrEmpty(Program.CurrentGame.Bezel) && File.Exists(Program.CurrentGame.Bezel))
                 {
                     var customBz = new BezelFiles() { PngFile = Program.CurrentGame.Bezel };
+
+                    if (Program.SystemConfig.getOptBoolean("tattoo"))
+                    {
+                        string newPngFile = Program.CurrentGame.Bezel.Replace(".png", "_tattoo.png");
+                        customBz.PngFile = GetTattooImage(customBz.PngFile, newPngFile, emulator);
+                    }
 
                     if (Program.SystemConfig.getOptBoolean("use_guns") && RawLightgun.IsSindenLightGunConnected())
                         return CreateSindenBorderBezel(customBz);
@@ -322,7 +333,7 @@ namespace EmulatorLauncher
             if (systemName == "fbneo" && bezel == "thebezelproject" && Directory.Exists(Path.Combine(overlayUser, bezel, "games", "mame")) && !Directory.Exists(Path.Combine(overlayUser, bezel, "games", "fbneo")))
                 perGameSystem = "mame";
 
-            string overlay_png_file = FindBezel(overlayUser, overlaySystem, bezel, systemName, Path.GetFileNameWithoutExtension(rom), perGameSystem);
+            string overlay_png_file = FindBezel(overlayUser, overlaySystem, bezel, systemName, Path.GetFileNameWithoutExtension(rom), perGameSystem, emulator);
             if (string.IsNullOrEmpty(overlay_png_file))
             {
                 if (Program.SystemConfig.getOptBoolean("use_guns") && RawLightgun.IsSindenLightGunConnected())
@@ -331,11 +342,32 @@ namespace EmulatorLauncher
                 return null;
             }
 
+            // If default bezel and game is vertcial, switch to default vertical bezel
+            if (systemName == "mame" || systemName == "fbneo")
+            {
+                var romInfo = Mame64Generator.MameGameInfo.GetGameInfo(Path.GetFileNameWithoutExtension(rom));
+
+                if (romInfo != null && romInfo.Vertical)
+                {
+                    if ((overlay_png_file.Contains("default\\systems") || overlay_png_file.Contains("default_unglazed\\systems")) && overlay_png_file.EndsWith(systemName + ".png"))
+                    {
+                        bezel = "arcade_vertical_default";
+                        overlay_png_file = FindBezel(overlayUser, overlaySystem, bezel, systemName, Path.GetFileNameWithoutExtension(rom), perGameSystem, emulator);
+                    }
+                }
+            }
+
             string overlay_info_file = Path.ChangeExtension(overlay_png_file, ".info");
             if (!File.Exists(overlay_info_file))
                 overlay_info_file = null;
 
             var ret = new BezelFiles() { PngFile = overlay_png_file, InfoFile = overlay_info_file };
+
+            if (Program.SystemConfig.getOptBoolean("tattoo"))
+            {
+                string newPngFile = overlay_png_file.Replace(".png", "_tattoo.png");
+                ret.PngFile = GetTattooImage(overlay_png_file, newPngFile, emulator);
+            }
 
             if (Program.SystemConfig.getOptBoolean("use_guns") && RawLightgun.IsSindenLightGunConnected())
                 return CreateSindenBorderBezel(ret);
@@ -344,7 +376,100 @@ namespace EmulatorLauncher
 
             return ret;
         }
-        
+
+        private static string GetSpecificBezels(string system, string emulator)
+        {
+            string core = Program.SystemConfig["core"];
+            if (system == "3ds")
+            {
+                switch (emulator)
+                {
+                    case "citra":
+                    case "citra-canary":
+                        if (Program.SystemConfig.isOptSet("citraqt_layout_option") && Program.SystemConfig["citraqt_layout_option"] == "3")
+                            return "3ds_side_by_side";
+                        else if (Program.SystemConfig.isOptSet("citraqt_layout_option") && Program.SystemConfig["citraqt_layout_option"] == "2")
+                            return "3ds_hybrid";
+                        break;
+                    case "libretro":
+                        if (Program.SystemConfig.isOptSet("citra_layout_option") && Program.SystemConfig["citra_layout_option"] == "Side by Side")
+                            return "3ds_side_by_side";
+                        else if (Program.SystemConfig.isOptSet("citra_layout_option") && Program.SystemConfig["citra_layout_option"] == "Large Screen, Small Screen")
+                            return "3ds_lr_hybrid";
+                        break;
+                    case "lime3ds":
+                        if (Program.SystemConfig.isOptSet("lime_layout_option") && Program.SystemConfig["lime_layout_option"] == "3")
+                            return "3ds_side_by_side";
+                        else if (Program.SystemConfig.isOptSet("lime_layout_option") && Program.SystemConfig["lime_layout_option"] == "2")
+                            return "3ds_hybrid";
+                        break;
+                }
+            }
+
+            if (system == "nds")
+            {
+                switch (emulator)
+                {
+                    case "melonds":
+                        if (Program.SystemConfig.isOptSet("melonds_screen_sizing") && (Program.SystemConfig["melonds_screen_sizing"] == "4" || Program.SystemConfig["melonds_screen_sizing"] == "5"))
+                            return "nds_melonds_single_screen";
+                        else if (Program.SystemConfig.isOptSet("melonds_screen_layout") && Program.SystemConfig["melonds_screen_layout"] == "2")
+                            return "nds_melonds_side_by_side";
+                        else if (Program.SystemConfig.isOptSet("melonds_screen_layout") && Program.SystemConfig["melonds_screen_layout"] == "3")
+                            return "nds_melonds_hybrid";
+                        else
+                            return "nds_melonds";
+                    case "bizhawk":
+                        if (Program.SystemConfig.isOptSet("bizhawk_melonds_layout") && Program.SystemConfig["bizhawk_melonds_layout"] == "2")
+                            return "nds_side_by_side";
+                        else if (Program.SystemConfig.isOptSet("bizhawk_melonds_layout") && (Program.SystemConfig["bizhawk_melonds_layout"] == "3" || Program.SystemConfig["bizhawk_melonds_layout"] == "4"))
+                            return "nds_single_screen";
+                        break;
+                    case "libretro":
+                    {
+                        switch (core)
+                        {
+                            case "melondsds":
+                                if (Program.SystemConfig.isOptSet("melondsds_screen_layout") && (Program.SystemConfig["melondsds_screen_layout"] == "left-right" || Program.SystemConfig["melondsds_screen_layout"] == "right-left"))
+                                    return "nds_side_by_side";
+                                else if (Program.SystemConfig.isOptSet("melondsds_screen_layout") && (Program.SystemConfig["melondsds_screen_layout"] == "hybrid-top" || Program.SystemConfig["melondsds_screen_layout"] == "hybrid-bottom"))
+                                    return "nds_lr_hybrid";
+                                else if (Program.SystemConfig.isOptSet("melondsds_screen_layout") && (Program.SystemConfig["melondsds_screen_layout"] == "top" || Program.SystemConfig["melondsds_screen_layout"] == "bottom"))
+                                    return "nds_single_screen";
+                                break;
+                            case "desmume":
+                            case "desmume2015":
+                                if (Program.SystemConfig.isOptSet("desmume_screens_layout") && (Program.SystemConfig["desmume_screens_layout"] == "left/right" || Program.SystemConfig["desmume_screens_layout"] == "right/left"))
+                                    return "nds_side_by_side";
+                                else if (Program.SystemConfig.isOptSet("desmume_screens_layout") && (Program.SystemConfig["desmume_screens_layout"] == "hybrid/top" || Program.SystemConfig["desmume_screens_layout"] == "hybrid/bottom"))
+                                    return "nds_lr_desmume_hybrid";
+                                else if (Program.SystemConfig.isOptSet("desmume_screens_layout") && (Program.SystemConfig["desmume_screens_layout"] == "top only" || Program.SystemConfig["desmume_screens_layout"] == "bottom only"))
+                                    return "nds_single_screen";
+                                break;
+                            case "melonds":
+                                if (Program.SystemConfig.isOptSet("melonds_screen_layout") && (Program.SystemConfig["melonds_screen_layout"] == "Left/Right" || Program.SystemConfig["melonds_screen_layout"] == "Right/Left"))
+                                    return "nds_side_by_side";
+                                else if (Program.SystemConfig.isOptSet("melonds_screen_layout") && (Program.SystemConfig["melonds_screen_layout"] == "Hybrid Top" || Program.SystemConfig["melonds_screen_layout"] == "duplicate"))
+                                    return "nds_lr_hybrid";
+                                else if (Program.SystemConfig.isOptSet("melonds_screen_layout") && (Program.SystemConfig["melonds_screen_layout"] == "Top Only" || Program.SystemConfig["melonds_screen_layout"] == "Bottom Only"))
+                                    return "nds_single_screen";
+                                break;
+                            case "noods":
+                                if (Program.SystemConfig.isOptSet("noods_screenArrangement") && Program.SystemConfig["noods_screenArrangement"] == "Horizontal")
+                                    return "nds_side_by_side";
+                                else if (Program.SystemConfig.isOptSet("noods_screenArrangement") && Program.SystemConfig["noods_screenArrangement"] == "Vertical")
+                                    return "nds";
+                                else if (Program.SystemConfig.isOptSet("noods_screenArrangement") && Program.SystemConfig["noods_screenArrangement"] == "Single Screen")
+                                    return "nds_single_screen";
+                                break;
+                            }
+                        break;
+                    }
+                }
+            }
+            return system;
+        }
+
         public static BezelFiles CreateSindenBorderBezel(BezelFiles input, ScreenResolution resolution = null)
         {
             if (input == null)
@@ -501,7 +626,6 @@ namespace EmulatorLauncher
             }
             return overlay_png_file;
         }
-
     }
 
     [DataContract]

@@ -58,6 +58,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\System.Data.SQLite.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Newtonsoft.Json.dll</HintPath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Management" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xaml" />
@@ -74,6 +80,7 @@
     <Compile Include="Controller.cs" />
     <Compile Include="EsFeaturesPoBuilder.cs" />
     <Compile Include="EsSaveStatesExtensions.cs" />
+    <Compile Include="Generators\ProjectArcadeLauncher.Generator.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="InstallerFrm.cs">
       <SubType>Form</SubType>
@@ -87,6 +94,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Bezels\BezelFiles.cs" />
+	<Compile Include="Bezels\BezelFiles.Tattoos.cs" />
     <Compile Include="Bezels\FakeBezelFrm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -104,7 +112,10 @@
       <DependentUpon>Ares.Generator.cs</DependentUpon>
     </Compile>
     <Compile Include="Generators\BigPEmu.Generator.cs" />
-    <Compile Include="Generators\BigPEmu.Controllers.cs">
+	<Compile Include="Generators\BigPEmu.Controllers.cs">
+      <DependentUpon>BigPEmu.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\BigPEmu.SaveStatesMonitor.cs">
       <DependentUpon>BigPEmu.Generator.cs</DependentUpon>
     </Compile>
     <Compile Include="Generators\Bizhawk.Generator.cs" />
@@ -117,6 +128,13 @@
     <Compile Include="Generators\Bizhawk.Guns.cs">
       <DependentUpon>Bizhawk.Generator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Generators\Bizhawk.SaveStatesMonitor.cs">
+      <DependentUpon>Bizhawk.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\CapriceForever.Generator.cs" />
+    <Compile Include="Generators\CapriceForever.Controllers.cs">
+      <DependentUpon>CapriceForever.Generator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Generators\Cemu.Generator.cs" />
     <Compile Include="Generators\Cemu.Controllers.cs">
       <DependentUpon>Cemu.Generator.cs</DependentUpon>
@@ -124,6 +142,10 @@
     <Compile Include="Generators\Citra.Generator.cs" />
     <Compile Include="Generators\Citra.Controllers.cs">
       <DependentUpon>Citra.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Citron.Generator.cs" />
+    <Compile Include="Generators\Citron.Controllers.cs">
+      <DependentUpon>Citron.Generator.cs</DependentUpon>
     </Compile>
     <Compile Include="Generators\Cxbx.Generator.cs" />
     <Compile Include="Generators\Cxbx.Controllers.cs">
@@ -186,6 +208,9 @@
     <Compile Include="Generators\Flycast.Wheels.cs">
       <DependentUpon>Flycast.Generator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Generators\Flycast.SaveStatesMonitor.cs">
+      <DependentUpon>Flycast.Generator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Generators\ForceEngine.Generator.cs" />
     <Compile Include="Generators\Fpinball.Generator.cs" />
     <Compile Include="Generators\GemRB.Generator.cs" />
@@ -194,6 +219,9 @@
     <Compile Include="Generators\Hatari.Generator.cs" />
     <Compile Include="Generators\Jgenesis.Generator.cs" />
     <Compile Include="Generators\Jgenesis.Controllers.cs">
+      <DependentUpon>Jgenesis.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Jgenesis.SaveStatesMonitor.cs">
       <DependentUpon>Jgenesis.Generator.cs</DependentUpon>
     </Compile>
     <Compile Include="Generators\Jynx.Generator.cs" />
@@ -210,6 +238,9 @@
       <DependentUpon>LibRetro.Generator.cs</DependentUpon>
     </Compile>
     <Compile Include="Generators\Libretro.Controllers.cs">
+      <DependentUpon>LibRetro.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Libretro.ControllersSpecial.cs">
       <DependentUpon>LibRetro.Generator.cs</DependentUpon>
     </Compile>
     <Compile Include="Generators\LibRetro.CoreOptions.cs">
@@ -276,6 +307,9 @@
     <Compile Include="Generators\OpenMSX.Controllers.cs">
       <DependentUpon>OpenMSX.Generator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Generators\Openmsx.SaveStatesMonitor.cs">
+      <DependentUpon>OpenMSX.Generator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Generators\Oricutron.Generator.cs" />
     <Compile Include="Generators\Pcsx2.Generator.cs" />
     <Compile Include="Generators\Pcsx2.Controllers.cs">
@@ -307,6 +341,9 @@
     <Compile Include="Generators\PortsLauncher.Controllers.cs">
       <DependentUpon>PortsLauncher.Generator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Generators\PortsLauncher.Templates.cs">
+      <DependentUpon>PortsLauncher.Generator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Generators\Ppsspp.Generator.cs" />
     <Compile Include="Generators\Ppsspp.Controllers.cs">
       <DependentUpon>Ppsspp.Generator.cs</DependentUpon>
@@ -320,6 +357,10 @@
       <DependentUpon>PSXMame.Generator.cs</DependentUpon>
     </Compile>
     <Compile Include="Generators\Raine.Generator.cs" />
+    <Compile Include="Generators\Raine.Controllers.cs">
+      <DependentUpon>Raine.Generator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\Raze.Generator.cs" />
     <Compile Include="Generators\Redream.Generator.cs" />
     <Compile Include="Generators\Redream.Controllers.cs">
       <DependentUpon>Redream.Generator.cs</DependentUpon>
@@ -338,6 +379,7 @@
       <DependentUpon>Ryujinx.Generator.cs</DependentUpon>
     </Compile>
     <Compile Include="Generators\ScummVm.Generator.cs" />
+    <Compile Include="Generators\ShadPS4.Generator.cs" />
     <Compile Include="Generators\SimCoupe.Generator.cs" />
     <Compile Include="Generators\Simple64.Generator.cs" />
     <Compile Include="Generators\Simple64.Controllers.cs">
@@ -369,13 +411,21 @@
     <Compile Include="Generators\TeknoParrot.Controllers.cs">
       <DependentUpon>TeknoParrot.Generator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Generators\TeknoParrot.Guns.cs">
+      <DependentUpon>TeknoParrot.Generator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Generators\Tsugaru.Generator.cs" />
     <Compile Include="Generators\Uae.Generator.cs" />
     <Compile Include="Generators\vita3k.Generator.cs" />
     <Compile Include="Generators\VPinball.Generator.cs" />
+    <Compile Include="Generators\WinArcadia.Generator.cs" />
     <Compile Include="Generators\XEmu.Generator.cs" />
     <Compile Include="Generators\Xenia.Generator.cs" />
     <Compile Include="Generators\Xm6pro.Generator.cs" />
+    <Compile Include="Generators\Yabasanshiro.Generator.cs" />
+    <Compile Include="Generators\Yabasanshiro.Controllers.cs">
+      <DependentUpon>Yabasanshiro.Generator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Generators\Yuzu.Generator.cs" />
     <Compile Include="Generators\Yuzu.Controllers.cs">
       <DependentUpon>Yuzu.Generator.cs</DependentUpon>
@@ -403,6 +453,11 @@
     </Compile>
     <Compile Include="Properties\Resources.ru.Designer.cs">
       <DependentUpon>Resources.ru.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Properties\Resources.es.Designer.cs">
+      <DependentUpon>Resources.es.resx</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
@@ -437,6 +492,11 @@
     <EmbeddedResource Include="Properties\Resources.ru.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.ru.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.es.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.es.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -478,6 +538,7 @@
   <ItemGroup>
     <Content Include="icon.ico" />
     <Content Include="projectarcade.ico" />
+    <None Include="Resources\projectarcade.png" />
     <None Include="Resources\blacklisted-words.txt" />
     <None Include="Resources\retrobat.png" />
     <None Include="Reshader\Bezel.fx" />

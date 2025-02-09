@@ -4,6 +4,7 @@ using System.Linq;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.Joysticks;
 using EmulatorLauncher.Common.EmulationStation;
+using EmulatorLauncher.Common;
 
 namespace EmulatorLauncher
 {
@@ -37,6 +38,8 @@ namespace EmulatorLauncher
         {
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
+
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for DuckStation");
 
             if (Program.SystemConfig.isOptSet("input_forceSDL") && Program.SystemConfig.getOptBoolean("input_forceSDL"))
                 _forceSDL = true;
@@ -265,13 +268,26 @@ namespace EmulatorLauncher
             {
                 ini.WriteValue(padNumber, "InvertLeftStick", "0");
                 ini.WriteValue(padNumber, "InvertRightStick", "0");
-                ini.WriteValue(padNumber, "ButtonDeadzone", "0.250000");
+
+                if (SystemConfig.isOptSet("trigger_deadzone") && !string.IsNullOrEmpty(SystemConfig["trigger_deadzone"]))
+                    ini.WriteValue(padNumber, "ButtonDeadzone", SystemConfig["trigger_deadzone"]);
+                else
+                    ini.WriteValue(padNumber, "ButtonDeadzone", "0.200000");
+
                 ini.WriteValue(padNumber, "AnalogSensitivity", "1.330000");
 
                 if (SystemConfig.isOptSet("stick_deadzone") && !string.IsNullOrEmpty(SystemConfig["stick_deadzone"]))
                     ini.WriteValue(padNumber, "AnalogDeadzone", SystemConfig["stick_deadzone"]);
                 else
-                    ini.WriteValue(padNumber, "AnalogDeadzone", "0.000000");
+                    ini.WriteValue(padNumber, "AnalogDeadzone", "0.150000");
+            }
+
+            if (SystemConfig.getOptBoolean("psx_triggerswap"))
+            {
+                ini.Remove(padNumber, "L2");
+                ini.Remove(padNumber, "R2");
+                ini.WriteValue(padNumber, "LUp", techPadNumber + GetInputKeyName(ctrl, InputKey.r2, tech));
+                ini.WriteValue(padNumber, "LDown", techPadNumber + GetInputKeyName(ctrl, InputKey.l2, tech));
             }
 
             // Write Hotkeys for player 1
@@ -292,6 +308,8 @@ namespace EmulatorLauncher
                 if (SystemConfig.isOptSet("disable_fullscreen") && SystemConfig.getOptBoolean("disable_fullscreen"))
                     ini.WriteValue("Hotkeys", "ToggleFullscreen", techPadNumber + hotKeyName + " & " + techPadNumber + GetInputKeyName(ctrl, InputKey.pageup, tech));
             }
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + ctrl.DevicePath + " to player : " + ctrl.PlayerIndex.ToString());
         }
 
         private void ResetHotkeysToDefault(IniFile ini)

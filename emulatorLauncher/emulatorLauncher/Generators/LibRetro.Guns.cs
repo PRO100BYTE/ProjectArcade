@@ -128,10 +128,16 @@ namespace EmulatorLauncher.Libretro
 
                     int deviceIndex = guns[i - 1].Index; // i-1;
 
-                    SimpleLogger.Instance.Info("[LightGun] Assigned player " + i + " to -> " + guns[i-1].Name.ToString() + " index: " + guns[i-1].Index.ToString());
+                    SimpleLogger.Instance.Info("[LightGun] Assigned player " + i + " to -> " + (guns[i - 1].Name != null ? guns[i-1].Name.ToString() : "") + " index: " + guns[i-1].Index.ToString());
 
                     retroarchConfig["input_libretro_device_p" + i] = deviceType;
-                    retroarchConfig["input_player" + i + "_mouse_index"] = deviceIndex.ToString();
+
+                    string gunPlayerIndex = "p" + i + "_gunIndex";
+                    if (SystemConfig.isOptSet(gunPlayerIndex) && !string.IsNullOrEmpty(SystemConfig[gunPlayerIndex]))
+                        retroarchConfig["input_player" + i + "_mouse_index"] = SystemConfig[gunPlayerIndex];
+                    else
+                        retroarchConfig["input_player" + i + "_mouse_index"] = deviceIndex.ToString();
+
                     retroarchConfig["input_player" + i + "_gun_trigger_mbtn"] = guninvert ? "2" : "1";
                     retroarchConfig["input_player" + i + "_gun_offscreen_shot_mbtn"] = guninvert ? "1" : "2";
                     retroarchConfig["input_player" + i + "_gun_start_mbtn"] = "3";
@@ -203,7 +209,7 @@ namespace EmulatorLauncher.Libretro
 
             // ... or configure core specific mappings            
             else
-                ConfigureGunsCore(retroarchConfig, playerIndex, core, deviceType, guninvert, useOneGun);
+                ConfigureGunsCore(retroarchConfig, playerIndex, core, deviceType, guninvert, multigun);
         }
 
         /// <summary>
@@ -262,7 +268,7 @@ namespace EmulatorLauncher.Libretro
 
         /// <summary>
         /// Dedicated core mappings for lightgun games
-        private void ConfigureGunsCore(ConfigFile retroarchConfig, int playerIndex, string core, string deviceType, bool guninvert = false, bool useOneGun = false)
+        private void ConfigureGunsCore(ConfigFile retroarchConfig, int playerIndex, string core, string deviceType, bool guninvert = false, bool multigun = false)
         {
             // Some systems offer multiple type of guns (justifier, guncon...). Option must be available in es_features.cfg
             if (SystemConfig.isOptSet("gun_type") && !string.IsNullOrEmpty(SystemConfig["gun_type"]) && SystemConfig["gun_type"] != "justifiers")
@@ -273,7 +279,7 @@ namespace EmulatorLauncher.Libretro
                 return;
 
             // If option in ES is forced to use one gun, only one gun will be configured on the playerIndex defined for the core
-            if (useOneGun || playerIndex == 2)
+            if (!multigun)
             {
                 retroarchConfig["input_driver"] = "dinput";
                 // Set deviceType and DeviceIndex
@@ -346,7 +352,12 @@ namespace EmulatorLauncher.Libretro
                     retroarchConfig["input_driver"] = "raw";
                     int deviceIndex2 = guns[1].Index;
                     retroarchConfig["input_libretro_device_p3"] = "772";
-                    retroarchConfig["input_player3_mouse_index"] = deviceIndex2.ToString();
+
+                    if (SystemConfig.isOptSet("p2_gunIndex") && !string.IsNullOrEmpty(SystemConfig["p2_gunIndex"]))
+                        retroarchConfig["input_player3_mouse_index"] = SystemConfig["p2_gunIndex"];
+                    else
+                        retroarchConfig["input_player3_mouse_index"] = deviceIndex2.ToString();
+
                     retroarchConfig["input_player3_gun_trigger_mbtn"] = guninvert ? "2" : "1";
                     retroarchConfig["input_player3_gun_offscreen_shot_mbtn"] = GetCoreMouseButton(core, guninvert, "reload");
                     retroarchConfig["input_player3_gun_aux_a_mbtn"] = GetCoreMouseButton(core, guninvert, "aux_a");
@@ -387,10 +398,15 @@ namespace EmulatorLauncher.Libretro
                 {
                     int deviceIndex = guns[i - 1].Index; // i-1;
 
-                    SimpleLogger.Instance.Info("[LightGun] Assigned player " + i + " to -> " + guns[i-1].Name.ToString() + " index: " + guns[i-1].Index.ToString());
+                    SimpleLogger.Instance.Info("[LightGun core] Assigned player " + i + " to -> " + (guns[i-1].Name != null ? guns[i-1].Name.ToString() : "") + " index: " + guns[i-1].Index.ToString());
 
                     retroarchConfig["input_libretro_device_p" + i] = deviceType;
-                    retroarchConfig["input_player" + i + "_mouse_index"] = deviceIndex.ToString();
+
+                    string gunPlayerIndex = "p" + i + "_gunIndex";
+                    if (SystemConfig.isOptSet(gunPlayerIndex) && !string.IsNullOrEmpty(SystemConfig[gunPlayerIndex]))
+                        retroarchConfig["input_player" + i + "_mouse_index"] = SystemConfig[gunPlayerIndex];
+                    else
+                        retroarchConfig["input_player" + i + "_mouse_index"] = deviceIndex.ToString();
 
                     retroarchConfig["input_player" + i + "_gun_trigger_mbtn"] = guninvert ? "2" : "1";
                     retroarchConfig["input_player" + i + "_gun_offscreen_shot_mbtn"] = GetCoreMouseButton(core, guninvert, "reload");

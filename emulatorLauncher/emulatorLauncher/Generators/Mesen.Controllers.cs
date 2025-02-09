@@ -3,6 +3,7 @@ using System.Linq;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.EmulationStation;
 using System;
+using EmulatorLauncher.Common;
 
 namespace EmulatorLauncher
 {
@@ -12,6 +13,8 @@ namespace EmulatorLauncher
         {
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
+
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for Mesen");
 
             // clear existing mapping sections of json file
             var portList = nesPorts;
@@ -60,9 +63,9 @@ namespace EmulatorLauncher
             if (controller == null || controller.Config == null)
                 return;
 
-            if (controller.IsKeyboard)
+            if (controller.IsKeyboard && !Controllers.Any(c => !c.IsKeyboard))
                 ConfigureKeyboard(pref, systemSection, controller.Config, mesenSystem);
-            else
+            else if (!controller.IsKeyboard)
                 ConfigureJoystick(pref, systemSection, controller, mesenSystem);
         }
 
@@ -75,7 +78,11 @@ namespace EmulatorLauncher
             if (joy == null)
                 return;
 
-            bool revertButtons = SystemConfig.isOptSet("mesen_revertbuttons") && SystemConfig.getOptBoolean("mesen_revertbuttons");
+            bool revertButtons = SystemConfig.isOptSet("rotate_buttons") && SystemConfig.getOptBoolean("rotate_buttons");
+            if (mesenSystem == "Nes")
+                revertButtons = !SystemConfig.getOptBoolean("rotate_buttons");
+
+            bool isNintendo = ctrl.VendorID == Common.Joysticks.USB_VENDOR.NINTENDO;
             bool isXInput = ctrl.IsXInputDevice;
             int index = isXInput ? ctrl.XInput.DeviceIndex : (ctrl.DirectInput != null ? ctrl.DirectInput.DeviceIndex : ctrl.DeviceIndex);
             int playerIndex = ctrl.PlayerIndex;
@@ -88,6 +95,14 @@ namespace EmulatorLauncher
 
             var port = systemSection.GetOrCreateContainer(portSection);
             var mapping = port.GetOrCreateContainer("Mapping1");
+            var inputKeyMapping = inputKeyMappingDefault;
+            if (isNintendo)
+            {
+                inputKeyMapping[InputKey.b] = "South";
+                inputKeyMapping[InputKey.a] = "West";
+                inputKeyMapping[InputKey.y] = "East";
+                inputKeyMapping[InputKey.x] = "North";
+            }
 
             string controllerType = "None";
             if (SystemConfig.isOptSet("mesen_controller" + playerIndex) && !string.IsNullOrEmpty(SystemConfig["mesen_controller" + playerIndex]))
@@ -97,7 +112,7 @@ namespace EmulatorLauncher
 
             port["Type"] = controllerType;
 
-            if (mesenSystem == "Nes" || mesenSystem == "Gameboy" || mesenSystem == "Sms")
+            if (mesenSystem == "Nes" || mesenSystem == "Sms")
             {
                 if (portSection == "Port1A")
                 {
@@ -122,16 +137,43 @@ namespace EmulatorLauncher
                 mapping["Left"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.left])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.left])).ToString();
                 mapping["Right"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.right])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.right])).ToString();
 
-                if (revertButtons)
+                if (SystemConfig.getOptBoolean("nes_turbo_enable"))
                 {
-                    mapping["TurboA"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.b])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.b])).ToString();
-                    mapping["TurboB"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString();
+                    if (revertButtons)
+                    {
+                        mapping["TurboA"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.b])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.b])).ToString();
+                        mapping["TurboB"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString();
+                    }
+                    else
+                    {
+                        mapping["TurboA"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString();
+                        mapping["TurboB"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.y])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.y])).ToString();
+                    }
                 }
                 else
                 {
-                    mapping["TurboA"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString();
-                    mapping["TurboB"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.y])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.y])).ToString();
+                    mapping["TurboA"] = "0";
+                    mapping["TurboB"] = "0";
                 }
+            }
+
+            else if (mesenSystem == "Gameboy")
+            {
+                if (portSection == "Port1A")
+                {
+                    port = systemSection.GetOrCreateContainer("Port1");
+                    mapping = port.GetOrCreateContainer("Mapping1");
+                }
+                mapping["A"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.b])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.b])).ToString();
+                mapping["B"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.a])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.a])).ToString();
+                mapping["Select"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.select])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.select])).ToString();
+                mapping["Start"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.start])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.start])).ToString();
+                mapping["Up"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.up])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.up])).ToString();
+                mapping["Down"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.down])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.down])).ToString();
+                mapping["Left"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.left])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.left])).ToString();
+                mapping["Right"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.right])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.right])).ToString();
+                mapping["TurboA"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString();
+                mapping["TurboB"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.y])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.y])).ToString();
             }
 
             else if (mesenSystem == "Snes")
@@ -150,10 +192,20 @@ namespace EmulatorLauncher
                     };
                     mapping.SetObject("MouseButtons", mouseID);
                 }
-                mapping["A"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.b])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.b])).ToString();
-                mapping["B"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.a])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.a])).ToString();
-                mapping["X"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString();
-                mapping["Y"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.y])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.y])).ToString();
+                if (SystemConfig.getOptBoolean("buttonsInvert"))
+                {
+                    mapping["A"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.a])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.a])).ToString();
+                    mapping["B"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.b])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.b])).ToString();
+                    mapping["X"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.y])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.y])).ToString();
+                    mapping["Y"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString();
+                }
+                else
+                {
+                    mapping["A"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.b])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.b])).ToString();
+                    mapping["B"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.a])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.a])).ToString();
+                    mapping["X"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.x])).ToString();
+                    mapping["Y"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.y])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.y])).ToString();
+                }
                 mapping["L"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.pageup])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.pageup])).ToString();
                 mapping["R"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.pagedown])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.pagedown])).ToString();
                 mapping["Up"] = isXInput ? (4096 + index * 256 + 1 + xbuttonNames.IndexOf(inputKeyMapping[InputKey.up])).ToString() : (8192 + index * 256 + dibuttonNames.IndexOf(inputKeyMapping[InputKey.up])).ToString();
@@ -186,7 +238,9 @@ namespace EmulatorLauncher
             }
 
             if (playerIndex == 1)
-                WriteHotkeys(pref, index, isXInput);
+                WriteHotkeys(pref, index, isXInput, inputKeyMapping);
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + ctrl.DevicePath + " to player : " + ctrl.PlayerIndex.ToString());
         }
 
         private void ConfigureKeyboard(DynamicJson pref, DynamicJson systemSection, InputConfig keyboard, string mesenSystem)
@@ -575,7 +629,7 @@ namespace EmulatorLauncher
             }
         }
 
-        private void WriteHotkeys(DynamicJson pref, int index, bool isXInput)
+        private void WriteHotkeys(DynamicJson pref, int index, bool isXInput, Dictionary<InputKey, string> inputKeyMapping)
         {
             pref.Remove("ShortcutKeys");
             var shortcuts = new List<DynamicJson>();
@@ -681,7 +735,7 @@ namespace EmulatorLauncher
         static readonly List<string> pcePorts = new List<string>() { "Port1", "Port1A", "Port1B", "Port1C", "Port1D", "Port1E" };
         static readonly List<string> smsPorts = new List<string>() { "Port1", "Port2" };
 
-        static readonly Dictionary<InputKey, string> inputKeyMapping = new Dictionary<InputKey, string>()
+        static readonly Dictionary<InputKey, string> inputKeyMappingDefault = new Dictionary<InputKey, string>()
         {
             { InputKey.b, "East" },
             { InputKey.a, "South" },

@@ -16,6 +16,8 @@ namespace EmulatorLauncher
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
 
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for Kega-Fusion");
+
             int maxPad = 8;
 
             if (system == "mastersystem")
@@ -79,9 +81,74 @@ namespace EmulatorLauncher
                 return;
 
             string gamecontrollerDB = Path.Combine(AppConfig.GetFullPath("tools"), "gamecontrollerdb.txt");
-            string guid = (ctrl.Guid.ToString()).Substring(0, 24) + "00000000";
+            string guid = ctrl.Guid.ToString();
             SdlToDirectInput controller = null;
+            List<string> buttonMapping = new List<string>();
+            string joy = joyIndex[ctrl.PlayerIndex.ToString()];
+            int index = ctrl.DirectInput != null ? ctrl.DirectInput.DeviceIndex : ctrl.DeviceIndex;
+            bool needMDActivationSwitch = false;
+            bool md_pad = Program.SystemConfig["md_pad_kega"] == "1" || Program.SystemConfig["md_pad_kega"] == "2";
 
+            if (_mdSystems.Contains(system))
+            {
+                string mdjson = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "mdControllers.json");
+                if (File.Exists(mdjson))
+                {
+                    try
+                    {
+                        var mdControllers = MegadriveController.LoadControllersFromJson(mdjson);
+
+                        if (mdControllers != null)
+                        {
+                            MegadriveController mdGamepad = MegadriveController.GetMDController("kega-fusion", guid, mdControllers);
+
+                            if (mdGamepad != null)
+                            {
+                                if (mdGamepad.ControllerInfo != null)
+                                {
+                                    if (mdGamepad.ControllerInfo.ContainsKey("needActivationSwitch"))
+                                        needMDActivationSwitch = mdGamepad.ControllerInfo["needActivationSwitch"] == "yes";
+
+                                    if (needMDActivationSwitch && !md_pad)
+                                    {
+                                        SimpleLogger.Instance.Info("[Controller] Specific MD mapping needs to be activated for this controller.");
+                                        goto BypassMDControllers;
+                                    }
+                                }
+
+                                SimpleLogger.Instance.Info("[Controller] Performing specific mapping for " + mdGamepad.Name);
+
+                                if (mdGamepad.Mapping != null)
+                                {
+                                    string input = mdGamepad.Mapping["buttons"];
+
+                                    if (Program.SystemConfig["md_pad_kega"] == "2" && mdGamepad.Mapping["buttons_anal"] != null)
+                                        input = mdGamepad.Mapping["buttons_anal"];
+
+                                    ini.WriteValue("", "Joystick" + joy + "Using", (index + 2).ToString());
+                                    ini.WriteValue("", "Joystick" + joy + "Type", "2");
+                                    ini.WriteValue("", "Player" + joy + "Buttons", input);
+
+                                    SimpleLogger.Instance.Info("[INFO] Assigned controller " + ctrl.DevicePath + " to player : " + ctrl.PlayerIndex.ToString());
+
+                                    return;
+                                }
+                                else
+                                    SimpleLogger.Instance.Info("[INFO] Missing mapping for Megadrive Gamepad, falling back to standard mapping.");
+                            }
+                            else
+                                SimpleLogger.Instance.Info("[Controller] No specific mapping found for megadrive controller.");
+                        }
+                        else
+                            SimpleLogger.Instance.Info("[Controller] Error loading JSON file.");
+                    }
+                    catch { }
+                }
+            }
+
+            BypassMDControllers:
+
+            guid = (ctrl.Guid.ToString()).Substring(0, 24) + "00000000";
             SimpleLogger.Instance.Info("[INFO] Player " + ctrl.PlayerIndex + ". Fetching gamecontrollerdb.txt file with guid : " + guid);
 
             try { controller = GameControllerDBParser.ParseByGuid(gamecontrollerDB, guid); }
@@ -93,11 +160,6 @@ namespace EmulatorLauncher
                 return;
             }
 
-            int index = ctrl.DirectInput != null ? ctrl.DirectInput.JoystickID : ctrl.DeviceIndex;
-            string joy = joyIndex[ctrl.PlayerIndex.ToString()];
-
-            List<string> buttonMapping = new List<string>();
-
             if (system != "mastersystem")
             {
                 buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.up));
@@ -105,7 +167,7 @@ namespace EmulatorLauncher
                 buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.left));
                 buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.right));
 
-                if (SystemConfig.isOptSet("kega_control_layout") && SystemConfig["kega_control_layout"] == "lr_yz")
+                if (SystemConfig.isOptSet("megadrive_control_layout") && SystemConfig["megadrive_control_layout"] == "lr_yz")
                 {
                     buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.y));
                     buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.a));
@@ -115,25 +177,25 @@ namespace EmulatorLauncher
                     buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.pageup));
                     buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.pagedown));
                 }
-                else if (SystemConfig.isOptSet("kega_control_layout") && SystemConfig["kega_control_layout"] == "lr_xz")
+                else if (SystemConfig.isOptSet("megadrive_control_layout") && SystemConfig["megadrive_control_layout"] == "lr_zc")
                 {
-                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.y));
                     buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.a));
                     buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.b));
-                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.start));
-                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.pageup));
-                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.x));
                     buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.pagedown));
+                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.start));
+                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.y));
+                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.x));
+                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.pageup));
                 }
                 else
                 {
+                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.y));
                     buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.a));
                     buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.b));
-                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.pagedown));
                     buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.start));
-                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.y));
-                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.x));
                     buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.pageup));
+                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.x));
+                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.pagedown));
                 }
 
                 buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.select));
@@ -145,7 +207,7 @@ namespace EmulatorLauncher
 
                 string input = string.Join(",", buttonMapping);
 
-                ini.WriteValue("", "Joystick" + joy + "Using", index.ToString());
+                ini.WriteValue("", "Joystick" + joy + "Using", (index+2).ToString());
                 ini.WriteValue("", "Joystick" + joy + "Type", "2");
                 ini.WriteValue("", "Player" + joy + "Buttons", input);
             }
@@ -156,17 +218,27 @@ namespace EmulatorLauncher
                 buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.down));
                 buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.left));
                 buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.right));
-                buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.a));
-                buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.b));
+                if (SystemConfig.getOptBoolean("rotate_buttons"))
+                {
+                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.y));
+                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.a));
+                }
+                else
+                {
+                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.a));
+                    buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.b));
+                }
                 buttonMapping.Add(GetInputCode(controller, ctrl, InputKey.start));
                 buttonMapping.Add("0");
 
                 string input = string.Join(",", buttonMapping);
 
-                ini.WriteValue("", "Joystick" + joy + "MSUsing", index.ToString());
+                ini.WriteValue("", "Joystick" + joy + "MSUsing", (index+2).ToString());
                 ini.WriteValue("", "Joystick" + joy + "MSType", "1");
                 ini.WriteValue("", "Player" + joy + "MSButtons", input);
             }
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + ctrl.DevicePath + " to player : " + ctrl.PlayerIndex.ToString());
         }
 
         private string GetInputCode(SdlToDirectInput ctrl, Controller c, InputKey key)
@@ -310,7 +382,7 @@ namespace EmulatorLauncher
                 AddKeyboardMapping(InputKey.left);
                 AddKeyboardMapping(InputKey.right);
 
-                if (SystemConfig.isOptSet("kega_control_layout") && SystemConfig["kega_control_layout"] == "lr_yz")
+                if (SystemConfig.isOptSet("megadrive_control_layout") && SystemConfig["megadrive_control_layout"] == "lr_yz")
                 {
                     AddKeyboardMapping(InputKey.y);
                     AddKeyboardMapping(InputKey.a);
@@ -320,7 +392,7 @@ namespace EmulatorLauncher
                     AddKeyboardMapping(InputKey.pageup);
                     AddKeyboardMapping(InputKey.pagedown);
                 }
-                else if (SystemConfig.isOptSet("kega_control_layout") && SystemConfig["kega_control_layout"] == "lr_xz")
+                else if (SystemConfig.isOptSet("megadrive_control_layout") && SystemConfig["megadrive_control_layout"] == "lr_xz")
                 {
                     AddKeyboardMapping(InputKey.y);
                     AddKeyboardMapping(InputKey.a);

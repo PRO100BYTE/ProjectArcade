@@ -32,7 +32,7 @@ namespace EmulatorLauncher
             { "ss", "gamepad" },
             { "wswan", "gamepad" }
         };
-        
+
         static readonly Dictionary<string, int> inputPortNb = new Dictionary<string, int>()
         {
             { "apple2", 2 },
@@ -52,39 +52,67 @@ namespace EmulatorLauncher
             { "wswan", 1 }
         };
 
-        private void CreateControllerConfiguration(MednafenConfigFile cfg, string mednafenCore)
+        private void CreateControllerConfiguration(MednafenConfigFile cfg, string mednafenCore, string system)
         {
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
             if (!systemWithAutoconfig.Contains(mednafenCore))
                 return;
 
-            Dictionary<string, int> double_pads = new Dictionary<string, int>();
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for Mednafen");
+
+            Dictionary<Controller, string> double_pads = new Dictionary<Controller, string>();
 
             // First, set all controllers to none
-            if (mednafenCore != "lynx" && mednafenCore !="sms" && mednafenCore != "wswan" && mednafenCore != "gb" && mednafenCore != "gba" && mednafenCore != "ngp" && mednafenCore != "gg")
+            if (mednafenCore != "lynx" && mednafenCore != "sms" && mednafenCore != "wswan" && mednafenCore != "gb" && mednafenCore != "gba" && mednafenCore != "ngp" && mednafenCore != "gg")
                 CleanUpConfigFile(mednafenCore, cfg);
 
             // Define maximum pads accepted by mednafen core
             int maxPad = inputPortNb[mednafenCore];
+          
+            foreach (var controller in this.Controllers.OrderBy(i => i.PlayerIndex).Take(maxPad))
+            {
+                string deviceID = "";
+                
+                if (controller.DirectInput != null)
+                    deviceID = "0x" + controller.DirectInput.ProductGuid.ToString().Replace("-", "");
+                else
+                    deviceID = "";
+
+                if (controller.IsXInputDevice)
+                {
+                    string idSection = "0000";
+                    short wButtons = controller.XInput.Wbuttons;
+                    idSection = ((ushort)(wButtons < 0 ? 65536 + wButtons : wButtons)).ToString("X4").ToLowerInvariant();
+
+                    deviceID = "0x000000000000000000010004" + idSection + "0000";
+                }
+
+                string newDeviceIDPath = Path.Combine(AppConfig.GetFullPath("tools"), "controllerinfo.yml");
+                string newDeviceID = SdlJoystickGuid.GetGuidFromFile(newDeviceIDPath, controller.Guid, "mednafen");
+                if (newDeviceID != null)
+                    deviceID = newDeviceID;
+
+                double_pads.Add(controller, deviceID);
+            }
 
             foreach (var controller in this.Controllers.OrderBy(i => i.PlayerIndex).Take(maxPad))
-                ConfigureInput(controller, cfg, mednafenCore, double_pads);
+                ConfigureInput(controller, cfg, mednafenCore, double_pads, system);
         }
 
-        private void ConfigureInput(Controller controller, MednafenConfigFile cfg, string mednafenCore, Dictionary<string, int> double_pads)
+        private void ConfigureInput(Controller controller, MednafenConfigFile cfg, string mednafenCore, Dictionary<Controller, string> double_pads, string system)
         {
             if (controller == null || controller.Config == null)
                 return;
 
             if (controller.IsKeyboard && this.Controllers.Count(i => !i.IsKeyboard) == 0)
-                ConfigureKeyboard(controller, cfg, mednafenCore);
+                ConfigureKeyboard(controller, cfg, mednafenCore, system);
             else
-                ConfigureJoystick(controller, cfg, mednafenCore, double_pads);
+                ConfigureJoystick(controller, cfg, mednafenCore, double_pads, system);
         }
 
         #region joystick
-        private void ConfigureJoystick(Controller controller, MednafenConfigFile cfg, string mednafenCore, Dictionary<string, int> double_pads)
+        private void ConfigureJoystick(Controller controller, MednafenConfigFile cfg, string mednafenCore, Dictionary<Controller, string> double_pads, string system)
         {
             if (controller == null)
                 return;
@@ -97,12 +125,19 @@ namespace EmulatorLauncher
                 return;
 
             int nbAxis = controller.NbAxes;
+            bool hatfix = hatFix.Contains(controller.ProductID);
+            bool mdSpecialPad = false;
+            bool mdSpecialPadHK = false;
+            bool saturnSpecialPad = false;
+            bool saturnSpecialPadHK = false;
+            MegadriveController mdGamepad = null;
+            MegadriveController saturnGamepad = null;
 
             string guid1 = (controller.Guid.ToString()).Substring(0, 24) + "00000000";
             // Fetch information in retrobat/system/tools/gamecontrollerdb.txt file
             SdlToDirectInput dinputCtrl = null;
             string gamecontrollerDB = Path.Combine(AppConfig.GetFullPath("tools"), "gamecontrollerdb.txt");
-            
+
             if (!File.Exists(gamecontrollerDB))
             {
                 SimpleLogger.Instance.Info("[INFO] gamecontrollerdb.txt file not found in tools folder. Controller mapping will not be available.");
@@ -111,14 +146,14 @@ namespace EmulatorLauncher
 
             if (gamecontrollerDB != null)
             {
-                SimpleLogger.Instance.Info("[INFO] Player 1. Fetching gamecontrollerdb.txt file with guid : " + guid1);
+                SimpleLogger.Instance.Info("[INFO] Player " + controller.PlayerIndex + ". Fetching gamecontrollerdb.txt file with guid : " + guid1);
 
                 dinputCtrl = GameControllerDBParser.ParseByGuid(gamecontrollerDB, guid1);
 
                 if (dinputCtrl == null)
-                    SimpleLogger.Instance.Info("[INFO] Player 1. No controller found in gamecontrollerdb.txt file for guid : " + guid1);
+                    SimpleLogger.Instance.Info("[INFO] Player " + controller.PlayerIndex + ". No controller found in gamecontrollerdb.txt file for guid : " + guid1);
                 else
-                    SimpleLogger.Instance.Info("[INFO] Player 1: " + guid1 + " found in gamecontrollerDB file.");
+                    SimpleLogger.Instance.Info("[INFO] Player " + controller.PlayerIndex + " : " + guid1 + " found in gamecontrollerDB file.");
             }
 
             int playerIndex = controller.PlayerIndex;
@@ -164,7 +199,7 @@ namespace EmulatorLauncher
                 if (portNumber == 1)
                 {
                     cfg[mednafenCore + ".input.port" + portNumber] = gunType;
-                    
+
                     foreach (var entry in gunMapping)
                         cfg[mednafenCore + ".input.port" + portNumber + "." + gunType + "." + entry.Key] = entry.Value;
 
@@ -188,31 +223,164 @@ namespace EmulatorLauncher
                 }
             }
 
-            // Manage gamepad mapping
+            // Manage controller mapping
             Dictionary<InputKey, string> buttonMapping = dinputMapping;
 
             if (controller.IsXInputDevice)
                 buttonMapping = xboxmapping;
 
-            /*if (controller.VendorID == USB_VENDOR.SONY)
-                buttonMapping = ds4ds5dinputmapping;*/
-
             bool dinput = (buttonMapping == dinputMapping && dinputCtrl != null);
 
-            string deviceID = "0x" + controller.DirectInput.ProductGuid.ToString().Replace("-", "");
+            // Search for megadrive specific controllers
+            bool needMDActivationSwitch = false;
+            bool md_pad = Program.SystemConfig.getOptBoolean("md_pad");
+
+            if (mednafenCore == "md")
+            {
+                string guid = controller.Guid.ToString().ToLowerInvariant();
+                string mdjson = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "mdControllers.json");
+
+                if (File.Exists(mdjson))
+                {
+                    try
+                    {
+                        var megadriveControllers = MegadriveController.LoadControllersFromJson(mdjson);
+
+                        if (megadriveControllers != null)
+                        {
+                            mdGamepad = MegadriveController.GetMDController("mednafen", guid, megadriveControllers);
+                            if (mdGamepad != null)
+                            {
+                                if (mdGamepad.ControllerInfo != null)
+                                {
+                                    if (mdGamepad.ControllerInfo.ContainsKey("needActivationSwitch"))
+                                        needMDActivationSwitch = mdGamepad.ControllerInfo["needActivationSwitch"] == "yes";
+
+                                    if (needMDActivationSwitch && !md_pad)
+                                    {
+                                        SimpleLogger.Instance.Info("[Controller] Specific MD mapping needs to be activated for this controller.");
+                                        goto BypassMDControllers;
+                                    }
+                                }
+
+                                SimpleLogger.Instance.Info("[Controller] Performing specific mapping for " + mdGamepad.Name);
+
+                                if (mdGamepad.Mapping != null)
+                                    mdSpecialPad = true;
+                                else
+                                    SimpleLogger.Instance.Info("[Controller] Missing mapping for mednafen : " + mdGamepad.Name);
+
+                                if (mdGamepad.HotKeyMapping != null && controller.PlayerIndex == 1)
+                                    mdSpecialPadHK = true;
+                                else
+                                    SimpleLogger.Instance.Info("[Controller] Missing mapping for mednafen hotkeys : " + mdGamepad.Name);
+                            }
+                            else
+                                SimpleLogger.Instance.Info("[Controller] No specific mapping found for Megadrive controller.");
+                        }
+                        else
+                            SimpleLogger.Instance.Info("[Controller] Error loading JSON file.");
+                    }
+                    catch { }
+                }
+            }
+
+        BypassMDControllers:
+
+            // Search for saturn specific controllers
+            bool needSatActivationSwitch = false;
+            bool sat_pad = Program.SystemConfig.getOptBoolean("saturn_pad");
+
+            if (mednafenCore == "ss")
+            {
+                string guid = controller.Guid.ToString().ToLowerInvariant();
+                string saturnjson = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "saturnControllers.json");
+
+                if (File.Exists(saturnjson))
+                {
+                    try
+                    {
+                        var saturnControllers = MegadriveController.LoadControllersFromJson(saturnjson);
+
+                        if (saturnControllers != null)
+                        {
+                            saturnGamepad = MegadriveController.GetMDController("mednafen", guid, saturnControllers);
+                            if (saturnGamepad != null)
+                            {
+                                if (mdGamepad.ControllerInfo != null)
+                                {
+                                    if (mdGamepad.ControllerInfo.ContainsKey("needActivationSwitch"))
+                                        needSatActivationSwitch = mdGamepad.ControllerInfo["needActivationSwitch"] == "yes";
+
+                                    if (needSatActivationSwitch && !sat_pad)
+                                    {
+                                        SimpleLogger.Instance.Info("[Controller] Specific Saturn mapping needs to be activated for this controller.");
+                                        goto BypassSATControllers;
+                                    }
+                                }
+
+                                SimpleLogger.Instance.Info("[Controller] Performing specific mapping for " + saturnGamepad.Name);
+
+                                if (saturnGamepad.Mapping != null)
+                                    saturnSpecialPad = true;
+                                else
+                                    SimpleLogger.Instance.Info("[Controller] Missing mapping for mednafen : " + saturnGamepad.Name);
+
+                                if (saturnGamepad.HotKeyMapping != null && controller.PlayerIndex == 1)
+                                    saturnSpecialPadHK = true;
+                                else
+                                    SimpleLogger.Instance.Info("[Controller] Missing mapping for mednafen hotkeys : " + saturnGamepad.Name);
+                            }
+                            else
+                                SimpleLogger.Instance.Info("[Controller] No specific mapping found for Saturn controller.");
+                        }
+                        else
+                            SimpleLogger.Instance.Info("[Controller] Error loading JSON file.");
+                    }
+                    catch { }
+                }
+            }
+
+            BypassSATControllers:
+
+            // Else continue
+            string deviceID = "";
+            
+            if (controller.DirectInput != null)
+                deviceID = "0x" + controller.DirectInput.ProductGuid.ToString().Replace("-", "");
+            else
+                deviceID = "";
 
             if (controller.IsXInputDevice)
-                deviceID = "0x000000000000000000010004f3ff0000";
-
-            int nsamepad = 0;
-            if (double_pads.ContainsKey(deviceID))
-                nsamepad = double_pads[deviceID];
-            else
-                nsamepad = 0;
-
-            if (nsamepad > 0)
             {
-                int dinputIndex = this.Controllers.Where(i => i.DirectInput.ProductGuid == controller.DirectInput.ProductGuid).OrderBy(c => c.PlayerIndex).ToList().IndexOf(controller);
+                string idSection = "0000";
+                short wButtons = controller.XInput.Wbuttons;
+                idSection = ((ushort)(wButtons < 0 ? 65536 + wButtons : wButtons)).ToString("X4").ToLowerInvariant();
+
+                deviceID = "0x000000000000000000010004" + idSection + "0000";
+            }
+
+            string newDeviceIDPath = Path.Combine(AppConfig.GetFullPath("tools"), "controllerinfo.yml");
+            string newDeviceID = SdlJoystickGuid.GetGuidFromFile(newDeviceIDPath, controller.Guid, "mednafen");
+            if (newDeviceID != null)
+                deviceID = newDeviceID;
+
+            int nsamePad = 0;
+            var valueCounts = new Dictionary<string, int>();
+
+            foreach (var pair in double_pads)
+            {
+                if (valueCounts.ContainsKey(pair.Value))
+                    valueCounts[pair.Value]++;
+                else
+                    valueCounts[pair.Value] = 1;
+            }
+            nsamePad = valueCounts[deviceID];
+
+            if (nsamePad > 0)
+            {
+                var cList = double_pads.Where(i => i.Value == deviceID).OrderBy(c => c.Key.DirectInput.DeviceIndex).ToList();
+                int dinputIndex = cList.FindIndex(kvp => kvp.Key.Equals(controller));
 
                 char lastChar = deviceID[deviceID.Length - 1];
                 int lastInt = Convert.ToInt32(lastChar.ToString(), 16);
@@ -221,11 +389,166 @@ namespace EmulatorLauncher
                 deviceID = deviceID.Substring(0, deviceID.Length - 1) + newLastChar;
             }
 
-            double_pads[deviceID] = nsamepad + 1;
-
             if (mappingToUse.ContainsKey(mapping))
                 newmapping = mappingToUse[mapping];
-            
+
+            // Special case for psx dualshock and driving games
+            if (mednafenCore == "psx" && SystemConfig.getOptBoolean("psx_triggerswap"))
+            {
+                padType = "dualshock";
+                mapping = mednafenCore + "_" + padType + "_gtspecial";
+                newmapping = mappingToUse[mapping];
+                cfg["psx.input.port" + playerIndex + ".dualshock.l2"] = "none";
+                cfg["psx.input.port" + playerIndex + ".dualshock.r2"] = "none";
+            }
+
+            // Specifics per system
+            // megadrive mapping when using special controller
+            if (mednafenCore == "md" && mdSpecialPad)
+            {
+                cfg[mednafenCore + ".input.port" + playerIndex] = padType;
+
+                foreach (var button in mdGamepad.Mapping)
+                {
+                    if (button.Value.Contains("_or_"))
+                    {
+                        string[] delimiter = new string[] { "_or_" };
+                        var values = button.Value.Split(delimiter, StringSplitOptions.None);
+                        string value1 = values[0];
+                        string value2 = values[1];
+                        cfg[mednafenCore + ".input.port" + playerIndex + "." + padType + "." + button.Key] = "joystick " + deviceID + " " + value1 + " || " + "joystick " + deviceID + " " + value2;
+                    }
+                    else
+                        cfg[mednafenCore + ".input.port" + playerIndex + "." + padType + "." + button.Key] = "joystick " + deviceID + " " + button.Value;
+                }
+
+                if (mdSpecialPadHK && playerIndex == 1)
+                {
+                    foreach (var button in mdGamepad.HotKeyMapping)
+                    {
+                        if (button.Value.Contains("_or_"))
+                        {
+                            string[] orSplitter = new string[] { "_or_" };
+                            var combinaisons = button.Value.Split(orSplitter, StringSplitOptions.None);
+                            string combination1 = combinaisons[0];
+                            string combination2 = combinaisons[1];
+
+                            string[] delimiters = new string[] { "_and_" };
+                            var buttons1 = combination1.Split(delimiters, StringSplitOptions.None);
+                            var buttons2 = combination2.Split(delimiters, StringSplitOptions.None);
+
+                            if (buttons1.Length < 2 || buttons2.Length < 2)
+                                continue;
+
+                            if (button.Key == "load_state")
+                                cfg["command.load_state"] = "keyboard 0x0 64" + " || " + "joystick " + deviceID + " " + buttons1[0] + " && " + "joystick " + deviceID + " " + buttons1[1] + " || " + "joystick " + deviceID + " " + buttons2[0] + " && " + "joystick " + deviceID + " " + buttons2[1];
+                            else if (button.Key == "save_state")
+                                cfg["command.save_state"] = "keyboard 0x0 62" + " || " + "joystick " + deviceID + " " + buttons1[0] + " && " + "joystick " + deviceID + " " + buttons1[1] + " || " + "joystick " + deviceID + " " + buttons2[0] + " && " + "joystick " + deviceID + " " + buttons2[1];
+                            else if (button.Key == "state_slot_dec")
+                                cfg["command.state_slot_dec"] = "keyboard 0x0 45" + " || " + "joystick " + deviceID + " " + buttons1[0] + " && " + "joystick " + deviceID + " " + buttons1[1] + " || " + "joystick " + deviceID + " " + buttons2[0] + " && " + "joystick " + deviceID + " " + buttons2[1];
+                            else if (button.Key == "state_slot_inc")
+                                cfg["command.state_slot_inc"] = "keyboard 0x0 46" + " || " + "joystick " + deviceID + " " + buttons1[0] + " && " + "joystick " + deviceID + " " + buttons1[1] + " || " + "joystick " + deviceID + " " + buttons2[0] + " && " + "joystick " + deviceID + " " + buttons2[1];
+                            else if (button.Key == "toggle_help")
+                                cfg["command.toggle_help"] = "keyboard 0x0 58" + " || " + "joystick " + deviceID + " " + buttons1[0] + " && " + "joystick " + deviceID + " " + buttons1[1] + " || " + "joystick " + deviceID + " " + buttons2[0] + " && " + "joystick " + deviceID + " " + buttons2[1];
+                            else if (button.Key == "select_disk")
+                                cfg["command.select_disk"] = "keyboard 0x0 63" + " || " + "joystick " + deviceID + " " + buttons1[0] + " && " + "joystick " + deviceID + " " + buttons1[1] + " || " + "joystick " + deviceID + " " + buttons2[0] + " && " + "joystick " + deviceID + " " + buttons2[1];
+                            else if (button.Key == "take_snapshot")
+                                cfg["command.take_snapshot"] = "keyboard 0x0 66" + " || " + "joystick " + deviceID + " " + buttons1[0] + " && " + "joystick " + deviceID + " " + buttons1[1] + " || " + "joystick " + deviceID + " " + buttons2[0] + " && " + "joystick " + deviceID + " " + buttons2[1];
+                            else if (button.Key == "fast_forward")
+                                cfg["command.fast_forward"] = "keyboard 0x0 53" + " || " + "joystick " + deviceID + " " + buttons1[0] + " && " + "joystick " + deviceID + " " + buttons1[1] + " || " + "joystick " + deviceID + " " + buttons2[0] + " && " + "joystick " + deviceID + " " + buttons2[1];
+                            else if (button.Key == "state_rewind")
+                                cfg["command.state_rewind"] = "keyboard 0x0 42" + " || " + "joystick " + deviceID + " " + buttons1[0] + " && " + "joystick " + deviceID + " " + buttons1[1] + " || " + "joystick " + deviceID + " " + buttons2[0] + " && " + "joystick " + deviceID + " " + buttons2[1];
+                            else if (button.Key == "pause")
+                                cfg["command.pause"] = "keyboard 0x0 72" + " || " + "joystick " + deviceID + " " + buttons1[0] + " && " + "joystick " + deviceID + " " + buttons1[1] + " || " + "joystick " + deviceID + " " + buttons2[0] + " && " + "joystick " + deviceID + " " + buttons2[1];
+                            else if (button.Key == "exit")
+                                cfg["command.exit"] = "keyboard 0x0 69" + " || " + "joystick " + deviceID + " " + buttons1[0] + " && " + "joystick " + deviceID + " " + buttons1[1] + " || " + "joystick " + deviceID + " " + buttons2[0] + " && " + "joystick " + deviceID + " " + buttons2[1];
+                        }
+
+                        else
+                        {
+                            string[] delimiters = new string[] { "_and_" };
+                            var buttons = button.Value.Split(delimiters, StringSplitOptions.None);
+
+                            if (buttons.Length < 2)
+                                continue;
+
+                            if (button.Key == "load_state")
+                                cfg["command.load_state"] = "keyboard 0x0 64" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                            else if (button.Key == "save_state")
+                                cfg["command.save_state"] = "keyboard 0x0 62" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                            else if (button.Key == "state_slot_dec")
+                                cfg["command.state_slot_dec"] = "keyboard 0x0 45" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                            else if (button.Key == "state_slot_inc")
+                                cfg["command.state_slot_inc"] = "keyboard 0x0 46" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                            else if (button.Key == "toggle_help")
+                                cfg["command.toggle_help"] = "keyboard 0x0 58" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                            else if (button.Key == "select_disk")
+                                cfg["command.select_disk"] = "keyboard 0x0 63" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                            else if (button.Key == "take_snapshot")
+                                cfg["command.take_snapshot"] = "keyboard 0x0 66" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                            else if (button.Key == "fast_forward")
+                                cfg["command.fast_forward"] = "keyboard 0x0 53" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                            else if (button.Key == "state_rewind")
+                                cfg["command.state_rewind"] = "keyboard 0x0 42" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                            else if (button.Key == "pause")
+                                cfg["command.pause"] = "keyboard 0x0 72" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                            else if (button.Key == "exit")
+                                cfg["command.exit"] = "keyboard 0x0 69" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                        }
+                    }
+                }
+
+                SimpleLogger.Instance.Info("[INFO] Assigned md controller " + controller.DevicePath + " to player : " + controller.PlayerIndex.ToString());
+                return;
+            }
+
+            // saturn mapping when using special controller
+            if (mednafenCore == "ss" && saturnSpecialPad)
+            {
+                cfg[mednafenCore + ".input.port" + playerIndex] = padType;
+
+                foreach (var button in saturnGamepad.Mapping)
+                    cfg[mednafenCore + ".input.port" + playerIndex + "." + padType + "." + button.Key] = "joystick " + deviceID + " " + button.Value;
+
+                if (saturnSpecialPadHK && playerIndex == 1)
+                {
+                    foreach (var button in saturnGamepad.HotKeyMapping)
+                    {
+                        string[] delimiters = new string[] { "_and_" };
+                        var buttons = button.Value.Split(delimiters, StringSplitOptions.None);
+
+                        if (buttons.Length < 2)
+                            continue;
+
+                        if (button.Key == "load_state")
+                            cfg["command.load_state"] = "keyboard 0x0 64" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                        else if (button.Key == "save_state")
+                            cfg["command.save_state"] = "keyboard 0x0 62" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                        else if (button.Key == "state_slot_dec")
+                            cfg["command.state_slot_dec"] = "keyboard 0x0 45" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                        else if (button.Key == "state_slot_inc")
+                            cfg["command.state_slot_inc"] = "keyboard 0x0 46" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                        else if (button.Key == "toggle_help")
+                            cfg["command.toggle_help"] = "keyboard 0x0 58" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                        else if (button.Key == "select_disk")
+                            cfg["command.select_disk"] = "keyboard 0x0 63" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                        else if (button.Key == "take_snapshot")
+                            cfg["command.take_snapshot"] = "keyboard 0x0 66" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                        else if (button.Key == "fast_forward")
+                            cfg["command.fast_forward"] = "keyboard 0x0 53" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                        else if (button.Key == "state_rewind")
+                            cfg["command.state_rewind"] = "keyboard 0x0 42" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                        else if (button.Key == "pause")
+                            cfg["command.pause"] = "keyboard 0x0 72" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                        else if (button.Key == "exit")
+                            cfg["command.exit"] = "keyboard 0x0 69" + " || " + "joystick " + deviceID + " " + buttons[0] + " && " + "joystick " + deviceID + " " + buttons[1];
+                    }
+                }
+
+                SimpleLogger.Instance.Info("[INFO] Assigned md controller " + controller.DevicePath + " to player : " + controller.PlayerIndex.ToString());
+                return;
+            }
+
             // apple2 only accepts atari joystick in port 2
             if (mednafenCore == "apple2" && playerIndex == 2)
             {
@@ -238,7 +561,7 @@ namespace EmulatorLauncher
                         string value = buttonMapping[joyButton];
 
                         if (dinput)
-                            cfg[mednafenCore + ".input.port" + 2 + ".atari." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                            cfg[mednafenCore + ".input.port" + 2 + ".atari." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis, hatfix);
                         else
                             cfg[mednafenCore + ".input.port" + 2 + ".atari." + entry.Key] = "joystick " + deviceID + " " + value;
                     }
@@ -255,7 +578,7 @@ namespace EmulatorLauncher
                     string value = buttonMapping[joyButton];
 
                     if (dinput)
-                        cfg["lynx.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                        cfg["lynx.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis, hatfix);
                     else
                         cfg["lynx.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
@@ -269,7 +592,7 @@ namespace EmulatorLauncher
                     string value = buttonMapping[joyButton];
 
                     if (dinput)
-                        cfg["gba.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                        cfg["gba.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis, hatfix);
                     else
                         cfg["gba.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
@@ -283,7 +606,7 @@ namespace EmulatorLauncher
                     string value = buttonMapping[joyButton];
 
                     if (dinput)
-                        cfg["gb.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                        cfg["gb.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis, hatfix);
                     else
                         cfg["gb.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
@@ -294,7 +617,7 @@ namespace EmulatorLauncher
                     string value = buttonMapping[joyButton];
 
                     if (dinput)
-                        cfg["gb.input.tilt.tilt." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                        cfg["gb.input.tilt.tilt." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis, hatfix);
                     else
                         cfg["gb.input.tilt.tilt." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
@@ -308,7 +631,7 @@ namespace EmulatorLauncher
                     string value = buttonMapping[joyButton];
 
                     if (dinput)
-                        cfg["gg.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                        cfg["gg.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis, hatfix);
                     else
                         cfg["gg.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
@@ -322,7 +645,7 @@ namespace EmulatorLauncher
                     string value = buttonMapping[joyButton];
 
                     if (dinput)
-                        cfg["ngp.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                        cfg["ngp.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis, hatfix);
                     else
                         cfg["ngp.input.builtin.gamepad." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
@@ -338,7 +661,7 @@ namespace EmulatorLauncher
                     string value = buttonMapping[joyButton];
 
                     if (dinput)
-                        cfg["wswan.input.builtin." + padType + "." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                        cfg["wswan.input.builtin." + padType + "." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis, hatfix);
                     else
                         cfg["wswan.input.builtin." + padType + "." + entry.Key] = "joystick " + deviceID + " " + value;
                 }
@@ -355,22 +678,74 @@ namespace EmulatorLauncher
                 if (!noType)
                     cfg[mednafenCore + ".input.port" + playerIndex] = padType;
 
+                newmapping = ConfigureMappingPerSystem(newmapping, system, padType, cfg);
+
                 foreach (var entry in newmapping)
                 {
                     InputKey joyButton = entry.Value;
                     string value = buttonMapping[joyButton];
 
                     if (dinput)
-                        cfg[mednafenCore + ".input.port" + playerIndex + "." + padType + "." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis);
+                        cfg[mednafenCore + ".input.port" + playerIndex + "." + padType + "." + entry.Key] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, value, nbAxis, hatfix);
                     else
                         cfg[mednafenCore + ".input.port" + playerIndex + "." + padType + "." + entry.Key] = "joystick " + deviceID + " " + value;
+                }
+            }
+
+            if (system == "segastv" && playerIndex == 1)
+            {
+                if (dinput)
+                {
+                    cfg["command.insert_coin"] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.select], nbAxis, hatfix);
+                    cfg["ss.input.builtin.builtin.stv_test"] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.r3], nbAxis, hatfix);
+                    cfg["ss.input.builtin.builtin.stv_service"] = "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.l3], nbAxis, hatfix);
+                }
+                else
+                {
+                    cfg["command.insert_coin"] = "joystick " + deviceID + " " + buttonMapping[InputKey.select];
+                    cfg["ss.input.builtin.builtin.stv_test"] = "joystick " + deviceID + " " + buttonMapping[InputKey.r3];
+                    cfg["ss.input.builtin.builtin.stv_service"] = "joystick " + deviceID + " " + buttonMapping[InputKey.l3];
+                }
+            }
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + controller.DevicePath + " to player : " + controller.PlayerIndex.ToString());
+
+            if (controller.PlayerIndex == 1)
+            {
+                if (dinput)
+                {
+                    cfg["command.load_state"] = "keyboard 0x0 64" + " || " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.select], nbAxis, hatfix) + " && " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.x], nbAxis, hatfix);
+                    cfg["command.save_state"] = "keyboard 0x0 62" + " || " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.select], nbAxis, hatfix) + " && " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.y], nbAxis, hatfix);
+                    cfg["command.state_slot_dec"] = "keyboard 0x0 45" + " || " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.select], nbAxis, hatfix) + " && " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.down], nbAxis, hatfix);
+                    cfg["command.state_slot_inc"] = "keyboard 0x0 46" + " || " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.select], nbAxis, hatfix) + " && " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.up], nbAxis, hatfix);
+                    cfg["command.toggle_help"] = "keyboard 0x0 58" + " || " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.select], nbAxis, hatfix) + " && " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.a], nbAxis, hatfix);
+                    cfg["command.select_disk"] = "keyboard 0x0 63" + " || " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.select], nbAxis, hatfix) + " && " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.r2], nbAxis, hatfix);
+                    cfg["command.take_snapshot"] = "keyboard 0x0 66" + " || " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.select], nbAxis, hatfix) + " && " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.r3], nbAxis, hatfix);
+                    cfg["command.fast_forward"] = "keyboard 0x0 53" + " || " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.select], nbAxis, hatfix) + " && " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.right], nbAxis, hatfix);
+                    cfg["command.state_rewind"] = "keyboard 0x0 42" + " || " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.select], nbAxis, hatfix) + " && " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.left], nbAxis, hatfix);
+                    cfg["command.pause"] = "keyboard 0x0 72" + " || " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.select], nbAxis, hatfix) + " && " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.b], nbAxis, hatfix);
+                    cfg["command.exit"] = "keyboard 0x0 69" + " || " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.select], nbAxis, hatfix) + " && " + "joystick " + deviceID + " " + GetDinputMapping(dinputCtrl, buttonMapping[InputKey.start], nbAxis, hatfix);
+                }
+                else
+                {
+                    cfg["command.load_state"] = "keyboard 0x0 64" + " || " + "joystick " + deviceID + " " + buttonMapping[InputKey.select] + " && " + "joystick " + deviceID + " " + buttonMapping[InputKey.x];
+                    cfg["command.save_state"] = "keyboard 0x0 62" + " || " + "joystick " + deviceID + " " + buttonMapping[InputKey.select] + " && " + "joystick " + deviceID + " " + buttonMapping[InputKey.y];
+                    cfg["command.state_slot_dec"] = "keyboard 0x0 45" + " || " + "joystick " + deviceID + " " + buttonMapping[InputKey.select] + " && " + "joystick " + deviceID + " " + buttonMapping[InputKey.down];
+                    cfg["command.state_slot_inc"] = "keyboard 0x0 46" + " || " + "joystick " + deviceID + " " + buttonMapping[InputKey.select] + " && " + "joystick " + deviceID + " " + buttonMapping[InputKey.up];
+                    cfg["command.toggle_help"] = "keyboard 0x0 58" + " || " + "joystick " + deviceID + " " + buttonMapping[InputKey.select] + " && " + "joystick " + deviceID + " " + buttonMapping[InputKey.a];
+                    cfg["command.select_disk"] = "keyboard 0x0 63" + " || " + "joystick " + deviceID + " " + buttonMapping[InputKey.select] + " && " + "joystick " + deviceID + " " + buttonMapping[InputKey.r2];
+                    cfg["command.take_snapshot"] = "keyboard 0x0 66" + " || " + "joystick " + deviceID + " " + buttonMapping[InputKey.select] + " && " + "joystick " + deviceID + " " + buttonMapping[InputKey.r3];
+                    cfg["command.fast_forward"] = "keyboard 0x0 53" + " || " + "joystick " + deviceID + " " + buttonMapping[InputKey.select] + " && " + "joystick " + deviceID + " " + buttonMapping[InputKey.right];
+                    cfg["command.state_rewind"] = "keyboard 0x0 42" + " || " + "joystick " + deviceID + " " + buttonMapping[InputKey.select] + " && " + "joystick " + deviceID + " " + buttonMapping[InputKey.left];
+                    cfg["command.pause"] = "keyboard 0x0 72" + " || " + "joystick " + deviceID + " " + buttonMapping[InputKey.select] + " && " + "joystick " + deviceID + " " + buttonMapping[InputKey.b];
+                    cfg["command.exit"] = "keyboard 0x0 69" + " || " + "joystick " + deviceID + " " + buttonMapping[InputKey.select] + " && " + "joystick " + deviceID + " " + buttonMapping[InputKey.start];
                 }
             }
         }
         #endregion
 
         #region keyboard
-        private static void ConfigureKeyboard(Controller controller, MednafenConfigFile cfg, string mednafenCore)
+        private static void ConfigureKeyboard(Controller controller, MednafenConfigFile cfg, string mednafenCore, string system)
         {
             if (controller == null)
                 return;
@@ -393,8 +768,8 @@ namespace EmulatorLauncher
                         keycode = azertyLayoutMapping[keycode];
 
                     int mednafenKey = mednafenKeyCodes[keycode];
-                    
-                    cfg[u + ".input.port" + v + "." + w + "." + x ] = "keyboard 0x0 " + mednafenKey;
+
+                    cfg[u + ".input.port" + v + "." + w + "." + x] = "keyboard 0x0 " + mednafenKey;
                 }
             };
 
@@ -459,7 +834,7 @@ namespace EmulatorLauncher
             }
 
             if (mednafenCore == "apple2")
-                    cfg[mednafenCore + ".input.port" + 2] = "paddle";
+                cfg[mednafenCore + ".input.port" + 2] = "paddle";
 
             else if (mednafenCore == "lynx")
             {
@@ -605,13 +980,72 @@ namespace EmulatorLauncher
                     noType = true;
 
                 if (mappingToUse.ContainsKey(mapping))
+                {
                     newmapping = mappingToUse[mapping];
+                }
 
                 if (!noType)
                     cfg[mednafenCore + ".input.port1"] = padType;
 
                 foreach (var entry in newmapping)
                     WriteKeyboardMapping(mednafenCore, 1, padType, entry.Key, entry.Value);
+            }
+
+            if (system == "segastv")
+            {
+                var coin = keyboard[InputKey.select];
+                if (coin != null)
+                {
+                    int id = (int)coin.Id;
+
+                    SDL.SDL_Keycode keycode = (SDL.SDL_Keycode)id;
+
+                    List<int> azertyLayouts = new List<int>() { 1036, 2060, 3084, 5132, 4108 };
+                    if (azertyLayouts.Contains(CultureInfo.CurrentCulture.KeyboardLayoutId) && azertyLayoutMapping.ContainsKey(keycode))
+                        keycode = azertyLayoutMapping[keycode];
+
+                    int mednafenKey = mednafenKeyCodes[keycode];
+
+                    cfg["command.insert_coin"] = "keyboard 0x0 " + mednafenKey;
+                }
+                else
+                    cfg["command.insert_coin"] = "keyboard 0x0 62"; //F5
+
+                var test = keyboard[InputKey.l3];
+                if (test != null)
+                {
+                    int id = (int)test.Id;
+
+                    SDL.SDL_Keycode keycode = (SDL.SDL_Keycode)id;
+
+                    List<int> azertyLayouts = new List<int>() { 1036, 2060, 3084, 5132, 4108 };
+                    if (azertyLayouts.Contains(CultureInfo.CurrentCulture.KeyboardLayoutId) && azertyLayoutMapping.ContainsKey(keycode))
+                        keycode = azertyLayoutMapping[keycode];
+
+                    int mednafenKey = mednafenKeyCodes[keycode];
+
+                    cfg["ss.input.builtin.builtin.stv_test"] = "keyboard 0x0 " + mednafenKey;
+                }
+                else
+                    cfg["ss.input.builtin.builtin.stv_test"] = "keyboard 0x0 65"; //F8
+
+                var service = keyboard[InputKey.r3];
+                if (service != null)
+                {
+                    int id = (int)service.Id;
+
+                    SDL.SDL_Keycode keycode = (SDL.SDL_Keycode)id;
+
+                    List<int> azertyLayouts = new List<int>() { 1036, 2060, 3084, 5132, 4108 };
+                    if (azertyLayouts.Contains(CultureInfo.CurrentCulture.KeyboardLayoutId) && azertyLayoutMapping.ContainsKey(keycode))
+                        keycode = azertyLayoutMapping[keycode];
+
+                    int mednafenKey = mednafenKeyCodes[keycode];
+
+                    cfg["ss.input.builtin.builtin.stv_service"] = "keyboard 0x0 " + mednafenKey;
+                }
+                else
+                    cfg["ss.input.builtin.builtin.stv_service"] = "keyboard 0x0 66";
             }
         }
         #endregion
@@ -730,12 +1164,12 @@ namespace EmulatorLauncher
 
         static readonly Dictionary<string, InputKey> nesgamepad = new Dictionary<string, InputKey>()
         {
-            { "a", InputKey.b },
-            { "b", InputKey.a },
+            { "a", InputKey.a },
+            { "b", InputKey.y },
             { "down", InputKey.down },
             { "left", InputKey.left },
-            { "rapid_a", InputKey.x },
-            { "rapid_b", InputKey.y },
+            { "rapid_a", InputKey.b },
+            { "rapid_b", InputKey.x },
             { "right", InputKey.right },
             { "select", InputKey.select },
             { "start", InputKey.start },
@@ -777,11 +1211,11 @@ namespace EmulatorLauncher
             { "down", InputKey.down },
             { "i", InputKey.b },
             { "ii", InputKey.a },
-            { "iii", InputKey.y },
-            { "iv", InputKey.x },
+            { "iii", InputKey.x },
+            { "iv", InputKey.y },
             { "left", InputKey.left },
-            { "mode1", InputKey.r2 },
-            { "mode2", InputKey.l2 },
+            { "mode1", InputKey.l2 },
+            { "mode2", InputKey.r2 },
             { "right", InputKey.right },
             { "run", InputKey.start },
             { "select", InputKey.select },
@@ -836,6 +1270,32 @@ namespace EmulatorLauncher
             { "up", InputKey.up }
         };
 
+        static readonly Dictionary<string, InputKey> psxdualshockgt = new Dictionary<string, InputKey>()
+        {
+            { "circle", InputKey.b },
+            { "cross", InputKey.a },
+            { "down", InputKey.down },
+            { "l1", InputKey.pageup },
+            { "l3", InputKey.l3 },
+            { "left", InputKey.left },
+            { "lstick_down", InputKey.leftanalogdown },
+            { "lstick_left", InputKey.leftanalogleft },
+            { "lstick_right", InputKey.leftanalogright },
+            { "lstick_up", InputKey.leftanalogup },
+            { "r1", InputKey.pagedown },
+            { "r3", InputKey.r3 },
+            { "right", InputKey.right },
+            { "rstick_down", InputKey.l2 },
+            { "rstick_left", InputKey.rightanalogleft },
+            { "rstick_right", InputKey.rightanalogright },
+            { "rstick_up", InputKey.r2 },
+            { "select", InputKey.select },
+            { "square", InputKey.y },
+            { "start", InputKey.start },
+            { "triangle", InputKey.x },
+            { "up", InputKey.up }
+        };
+
         static readonly Dictionary<string, InputKey> snesgamepad = new Dictionary<string, InputKey>()
         {
             { "a", InputKey.b },
@@ -856,8 +1316,8 @@ namespace EmulatorLauncher
 
         static readonly Dictionary<string, InputKey> ssgamepad = new Dictionary<string, InputKey>()
         {
-            { "a", InputKey.b },
-            { "b", InputKey.a },
+            { "a", InputKey.a },
+            { "b", InputKey.b },
             { "c", InputKey.pagedown },
             { "down", InputKey.down },
             { "left", InputKey.left },
@@ -866,8 +1326,8 @@ namespace EmulatorLauncher
             { "rs", InputKey.r2 },
             { "start", InputKey.start },
             { "up", InputKey.up },
-            { "x", InputKey.x },
-            { "y", InputKey.y },
+            { "x", InputKey.y },
+            { "y", InputKey.x },
             { "z", InputKey.pageup }
         };
 
@@ -1050,7 +1510,7 @@ namespace EmulatorLauncher
         #endregion
 
         #region Mapping link
-        static readonly Dictionary<string, Dictionary<string, InputKey> > mappingToUse = new Dictionary<string, Dictionary<string, InputKey>>()
+        static readonly Dictionary<string, Dictionary<string, InputKey>> mappingToUse = new Dictionary<string, Dictionary<string, InputKey>>()
         {
             { "apple2_gamepad", apple2gamepad },
             { "apple2_joystick", apple2joystick },
@@ -1065,6 +1525,7 @@ namespace EmulatorLauncher
             { "ss_gamepad", ssgamepad },
             { "psx_gamepad", psxgamepad },
             { "psx_dualshock", psxdualshock },
+            { "psx_dualshock_gtspecial", psxdualshockgt },
             { "wswan_gamepad", wswanhorizontal },
             { "wswan_gamepadraa", wswanvertical }
         };
@@ -1428,22 +1889,10 @@ namespace EmulatorLauncher
             { "ss", 12 }
         };
 
-        private string GetDinputMapping(SdlToDirectInput c, string buttonkey, int nbAxis)
+        private string GetDinputMapping(SdlToDirectInput c, string buttonkey, int nbAxis, bool hatfix)
         {
             if (c == null)
                 return "";
-
-            if (c.ButtonMappings == null)
-            {
-                SimpleLogger.Instance.Info("[INFO] No mapping found for the controller.");
-                return "";
-            }
-
-            if (!c.ButtonMappings.ContainsKey(buttonkey))
-            {
-                SimpleLogger.Instance.Info("[INFO] No mapping found for " + buttonkey + " in gamecontrollerdb file");
-                return "";
-            }
 
             int direction = 1;
 
@@ -1455,6 +1904,18 @@ namespace EmulatorLauncher
             else if (buttonkey.StartsWith("+"))
             {
                 buttonkey = buttonkey.Substring(1);
+            }
+
+            if (c.ButtonMappings == null)
+            {
+                SimpleLogger.Instance.Info("[INFO] No mapping found for the controller.");
+                return "";
+            }
+
+            if (!c.ButtonMappings.ContainsKey(buttonkey))
+            {
+                SimpleLogger.Instance.Info("[INFO] No mapping found for " + buttonkey + " in gamecontrollerdb file");
+                return "";
             }
 
             string button = c.ButtonMappings[buttonkey];
@@ -1472,13 +1933,25 @@ namespace EmulatorLauncher
                 switch (hatID)
                 {
                     case 1:
-                        return "abs_" + (nbAxis + 1) + "-";
+                        if (hatfix)
+                            return "abs_" + (nbAxis - 1) + "-";
+                        else
+                            return "abs_" + (nbAxis + 1) + "-";
                     case 2:
-                        return "abs_" + nbAxis + "+";
+                        if (hatfix)
+                            return "abs_" + (nbAxis - 2) + "+";
+                        else
+                            return "abs_" + nbAxis + "+";
                     case 4:
-                        return "abs_" + (nbAxis + 1) + "+";
+                        if (hatfix)
+                            return "abs_" + (nbAxis - 1) + "+";
+                        else
+                            return "abs_" + (nbAxis + 1) + "+";
                     case 8:
-                        return "abs_" + nbAxis + "-";
+                        if (hatfix)
+                            return "abs_" + (nbAxis - 2) + "-";
+                        else
+                            return "abs_" + nbAxis + "-";
                 }
             }
 
@@ -1507,5 +1980,127 @@ namespace EmulatorLauncher
 
             return "";
         }
+
+        private static Dictionary<string, InputKey> ConfigureMappingPerSystem(Dictionary<string, InputKey> mapping, string system, string padType, MednafenConfigFile cfg)
+        {
+            Dictionary<string, InputKey> newMapping = mapping;
+            if (system == "nes")
+            {
+                if (Program.SystemConfig.getOptBoolean("rotate_buttons"))
+                {
+                    newMapping["a"] = InputKey.b;
+                    newMapping["b"] = InputKey.a;
+                    newMapping["rapid_a"] = InputKey.x;
+                    newMapping["rapid_b"] = InputKey.y;
+                }
+                if (!Program.SystemConfig.getOptBoolean("nes_turbo_enable"))
+                {
+                    newMapping.Remove("rapid_a");
+                    newMapping.Remove("rapid_b");
+
+                    for (int i = 1; i <= 4; i++)
+                    {
+                        cfg["nes.input.port" + i + ".gamepad.rapid_a"] = "";
+                        cfg["nes.input.port" + i + ".gamepad.rapid_b"] = "";
+                    }
+                }
+            }
+            else if (system == "megadrive" && padType == "gamepad6")
+            {
+                if (Program.SystemConfig["megadrive_control_layout"] == "lr_zc")
+                {
+                    newMapping["a"] = InputKey.a;
+                    newMapping["b"] = InputKey.b;
+                    newMapping["c"] = InputKey.pagedown;
+                    newMapping["x"] = InputKey.y;
+                    newMapping["z"] = InputKey.pageup;
+                }
+                else if (Program.SystemConfig["megadrive_control_layout"] == "lr_yz")
+                {
+                    newMapping["x"] = InputKey.x;
+                    newMapping["y"] = InputKey.pageup;
+                }
+            }
+            else if (system == "mastersystem")
+            {
+                if (Program.SystemConfig.getOptBoolean("rotate_buttons"))
+                {
+                    newMapping["fire1"] = InputKey.y;
+                    newMapping["fire2"] = InputKey.a;
+                    newMapping["rapid_fire1"] = InputKey.x;
+                    newMapping["rapid_fire2"] = InputKey.b;
+                }
+            }
+            else if (system == "saturn")
+            {
+                bool switchTriggers = Program.SystemConfig.getOptBoolean("saturn_invert_triggers");
+                if (Program.SystemConfig.isOptSet("saturn_padlayout") && !string.IsNullOrEmpty(Program.SystemConfig["saturn_padlayout"]))
+                {
+                    switch (Program.SystemConfig["saturn_padlayout"])
+                    {
+                        case "lr_yz":
+                            if (switchTriggers)
+                            {
+                                newMapping["a"] = InputKey.y;
+                                newMapping["b"] = InputKey.a;
+                                newMapping["c"] = InputKey.b;
+                                newMapping["x"] = InputKey.x;
+                                newMapping["ls"] = InputKey.pageup;
+                                newMapping["rs"] = InputKey.pagedown;
+                                newMapping["y"] = InputKey.l2;
+                                newMapping["z"] = InputKey.r2;
+                                break;
+                            }
+                            else
+                            {
+                                newMapping["a"] = InputKey.y;
+                                newMapping["b"] = InputKey.a;
+                                newMapping["c"] = InputKey.b;
+                                newMapping["x"] = InputKey.x;
+                                newMapping["y"] = InputKey.pageup;
+                                newMapping["z"] = InputKey.pagedown;
+                                break;
+                            }
+                        case "lr_xz":
+                            if (switchTriggers)
+                            {
+                                newMapping["a"] = InputKey.y;
+                                newMapping["b"] = InputKey.a;
+                                newMapping["c"] = InputKey.b;
+                                newMapping["ls"] = InputKey.pageup;
+                                newMapping["rs"] = InputKey.pagedown;
+                                newMapping["x"] = InputKey.l2;
+                                newMapping["z"] = InputKey.r2;
+                                break;
+                            }
+                            else
+                            {
+                                newMapping["a"] = InputKey.y;
+                                newMapping["b"] = InputKey.a;
+                                newMapping["c"] = InputKey.b;
+                                newMapping["x"] = InputKey.pageup;
+                                newMapping["z"] = InputKey.pagedown;
+                                break;
+                            }
+                        case "lr_zc":
+                            if (switchTriggers)
+                            {
+                                newMapping["ls"] = InputKey.pageup;
+                                newMapping["rs"] = InputKey.pagedown;
+                                newMapping["z"] = InputKey.l2;
+                                newMapping["c"] = InputKey.r2;
+                                break;
+                            }
+                            break;
+                    }
+                }
+            }
+            return newMapping;
+        }
+
+        private static readonly List<USB_PRODUCT> hatFix = new List<USB_PRODUCT>
+        {
+            USB_PRODUCT.NINTENDO_SWITCH_PRO
+        };
     }
 }

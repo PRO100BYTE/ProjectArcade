@@ -79,3 +79,13 @@
 - Update of the emulatorLauncher
 - Updating emulators
 - Adding ArcadeGUI, a user-friendly interface for managing ProjectArcade configuration
+
+**ProjectArcade 1.6.0**
+- Minor bug fixes
+- Update the emulatorLauncher
+- Update the emulators
+- Adding ArcadeGUI, a user-friendly interface for managing ProjectArcade configuration
+- Adding new boot animations
+- Adding new background music
+- Adding new frames for emulators
+and much, much more :)

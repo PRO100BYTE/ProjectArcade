@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.Common.Joysticks;
+using System.Globalization;
 
 namespace EmulatorLauncher
 {
@@ -38,6 +40,8 @@ namespace EmulatorLauncher
         {
             if (Program.SystemConfig.isOptSet("disableautocontrollers") && Program.SystemConfig["disableautocontrollers"] == "1")
                 return;
+
+            SimpleLogger.Instance.Info("[INFO] Creating controller configuration for Suyu");
 
             UpdateSdlControllersWithHints(ini);
 
@@ -91,6 +95,10 @@ namespace EmulatorLauncher
             }
 
             var suyuGuid = guid.ToString().ToLowerInvariant();
+            string newGuidPath = Path.Combine(AppConfig.GetFullPath("tools"), "controllerinfo.yml");
+            string newGuid = SdlJoystickGuid.GetGuidFromFile(newGuidPath, controller.Guid, "suyu");
+            if (newGuid != null)
+                suyuGuid = newGuid;
 
             int index = Program.Controllers
                     .GroupBy(c => c.Guid.ToLowerInvariant())
@@ -263,6 +271,8 @@ namespace EmulatorLauncher
 
             ProcessStick(controller, player, "lstick", ini, suyuGuid, index);
             ProcessStick(controller, player, "rstick", ini, suyuGuid, index);
+
+            SimpleLogger.Instance.Info("[INFO] Assigned controller " + controller.DevicePath + " to player : " + controller.PlayerIndex.ToString());
         }
 
         private string FromInput(Controller controller, Input input, string guid, int index)
@@ -298,6 +308,9 @@ namespace EmulatorLauncher
             var cfg = controller.Config;
 
             string name = player + stickName;
+            string deadzone = "0.15";
+            if (SystemConfig.isOptSet("suyu_deadzone") && !string.IsNullOrEmpty(SystemConfig["suyu_deadzone"]))
+                deadzone = (SystemConfig["suyu_deadzone"].ToDouble() / 100).ToString(CultureInfo.InvariantCulture);
 
             var leftVal = cfg[stickName == "lstick" ? InputKey.joystick1left : InputKey.joystick2left];
             var topVal = cfg[stickName == "lstick" ? InputKey.joystick1up : InputKey.joystick2up];
@@ -314,7 +327,7 @@ namespace EmulatorLauncher
                     suyutopval = 4;
                 }
 
-                string value = "engine:sdl," + "axis_x:" + suyuleftval + ",port:" + index + ",guid:" + guid + ",axis_y:" + suyutopval + ",deadzone:0.150000,range:1.000000";
+                string value = "engine:sdl," + "axis_x:" + suyuleftval + ",port:" + index + ",guid:" + guid + ",axis_y:" + suyutopval + ",deadzone:" + deadzone + ",range:1.000000";
 
                 ini.WriteValue("Controls", name + "\\default", "false");
                 ini.WriteValue("Controls", name, "\"" + value + "\"");

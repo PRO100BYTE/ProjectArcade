@@ -15,6 +15,8 @@ using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.Common.EmulationStation;
 using System.Runtime.InteropServices;
+using System.Xml.Linq;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace EmulatorLauncher
 {
@@ -80,7 +82,7 @@ namespace EmulatorLauncher
             { "VT3",                             @"Virtua Tennis 3\vt3_Lindbergh\vt3_Lindbergh_FULLHD" },
             { "VT4",                             @"Virtua Tennis 4 (Ring Edge)\VT4_RING_r.exe" },            
 
-            { "2Spicy",                          @"Too Spicy\elf\apacheM_HD.elf" },
+            //{ "2Spicy",                          @"Too Spicy\elf\apacheM_HD.elf" },
             { "abc",                             @"Afterburner Climax\abc 1080p" },
             { "AkaiKatanaShinNesica",            @"Akai Katana Shin for NesicaxLive\Game.exe" },
             { "AquapazzaAquaplusDreamMatch",     @"Aquapazza Aquaplus Dream Match for NesicaxLive\Game.exe" },
@@ -142,8 +144,6 @@ namespace EmulatorLauncher
             { "Tekken7",                         @"Tekken 7 Fated Retribution\TekkenGame\Binaries\Win64\TekkenGame-Win64-Shipping.exe" },
             { "Tekken7FR",                       @"Tekken7FR\TekkenGame\Binaries\Win64\TekkenGame-Win64-Shipping.exe" },
 
-            { "AliensExtermination",             @"aliens\DATA\aliens dehasped.exe" },
-
             { "KingofFightersSkyStage",          @"KOF SkyStage\Game.exe" },
             { "KingofFightersXII",               @"King of Fighters XII\game.exe" },
             { "KingofFightersXIII",              @"King of Fighters XIII\game.exe" },
@@ -155,6 +155,13 @@ namespace EmulatorLauncher
             { "KingofFighters98UltimateMatchFinalEditionNesica", @"The King of Fighters '98 Ultimate Match Final Edition for NesicaxLive\game.exe" },
             { "KingofFightersMaximumImpactRegulationA", @"King of Fighters Maximum Impact Regulation A\game.exe" },
 
+            { "BBBHome",                         @"Big Buck Hunter Pro Home\game" },
+            { "HOTDEX",                          @"House of The Dead EX\disk0\elf\hodexRI.elf" },
+            { "JurassicPark",                    @"Jurassic Park Arcade\Game" },
+            { "TargetTerrorGold",                @"Target Terror: Gold\game" },
+            { "HOTD4SP",                         @"House of The Dead 4: Special\disk0\hod4-sp\elf\hod4M.elf" },
+            { "TransformersShadowsRising",       @"Transformers: Shadows Rising\Sega\Transformers2\Transformers2.exe" },
+            { "AliensExtermination",             @"Aliens Extermination\aliens\DATA\aliens dehasped.exe" },
         };
 
         private string _exename;
@@ -199,8 +206,34 @@ namespace EmulatorLauncher
             
             if (userProfile.GamePath == null || !File.Exists(userProfile.GamePath))
             {
-                userProfile.GamePath = FindExecutable(rom, Path.GetFileNameWithoutExtension(userProfile.FileName));    
-            
+                if (userProfile.ExecutableName.Contains(";"))
+                {
+                    var split = userProfile.ExecutableName.Split(';');
+                    if (split.Length > 1)
+                        userProfile.ExecutableName = split[0];
+                }
+                
+                userProfile.GamePath = FindExecutable(rom, Path.GetFileNameWithoutExtension(userProfile.FileName));
+
+                if (userProfile.ExecutableName == "game")
+                {
+                    if (userProfile.EmulatorType != null)
+                    {
+                        string exeLoaderPath = Path.Combine(path, userProfile.EmulatorType);
+                        if (Directory.Exists(exeLoaderPath))
+                        {
+                            string[] exeFiles = Directory.GetFiles(exeLoaderPath, "*.exe");
+                            if (exeFiles.Length > 0)
+                                _exename = exeFiles[0];
+                        }
+                    }
+                }
+
+                if (userProfile.GamePath == null && userProfile.ExecutableName == "game")
+                {
+                    userProfile.GamePath = File.Exists(Path.Combine(rom, "game")) ? Path.Combine(rom, "game") : null;
+                }
+
                 if (userProfile.GamePath == null)
                     userProfile.GamePath = FindBestExecutable(rom, userProfile.ExecutableName);
 
@@ -208,6 +241,21 @@ namespace EmulatorLauncher
                 {
                     SimpleLogger.Instance.Error("[TeknoParrotGenerator] Unable to find Game executable for " + rom);
                     return new ProcessStartInfo() { FileName = "WARNING", Arguments = "Unable to find game executable" };
+                }
+            }
+
+            if (profile.ExecutableName2 != null)
+            {
+                if (userProfile.GamePath2 == null || !File.Exists(userProfile.GamePath2))
+                {
+                    if (userProfile.ExecutableName2.Contains(";"))
+                    {
+                        var split = userProfile.ExecutableName2.Split(';');
+                        if (split.Length > 1)
+                            userProfile.ExecutableName2 = split[0];
+                    }
+
+                    userProfile.GamePath2 = FindBestExecutable(rom, userProfile.ExecutableName2);
                 }
             }
 
@@ -255,7 +303,9 @@ namespace EmulatorLauncher
 
             string profileName = Path.GetFileName(userProfile.FileName);
 
-            _exename = Path.GetFileNameWithoutExtension(userProfile.GamePath);
+            if (_exename == null)
+                _exename = Path.GetFileNameWithoutExtension(userProfile.GamePath);
+            
             _gameProfile = userProfile;
 
             List<string> commandArray = new List<string>();
@@ -279,36 +329,73 @@ namespace EmulatorLauncher
             string parrotData = Path.Combine(path, "ParrotData.xml");
 
             ParrotData data = null;
+            XElement xdoc = null;
 
-            try { data = XmlExtensions.FromXml<ParrotData>(parrotData); }
-            catch { data = new ParrotData(); }
-
-            if (!data.SilentMode || data.ConfirmExit)
+            if (File.Exists(parrotData))
             {
-                data.SilentMode = true;
-                data.ConfirmExit = false; 
+                xdoc = XElement.Load(parrotData);
+
+                xdoc.SetElementValue("SilentMode", true);
+                xdoc.SetElementValue("ConfirmExit", false);
+                xdoc.SetElementValue("HideVanguardWarning", true);
+                xdoc.SetElementValue("DisableAnalytics", true);
+                xdoc.SetElementValue("HasReadPolicies", true);
+
+                if (Program.SystemConfig.isOptSet("tp_stooz") && !string.IsNullOrEmpty(Program.SystemConfig["tp_stooz"]))
+                {
+                    xdoc.SetElementValue("UseSto0ZDrivingHack", true);
+                    string stooz = Program.SystemConfig["tp_stooz"].ToIntegerString();
+                    xdoc.SetElementValue("StoozPercent", stooz.ToInteger());
+                }
+                else
+                {
+                    xdoc.SetElementValue("UseSto0ZDrivingHack", false);
+                    xdoc.SetElementValue("StoozPercent", 0);
+                }
+                
+                if (Program.SystemConfig.isOptSet("discord") && Program.SystemConfig.getOptBoolean("discord"))
+                    xdoc.SetElementValue("UseDiscordRPC", true);
+                else
+                    xdoc.SetElementValue("UseDiscordRPC", false);
+
+                xdoc.Save(parrotData);
             }
 
-            if (Program.SystemConfig.isOptSet("tp_stooz") && !string.IsNullOrEmpty(Program.SystemConfig["tp_stooz"]))
-            {
-                data.UseSto0ZDrivingHack = true;
-                data.StoozPercent = Program.SystemConfig["tp_stooz"].ToInteger();
-            }
             else
             {
-                data.UseSto0ZDrivingHack = false;
-                data.StoozPercent = 0;
-            }
-            
-            if (Program.SystemConfig.isOptSet("discord") && Program.SystemConfig.getOptBoolean("discord"))
-                data.UseDiscordRPC = true;
-            else
-                data.UseDiscordRPC = false;
+                data = new ParrotData();
 
-            File.WriteAllText(parrotData, data.ToXml());
+                if (!data.SilentMode || data.ConfirmExit)
+                {
+                    data.SilentMode = true;
+                    data.ConfirmExit = false;
+                }
+
+                if (Program.SystemConfig.isOptSet("tp_stooz") && !string.IsNullOrEmpty(Program.SystemConfig["tp_stooz"]))
+                {
+                    data.UseSto0ZDrivingHack = true;
+                    string stooz = Program.SystemConfig["tp_stooz"].ToIntegerString();
+                    data.StoozPercent = stooz.ToInteger();
+                }
+                else
+                {
+                    data.UseSto0ZDrivingHack = false;
+                    data.StoozPercent = 0;
+                }
+
+                if (Program.SystemConfig.isOptSet("discord") && Program.SystemConfig.getOptBoolean("discord"))
+                    data.UseDiscordRPC = true;
+                else
+                    data.UseDiscordRPC = false;
+
+                data.HideVanguardWarning = true;
+                data.DisableAnalytics = true;
+
+                File.WriteAllText(parrotData, data.ToXml());
+            }
         }
 
-        private static void ExtractUserProfiles(string path)
+        /*private static void ExtractUserProfiles(string path)
         {
 
             StringBuilder sb = new StringBuilder();
@@ -332,7 +419,7 @@ namespace EmulatorLauncher
             }
 
             var str = sb.ToString();
-        }
+        }*/
 
         // <string name="teknoparrot.disableautocontrollers" value="1" />
 
@@ -578,7 +665,19 @@ namespace EmulatorLauncher
 
         private static string FindBestExecutable(string path, string executableName, bool childs = true)
         {
-            foreach (var file in Directory.GetFiles(path, "*.exe"))
+            try
+            {
+                // Search for the file in the current directory and all subdirectories
+                foreach (string file in Directory.GetFiles(path, executableName, SearchOption.AllDirectories))
+                {
+                    return file;
+                }
+            }
+            catch { }
+
+            return null;
+
+            /*foreach (var file in Directory.GetFiles(path, "*.exe"))
             {
                 if (file.IndexOf("AmAut", StringComparison.InvariantCultureIgnoreCase) >= 0)
                     continue;
@@ -603,7 +702,7 @@ namespace EmulatorLauncher
                 }
             }
 
-            return null;
+            return null;*/
         }
 
         public override int RunAndWait(ProcessStartInfo path)
@@ -662,10 +761,13 @@ namespace EmulatorLauncher
             ConfirmExit = true;
             DownloadIcons = true;
             UiDisableHardwareAcceleration = false;
+            HideVanguardWarning = true;
 
             UiColour = "lightblue";
             UiDarkMode = false;
             UiHolidayThemes = true;
+            HasReadPolicies = true;
+            DisableAnalytics = true;
         }
 
         public bool UseSto0ZDrivingHack { get; set; }
@@ -687,13 +789,14 @@ namespace EmulatorLauncher
         public bool UseDiscordRPC { get; set; }
         public bool SilentMode { get; set; }
         public bool CheckForUpdates { get; set; }
-
         public bool ConfirmExit { get; set; }
         public bool DownloadIcons { get; set; }
         public bool UiDisableHardwareAcceleration { get; set; }
-
+        public bool HideVanguardWarning { get; set; }
         public string UiColour { get; set; }
         public bool UiDarkMode { get; set; }
         public bool UiHolidayThemes { get; set; }
+        public bool HasReadPolicies { get; set; }
+        public bool DisableAnalytics { get; set; }
     }
 }

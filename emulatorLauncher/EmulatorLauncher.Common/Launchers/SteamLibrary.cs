@@ -51,30 +51,54 @@ namespace EmulatorLauncher.Common.Launchers
         
         public static string GetSteamGameExecutableName(Uri uri)
         {
+            // Get Steam app ID from url
             string shorturl = uri.AbsolutePath.Substring(1);
+            int endurl = shorturl.IndexOf("%");
+            if (endurl == -1) // If there's no space, get until the end of the string
+                endurl = shorturl.Length;
+            shorturl = shorturl.Substring(0, endurl);
+            
+            if (!string.IsNullOrEmpty(shorturl))
+                SimpleLogger.Instance.Info("[INFO] STEAM appID: " + shorturl);
+            
             int steamAppId = shorturl.ToInteger();
+            ulong SteamAppIdLong = shorturl.ToUlong();
 
-            string exe = FindExecutableName(steamAppId);
+            // If app ID is too long, it's a non-Steam game : return
+            if (steamAppId == 0 && SteamAppIdLong == 0)
+            {
+                SimpleLogger.Instance.Info("[STEAM] Non-Steam game detected.");
+                return null;
+            }
+
+            // Call method to get executable name from Steam vdf files
+            string exe = FindExecutableName(steamAppId, SteamAppIdLong);
 
             if (string.IsNullOrEmpty(exe))
             {
-                SimpleLogger.Instance.Info("[WARNING] Cannot find STEAM game executable");
+                SimpleLogger.Instance.Info("[WARNING] Cannot find STEAM game executable in appinfo.vdf.");
                 return null;
             }
+            else
+                SimpleLogger.Instance.Info("[STEAM] STEAM game executable found: " + exe);
 
             return Path.GetFileNameWithoutExtension(exe);
         }
 
-        static string FindExecutableName(int steamAppId)
+        static string FindExecutableName(int steamAppId, ulong SteamAppIdLong = 1999999999999999999)
         {
+            // Get Steam installation path in registry
             string path = GetInstallPath();
             if (string.IsNullOrEmpty(path))
                 throw new ApplicationException("Can not find Steam installation folder in registry.");
             
             string appinfoPath = Path.Combine(path, "appcache", "appinfo.vdf");
+
             if (!File.Exists(appinfoPath))
                 SimpleLogger.Instance.Info("[WARNING] Missing file " + appinfoPath);
 
+            // Try to get executable by deserializing vdf file
+            // Broken since july 2024 - returns error
             try
             {
                 var reader = new SteamAppInfoReader();
@@ -83,6 +107,8 @@ namespace EmulatorLauncher.Common.Launchers
                 SimpleLogger.Instance.Info("[INFO] Reading Steam file 'appinfo.vdf'");
 
                 var app = reader.Apps.FirstOrDefault(a => a.AppID == steamAppId);
+                if (app == null || steamAppId == 0)
+                    app = reader.Apps.FirstOrDefault(a => a.AppID == SteamAppIdLong);
                 if (app == null)
                     return null;
 
@@ -126,7 +152,60 @@ namespace EmulatorLauncher.Common.Launchers
                     SimpleLogger.Instance.Info("[WARNING] No game executable found, cannot put ES in Wait-mode.");
                 }
             }
-            catch { }
+            catch
+            {
+                SimpleLogger.Instance.Info("[WARNING] Impossible to read SteamAppInfo.");
+            }
+
+            // Try brutal method to look for the app ID and retrieve the first .exe that follows in the vdf file
+            try
+            {
+                SimpleLogger.Instance.Info("[INFO] Searching executable in Steam file 'appinfo.vdf' : alternative method");
+                string appInfo = File.ReadAllText(appinfoPath);
+                int index = appInfo.IndexOf(steamAppId.ToString());
+                if (steamAppId == 0)
+                    index = appInfo.IndexOf(SteamAppIdLong.ToString());
+
+                if (index != -1)
+                {
+                    SimpleLogger.Instance.Info("[INFO] Found Game \"" + steamAppId + "\" in 'appinfo.vdf'");
+                    string substringToSearch = appInfo.Substring(index);
+
+                    int exeIndex = substringToSearch.IndexOf(".exe");
+
+                    if (exeIndex != -1)
+                    {
+                        int actualExeIndex = index + exeIndex;
+
+                        // Restrict the search to the substring between the app ID and the .exe
+                        int sectionStart = index;
+                        int sectionEnd = actualExeIndex;
+                        if (sectionEnd != -1)
+                        {
+                            string restrictedContent = appInfo.Substring(sectionStart, sectionEnd - sectionStart);
+
+                            if (restrictedContent != null)
+                            {
+                                int nullIndex = restrictedContent.LastIndexOf('\0');
+                                if (nullIndex != -1)
+                                {
+                                    string steamExeName = restrictedContent.Substring(nullIndex + 1);
+
+                                    if (steamExeName != null)
+                                    {
+                                        SimpleLogger.Instance.Info("[INFO] Game executable " + steamExeName + " found (alternative method).");
+                                        return steamExeName;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch 
+            {
+                SimpleLogger.Instance.Info("[WARNING] Impossible to find Steam executable name : consider .gameexe method.");
+            }
 
             return null;
         }
@@ -237,7 +316,11 @@ namespace EmulatorLauncher.Common.Launchers
             return dbs;
         }
 
-        static string GetInstallPath()
+        /// <summary>
+        /// Get Steam installation path in registry
+        /// </summary>
+        /// <returns>Steam install path</returns>
+        public static string GetInstallPath()
         {
             try
             {

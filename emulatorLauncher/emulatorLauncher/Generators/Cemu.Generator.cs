@@ -18,14 +18,30 @@ namespace EmulatorLauncher
 
         private SdlVersion _sdlVersion = SdlVersion.SDL2_0_X;
         private string _sdl2dll;
+        private bool _cemu21;
+        private bool _gameProfileRename = false;
+        private string _gameProfilePath;
 
         public override System.Diagnostics.ProcessStartInfo Generate(string system, string emulator, string core, string rom, string playersControllers, ScreenResolution resolution)
         {
-            string path = AppConfig.GetFullPath("cemu");
+            SimpleLogger.Instance.Info("[Generator] Getting " + emulator + " path and executable name.");
 
-            string exe = Path.Combine(path, "cemu.exe");
+            string path = AppConfig.GetFullPath("cemu");
+            if (string.IsNullOrEmpty(path))
+                return null;
+
+            string exe = Path.Combine(path, "Cemu.exe");
             if (!File.Exists(exe))
                 return null;
+
+            // Create portable directory if it does not exist
+            string portablePath = Path.Combine(path, "portable");
+            if (!Directory.Exists(portablePath))
+                try { Directory.CreateDirectory(portablePath); }
+                catch { }
+
+            var versionInfo = FileVersionInfo.GetVersionInfo(exe);
+            _cemu21 = versionInfo.ProductMajorPart >= 2 && versionInfo.ProductMinorPart >= 1;
 
             rom = TryUnZipGameIfNeeded(system, rom);
 
@@ -59,6 +75,29 @@ namespace EmulatorLauncher
 
             //settings
             SetupConfiguration(path, rom, fullscreen);
+
+            // Try and rename gameprofiles folder to not mess with RetroBat
+            try
+            {
+                _gameProfilePath = Path.Combine(portablePath, "gameProfiles");
+                if (Directory.Exists(_gameProfilePath))
+                {
+                    try
+                    {
+                        Directory.Move(_gameProfilePath, _gameProfilePath + ".old");
+                        _gameProfileRename = true;
+                        SimpleLogger.Instance.Info("[GENERATOR] Renaming temporarely gameprofiles folder.");
+                    }
+                    catch 
+                    {
+                        SimpleLogger.Instance.Info("[GENERATOR] Impossible to rename gameprofiles folder, RetroBat options might not work.");
+                    }
+                }
+            } 
+            catch 
+            {
+                SimpleLogger.Instance.Info("[GENERATOR] Impossible to rename gameprofiles folder, RetroBat options might not work.");
+            }
 
             //controller configuration
             CreateControllerConfiguration(path);
@@ -137,7 +176,14 @@ namespace EmulatorLauncher
         {
             string settingsFile = Path.Combine(path, "settings.xml");
 
+            if (_cemu21)
+                settingsFile = Path.Combine(path, "portable", "settings.xml");
+
             var xdoc = File.Exists(settingsFile) ? XElement.Load(settingsFile) : new XElement("content");
+
+            string mlcPath = Path.Combine(AppConfig.GetFullPath("saves"), "wiiu", "cemu", "mlc01");
+            if (Directory.Exists(mlcPath))
+                xdoc.SetElementValue("mlc_path", mlcPath.Replace("\\", "/"));
 
             if (SystemConfig.isOptSet("discord") && SystemConfig.getOptBoolean("discord"))
                 xdoc.SetElementValue("use_discord_presence", "true");
@@ -152,10 +198,17 @@ namespace EmulatorLauncher
 
             // Graphic part of settings file
             var graphic = xdoc.GetOrCreateElement("Graphic");
-            BindFeature(graphic, "VSync", "VSync", "1"); // VSYNC (true or false)
+            BindFeature(graphic, "VSync", "cemu_vsync", "1");
+            
+            if (SystemConfig["video_renderer"] == "0" && SystemConfig.isOptSet("cemu_vsync") && (SystemConfig["cemu_vsync"] == "2" || SystemConfig["cemu_vsync"] == "3"))
+                graphic.SetElementValue("VSync", "1");
+
             BindFeature(graphic, "api", "video_renderer", "1"); // Graphic driver (0 for OpenGL / 1 for Vulkan)
-            BindFeature(graphic, "AsyncCompile", "async_texture", SystemConfig["video_renderer"] != "0" ? "true" : "false"); // Async shader compilation (only if vulkan - true or false)
-            BindFeature(graphic, "GX2DrawdoneSync", "accurate_sync", "true"); // Full sync at GX2DrawDone (only if opengl - true or false)
+            BindBoolFeature(graphic, "AsyncCompile", "async_texture", "true", "false"); // Async shader compilation (only if vulkan - true or false)
+            if (!SystemConfig.isOptSet("async_texture") && SystemConfig["video_renderer"] == "1")
+                graphic.SetElementValue("AsyncCompile", "true");
+
+            BindBoolFeatureOn(graphic, "GX2DrawdoneSync", "accurate_sync", "true", "false"); // Full sync at GX2DrawDone (only if opengl - true or false)
             BindFeature(graphic, "UpscaleFilter", "upscaleFilter", "1"); // Upscale filter (0 to 3)
             BindFeature(graphic, "DownscaleFilter", "downscaleFilter", "0"); // Downscale filter (0 to 3)
             BindFeature(graphic, "FullscreenScaling", "stretch", "0"); // Fullscreen scaling (0 = keep aspect ratio / 1 = stretch)
@@ -214,6 +267,38 @@ namespace EmulatorLauncher
 
             AddPathToGamePaths(Path.GetFullPath(Path.GetDirectoryName(rom)), xdoc);
 
+            /* Add known graphic packs patches
+            var graphicPack = xdoc.Element("GraphicPack");
+            bool graphicPackExists = true;
+            if (graphicPack == null)
+            {
+                graphicPack = new XElement("GraphicPack");
+                graphicPackExists = false;
+            }
+
+            string graphicpackDB = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "cemuGraphicPacks.txt");
+
+            if (File.Exists(graphicpackDB))
+            {
+                string[] patches = File.ReadAllLines(graphicpackDB);
+
+                if (patches.Length > 0)
+                {
+                    foreach (var patch in patches)
+                    {
+                        if (!graphicPack.Elements("Entry").Any(entry => entry.Attribute("filename")?.Value == patch))
+                        {
+                            XElement entry = new XElement("Entry");
+                            entry.SetAttributeValue("filename", patch);
+                            graphicPack.Add(entry);
+                        }
+                    }
+                }
+            }
+
+            if (!graphicPackExists)
+                xdoc.Add(graphicPack);*/
+
             // Save xml file
             xdoc.Save(settingsFile);
         }
@@ -227,6 +312,35 @@ namespace EmulatorLauncher
             var paths = gamePaths.Elements("Entry").Select(e => e.Value).Where(e => !string.IsNullOrEmpty(e)).Select(e => Path.GetFullPath(e)).ToList();
             if (!paths.Contains(romPath))
                 gamePaths.Add(new XElement("Entry", romPath));
+        }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+
+            try
+            {
+                if (_gameProfileRename)
+                {
+                    string oldPath = _gameProfilePath + ".old";
+                    if (Directory.Exists(_gameProfilePath))
+                    {
+                        try { Directory.Delete(_gameProfilePath, true); }
+                        catch { }
+                    }
+                    
+                    if (Directory.Exists(oldPath) && !Directory.Exists(_gameProfilePath))
+                    {
+                        try 
+                        { 
+                            Directory.Move(oldPath, _gameProfilePath);
+                            SimpleLogger.Instance.Info("[GENERATOR] Resetting gameprofiles folder.");
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch { }
         }
     }
 }
